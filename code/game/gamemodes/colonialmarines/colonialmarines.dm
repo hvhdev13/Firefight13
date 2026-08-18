@@ -22,6 +22,7 @@
 	corpses_to_spawn = 0
 	flags_round_type = MODE_INFESTATION|MODE_FOG_ACTIVATED|MODE_NEW_SPAWN
 	static_comms_amount = 2
+	votable = FALSE
 	var/round_status_flags
 	var/next_stat_check = 0
 	var/list/running_round_stats = list()

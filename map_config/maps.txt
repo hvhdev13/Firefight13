@@ -13,7 +13,6 @@ Format:
 endmap
 
 map lv624
-	default
 endmap
 
 map bigredv2
@@ -24,7 +23,7 @@ map prison_station_fop
 endmap
 
 map fiorina_sciannex
-	minplayers 130
+	minplayers 0
 endmap
 
 map corsat
@@ -34,7 +33,7 @@ map corsat
 endmap
 
 map desert_dam
-	minplayers 130
+	minplayers 0
 endmap
 
 map ice_colony_v2
@@ -50,25 +49,29 @@ map kutjevo
 endmap
 
 map sorokyne_strata
-	minplayers 110
+	minplayers 0
 endmap
 
 map lv522_chances_claim
 endmap
 
 map lv759_hybrisa_prospera
-	minplayers 130
+	minplayers 0
 endmap
 
 map new_varadero
+	default
 endmap
 
 map tyrargo_rift
 	minplayers 100
+	disabled
 endmap
 
 map white_antre_research_facility
+	disabled
 endmap
 
 map whiskey_outpost_v2
+	disabled
 endmap
