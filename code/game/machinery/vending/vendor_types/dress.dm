@@ -89,7 +89,7 @@
 		vended_items = id_card.vended_items
 
 	var/list/data = list()
-	var/list/ui_listed_products = get_listed_products(user)
+	var/list/ui_listed_products = get_available_products(user)
 	var/list/stock_values = list()
 	for (var/i in 1 to length(ui_listed_products))
 		var/prod_available = TRUE
@@ -115,7 +115,7 @@
 			var/exploiting = TRUE
 			var/idx=params["prod_index"]
 
-			var/list/topic_listed_products = get_listed_products(usr)
+			var/list/topic_listed_products = get_available_products(usr)
 			var/list/L = topic_listed_products[idx]
 
 			var/item_path = L[3]

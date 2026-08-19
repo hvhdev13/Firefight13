@@ -72,7 +72,7 @@ IN_USE used for vending/denying
 
 /obj/structure/machinery/cm_vending/Initialize()
 	. = ..()
-	cm_build_inventory(get_listed_products(), 1, 3)
+	cm_build_inventory(get_available_products(), 1, 3)
 
 /obj/structure/machinery/cm_vending/update_icon()
 	//restoring sprite to initial
@@ -191,7 +191,7 @@ GLOBAL_LIST_EMPTY(vending_products)
 	var/datum/item_to_multiple_box_pairing/item_to_box_mapping = GLOB.item_to_box_mapping.get_item_to_box_mapping(base_ammo_item[3])
 	if(!item_to_box_mapping)
 		return
-	var/list/topic_listed_products = get_listed_products(usr)
+	var/list/topic_listed_products = get_available_products(usr)
 	for(var/datum/item_box_pairing/item_box_pairing as anything in item_to_box_mapping.item_box_pairings)
 		for(var/list/product in topic_listed_products)
 			if(product[3] == item_box_pairing.box)
@@ -205,7 +205,7 @@ GLOBAL_LIST_EMPTY(vending_products)
 		return
 	//Item is a vented box, update base ammo count
 	//and then update all the relevant boxes based on the new item count by calling this function again with the ammo parameter
-	var/list/topic_listed_products = get_listed_products(usr)
+	var/list/topic_listed_products = get_available_products(usr)
 	for(var/list/product in topic_listed_products)
 		if(product[3] == item_box_pairing.item)
 			if(add_box)
@@ -506,7 +506,7 @@ GLOBAL_LIST_EMPTY(vending_products)
 		return vendor_inventory_ui_data(user)
 
 	. = list()
-	var/list/ui_listed_products = get_listed_products(user)
+	var/list/ui_listed_products = get_available_products(user)
 	// list format
 	// (
 	// name: str
@@ -562,7 +562,7 @@ GLOBAL_LIST_EMPTY(vending_products)
 				return TRUE
 
 			var/index=params["prod_index"]
-			var/list/topic_listed_products = get_listed_products(user)
+			var/list/topic_listed_products = get_available_products(user)
 			var/list/itemspec = topic_listed_products[index]
 
 			var/turf/target_turf = get_appropriate_vend_turf(user)
@@ -800,10 +800,14 @@ GLOBAL_LIST_EMPTY(vending_products)
 	. = ..()
 
 /obj/structure/machinery/cm_vending/proc/get_listed_products(mob/user)
+	return listed_products
+
+/obj/structure/machinery/cm_vending/proc/get_available_products(mob/user)
+	var/list/products = get_listed_products(user)
 	if(!SSticker.mode || !MODE_HAS_FLAG(MODE_FACTION_CLASH))
-		return listed_products
+		return products
 	var/list/available = list()
-	for(var/list/product in listed_products)
+	for(var/list/product in products)
 		if(length(product) >= 3 && GLOB.faction_clash_restricted_items[product[3]])
 			continue
 		available += list(product)
@@ -934,7 +938,7 @@ GLOBAL_LIST_EMPTY(vending_products)
 /obj/structure/machinery/cm_vending/sorted/Initialize()
 	. = ..()
 	populate_product_list_and_boxes(1.2)
-	cm_build_inventory(get_listed_products(), 1, 3)
+	cm_build_inventory(get_available_products(), 1, 3)
 	corresponding_types_list = GLOB.cm_vending_gear_corresponding_types_list
 	GLOB.cm_vending_vendors += src
 
@@ -1085,7 +1089,7 @@ GLOBAL_LIST_EMPTY(vending_products)
 	if(istype(item_to_stock, /obj/item/storage) && !istype(item_to_stock, /obj/item/storage/pill_bottle))
 		return FALSE
 
-	var/list/stock_listed_products = get_listed_products(user)
+	var/list/stock_listed_products = get_available_products(user)
 	for(var/list/vendspec as anything in stock_listed_products)
 		if(item_to_stock.type == vendspec[3])
 
@@ -1333,7 +1337,7 @@ GLOBAL_LIST_INIT(cm_vending_gear_corresponding_types_list, list(
 	// allowed to buy flag
 	// item priority (mandatory/recommended/regular)
 	// )
-	var/list/ui_listed_products = get_listed_products(user)
+	var/list/ui_listed_products = get_available_products(user)
 
 	for (var/i in 1 to length(ui_listed_products))
 		var/list/myprod = ui_listed_products[i] //we take one list from listed_products
@@ -1381,7 +1385,7 @@ GLOBAL_LIST_INIT(cm_vending_gear_corresponding_types_list, list(
 
 /obj/structure/machinery/cm_vending/proc/vendor_inventory_ui_data(mob/user)
 	. = list()
-	var/list/products = get_listed_products(user)
+	var/list/products = get_available_products(user)
 	var/list/product_amounts = list()
 	var/list/product_partials = list()
 
@@ -1506,7 +1510,7 @@ GLOBAL_LIST_INIT(cm_vending_gear_corresponding_types_list, list(
 // Unload ALL the items throwing them around randomly, optionally destroying the vendor
 /obj/structure/machinery/cm_vending/proc/catastrophic_failure(throw_objects = TRUE, destroy = FALSE)
 	stat |= IN_USE
-	var/list/products = get_listed_products()
+	var/list/products = get_available_products()
 	var/i = 1
 	while(i <= length(products))
 		sleep(0.5)
