@@ -800,7 +800,14 @@ GLOBAL_LIST_EMPTY(vending_products)
 	. = ..()
 
 /obj/structure/machinery/cm_vending/proc/get_listed_products(mob/user)
-	return listed_products
+	if(!SSticker.mode || !MODE_HAS_FLAG(MODE_FACTION_CLASH))
+		return listed_products
+	var/list/available = list()
+	for(var/list/product in listed_products)
+		if(length(product) >= 3 && GLOB.faction_clash_restricted_items[product[3]])
+			continue
+		available += list(product)
+	return available
 
 /obj/structure/machinery/cm_vending/proc/can_access_to_vend(mob/user, display = TRUE, ignore_hack = FALSE)
 	if(HAS_TRAIT(user, TRAIT_OPPOSABLE_THUMBS)) // We're just going to skip the mess of access checks assuming xenos with thumbs are human and just allow them to access because it's funny

@@ -1,5 +1,6 @@
 /datum/ammo
 	var/name = "generic bullet"
+	var/faction_clash_applied = FALSE
 	//Icon state when a human is permanently killed with it by execution/suicide.
 	var/headshot_state = null
 	var/icon = 'icons/obj/items/weapons/projectiles.dmi'
@@ -119,7 +120,11 @@
 	smoke.start()
 
 /datum/ammo/proc/setup_faction_clash_values()
-	accuracy = (accuracy - 85)/2
+	if(faction_clash_applied)
+		return
+	faction_clash_applied = TRUE
+	damage = damage * DAMAGE_MULT
+	accuracy = (accuracy - 85)/3
 	penetration = min(penetration, 30) //more ap overpenatrates anyway but makes next calculation cleaner
 	accurate_range = min(accurate_range, 10 - penetration/5) //this makes AP ammo better at clsoe range (and techinicly super far range when the hitchance gets bottom caped at 5% hitchance)
 

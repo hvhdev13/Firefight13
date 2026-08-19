@@ -704,6 +704,11 @@
 		else if(traveled_in_open == traveled_in_closed)
 			effective_accuracy *= 0.5
 
+	if(SSticker.mode && MODE_HAS_FLAG(MODE_FACTION_CLASH))
+		if(effective_accuracy > ACCURACY_COMPRESSION_KNEE)
+			effective_accuracy = ACCURACY_COMPRESSION_KNEE + (effective_accuracy - ACCURACY_COMPRESSION_KNEE) * ACCURACY_COMPRESSION_SLOPE
+		effective_accuracy = min(effective_accuracy, ACCURACY_CEILING)
+
 	#if DEBUG_HIT_CHANCE
 	to_world(SPAN_DEBUG("Final accuracy is <b>[effective_accuracy]</b> (open: [traveled_in_open] closed: [traveled_in_closed])"))
 	var/turf/fire_turf = get_turf(firer)

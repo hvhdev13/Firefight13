@@ -10,6 +10,7 @@
 		/datum/gamemode_modifier/defib_past_armor,
 		/datum/gamemode_modifier/disable_combat_cas,
 		/datum/gamemode_modifier/disable_ib,
+		/datum/gamemode_modifier/disable_mortar,
 		/datum/gamemode_modifier/disable_ob,
 		/datum/gamemode_modifier/disable_attacking_corpses,
 		/datum/gamemode_modifier/disable_long_range_sentry,

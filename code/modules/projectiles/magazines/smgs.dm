@@ -19,7 +19,7 @@
 	icon = 'icons/obj/items/weapons/guns/ammo_by_faction/USCM/smgs.dmi'
 	icon_state = "m39_HV"
 	bonus_overlay_icon = 'icons/obj/items/weapons/guns/guns_by_faction/USCM/smgs.dmi'
-	max_rounds = 48
+	max_rounds = 55
 	w_class = SIZE_MEDIUM
 	gun_type = /obj/item/weapon/gun/smg/m39
 	default_ammo = /datum/ammo/bullet/smg/m39
@@ -190,7 +190,7 @@
 	caliber = "7.62x19mm"
 	icon = 'icons/obj/items/weapons/guns/ammo_by_faction/UPP/smgs.dmi'
 	icon_state = "type64mag"
-	max_rounds = 64
+	max_rounds = 50
 	gun_type = /obj/item/weapon/gun/smg/bizon
 
 //-------------------------------------------------------

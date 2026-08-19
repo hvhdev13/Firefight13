@@ -122,6 +122,10 @@ As such, don't expect any values assigned to common firearms to even consider ho
 */
 
 #define BASE_BULLET_DAMAGE_MULT 1
+#define DAMAGE_MULT 0.60
+#define ACCURACY_COMPRESSION_KNEE 78
+#define ACCURACY_COMPRESSION_SLOPE 0.22
+#define ACCURACY_CEILING 95
 #define BULLET_DAMAGE_MULT_TIER_1 0.05
 #define BULLET_DAMAGE_MULT_TIER_2 0.10
 #define BULLET_DAMAGE_MULT_TIER_3 0.15

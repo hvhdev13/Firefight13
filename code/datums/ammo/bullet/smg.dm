@@ -13,7 +13,7 @@
 
 /datum/ammo/bullet/smg
 	name = "submachinegun bullet"
-	damage = 34
+	damage = 37
 	accurate_range = 4
 	effective_range_max = 4
 	penetration = ARMOR_PENETRATION_TIER_1
@@ -24,6 +24,8 @@
 
 /datum/ammo/bullet/smg/m39
 	name = "high-velocity submachinegun bullet" //i don't want all smgs to inherit 'high velocity'
+
+	damage = 43
 
 /datum/ammo/bullet/smg/ap
 	name = "armor-piercing submachinegun bullet"

@@ -17,7 +17,7 @@
 		)
 	w_class = SIZE_MEDIUM
 	default_ammo = /datum/ammo/bullet/rifle
-	max_rounds = 40
+	max_rounds = 45
 	gun_type = /obj/item/weapon/gun/rifle/m41a
 	ammo_band_icon = "+m41a_band"
 	ammo_band_icon_empty = "+m41a_band_e"
@@ -134,8 +134,8 @@
 	desc = "A magazine of 10x24mm rounds for use in the M4RA battle rifle."
 	icon = 'icons/obj/items/weapons/guns/ammo_by_faction/USCM/marksman_rifles.dmi'
 	icon_state = "m4ra"
-	default_ammo = /datum/ammo/bullet/rifle
-	max_rounds = 25
+	default_ammo = /datum/ammo/bullet/rifle/marksman
+	max_rounds = 15
 	gun_type = /obj/item/weapon/gun/rifle/m4ra
 	bonus_overlay_icon = 'icons/obj/items/weapons/guns/guns_by_faction/USCM/marksman_rifles.dmi'
 	ammo_band_icon = "+m4ra_band"
@@ -346,8 +346,14 @@
 	ammo_band_icon = "+type71_band"
 	ammo_band_icon_empty = "+type71_band_e"
 	default_ammo = /datum/ammo/bullet/rifle/type71
-	max_rounds = 60
+	max_rounds = 35
 	gun_type = /obj/item/weapon/gun/rifle/type71
+
+/obj/item/ammo_magazine/rifle/type71/carbine
+	name = "\improper Type 71 carbine magazine (5.45x39mm)"
+	desc = "A 5.45x39mm casket magazine for the Type 71 carbine."
+	max_rounds = 45
+	gun_type = /obj/item/weapon/gun/rifle/type71/carbine
 
 /obj/item/ammo_magazine/rifle/type71/ap
 	name = "\improper Type 71 AP magazine (5.45x39mm)"

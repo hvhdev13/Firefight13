@@ -8,7 +8,7 @@
 	name = "rifle bullet"
 	headshot_state = HEADSHOT_OVERLAY_MEDIUM
 
-	damage = 40
+	damage = 50
 	penetration = ARMOR_PENETRATION_TIER_1
 	accurate_range = 16
 	accuracy = HIT_ACCURACY_TIER_4
@@ -17,6 +17,11 @@
 	effective_range_max = 7
 	damage_falloff = DAMAGE_FALLOFF_TIER_7
 	max_range = 24 //So S8 users don't have their bullets magically disappaer at 22 tiles (S8 can see 24 tiles)
+
+/datum/ammo/bullet/rifle/marksman
+	name = "marksman rifle bullet"
+
+	damage = 55
 
 /datum/ammo/bullet/rifle/holo_target
 	name = "holo-targeting rifle bullet"
@@ -228,7 +233,7 @@
 /datum/ammo/bullet/rifle/type71
 	name = "heavy rifle bullet"
 
-	damage = 55
+	damage = 63
 	penetration = ARMOR_PENETRATION_TIER_3
 
 /datum/ammo/bullet/rifle/type71/setup_faction_clash_values()

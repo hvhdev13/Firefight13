@@ -394,6 +394,9 @@
 		if(busy)
 			to_chat(user, SPAN_WARNING("Someone else is currently using [src]."))
 			return
+		if(MODE_HAS_MODIFIER(/datum/gamemode_modifier/disable_mortar))
+			to_chat(user, SPAN_WARNING("[src] has been decommissioned and cannot be fired."))
+			return
 		if(!ship_side)
 			if(targ_x == 0 && targ_y == 0 && targ_z == 0 && !lase_mode) //Mortar wasn't set
 				to_chat(user, SPAN_WARNING("[src] needs to be aimed first."))

@@ -112,6 +112,7 @@ GLOBAL_VAR_INIT(cas_tracking_id_increment, 0) //this var used to assign unique t
 	SEND_GLOBAL_SIGNAL(COMSIG_GLOB_MODE_POSTSETUP)
 	addtimer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(display_roundstart_logout_report)), ROUNDSTART_LOGOUT_REPORT_TIME)
 	adjust_ammo_values()
+	restrict_faction_clash_supply()
 	round_time_lobby = world.time
 	log_game("Round started at [time2text(world.realtime)]")
 	log_game("Operation time at round start is [worldtime2text()]")
@@ -120,10 +121,34 @@ GLOBAL_VAR_INIT(cas_tracking_id_increment, 0) //this var used to assign unique t
 	log_game("Server IP: [world.internet_address]:[world.port]")
 	return TRUE
 
+GLOBAL_LIST_INIT(faction_clash_restricted_items, typecacheof(list(
+	/obj/item/mortar_kit,
+	/obj/item/mortar_shell,
+	/obj/item/storage/backpack/marine/mortarpack,
+	/obj/item/storage/belt/gun/mortarbelt,
+	/obj/item/ammo_magazine/pistol/ap,
+	/obj/item/ammo_magazine/rifle/ap,
+	/obj/item/ammo_magazine/rifle/m41aMK1/ap,
+	/obj/item/ammo_magazine/rifle/m4ra/ap,
+	/obj/item/ammo_magazine/rifle/type71/ap,
+	/obj/item/ammo_magazine/rocket/ap,
+	/obj/item/ammo_magazine/smg/m39/ap,
+)))
+
 /datum/game_mode/proc/adjust_ammo_values()
 	if(MODE_HAS_FLAG(MODE_FACTION_CLASH))
 		for(var/ammo in GLOB.ammo_list)
 			GLOB.ammo_list[ammo].setup_faction_clash_values()
+
+/datum/game_mode/proc/restrict_faction_clash_supply()
+	if(!MODE_HAS_FLAG(MODE_FACTION_CLASH))
+		return
+	for(var/pack_type in GLOB.supply_packs_datums)
+		var/datum/supply_packs/pack = GLOB.supply_packs_datums[pack_type]
+		for(var/content_type in pack.contains)
+			if(GLOB.faction_clash_restricted_items[content_type])
+				pack.buyable = 0
+				break
 
 /datum/game_mode/proc/get_affected_zlevels()
 	if(is_in_endgame)

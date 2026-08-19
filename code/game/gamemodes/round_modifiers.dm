@@ -96,6 +96,10 @@
 	modifier_name = "Indestructible Splints"
 	modifier_desc = "Turns splints into nanosplints when the splint is created."
 
+/datum/gamemode_modifier/disable_mortar
+	modifier_name = "Disable Mortars"
+	modifier_desc = "Prevents mortars from being fired."
+
 /datum/gamemode_modifier/lz_mortar_protection
 	modifier_name = "Landing Zone Mortar Protection"
 	modifier_desc = "Prevents mortars from targetting the primary landing zone."
