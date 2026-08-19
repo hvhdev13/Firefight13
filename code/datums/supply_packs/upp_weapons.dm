@@ -124,12 +124,12 @@
 	group = "UPP Special Weapon"
 
 /datum/supply_packs/upp/Type71_carbine_commando_x10
-	name = "UPP Type 71 'Commando' pulse carbine (x2)"
+	name = "UPP Type 71 'Commando' pulse rifle (x2)"
 	contains = list(
 		/obj/item/weapon/gun/rifle/type71/carbine/commando,
 		/obj/item/weapon/gun/rifle/type71/carbine/commando,
 	)
 	cost = 40
 	containertype = /obj/structure/closet/crate/weapon
-	containername = "Type 71 'Commando' pulse carbine Crate"
+	containername = "Type 71 'Commando' pulse rifle Crate"
 	group = "UPP Special Weapon"

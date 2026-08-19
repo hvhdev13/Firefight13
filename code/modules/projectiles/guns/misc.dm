@@ -57,6 +57,10 @@
 	desc = "A gas-operated rotary machine gun used by UPP heavies. Its enormous volume of fire and ammunition capacity allows the suppression of large concentrations of enemy forces. Heavy weapons training is required control its recoil."
 	flags_gun_features = GUN_AUTO_EJECTOR|GUN_SPECIALIST|GUN_WIELDED_FIRING_ONLY|GUN_AMMO_COUNTER|GUN_RECOIL_BUILDUP|GUN_CAN_POINTBLANK
 
+/obj/item/weapon/gun/minigun/upp/set_gun_config_values()
+	..()
+	burst_scatter_mult = SCATTER_AMOUNT_TIER_10
+
 /obj/item/weapon/gun/minigun/upp/able_to_fire(mob/living/user)
 	. = ..()
 	if(!. || !istype(user)) //Let's check all that other stuff first.
@@ -197,7 +201,7 @@
 	force = 40 //the image of a upp machinegunner beating someone to death with a gpmg makes me laugh
 	start_semiauto = FALSE
 	start_automatic = TRUE
-	flags_gun_features = GUN_WIELDED_FIRING_ONLY|GUN_CAN_POINTBLANK|GUN_AUTO_EJECTOR|GUN_SPECIALIST|GUN_AMMO_COUNTER
+	flags_gun_features = GUN_WIELDED_FIRING_ONLY|GUN_CAN_POINTBLANK|GUN_AUTO_EJECTOR|GUN_SPECIALIST|GUN_AMMO_COUNTER|GUN_RECOIL_BUILDUP
 	gun_category = GUN_CATEGORY_HEAVY
 	attachable_allowed = list(
 		/obj/item/attachable/bipod/pkp,
@@ -237,12 +241,15 @@
 	burst_delay = FIRE_DELAY_TIER_9
 	accuracy_mult = BASE_ACCURACY_MULT + HIT_ACCURACY_MULT_TIER_4
 	accuracy_mult_unwielded = BASE_ACCURACY_MULT
-	fa_max_scatter = SCATTER_AMOUNT_TIER_8
-	scatter = SCATTER_AMOUNT_TIER_10
-	burst_scatter_mult = SCATTER_AMOUNT_TIER_8
+	fa_max_scatter = 9
+	fa_scatter_peak = 7
+	scatter = SCATTER_AMOUNT_TIER_5
+	burst_scatter_mult = SCATTER_AMOUNT_TIER_10
 	scatter_unwielded = SCATTER_AMOUNT_TIER_10
 	damage_mult = BASE_BULLET_DAMAGE_MULT
-	recoil = RECOIL_AMOUNT_TIER_5
+	recoil = RECOIL_AMOUNT_TIER_1
+	recoil_buildup_limit = 48
+	recoil_loss_per_second = 5
 	empty_sound = 'sound/weapons/gun_empty.ogg'
 
 /obj/item/weapon/gun/pkp/clicked(mob/user, list/mods)

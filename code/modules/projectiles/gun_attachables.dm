@@ -4142,6 +4142,16 @@ Defined in conflicts.dm of the #defines folder.
 	icon_state = "qjy72_bipod"
 	attach_icon = "qjy72_bipod"
 
+/obj/item/attachable/bipod/pkp/activate_attachment(obj/item/weapon/gun/gun, mob/living/user, turn_off)
+	. = ..()
+	if(bipod_deployed)
+		scatter_mod = SCATTER_AMOUNT_TIER_6
+		recoil_mod = -RECOIL_AMOUNT_TIER_2
+		burst_scatter_mod = 0
+		gun.recalculate_attachment_bonuses()
+		gun.fa_scatter_peak = 6
+		gun.recoil_buildup_limit = RECOIL_AMOUNT_TIER_2 / RECOIL_BUILDUP_VIEWPUNCH_MULTIPLIER
+
 /obj/item/attachable/bipod/vulture
 	name = "heavy bipod"
 	desc = "A set of rugged telescopic poles to keep a weapon stabilized during firing."
