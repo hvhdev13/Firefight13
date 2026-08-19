@@ -11,12 +11,12 @@ GLOBAL_LIST_INIT(cm_vending_gear_intelligence_officer, list(
 
 		list("PRIMARY AMMUNITION", 0, null, null, null),
 		list("M4RA AP Magazine (10x24mm)", 10, /obj/item/ammo_magazine/rifle/m4ra/ap, null, VENDOR_ITEM_REGULAR),
-		list("M4RA Extended Magazine (10x24mm)", 10, /obj/item/ammo_magazine/rifle/m4ra/extended, null, VENDOR_ITEM_REGULAR),
+		list("M4RA Magazine (10x24mm)", 10, /obj/item/ammo_magazine/rifle/m4ra, null, VENDOR_ITEM_REGULAR),
 		list("M39 AP Magazine (10x20mm)", 10, /obj/item/ammo_magazine/smg/m39/ap , null, VENDOR_ITEM_REGULAR),
-		list("M39 Extended Magazine (10x20mm)", 10, /obj/item/ammo_magazine/smg/m39/extended , null, VENDOR_ITEM_REGULAR),
+		list("M39 Magazine (10x20mm)", 10, /obj/item/ammo_magazine/smg/m39 , null, VENDOR_ITEM_REGULAR),
 		list("M41A AP Magazine (10x24mm)", 10, /obj/item/ammo_magazine/rifle/ap , null, VENDOR_ITEM_REGULAR),
-		list("M41A Extended Magazine (10x24mm)", 10, /obj/item/ammo_magazine/rifle/extended , null, VENDOR_ITEM_REGULAR),
-		list("M10 HV Extended Magazine (10x20mm-APC)", 10, /obj/item/ammo_magazine/pistol/m10/extended, null, VENDOR_ITEM_REGULAR),
+		list("M41A Magazine (10x24mm)", 10, /obj/item/ammo_magazine/rifle , null, VENDOR_ITEM_REGULAR),
+		list("M10 HV Magazine (10x20mm-APC)", 10, /obj/item/ammo_magazine/pistol/m10, null, VENDOR_ITEM_REGULAR),
 
 		list("SIDEARM AMMUNITION", 0, null, null, null),
 		list("M44 Heavy Speed Loader (.44)", 10, /obj/item/ammo_magazine/revolver/heavy, null, VENDOR_ITEM_REGULAR),
@@ -185,8 +185,7 @@ GLOBAL_LIST_INIT(cm_vending_guns_intelligence_officer, list(
 
 		list("SIDEARM AMMUNITION", -1, null, null),
 		list("M10 HV Magazine (10x20mm-APC)", 20, /obj/item/ammo_magazine/pistol/m10, VENDOR_ITEM_REGULAR),
-		list("M10 HV Extended Magazine (10x20mm-APC)", 8, /obj/item/ammo_magazine/pistol/m10/extended, VENDOR_ITEM_REGULAR),
-		list("88M4 AP Magazine (9mm)", 20, /obj/item/ammo_magazine/pistol/mod88, VENDOR_ITEM_REGULAR),
+		list("88M4 FMJ Magazine (9mm)", 20, /obj/item/ammo_magazine/pistol/mod88/normalpoint, VENDOR_ITEM_REGULAR),
 		list("M44 Speedloader (.44)", 20, /obj/item/ammo_magazine/revolver, VENDOR_ITEM_REGULAR),
 		list("M4A3 Magazine (9mm)", 20, /obj/item/ammo_magazine/pistol, VENDOR_ITEM_REGULAR),
 		list("M4A3 AP Magazine (9mm)", 8, /obj/item/ammo_magazine/pistol/ap, VENDOR_ITEM_REGULAR),

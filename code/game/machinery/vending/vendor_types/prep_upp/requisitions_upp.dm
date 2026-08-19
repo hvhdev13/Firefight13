@@ -109,13 +109,9 @@
 		list("Nailgun Magazine (7x45mm)", floor(scale * 4), /obj/item/ammo_magazine/smg/nailgun, VENDOR_ITEM_REGULAR),
 
 		list("EXPLOSIVES BOXES", -1, null, null),
-		list("M15 Fragmentation Grenade Packet", 0, /obj/item/storage/box/packet/m15, VENDOR_ITEM_REGULAR),
 		list("Type 8 WP grenade packet", 0, /obj/item/storage/box/packet/phosphorus/upp, VENDOR_ITEM_REGULAR),
+		list("Molotov Cocktail", 20, /obj/item/explosive/grenade/incendiary/molotov, VENDOR_ITEM_REGULAR),
 		list("HSDP grenade packet", 0, /obj/item/storage/box/packet/smoke, VENDOR_ITEM_REGULAR),
-		list("M40 HEDP Grenade Packet", 0, /obj/item/storage/box/packet/high_explosive, VENDOR_ITEM_REGULAR),
-		list("M40 HEDP Grenade Box", 0, /obj/item/storage/box/nade_box, VENDOR_ITEM_REGULAR),
-		list("M40 HIDP Grenade Packet", 0, /obj/item/storage/box/packet/incendiary, VENDOR_ITEM_REGULAR),
-		list("M40 HIDP Grenade Box", 0, /obj/item/storage/box/nade_box/incen, VENDOR_ITEM_REGULAR),
 
 		list("OTHER BOXES", -1, null, null),
 		list("Box of Combat Flashlights", 0, /obj/item/ammo_box/magazine/misc/flashlight/combat, VENDOR_ITEM_REGULAR),
@@ -166,8 +162,6 @@
 		list("Type 71 AP Magazine (5.45x39mm)", floor(scale * 10), /obj/item/ammo_magazine/rifle/type71/ap, VENDOR_ITEM_REGULAR),
 
 		list("RESTRICTED FIREARM AMMUNITION", -1, null, null),
-		list("Type-19 stick magazine (7.62x25mm)", floor(scale * 12), /obj/item/ammo_magazine/smg/pps43, VENDOR_ITEM_REGULAR),
-		list("Type-19 drum magazine (7.62x25mm)", floor(scale * 1), /obj/item/ammo_magazine/smg/pps43/extended, VENDOR_ITEM_REGULAR),
 		list("M240 Incinerator Tank", floor(scale * 3), /obj/item/ammo_magazine/flamer_tank, VENDOR_ITEM_REGULAR),
 
 		list("MAGAZINE BOXES", -1, null, null),

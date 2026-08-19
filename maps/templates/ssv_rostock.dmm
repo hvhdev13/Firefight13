@@ -1679,8 +1679,6 @@
 /area/rostock/engineering/main_area)
 "awv" = (
 /obj/structure/surface/rack,
-/obj/item/mortar_shell/flare,
-/obj/item/mortar_shell/flare,
 /turf/open/floor/prison/floor_marked/west,
 /area/rostock/req)
 "awX" = (
@@ -7103,7 +7101,6 @@
 /obj/structure/surface/rack,
 /obj/item/ammo_box/magazine/type71,
 /obj/item/ammo_box/magazine/type71,
-/obj/item/ammo_box/magazine/type71/ap,
 /obj/structure/machinery/light{
 	dir = 8
 	},
@@ -10326,8 +10323,6 @@
 /obj/item/ammo_magazine/rifle/type71,
 /obj/item/ammo_magazine/rifle/type71,
 /obj/item/ammo_magazine/rifle/type71,
-/obj/item/ammo_magazine/rifle/type71/ap,
-/obj/item/ammo_magazine/rifle/type71/ap,
 /turf/open/floor/plating/plating_catwalk/prison,
 /area/rostock/security/headquarters_armory)
 "huN" = (
@@ -12218,7 +12213,6 @@
 /obj/item/tool/extinguisher,
 /obj/item/tool/extinguisher,
 /obj/item/tool/extinguisher,
-/obj/item/storage/box/guncase/ppsh,
 /turf/open/floor/prison/darkbrown3,
 /area/rostock/req)
 "iMB" = (
@@ -16368,8 +16362,6 @@
 /area/rostock/lower_deck/briefing)
 "maj" = (
 /obj/structure/surface/rack,
-/obj/item/mortar_shell/frag,
-/obj/item/mortar_shell/frag,
 /turf/open/floor/prison/floor_marked/west,
 /area/rostock/req)
 "mat" = (
@@ -17428,8 +17420,6 @@
 /area/rostock/command/cic)
 "mYe" = (
 /obj/structure/surface/rack,
-/obj/item/mortar_shell/he,
-/obj/item/mortar_shell/he,
 /turf/open/floor/prison/floor_marked/west,
 /area/rostock/req)
 "mYl" = (
@@ -17629,8 +17619,6 @@
 /area/rostock/lower_deck/p_a_hallway)
 "nld" = (
 /obj/structure/surface/rack,
-/obj/item/mortar_shell/incendiary,
-/obj/item/mortar_shell/incendiary,
 /turf/open/floor/prison/floor_marked/west,
 /area/rostock/req)
 "nlg" = (
@@ -21712,7 +21700,6 @@
 /area/rostock/lower_deck/m_hallway)
 "qAi" = (
 /obj/structure/surface/table/almayer,
-/obj/item/storage/box/guncase/ppsh,
 /turf/open/floor/plating/plating_catwalk/prison,
 /area/rostock/upperdeck_maint/p_a)
 "qAj" = (
@@ -24341,7 +24328,6 @@
 /area/rostock/upper_deck/hallway)
 "sJS" = (
 /obj/structure/surface/rack,
-/obj/item/mortar_kit,
 /turf/open/floor/prison/floor_marked/west,
 /area/rostock/req)
 "sKB" = (
@@ -25779,7 +25765,6 @@
 /area/rostock/command/polcom)
 "tWj" = (
 /obj/structure/surface/rack,
-/obj/item/storage/belt/gun/mortarbelt,
 /turf/open/floor/prison/floor_marked/west,
 /area/rostock/req)
 "tWr" = (
@@ -26079,7 +26064,6 @@
 /area/rostock/engineering/main_area)
 "ugl" = (
 /obj/structure/surface/rack,
-/obj/item/ammo_box/magazine/type71/ap,
 /turf/open/floor/prison/floor_marked/west,
 /area/rostock/req)
 "ugK" = (

@@ -266,18 +266,17 @@
 		list("M44 Speed Loader (.44)", floor(scale * 80), /obj/item/ammo_magazine/revolver, VENDOR_ITEM_REGULAR),
 		list("M4A3 Magazine (9mm)", floor(scale * 100), /obj/item/ammo_magazine/pistol, VENDOR_ITEM_REGULAR),
 
-		list("ARMOR-PIERCING AMMUNITION", -1, null, null),
-		list("88 Mod 4 AP Magazine (9mm)", floor(scale * 50), /obj/item/ammo_magazine/pistol/mod88, VENDOR_ITEM_REGULAR),
+		list("STANDARD AMMUNITION", -1, null, null),
+		list("88 Mod 4 FMJ Magazine (9mm)", floor(scale * 50), /obj/item/ammo_magazine/pistol/mod88/normalpoint, VENDOR_ITEM_REGULAR),
 		list("M4RA AP Magazine (10x24mm)", floor(scale * 16), /obj/item/ammo_magazine/rifle/m4ra/ap, VENDOR_ITEM_REGULAR),
 		list("M39 AP Magazine (10x20mm)", floor(scale * 12), /obj/item/ammo_magazine/smg/m39/ap, VENDOR_ITEM_REGULAR),
 		list("M41A MK2 AP Magazine (10x24mm)", floor(scale * 10), /obj/item/ammo_magazine/rifle/ap, VENDOR_ITEM_REGULAR),
 		list("M4A3 AP Magazine (9mm)", floor(scale * 2), /obj/item/ammo_magazine/pistol/ap, VENDOR_ITEM_REGULAR),
 
-		list("EXTENDED AMMUNITION", -1, null, null),
-		list("M10 HV Extended Magazine (10x20mm-APC)", floor(scale * 5), /obj/item/ammo_magazine/pistol/m10/extended , VENDOR_ITEM_REGULAR),
-		list("M39 Extended Magazine (10x20mm)", floor(scale * 10), /obj/item/ammo_magazine/smg/m39/extended, VENDOR_ITEM_REGULAR),
-		list("M4RA Extended Magazine (10x24mm)", floor(scale * 10), /obj/item/ammo_magazine/rifle/m4ra/extended, VENDOR_ITEM_REGULAR),
-		list("M41A MK2 Extended Magazine (10x24mm)", floor(scale * 8), /obj/item/ammo_magazine/rifle/extended, VENDOR_ITEM_REGULAR),
+		list("M10 HV Magazine (10x20mm-APC)", floor(scale * 5), /obj/item/ammo_magazine/pistol/m10 , VENDOR_ITEM_REGULAR),
+		list("M39 Magazine (10x20mm)", floor(scale * 10), /obj/item/ammo_magazine/smg/m39, VENDOR_ITEM_REGULAR),
+		list("M4RA Magazine (10x24mm)", floor(scale * 10), /obj/item/ammo_magazine/rifle/m4ra, VENDOR_ITEM_REGULAR),
+		list("M41A MK2 Magazine (10x24mm)", floor(scale * 8), /obj/item/ammo_magazine/rifle, VENDOR_ITEM_REGULAR),
 
 		list("SPECIAL AMMUNITION", -1, null, null),
 		list("M56 DV9 Battery", 4, /obj/item/smartgun_battery, VENDOR_ITEM_REGULAR),
@@ -300,7 +299,7 @@
 
 		list("MAGAZINE BOXES", -1, null, null),
 		list("Magazine Box (M10 x 16)", 0, /obj/item/ammo_box/magazine/m10, VENDOR_ITEM_REGULAR),
-		list("Magazine Box (Ext M10 x 10)", 0, /obj/item/ammo_box/magazine/m10/extended, VENDOR_ITEM_REGULAR),
+		list("Magazine Box (M10 x 10)", 0, /obj/item/ammo_box/magazine/m10, VENDOR_ITEM_REGULAR),
 		list("Magazine Box (M39 x 12)", 0, /obj/item/ammo_box/magazine/m39, VENDOR_ITEM_REGULAR),
 		list("Magazine Box (AP M39 x 12)", 0, /obj/item/ammo_box/magazine/m39/ap, VENDOR_ITEM_REGULAR),
 		list("Magazine Box (Ext M39 x 10)", 0, /obj/item/ammo_box/magazine/m39/ext, VENDOR_ITEM_REGULAR),

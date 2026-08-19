@@ -6,6 +6,7 @@
 
 /datum/supply_packs/upp/random_weapon
 	name = "UPP Old supplies (Weapon)"
+	buyable = 0
 	cost = 5
 	containertype = /obj/structure/closet/crate/weapon
 	containername = "Old supplies crate (Weapon)"

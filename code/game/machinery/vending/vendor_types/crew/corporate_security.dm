@@ -71,10 +71,8 @@ GLOBAL_LIST_INIT(cm_vending_gear_corporate_security_full, list(
 	list("X21 Shock Slugs", 10, /obj/item/ammo_magazine/shotgun/beanbag/es7, null, VENDOR_ITEM_REGULAR),
 	list("X21 Lethal Slugs", 15, /obj/item/ammo_magazine/shotgun/beanbag/es7/slug, null, VENDOR_ITEM_REGULAR),
 	list("M39 Magazine (10x20mm)", 6, /obj/item/ammo_magazine/smg/m39 , null, VENDOR_ITEM_REGULAR),
-	list("M39 Extended Magazine (10x20mm)", 8, /obj/item/ammo_magazine/smg/m39/extended , null, VENDOR_ITEM_REGULAR),
 	list("M39 AP Magazine (10x20mm)", 10, /obj/item/ammo_magazine/smg/m39/ap , null, VENDOR_ITEM_REGULAR),
 	list("M41A Magazine (10x24mm)", 6, /obj/item/ammo_magazine/rifle , null, VENDOR_ITEM_REGULAR),
-	list("M41A Extended Magazine (10x24mm)", 8, /obj/item/ammo_magazine/rifle/extended , null, VENDOR_ITEM_REGULAR),
 	list("M41A AP Magazine (10x24mm)", 10, /obj/item/ammo_magazine/rifle/ap , null, VENDOR_ITEM_REGULAR),
 	list("NSG 23 magazine (10x24mm)", 6, /obj/item/ammo_magazine/rifle/nsg23, null, VENDOR_ITEM_REGULAR),
 	list("NSG 23 extended magazine (10x24mm)", 8, /obj/item/ammo_magazine/rifle/nsg23/extended, null, VENDOR_ITEM_REGULAR),
@@ -82,7 +80,7 @@ GLOBAL_LIST_INIT(cm_vending_gear_corporate_security_full, list(
 
 	list("SIDEARM AMMUNITION", 0, null, null, null),
 	list("ES-4 Stun Magazine (9mm)", 4, /obj/item/ammo_magazine/pistol/es4, null, VENDOR_ITEM_REGULAR),
-	list("88M4 AP Magazine (9mm)", 4, /obj/item/ammo_magazine/pistol/mod88, null, VENDOR_ITEM_REGULAR),
+	list("88M4 FMJ Magazine (9mm)", 4, /obj/item/ammo_magazine/pistol/mod88/normalpoint, null, VENDOR_ITEM_REGULAR),
 	list("VP78 Magazine (9mm)", 6, /obj/item/ammo_magazine/pistol/vp78, null, VENDOR_ITEM_REGULAR),
 
 	list("RAIL ATTACHMENTS (CHOOSE 2)", 0, null, null, null),

@@ -20,7 +20,6 @@
 		list("Type 71 AP Magazine (5.45x39mm)", floor(scale * 6), /obj/item/ammo_magazine/rifle/type71/ap, VENDOR_ITEM_REGULAR),
 
 		list("RESTRICTED FIREARM AMMUNITION", -1, null, null),
-		list("Type-19 stick magazine (7.62x25mm)", floor(scale * 6), /obj/item/ammo_magazine/smg/pps43, VENDOR_ITEM_REGULAR),
 		list("M240 Incinerator Tank", floor(scale * 3), /obj/item/ammo_magazine/flamer_tank, VENDOR_ITEM_REGULAR),
 		)
 
