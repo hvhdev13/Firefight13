@@ -129,6 +129,7 @@
 	VAR_PROTECTED/burst_delay = 1
 	///When burst-firing, this number is extra time before the weapon can fire again. Depends on number of rounds fired.
 	var/extra_delay = 0
+	var/burst_cooldown = 0
 	///When PB burst firing and handing off to /fire after a target moves out of range, this is how many bullets have been fired.
 	var/PB_burst_bullets_fired = 0
 
@@ -1351,6 +1352,8 @@ and you're good to go.
 		return fire_return
 
 	flags_gun_features &= ~GUN_BURST_FIRING // We always want to turn off bursting when we're done, mainly for when we break early mid-burstfire.
+	if(gun_firemode == GUN_FIREMODE_BURSTFIRE)
+		extra_delay = burst_cooldown
 	return AUTOFIRE_CONTINUE
 
 /obj/item/weapon/gun/proc/handle_fire(atom/target, mob/living/user, params, reflex = FALSE, dual_wield, check_for_attachment_fire, akimbo, fired_by_akimbo)

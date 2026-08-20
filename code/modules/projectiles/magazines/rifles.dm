@@ -352,6 +352,7 @@
 /obj/item/ammo_magazine/rifle/type71/carbine
 	name = "\improper Type 71 carbine magazine (5.45x39mm)"
 	desc = "A 5.45x39mm casket magazine for the Type 71 carbine."
+	default_ammo = /datum/ammo/bullet/rifle/type71/carbine
 	max_rounds = 45
 	gun_type = /obj/item/weapon/gun/rifle/type71/carbine
 
@@ -382,8 +383,8 @@
 		WEAR_R_HAND = 'icons/mob/humans/onmob/inhands/weapons/ammo_righthand.dmi'
 		)
 	w_class = SIZE_MEDIUM
-	default_ammo = /datum/ammo/bullet/rifle
-	max_rounds = 40
+	default_ammo = /datum/ammo/bullet/rifle/ak4047
+	max_rounds = 30
 	gun_type = /obj/item/weapon/gun/rifle/ak4047
 	ammo_band_icon = "+ak4047_band"
 	ammo_band_icon_empty = "+ak4047_band_e"

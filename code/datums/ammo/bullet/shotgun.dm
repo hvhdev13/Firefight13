@@ -266,6 +266,10 @@
 	damage_armor_punch = 0
 	pen_armor_punch = 0
 
+/datum/ammo/bullet/shotgun/heavy/buckshot/setup_faction_clash_values()
+	. = ..()
+	damage = 35
+
 /datum/ammo/bullet/shotgun/heavy/buckshot/on_hit_mob(mob/M,obj/projectile/P)
 	knockback(M,P)
 
@@ -309,6 +313,10 @@
 	damage = 90 //ouch.
 	penetration = ARMOR_PENETRATION_TIER_6
 	damage_armor_punch = 2
+
+/datum/ammo/bullet/shotgun/heavy/slug/setup_faction_clash_values()
+	. = ..()
+	damage = 40
 
 /datum/ammo/bullet/shotgun/heavy/slug/on_hit_mob(mob/M,obj/projectile/P)
 	knockback(M, P, 7)

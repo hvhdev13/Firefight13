@@ -14,6 +14,7 @@
 		list("PRIMARY FIREARMS", -1, null, null),
 		list("Type 71 Pulse Rifle", floor(scale * 60), /obj/item/weapon/gun/rifle/type71, VENDOR_ITEM_REGULAR),
 		list("Type 71 Pulse Rifle Carbine", floor(scale * 20), /obj/item/weapon/gun/rifle/type71/carbine, VENDOR_ITEM_REGULAR),
+		list("AK-4047 Pulse Assault Rifle", floor(scale * 60), /obj/item/weapon/gun/rifle/ak4047, VENDOR_ITEM_REGULAR),
 		list("Type 64 Submachinegun", floor(scale * 60), /obj/item/weapon/gun/smg/bizon/upp, VENDOR_ITEM_REGULAR),
 		list("Type 23 Riot Shotgun", floor(scale * 20), /obj/item/weapon/gun/shotgun/type23, VENDOR_ITEM_REGULAR),
 
@@ -150,6 +151,8 @@
 	listed_products = list(
 		list("REGULAR AMMUNITION", -1, null, null),
 		list("Type 71 Magazine (5.45x39mm)", floor(scale * 100), /obj/item/ammo_magazine/rifle/type71, VENDOR_ITEM_REGULAR),
+		list("Type 71 Carbine Magazine (5.45x39mm)", floor(scale * 100), /obj/item/ammo_magazine/rifle/type71/carbine, VENDOR_ITEM_REGULAR),
+		list("AK-4047 Magazine (10x24mm)", floor(scale * 100), /obj/item/ammo_magazine/rifle/ak4047, VENDOR_ITEM_REGULAR),
 		list("Type 64 Helical Magazine (7.62x19mm)", floor(scale * 100), /obj/item/ammo_magazine/smg/bizon, VENDOR_ITEM_REGULAR),
 		list("Box of Heavy Buckshot Shells (8g)", floor(scale * 56), /obj/item/ammo_magazine/shotgun/heavy/buckshot, VENDOR_ITEM_REGULAR),
 		list("Box of Heavy Slugs (8g)", floor(scale * 56), /obj/item/ammo_magazine/shotgun/heavy/slug, VENDOR_ITEM_REGULAR),

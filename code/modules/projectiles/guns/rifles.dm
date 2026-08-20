@@ -112,12 +112,13 @@
 	set_fire_delay(FIRE_DELAY_TIER_11)
 	set_burst_amount(BURST_AMOUNT_TIER_3)
 	set_burst_delay(FIRE_DELAY_TIER_11)
-	accuracy_mult = BASE_ACCURACY_MULT + HIT_ACCURACY_MULT_TIER_4 + 2*HIT_ACCURACY_MULT_TIER_1
+	accuracy_mult = 1.23
 	accuracy_mult_unwielded = BASE_ACCURACY_MULT - HIT_ACCURACY_MULT_TIER_7
-	scatter = SCATTER_AMOUNT_TIER_8
+	scatter = SCATTER_AMOUNT_TIER_7
+	burst_cooldown = 4
 	burst_scatter_mult = SCATTER_AMOUNT_TIER_10
 	scatter_unwielded = SCATTER_AMOUNT_TIER_2
-	damage_mult = BASE_BULLET_DAMAGE_MULT + BULLET_DAMAGE_MULT_TIER_2
+	damage_mult = BASE_BULLET_DAMAGE_MULT
 	recoil_unwielded = RECOIL_AMOUNT_TIER_2
 
 
@@ -1565,6 +1566,7 @@
 	flags_gun_features = GUN_AUTO_EJECTOR|GUN_CAN_POINTBLANK|GUN_AMMO_COUNTER
 	flags_equip_slot = SLOT_BACK
 	start_automatic = TRUE
+	gun_firemode = GUN_FIREMODE_BURSTFIRE
 
 /obj/item/weapon/gun/rifle/type71/Initialize()
 	. = ..()
@@ -1578,14 +1580,14 @@
 	set_fire_delay(FIRE_DELAY_TIER_10)
 	set_burst_amount(BURST_AMOUNT_TIER_4)
 	set_burst_delay(FIRE_DELAY_TIER_11)
-	accuracy_mult = BASE_ACCURACY_MULT + HIT_ACCURACY_MULT_TIER_4
+	accuracy_mult = BASE_ACCURACY_MULT + HIT_ACCURACY_MULT_TIER_3
 	accuracy_mult_unwielded = BASE_ACCURACY_MULT - HIT_ACCURACY_MULT_TIER_7
-	scatter = SCATTER_AMOUNT_TIER_8
+	scatter = 3.5
 	burst_scatter_mult = SCATTER_AMOUNT_TIER_10
 	scatter_unwielded = SCATTER_AMOUNT_TIER_4
+	burst_cooldown = 3
 	damage_mult = BASE_BULLET_DAMAGE_MULT //10~ more damage than m41, as well as higher ap from bullet, slightly higher DPS, 133>137.5
-	recoil = RECOIL_AMOUNT_TIER_5
-	recoil_unwielded = RECOIL_AMOUNT_TIER_4
+	recoil_unwielded = RECOIL_AMOUNT_TIER_3
 
 /obj/item/weapon/gun/rifle/type71/rifleman
 	//add GL
@@ -1743,7 +1745,8 @@
 	..()
 	set_fire_delay(FIRE_DELAY_TIER_11)
 	set_burst_delay(FIRE_DELAY_TIER_LMG)
-	damage_mult = BASE_BULLET_DAMAGE_MULT - BULLET_DAMAGE_MULT_TIER_4//same damage as m41 reg bullets probably
+	burst_cooldown = 3
+	damage_mult = BASE_BULLET_DAMAGE_MULT
 	scatter_unwielded = SCATTER_AMOUNT_TIER_5
 	if(SSticker.mode && MODE_HAS_FLAG(MODE_FACTION_CLASH))
 		scatter = SCATTER_AMOUNT_TIER_5
@@ -1924,16 +1927,18 @@
 
 /obj/item/weapon/gun/rifle/ak4047/set_gun_config_values()
 	..()
-	set_fire_delay(FIRE_DELAY_TIER_11)
+	set_fire_delay(FIRE_DELAY_TIER_9)
 	set_burst_amount(BURST_AMOUNT_TIER_3)
 	set_burst_delay(FIRE_DELAY_TIER_11)
-	accuracy_mult = BASE_ACCURACY_MULT + HIT_ACCURACY_MULT_TIER_4 + 2*HIT_ACCURACY_MULT_TIER_1
+	accuracy_mult = BASE_ACCURACY_MULT + HIT_ACCURACY_MULT_TIER_3
 	accuracy_mult_unwielded = BASE_ACCURACY_MULT - HIT_ACCURACY_MULT_TIER_7
-	scatter = SCATTER_AMOUNT_TIER_8
+	scatter = 4.5
 	burst_scatter_mult = SCATTER_AMOUNT_TIER_10
 	scatter_unwielded = SCATTER_AMOUNT_TIER_2
-	damage_mult = BASE_BULLET_DAMAGE_MULT + BULLET_DAMAGE_MULT_TIER_2
-	recoil_unwielded = RECOIL_AMOUNT_TIER_2
+	damage_mult = BASE_BULLET_DAMAGE_MULT + BULLET_DAMAGE_MULT_TIER_9
+	burst_cooldown = 3
+	recoil = RECOIL_AMOUNT_TIER_4
+	recoil_unwielded = RECOIL_AMOUNT_TIER_3
 
 /obj/item/weapon/gun/rifle/ak4047/tactical
 	current_mag = /obj/item/ammo_magazine/rifle/ak4047

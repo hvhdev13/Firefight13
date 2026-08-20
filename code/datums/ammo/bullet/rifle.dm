@@ -23,6 +23,11 @@
 
 	damage = 55
 
+/datum/ammo/bullet/rifle/ak4047
+	name = "assault rifle bullet"
+
+	damage = 60
+
 /datum/ammo/bullet/rifle/holo_target
 	name = "holo-targeting rifle bullet"
 	damage = 30
@@ -240,6 +245,11 @@
 	if(penetration <= ARMOR_PENETRATION_TIER_3) //so we only reduce AP of normal ammo here
 		penetration = ARMOR_PENETRATION_TIER_1
 	. = ..()
+
+/datum/ammo/bullet/rifle/type71/carbine
+	name = "carbine rifle bullet"
+
+	damage = 57
 
 /datum/ammo/bullet/rifle/type71/ap
 	name = "heavy armor-piercing rifle bullet"

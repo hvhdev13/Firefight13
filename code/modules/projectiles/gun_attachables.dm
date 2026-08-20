@@ -541,7 +541,7 @@ Defined in conflicts.dm of the #defines folder.
 
 /obj/item/attachable/extended_barrel/New()
 	..()
-	accuracy_mod = HIT_ACCURACY_MULT_TIER_4
+	accuracy_mod = HIT_ACCURACY_MULT_TIER_2
 	velocity_mod = AMMO_SPEED_TIER_1
 
 /obj/item/attachable/extended_barrel/vented
@@ -580,7 +580,7 @@ Defined in conflicts.dm of the #defines folder.
 
 /obj/item/attachable/extended_barrel/vented/New()
 	..()
-	accuracy_mod = HIT_ACCURACY_MULT_TIER_6
+	accuracy_mod = HIT_ACCURACY_MULT_TIER_3
 	damage_mod = -BULLET_DAMAGE_MULT_TIER_2
 	recoil_mod = -RECOIL_AMOUNT_TIER_5
 
@@ -825,7 +825,7 @@ Defined in conflicts.dm of the #defines folder.
 
 /obj/item/attachable/reddot/New()
 	..()
-	accuracy_mod = HIT_ACCURACY_MULT_TIER_4
+	accuracy_mod = HIT_ACCURACY_MULT_TIER_3
 	accuracy_unwielded_mod = HIT_ACCURACY_MULT_TIER_1
 	movement_onehanded_acc_penalty_mod = MOVEMENT_ACCURACY_PENALTY_MULT_TIER_5
 	AddElement(/datum/element/corp_label/armat)
@@ -856,7 +856,7 @@ Defined in conflicts.dm of the #defines folder.
 
 /obj/item/attachable/reflex/New()
 	..()
-	accuracy_mod = HIT_ACCURACY_MULT_TIER_3
+	accuracy_mod = HIT_ACCURACY_MULT_TIER_2
 	accuracy_unwielded_mod = HIT_ACCURACY_MULT_TIER_1
 	scatter_mod = -SCATTER_AMOUNT_TIER_10
 	burst_scatter_mod = -1
@@ -2378,7 +2378,7 @@ Defined in conflicts.dm of the #defines folder.
 /obj/item/attachable/stock/rifle/New()
 	..()
 	//it makes stuff much better when two-handed
-	accuracy_mod = HIT_ACCURACY_MULT_TIER_5
+	accuracy_mod = HIT_ACCURACY_MULT_TIER_3
 	recoil_mod = -RECOIL_AMOUNT_TIER_3
 	scatter_mod = -SCATTER_AMOUNT_TIER_7
 	movement_onehanded_acc_penalty_mod = -MOVEMENT_ACCURACY_PENALTY_MULT_TIER_4
@@ -2423,7 +2423,7 @@ Defined in conflicts.dm of the #defines folder.
 
 /obj/item/attachable/stock/rifle/collapsible/apply_on_weapon(obj/item/weapon/gun/gun)
 	if(stock_activated)
-		accuracy_mod = HIT_ACCURACY_MULT_TIER_2
+		accuracy_mod = HIT_ACCURACY_MULT_TIER_1
 		recoil_mod = -RECOIL_AMOUNT_TIER_5
 		scatter_mod = -SCATTER_AMOUNT_TIER_9
 		//it makes stuff worse when one handed
@@ -2487,9 +2487,9 @@ Defined in conflicts.dm of the #defines folder.
 
 /obj/item/attachable/stock/rifle/collapsible/ak4047/apply_on_weapon(obj/item/weapon/gun/gun)
 	if(stock_activated)
-		accuracy_mod = HIT_ACCURACY_MULT_TIER_2
-		recoil_mod = -RECOIL_AMOUNT_TIER_5
-		scatter_mod = -SCATTER_AMOUNT_TIER_9
+		accuracy_mod = HIT_ACCURACY_MULT_TIER_1
+		recoil_mod = -0.3
+		scatter_mod = -0.5
 		//it makes stuff worse when one handed
 		movement_onehanded_acc_penalty_mod = -MOVEMENT_ACCURACY_PENALTY_MULT_TIER_5
 		accuracy_unwielded_mod = -HIT_ACCURACY_MULT_TIER_3
@@ -2596,7 +2596,7 @@ Defined in conflicts.dm of the #defines folder.
 
 /obj/item/attachable/stock/xm177/apply_on_weapon(obj/item/weapon/gun/gun)
 	if(stock_activated)
-		accuracy_mod = HIT_ACCURACY_MULT_TIER_2
+		accuracy_mod = HIT_ACCURACY_MULT_TIER_1
 		recoil_mod = -RECOIL_AMOUNT_TIER_5
 		scatter_mod = -SCATTER_AMOUNT_TIER_9
 		aim_speed_mod = CONFIG_GET(number/slowdown_med)
@@ -3829,7 +3829,7 @@ Defined in conflicts.dm of the #defines folder.
 
 /obj/item/attachable/verticalgrip/New()
 	..()
-	accuracy_mod = HIT_ACCURACY_MULT_TIER_3
+	accuracy_mod = HIT_ACCURACY_MULT_TIER_2
 	recoil_mod = -RECOIL_AMOUNT_TIER_5
 	scatter_mod = -SCATTER_AMOUNT_TIER_10
 	burst_scatter_mod = -2
