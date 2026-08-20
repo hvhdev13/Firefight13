@@ -138,6 +138,7 @@
 	var/fa_firing = FALSE
 	///How many full-auto shots to get to max scatter?
 	var/fa_scatter_peak = 4
+	var/fa_scatter_unwielded_mult = 2
 	///How bad does the scatter get on full auto?
 	var/fa_max_scatter = 6.5
 
@@ -2087,7 +2088,7 @@ not all weapons use normal magazines etc. load_into_chamber() itself is designed
 		if(flags_item & WIELDED)
 			total_scatter_angle += max(0, bullet_amt_scat * burst_scatter_mult)
 		else
-			total_scatter_angle += max(0, 2 * bullet_amt_scat * burst_scatter_mult)
+			total_scatter_angle += max(0, fa_scatter_unwielded_mult * bullet_amt_scat * burst_scatter_mult)
 
 	// Full auto fucks your scatter up big time
 	// Note that full auto uses burst scatter multipliers
@@ -2097,7 +2098,7 @@ not all weapons use normal magazines etc. load_into_chamber() itself is designed
 		if(flags_item & WIELDED)
 			total_scatter_angle += max(0, bullet_amt_scat * burst_scatter_mult)
 		else
-			total_scatter_angle += max(0, 2 * bullet_amt_scat * burst_scatter_mult)
+			total_scatter_angle += max(0, fa_scatter_unwielded_mult * bullet_amt_scat * burst_scatter_mult)
 
 	if(user && user.mind && user.skills)
 		if(user?.skills?.get_skill_level(SKILL_FIREARMS) == SKILL_FIREARMS_CIVILIAN && !is_civilian_usable(user))

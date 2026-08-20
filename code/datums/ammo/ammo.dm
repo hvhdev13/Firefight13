@@ -19,6 +19,7 @@
 	var/sound_shield_hit
 	/// Snipers use this to simulate poor accuracy at close ranges
 	var/accurate_range_min = 0
+	var/accuracy_falloff_per_tile = 0
 	/// Completely prevents shots hitting in this range
 	var/accurate_range_min_strict = 0
 	/// How much the ammo scatters when burst fired, added to gun scatter, along with other mods

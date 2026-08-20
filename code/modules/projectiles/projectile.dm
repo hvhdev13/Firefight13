@@ -685,7 +685,10 @@
 		if(distance_travelled <= ammo.accurate_range_min) // If bullet stays within max accurate range + random variance
 			effective_accuracy -= (ammo.accurate_range_min - distance_travelled) * accuracy_range_falloff // Snipers have accuracy falloff at closer range before point blank
 	else
-		effective_accuracy -= (distance_travelled - ammo.accurate_range) * ((ammo_flags & AMMO_SNIPER) ? 1.5 : 10) // Snipers have a smaller falloff constant due to longer max range
+		var/falloff_per_tile = ammo.accuracy_falloff_per_tile
+		if(!falloff_per_tile)
+			falloff_per_tile = (ammo_flags & AMMO_SNIPER) ? 1.5 : 10
+		effective_accuracy -= (distance_travelled - ammo.accurate_range) * falloff_per_tile
 
 	if(ammo.accurate_range_min_strict > 0 && distance_travelled <= ammo.accurate_range_min_strict)
 		return 0
