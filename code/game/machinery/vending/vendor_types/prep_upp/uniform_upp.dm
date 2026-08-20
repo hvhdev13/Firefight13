@@ -23,11 +23,11 @@
 
 		list("WEBBINGS", -1, null, null),
 		list("Brown Webbing Vest", 1, /obj/item/clothing/accessory/storage/black_vest/brown_vest, VENDOR_ITEM_REGULAR),
-		list("Black Webbing Vest", 1, /obj/item/clothing/accessory/storage/black_vest, VENDOR_ITEM_REGULAR),
+		list("Black Webbing Vest", 15, /obj/item/clothing/accessory/storage/black_vest, VENDOR_ITEM_REGULAR),
 		list("Webbing", floor(scale * 2), /obj/item/clothing/accessory/storage/webbing, VENDOR_ITEM_REGULAR),
-		list("Drop Pouch", 0.75, /obj/item/clothing/accessory/storage/droppouch, VENDOR_ITEM_REGULAR),
-		list("Black Drop Pouch", 0.75, /obj/item/clothing/accessory/storage/droppouch/black, VENDOR_ITEM_REGULAR),
-		list("Shoulder Holster", 0.75, /obj/item/clothing/accessory/storage/holster, VENDOR_ITEM_REGULAR),
+		list("Drop Pouch", 2, /obj/item/clothing/accessory/storage/droppouch, VENDOR_ITEM_REGULAR),
+		list("Black Drop Pouch", 2, /obj/item/clothing/accessory/storage/droppouch/black, VENDOR_ITEM_REGULAR),
+		list("Shoulder Holster", 2, /obj/item/clothing/accessory/storage/holster, VENDOR_ITEM_REGULAR),
 
 		list("ARMOR", -1, null, null),
 		list("UM5 Medium Personal Armor", floor(scale * 15), /obj/item/clothing/suit/storage/marine/faction/UPP, VENDOR_ITEM_REGULAR),

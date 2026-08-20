@@ -251,7 +251,7 @@
 	hackable = TRUE
 
 	vendor_theme = VENDOR_THEME_COMPANY
-	vend_delay = 0.5 SECONDS
+	vend_delay = 0
 
 	/// Whether the vendor can use a medlink to be able to resupply automatically
 	var/allow_supply_link_restock = TRUE
@@ -509,54 +509,54 @@
 /obj/structure/machinery/cm_vending/sorted/medical/populate_product_list(scale)
 	listed_products = list(
 		list("FIELD SUPPLIES", -1, null, null),
-		list("Burn Kit", floor(scale * 10), /obj/item/stack/medical/advanced/ointment, VENDOR_ITEM_REGULAR),
-		list("Trauma Kit", floor(scale * 10), /obj/item/stack/medical/advanced/bruise_pack, VENDOR_ITEM_REGULAR),
-		list("Ointment", floor(scale * 10), /obj/item/stack/medical/ointment, VENDOR_ITEM_REGULAR),
-		list("Roll of Gauze", floor(scale * 10), /obj/item/stack/medical/bruise_pack, VENDOR_ITEM_REGULAR),
-		list("Splints", floor(scale * 10), /obj/item/stack/medical/splint, VENDOR_ITEM_REGULAR),
+		list("Burn Kit", floor(scale * 30), /obj/item/stack/medical/advanced/ointment, VENDOR_ITEM_REGULAR),
+		list("Trauma Kit", floor(scale * 30), /obj/item/stack/medical/advanced/bruise_pack, VENDOR_ITEM_REGULAR),
+		list("Ointment", floor(scale * 30), /obj/item/stack/medical/ointment, VENDOR_ITEM_REGULAR),
+		list("Roll of Gauze", floor(scale * 30), /obj/item/stack/medical/bruise_pack, VENDOR_ITEM_REGULAR),
+		list("Splints", floor(scale * 30), /obj/item/stack/medical/splint, VENDOR_ITEM_REGULAR),
 
 		list("AUTOINJECTORS", -1, null, null),
-		list("Autoinjector (Bicaridine)", floor(scale * 5), /obj/item/reagent_container/hypospray/autoinjector/bicaridine, VENDOR_ITEM_REGULAR),
-		list("Autoinjector (Dexalin+)", floor(scale * 5), /obj/item/reagent_container/hypospray/autoinjector/dexalinp, VENDOR_ITEM_REGULAR),
-		list("Autoinjector (Dylovene)", floor(scale * 5), /obj/item/reagent_container/hypospray/autoinjector/antitoxin, VENDOR_ITEM_REGULAR),
-		list("Autoinjector (Epinephrine)", floor(scale * 5), /obj/item/reagent_container/hypospray/autoinjector/adrenaline, VENDOR_ITEM_REGULAR),
-		list("Autoinjector (Inaprovaline)", floor(scale * 5), /obj/item/reagent_container/hypospray/autoinjector/inaprovaline, VENDOR_ITEM_REGULAR),
-		list("Autoinjector (Kelotane)", floor(scale * 5), /obj/item/reagent_container/hypospray/autoinjector/kelotane, VENDOR_ITEM_REGULAR),
-		list("Autoinjector (Oxycodone)", floor(scale * 5), /obj/item/reagent_container/hypospray/autoinjector/oxycodone, VENDOR_ITEM_REGULAR),
-		list("Autoinjector (Peridaxon)", floor(scale * 5), /obj/item/reagent_container/hypospray/autoinjector/peridaxon, VENDOR_ITEM_REGULAR),
-		list("Autoinjector (Tramadol)", floor(scale * 5), /obj/item/reagent_container/hypospray/autoinjector/tramadol, VENDOR_ITEM_REGULAR),
-		list("Autoinjector (Tricordrazine)", floor(scale * 5), /obj/item/reagent_container/hypospray/autoinjector/tricord, VENDOR_ITEM_REGULAR),
+		list("Autoinjector (Bicaridine)", floor(scale * 15), /obj/item/reagent_container/hypospray/autoinjector/bicaridine, VENDOR_ITEM_REGULAR),
+		list("Autoinjector (Dexalin+)", floor(scale * 15), /obj/item/reagent_container/hypospray/autoinjector/dexalinp, VENDOR_ITEM_REGULAR),
+		list("Autoinjector (Dylovene)", floor(scale * 15), /obj/item/reagent_container/hypospray/autoinjector/antitoxin, VENDOR_ITEM_REGULAR),
+		list("Autoinjector (Epinephrine)", floor(scale * 15), /obj/item/reagent_container/hypospray/autoinjector/adrenaline, VENDOR_ITEM_REGULAR),
+		list("Autoinjector (Inaprovaline)", floor(scale * 15), /obj/item/reagent_container/hypospray/autoinjector/inaprovaline, VENDOR_ITEM_REGULAR),
+		list("Autoinjector (Kelotane)", floor(scale * 15), /obj/item/reagent_container/hypospray/autoinjector/kelotane, VENDOR_ITEM_REGULAR),
+		list("Autoinjector (Oxycodone)", floor(scale * 15), /obj/item/reagent_container/hypospray/autoinjector/oxycodone, VENDOR_ITEM_REGULAR),
+		list("Autoinjector (Peridaxon)", floor(scale * 15), /obj/item/reagent_container/hypospray/autoinjector/peridaxon, VENDOR_ITEM_REGULAR),
+		list("Autoinjector (Tramadol)", floor(scale * 15), /obj/item/reagent_container/hypospray/autoinjector/tramadol, VENDOR_ITEM_REGULAR),
+		list("Autoinjector (Tricordrazine)", floor(scale * 15), /obj/item/reagent_container/hypospray/autoinjector/tricord, VENDOR_ITEM_REGULAR),
 
 		list("LIQUID BOTTLES", -1, null, null),
-		list("Bottle (Bicaridine)", floor(scale * 3), /obj/item/reagent_container/glass/bottle/bicaridine, VENDOR_ITEM_REGULAR),
-		list("Bottle (Dylovene)", floor(scale * 3), /obj/item/reagent_container/glass/bottle/antitoxin, VENDOR_ITEM_REGULAR),
-		list("Bottle (Dexalin)", floor(scale * 3), /obj/item/reagent_container/glass/bottle/dexalin, VENDOR_ITEM_REGULAR),
-		list("Bottle (Inaprovaline)", floor(scale * 3), /obj/item/reagent_container/glass/bottle/inaprovaline, VENDOR_ITEM_REGULAR),
-		list("Bottle (Kelotane)", floor(scale * 3), /obj/item/reagent_container/glass/bottle/kelotane, VENDOR_ITEM_REGULAR),
-		list("Bottle (Oxycodone)", floor(scale * 3), /obj/item/reagent_container/glass/bottle/oxycodone, VENDOR_ITEM_REGULAR),
-		list("Bottle (Peridaxon)", floor(scale * 3), /obj/item/reagent_container/glass/bottle/peridaxon, VENDOR_ITEM_REGULAR),
-		list("Bottle (Tramadol)", floor(scale * 3), /obj/item/reagent_container/glass/bottle/tramadol, VENDOR_ITEM_REGULAR),
+		list("Bottle (Bicaridine)", floor(scale * 9), /obj/item/reagent_container/glass/bottle/bicaridine, VENDOR_ITEM_REGULAR),
+		list("Bottle (Dylovene)", floor(scale * 9), /obj/item/reagent_container/glass/bottle/antitoxin, VENDOR_ITEM_REGULAR),
+		list("Bottle (Dexalin)", floor(scale * 9), /obj/item/reagent_container/glass/bottle/dexalin, VENDOR_ITEM_REGULAR),
+		list("Bottle (Inaprovaline)", floor(scale * 9), /obj/item/reagent_container/glass/bottle/inaprovaline, VENDOR_ITEM_REGULAR),
+		list("Bottle (Kelotane)", floor(scale * 9), /obj/item/reagent_container/glass/bottle/kelotane, VENDOR_ITEM_REGULAR),
+		list("Bottle (Oxycodone)", floor(scale * 9), /obj/item/reagent_container/glass/bottle/oxycodone, VENDOR_ITEM_REGULAR),
+		list("Bottle (Peridaxon)", floor(scale * 9), /obj/item/reagent_container/glass/bottle/peridaxon, VENDOR_ITEM_REGULAR),
+		list("Bottle (Tramadol)", floor(scale * 9), /obj/item/reagent_container/glass/bottle/tramadol, VENDOR_ITEM_REGULAR),
 
 		list("PILL BOTTLES", -1, null, null),
-		list("Pill Bottle (Bicaridine)", floor(scale * 4), /obj/item/storage/pill_bottle/bicaridine, VENDOR_ITEM_REGULAR),
-		list("Pill Bottle (Dexalin)", floor(scale * 4), /obj/item/storage/pill_bottle/dexalin, VENDOR_ITEM_REGULAR),
-		list("Pill Bottle (Dylovene)", floor(scale * 4), /obj/item/storage/pill_bottle/antitox, VENDOR_ITEM_REGULAR),
-		list("Pill Bottle (Inaprovaline)", floor(scale * 4), /obj/item/storage/pill_bottle/inaprovaline, VENDOR_ITEM_REGULAR),
-		list("Pill Bottle (Kelotane)", floor(scale * 4), /obj/item/storage/pill_bottle/kelotane, VENDOR_ITEM_REGULAR),
-		list("Pill Bottle (Oxycodone)", floor(scale * 3), /obj/item/storage/pill_bottle/oxycodone, VENDOR_ITEM_REGULAR),
-		list("Pill Bottle (Peridaxon)", floor(scale * 3), /obj/item/storage/pill_bottle/peridaxon, VENDOR_ITEM_REGULAR),
-		list("Pill Bottle (Tramadol)", floor(scale * 4), /obj/item/storage/pill_bottle/tramadol, VENDOR_ITEM_REGULAR),
+		list("Pill Bottle (Bicaridine)", floor(scale * 12), /obj/item/storage/pill_bottle/bicaridine, VENDOR_ITEM_REGULAR),
+		list("Pill Bottle (Dexalin)", floor(scale * 12), /obj/item/storage/pill_bottle/dexalin, VENDOR_ITEM_REGULAR),
+		list("Pill Bottle (Dylovene)", floor(scale * 12), /obj/item/storage/pill_bottle/antitox, VENDOR_ITEM_REGULAR),
+		list("Pill Bottle (Inaprovaline)", floor(scale * 12), /obj/item/storage/pill_bottle/inaprovaline, VENDOR_ITEM_REGULAR),
+		list("Pill Bottle (Kelotane)", floor(scale * 12), /obj/item/storage/pill_bottle/kelotane, VENDOR_ITEM_REGULAR),
+		list("Pill Bottle (Oxycodone)", floor(scale * 9), /obj/item/storage/pill_bottle/oxycodone, VENDOR_ITEM_REGULAR),
+		list("Pill Bottle (Peridaxon)", floor(scale * 9), /obj/item/storage/pill_bottle/peridaxon, VENDOR_ITEM_REGULAR),
+		list("Pill Bottle (Tramadol)", floor(scale * 12), /obj/item/storage/pill_bottle/tramadol, VENDOR_ITEM_REGULAR),
 
 		list("MEDICAL UTILITIES", -1, null, null),
-		list("Emergency Defibrillator", floor(scale * 3), /obj/item/device/defibrillator, VENDOR_ITEM_REGULAR),
-		list("Surgical Line", floor(scale * 2), /obj/item/tool/surgery/surgical_line, VENDOR_ITEM_REGULAR),
-		list("Synth-Graft", floor(scale * 2), /obj/item/tool/surgery/synthgraft, VENDOR_ITEM_REGULAR),
-		list("Hypospray", floor(scale * 3), /obj/item/reagent_container/hypospray/tricordrazine, VENDOR_ITEM_REGULAR),
-		list("Health Analyzer", floor(scale * 5), /obj/item/device/healthanalyzer, VENDOR_ITEM_REGULAR),
-		list("M276 Pattern Medical Storage Rig", floor(scale * 2), /obj/item/storage/belt/medical, VENDOR_ITEM_REGULAR),
-		list("Medical HUD Glasses", floor(scale * 3), /obj/item/clothing/glasses/hud/health, VENDOR_ITEM_REGULAR),
-		list("Stasis Bag", floor(scale * 3), /obj/item/bodybag/cryobag, VENDOR_ITEM_REGULAR),
-		list("Syringe", floor(scale * 7), /obj/item/reagent_container/syringe, VENDOR_ITEM_REGULAR)
+		list("Emergency Defibrillator", floor(scale * 9), /obj/item/device/defibrillator, VENDOR_ITEM_REGULAR),
+		list("Surgical Line", floor(scale * 6), /obj/item/tool/surgery/surgical_line, VENDOR_ITEM_REGULAR),
+		list("Synth-Graft", floor(scale * 6), /obj/item/tool/surgery/synthgraft, VENDOR_ITEM_REGULAR),
+		list("Hypospray", floor(scale * 9), /obj/item/reagent_container/hypospray/tricordrazine, VENDOR_ITEM_REGULAR),
+		list("Health Analyzer", floor(scale * 15), /obj/item/device/healthanalyzer, VENDOR_ITEM_REGULAR),
+		list("M276 Pattern Medical Storage Rig", floor(scale * 6), /obj/item/storage/belt/medical, VENDOR_ITEM_REGULAR),
+		list("Medical HUD Glasses", floor(scale * 9), /obj/item/clothing/glasses/hud/health, VENDOR_ITEM_REGULAR),
+		list("Stasis Bag", floor(scale * 9), /obj/item/bodybag/cryobag, VENDOR_ITEM_REGULAR),
+		list("Syringe", floor(scale * 21), /obj/item/reagent_container/syringe, VENDOR_ITEM_REGULAR)
 	)
 
 /obj/structure/machinery/cm_vending/sorted/medical/populate_product_list_and_boxes(scale)
@@ -741,17 +741,17 @@
 /obj/structure/machinery/cm_vending/sorted/medical/marinemed/populate_product_list(scale)
 	listed_products = list(
 		list("AUTOINJECTORS", -1, null, null),
-		list("First-Aid Autoinjector", floor(scale * 5), /obj/item/reagent_container/hypospray/autoinjector/skillless, VENDOR_ITEM_REGULAR),
-		list("Pain-Stop Autoinjector", floor(scale * 5), /obj/item/reagent_container/hypospray/autoinjector/skillless/tramadol, VENDOR_ITEM_REGULAR),
+		list("First-Aid Autoinjector", floor(scale * 15), /obj/item/reagent_container/hypospray/autoinjector/skillless, VENDOR_ITEM_REGULAR),
+		list("Pain-Stop Autoinjector", floor(scale * 15), /obj/item/reagent_container/hypospray/autoinjector/skillless/tramadol, VENDOR_ITEM_REGULAR),
 
 		list("DEVICES", -1, null, null),
-		list("Health Analyzer", floor(scale * 3), /obj/item/device/healthanalyzer, VENDOR_ITEM_REGULAR),
+		list("Health Analyzer", floor(scale * 9), /obj/item/device/healthanalyzer, VENDOR_ITEM_REGULAR),
 
 		list("FIELD SUPPLIES", -1, null, null),
 		list("Fire Extinguisher (portable)", 5, /obj/item/tool/extinguisher/mini, VENDOR_ITEM_REGULAR),
-		list("Ointment", floor(scale * 8), /obj/item/stack/medical/ointment, VENDOR_ITEM_REGULAR),
-		list("Roll of Gauze", floor(scale * 8), /obj/item/stack/medical/bruise_pack, VENDOR_ITEM_REGULAR),
-		list("Splints", floor(scale * 8), /obj/item/stack/medical/splint, VENDOR_ITEM_REGULAR)
+		list("Ointment", floor(scale * 24), /obj/item/stack/medical/ointment, VENDOR_ITEM_REGULAR),
+		list("Roll of Gauze", floor(scale * 24), /obj/item/stack/medical/bruise_pack, VENDOR_ITEM_REGULAR),
+		list("Splints", floor(scale * 24), /obj/item/stack/medical/splint, VENDOR_ITEM_REGULAR)
 	)
 
 /obj/structure/machinery/cm_vending/sorted/medical/marinemed/antag
@@ -785,15 +785,15 @@
 /obj/structure/machinery/cm_vending/sorted/medical/blood/populate_product_list(scale)
 	listed_products = list(
 		list("BLOOD PACKS", -1, null, null),
-		list("A+ Blood Pack", floor(scale * 5), /obj/item/reagent_container/blood/APlus, VENDOR_ITEM_REGULAR),
-		list("A- Blood Pack", floor(scale * 5), /obj/item/reagent_container/blood/AMinus, VENDOR_ITEM_REGULAR),
-		list("B+ Blood Pack", floor(scale * 5), /obj/item/reagent_container/blood/BPlus, VENDOR_ITEM_REGULAR),
-		list("B- Blood Pack", floor(scale * 5), /obj/item/reagent_container/blood/BMinus, VENDOR_ITEM_REGULAR),
-		list("O+ Blood Pack", floor(scale * 5), /obj/item/reagent_container/blood/OPlus, VENDOR_ITEM_REGULAR),
-		list("O- Blood Pack", floor(scale * 5), /obj/item/reagent_container/blood/OMinus, VENDOR_ITEM_REGULAR),
+		list("A+ Blood Pack", floor(scale * 15), /obj/item/reagent_container/blood/APlus, VENDOR_ITEM_REGULAR),
+		list("A- Blood Pack", floor(scale * 15), /obj/item/reagent_container/blood/AMinus, VENDOR_ITEM_REGULAR),
+		list("B+ Blood Pack", floor(scale * 15), /obj/item/reagent_container/blood/BPlus, VENDOR_ITEM_REGULAR),
+		list("B- Blood Pack", floor(scale * 15), /obj/item/reagent_container/blood/BMinus, VENDOR_ITEM_REGULAR),
+		list("O+ Blood Pack", floor(scale * 15), /obj/item/reagent_container/blood/OPlus, VENDOR_ITEM_REGULAR),
+		list("O- Blood Pack", floor(scale * 15), /obj/item/reagent_container/blood/OMinus, VENDOR_ITEM_REGULAR),
 
 		list("MISCELLANEOUS", -1, null, null),
-		list("Empty Blood Pack", floor(scale * 5), /obj/item/reagent_container/blood, VENDOR_ITEM_REGULAR)
+		list("Empty Blood Pack", floor(scale * 15), /obj/item/reagent_container/blood, VENDOR_ITEM_REGULAR)
 	)
 
 /obj/structure/machinery/cm_vending/sorted/medical/blood/antag

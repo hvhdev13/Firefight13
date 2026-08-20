@@ -116,14 +116,14 @@
 
 		list("WEBBINGS", -1, null, null),
 		list("Brown Webbing Vest", 1, /obj/item/clothing/accessory/storage/black_vest/brown_vest, VENDOR_ITEM_REGULAR),
-		list("Black Webbing Vest", 1, /obj/item/clothing/accessory/storage/black_vest, VENDOR_ITEM_REGULAR),
+		list("Black Webbing Vest", 15, /obj/item/clothing/accessory/storage/black_vest, VENDOR_ITEM_REGULAR),
 		list("Leg Pouch", 1, /obj/item/clothing/accessory/storage/black_vest/leg_pouch, VENDOR_ITEM_REGULAR),
 		list("Black Leg Pouch", 1, /obj/item/clothing/accessory/storage/black_vest/black_leg_pouch, VENDOR_ITEM_REGULAR),
 		list("Webbing", floor(scale * 2), /obj/item/clothing/accessory/storage/webbing, VENDOR_ITEM_REGULAR),
 		list("Black Webbing", floor(scale * 2), /obj/item/clothing/accessory/storage/webbing/black, VENDOR_ITEM_REGULAR),
-		list("Drop Pouch", 0.75, /obj/item/clothing/accessory/storage/droppouch, VENDOR_ITEM_REGULAR),
-		list("Black Drop Pouch", 0.75, /obj/item/clothing/accessory/storage/droppouch/black, MARINE_CAN_BUY_ACCESSORY, VENDOR_ITEM_REGULAR),
-		list("Shoulder Holster", 0.75, /obj/item/clothing/accessory/storage/holster, VENDOR_ITEM_REGULAR),
+		list("Drop Pouch", 2, /obj/item/clothing/accessory/storage/droppouch, VENDOR_ITEM_REGULAR),
+		list("Black Drop Pouch", 2, /obj/item/clothing/accessory/storage/droppouch/black, MARINE_CAN_BUY_ACCESSORY, VENDOR_ITEM_REGULAR),
+		list("Shoulder Holster", 2, /obj/item/clothing/accessory/storage/holster, VENDOR_ITEM_REGULAR),
 
 		list("ARMOR", -1, null, null),
 		list("M3 Pattern Carrier Marine Armor", floor(scale * 15), /obj/item/clothing/suit/storage/marine/medium/carrier, VENDOR_ITEM_REGULAR),
@@ -379,17 +379,17 @@
 /obj/structure/machinery/cm_vending/sorted/attachments/squad/populate_product_list(scale)
 	listed_products = list(
 		list("BARREL", -1, null, null),
-		list("Barrel Charger", 0.75, /obj/item/attachable/heavy_barrel, VENDOR_ITEM_REGULAR),
+		list("Barrel Charger", 2, /obj/item/attachable/heavy_barrel, VENDOR_ITEM_REGULAR),
 		list("Extended Recoil Compensator", 2.5, /obj/item/attachable/extended_barrel/vented, VENDOR_ITEM_REGULAR),
 		list("Extended Barrel", 2.5, /obj/item/attachable/extended_barrel, VENDOR_ITEM_REGULAR),
 		list("Recoil Compensator", 2.5, /obj/item/attachable/compensator, VENDOR_ITEM_REGULAR),
-		list("M10 Compensator", 1, /obj/item/attachable/compensator/m10, VENDOR_ITEM_REGULAR),
+		list("M10 Compensator", 2, /obj/item/attachable/compensator/m10, VENDOR_ITEM_REGULAR),
 		list("Suppressor", 2.5, /obj/item/attachable/suppressor, VENDOR_ITEM_REGULAR),
 		list("Suppressor, Compact", 2.5, /obj/item/attachable/suppressor/sleek, VENDOR_ITEM_REGULAR),
-		list("Shotgun Choke", 1.5, /obj/item/attachable/shotgun_choke, VENDOR_ITEM_REGULAR),
+		list("Shotgun Choke", 2, /obj/item/attachable/shotgun_choke, VENDOR_ITEM_REGULAR),
 
 		list("RAIL", -1, null, null),
-		list("B8 Smart-Scope", 1.5, /obj/item/attachable/alt_iff_scope, VENDOR_ITEM_REGULAR),
+		list("B8 Smart-Scope", 2, /obj/item/attachable/alt_iff_scope, VENDOR_ITEM_REGULAR),
 		list("Magnetic Harness", 4, /obj/item/attachable/magnetic_harness, VENDOR_ITEM_REGULAR),
 		list("S4 2x Telescopic Mini-Scope", 2, /obj/item/attachable/scope/mini, VENDOR_ITEM_REGULAR),
 		list("S5 Red-Dot Sight", 3, /obj/item/attachable/reddot, VENDOR_ITEM_REGULAR),
@@ -400,24 +400,24 @@
 		list("UNDERBARREL", -1, null, null),
 		list("Angled Grip", 2.5, /obj/item/attachable/angledgrip, VENDOR_ITEM_REGULAR),
 		list("Bipod", 2.5, /obj/item/attachable/bipod, VENDOR_ITEM_REGULAR),
-		list("Burst Fire Assembly", 1.5, /obj/item/attachable/burstfire_assembly, VENDOR_ITEM_REGULAR),
-		list("Gyroscopic Stabilizer", 1.5, /obj/item/attachable/gyro, VENDOR_ITEM_REGULAR),
+		list("Burst Fire Assembly", 2, /obj/item/attachable/burstfire_assembly, VENDOR_ITEM_REGULAR),
+		list("Gyroscopic Stabilizer", 2, /obj/item/attachable/gyro, VENDOR_ITEM_REGULAR),
 		list("Laser Sight", 3, /obj/item/attachable/lasersight, VENDOR_ITEM_REGULAR),
 		list("Micro Laser Sight", 2.5, /obj/item/attachable/lasersight/micro, VENDOR_ITEM_REGULAR),
-		list("Mini Flamethrower", 1.5, /obj/item/attachable/attached_gun/flamer, VENDOR_ITEM_REGULAR),
-		list("XM-VESG-1 Flamer Nozzle", 1.5, /obj/item/attachable/attached_gun/flamer_nozzle, VENDOR_ITEM_REGULAR),
-		list("U7 Underbarrel Shotgun", 1.5, /obj/item/attachable/attached_gun/shotgun, VENDOR_ITEM_REGULAR),
-		list("Underbarrel Extinguisher", 1.5, /obj/item/attachable/attached_gun/extinguisher, VENDOR_ITEM_REGULAR),
+		list("Mini Flamethrower", 2, /obj/item/attachable/attached_gun/flamer, VENDOR_ITEM_REGULAR),
+		list("XM-VESG-1 Flamer Nozzle", 2, /obj/item/attachable/attached_gun/flamer_nozzle, VENDOR_ITEM_REGULAR),
+		list("U7 Underbarrel Shotgun", 2, /obj/item/attachable/attached_gun/shotgun, VENDOR_ITEM_REGULAR),
+		list("Underbarrel Extinguisher", 2, /obj/item/attachable/attached_gun/extinguisher, VENDOR_ITEM_REGULAR),
 		list("Vertical Grip", 3, /obj/item/attachable/verticalgrip, VENDOR_ITEM_REGULAR),
 
 		list("STOCK", -1, null, null),
-		list("M10 Solid Stock", 1, /obj/item/attachable/stock/m10_solid, VENDOR_ITEM_REGULAR),
-		list("M10 Folding Stock", 1.5, /obj/item/attachable/stock/pistol/collapsible, VENDOR_ITEM_REGULAR),
-		list("M37A2 Collapsible Stock", 1.5, /obj/item/attachable/stock/synth/collapsible, VENDOR_ITEM_REGULAR),
-		list("M39 Arm Brace", 1.5, /obj/item/attachable/stock/smg/collapsible/brace, VENDOR_ITEM_REGULAR),
-		list("M39 Stock", 1.5, /obj/item/attachable/stock/smg, VENDOR_ITEM_REGULAR),
-		list("M41A Solid Stock", 1.5, /obj/item/attachable/stock/rifle, VENDOR_ITEM_REGULAR),
-		list("M44 Magnum Sharpshooter Stock", 1.5, /obj/item/attachable/stock/revolver, VENDOR_ITEM_REGULAR)
+		list("M10 Solid Stock", 2, /obj/item/attachable/stock/m10_solid, VENDOR_ITEM_REGULAR),
+		list("M10 Folding Stock", 2, /obj/item/attachable/stock/pistol/collapsible, VENDOR_ITEM_REGULAR),
+		list("M37A2 Collapsible Stock", 2, /obj/item/attachable/stock/synth/collapsible, VENDOR_ITEM_REGULAR),
+		list("M39 Arm Brace", 2, /obj/item/attachable/stock/smg/collapsible/brace, VENDOR_ITEM_REGULAR),
+		list("M39 Stock", 2, /obj/item/attachable/stock/smg, VENDOR_ITEM_REGULAR),
+		list("M41A Solid Stock", 2, /obj/item/attachable/stock/rifle, VENDOR_ITEM_REGULAR),
+		list("M44 Magnum Sharpshooter Stock", 2, /obj/item/attachable/stock/revolver, VENDOR_ITEM_REGULAR)
 		)
 
 /obj/structure/machinery/cm_vending/sorted/attachments/mp_extended
@@ -430,7 +430,7 @@
 
 	listed_products = list(
 		list("ATTACHMENTS", -1, null, null),
-		list("Extended Barrel", 1, /obj/item/attachable/extended_barrel, VENDOR_ITEM_REGULAR),
+		list("Extended Barrel", 2, /obj/item/attachable/extended_barrel, VENDOR_ITEM_REGULAR),
 		list("Suppressor", 3, /obj/item/attachable/suppressor, VENDOR_ITEM_REGULAR),
 		list("Suppressor, Compact", 3, /obj/item/attachable/suppressor/sleek, VENDOR_ITEM_REGULAR),
 		list("S5 Red-Dot Sight", 3, /obj/item/attachable/reddot, VENDOR_ITEM_REGULAR),

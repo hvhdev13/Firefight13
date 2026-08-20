@@ -466,6 +466,10 @@ GLOBAL_LIST_EMPTY(activated_medevac_stretchers)
 	rollertype = /obj/structure/bed/medevac_stretcher
 	matter = list("plastic" = 5000, "metal" = 5000)
 
+/obj/item/roller/medevac/upp
+	name = "UPP medevac stretcher"
+	rollertype = /obj/structure/bed/medevac_stretcher/upp
+
 /obj/item/roller/medevac/deploy_roller(mob/user, atom/location)
 	var/obj/structure/bed/medevac_stretcher/medevac_stretcher = new rollertype(location)
 	medevac_stretcher.add_fingerprint(user)

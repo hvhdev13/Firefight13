@@ -17,7 +17,7 @@
 /obj/structure/machinery/cm_vending/sorted/cargo_ammo/upp_squad/populate_product_list(scale)
 	listed_products = list(
 		list("RESTRICTED FIREARM AMMUNITION", -1, null, null),
-		list("M240 Incinerator Tank", floor(scale * 3), /obj/item/ammo_magazine/flamer_tank, VENDOR_ITEM_REGULAR),
+		list("M240 Incinerator Tank", floor(scale * 8), /obj/item/ammo_magazine/flamer_tank, VENDOR_ITEM_REGULAR),
 		)
 
 //--------------UPP SQUAD ARMAMENTS VENDOR--------------
@@ -93,7 +93,7 @@
 		list("Suppressor", 2.5, /obj/item/attachable/suppressor, VENDOR_ITEM_REGULAR),
 
 		list("RAIL", -1, null, null),
-		list("B8 Smart-Scope", 1.5, /obj/item/attachable/alt_iff_scope, VENDOR_ITEM_REGULAR),
+		list("B8 Smart-Scope", 2, /obj/item/attachable/alt_iff_scope, VENDOR_ITEM_REGULAR),
 		list("Magnetic Harness", 4, /obj/item/attachable/magnetic_harness, VENDOR_ITEM_REGULAR),
 		list("S4 2x Telescopic Mini-Scope", 2, /obj/item/attachable/scope/mini, VENDOR_ITEM_REGULAR),
 		list("S5 Red-Dot Sight", 3, /obj/item/attachable/reddot, VENDOR_ITEM_REGULAR),
@@ -103,13 +103,13 @@
 		list("UNDERBARREL", -1, null, null),
 		list("Angled Grip", 2.5, /obj/item/attachable/angledgrip, VENDOR_ITEM_REGULAR),
 		list("Bipod", 2.5, /obj/item/attachable/bipod, VENDOR_ITEM_REGULAR),
-		list("Burst Fire Assembly", 1.5, /obj/item/attachable/burstfire_assembly, VENDOR_ITEM_REGULAR),
-		list("Gyroscopic Stabilizer", 1.5, /obj/item/attachable/gyro, VENDOR_ITEM_REGULAR),
+		list("Burst Fire Assembly", 2, /obj/item/attachable/burstfire_assembly, VENDOR_ITEM_REGULAR),
+		list("Gyroscopic Stabilizer", 2, /obj/item/attachable/gyro, VENDOR_ITEM_REGULAR),
 		list("Laser Sight", 3, /obj/item/attachable/lasersight, VENDOR_ITEM_REGULAR),
-		list("Mini Flamethrower", 1.5, /obj/item/attachable/attached_gun/flamer, VENDOR_ITEM_REGULAR),
-		list("XM-VESG-1 Flamer Nozzle", 1.5, /obj/item/attachable/attached_gun/flamer_nozzle, VENDOR_ITEM_REGULAR),
-		list("U7 Underbarrel Shotgun", 1.5, /obj/item/attachable/attached_gun/shotgun, VENDOR_ITEM_REGULAR),
-		list("Underbarrel Extinguisher", 1.5, /obj/item/attachable/attached_gun/extinguisher, VENDOR_ITEM_REGULAR),
+		list("Mini Flamethrower", 2, /obj/item/attachable/attached_gun/flamer, VENDOR_ITEM_REGULAR),
+		list("XM-VESG-1 Flamer Nozzle", 2, /obj/item/attachable/attached_gun/flamer_nozzle, VENDOR_ITEM_REGULAR),
+		list("U7 Underbarrel Shotgun", 2, /obj/item/attachable/attached_gun/shotgun, VENDOR_ITEM_REGULAR),
+		list("Underbarrel Extinguisher", 2, /obj/item/attachable/attached_gun/extinguisher, VENDOR_ITEM_REGULAR),
 		list("Vertical Grip", 3, /obj/item/attachable/verticalgrip, VENDOR_ITEM_REGULAR),
 
 		)

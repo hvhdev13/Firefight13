@@ -21,7 +21,7 @@ GLOBAL_LIST_INIT(cm_vending_gear_leader, list(
 		list("CLOTHING ITEMS", 0, null, null, null),
 		list("Machete Scabbard (Full)", 4, /obj/item/storage/large_holster/machete/full, null, VENDOR_ITEM_REGULAR),
 		list("Machete Pouch (Full)", 4, /obj/item/storage/pouch/machete/full, null, VENDOR_ITEM_REGULAR),
-		list("USCM Radio Telephone Pack", 15, /obj/item/storage/backpack/marine/satchel/rto, null, VENDOR_ITEM_REGULAR),
+		list("USCM Radio Telephone Pack", 10, /obj/item/storage/backpack/marine/satchel/rto, null, VENDOR_ITEM_REGULAR),
 		list("M276 Pattern Combat Toolbelt Rig", 15, /obj/item/storage/belt/gun/utility, null, VENDOR_ITEM_REGULAR),
 
 		list("UTILITIES", 0, null, null, null),
