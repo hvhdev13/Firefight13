@@ -415,7 +415,7 @@ their unique feature is that a direct hit will buff your damage and firerate
 	..()
 	set_fire_delay(FIRE_DELAY_TIER_2)
 	lever_delay = FIRE_DELAY_TIER_3
-	accuracy_mult = BASE_ACCURACY_MULT + HIT_ACCURACY_MULT_TIER_5
+	accuracy_mult = BASE_ACCURACY_MULT * 2
 	accuracy_mult_unwielded = BASE_ACCURACY_MULT - HIT_ACCURACY_MULT_TIER_10
 	scatter = SCATTER_AMOUNT_TIER_8
 	burst_scatter_mult = 0

@@ -97,7 +97,12 @@
 /datum/ammo/bullet/sniper/upp
 	name = "armor-piercing sniper bullet"
 	damage = 80
-	penetration = ARMOR_PENETRATION_TIER_10
+	penetration = 16
+	accuracy_falloff_per_tile = 2
+
+/datum/ammo/bullet/sniper/upp/setup_faction_clash_values()
+	. = ..()
+	accurate_range = 10
 
 /datum/ammo/bullet/sniper/anti_materiel
 	name = "anti-materiel sniper bullet"

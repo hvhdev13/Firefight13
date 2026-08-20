@@ -1516,7 +1516,7 @@
 
 /obj/item/weapon/gun/rifle/type71
 	name = "\improper Type 71 pulse rifle"
-	desc = "The primary service rifle of the UPP space forces, the Type 71 is an ergonomic, lightweight pulse rifle chambered in 5.45x39mm. In accordance with doctrinal principles of overmatch and suppression, the rifle has a high rate of fire and a high-capacity casket magazine. Despite lackluster precision, an integrated recoil-dampening mechanism makes the rifle surprisingly controllable in bursts."
+	desc = "The primary service rifle of the UPP space forces, the Type 71 is an ergonomic, lightweight bullpup pulse rifle chambered in 5.45x39mm. In accordance with UPP doctrine emphasizing overmatch and suppression, the rifle features a high rate of fire and a large-capacity casket magazine. An integrated recoil-dampening mechanism makes the rifle surprisingly controllable, particularly in bursts."
 	icon = 'icons/obj/items/weapons/guns/guns_by_faction/UPP/assault_rifles.dmi'
 	icon_state = "type71"
 	item_state = "type71"
@@ -1695,7 +1695,7 @@
 /obj/item/weapon/gun/rifle/type71/carbine
 	current_mag = /obj/item/ammo_magazine/rifle/type71/carbine
 	name = "\improper Type 71 pulse carbine"
-	desc = "A carbine variant of the Type 71, easier to handle at the cost of lesser damage, but negative soldier reviews have shifted it out of active use, given only to reserves or troops not expected to face much combat."
+	desc = "A carbine variant of the Type 71 featuring a shortened barrel and modified gas system. The reduced length sacrifices some effective range and precision in exchange for improved close-range performance. Favored by assault troops for clearing structures and other confined environments."
 	icon_state = "type71c"
 	item_state = "type71c"
 
@@ -1749,7 +1749,7 @@
 	damage_mult = BASE_BULLET_DAMAGE_MULT
 	scatter_unwielded = SCATTER_AMOUNT_TIER_5
 	if(SSticker.mode && MODE_HAS_FLAG(MODE_FACTION_CLASH))
-		scatter = SCATTER_AMOUNT_TIER_5
+		scatter = 7.5
 	recoil_unwielded = RECOIL_AMOUNT_TIER_4
 
 /obj/item/weapon/gun/rifle/type71/carbine/dual
@@ -1864,7 +1864,7 @@
 
 /obj/item/weapon/gun/rifle/ak4047
 	name = "\improper AK-4047 pulse assault rifle"
-	desc = "The UPP equivalent to the M41A Pulse Rifle, the AK-4047 is a cheap and reliable substitute. As such, the weapon often winds up in the hands of mercenaries and insurgents. While not as accurate as the M41, the AK-4047 is sturdier than the USCMC weapon. An AK-4047 still works after being thrown off a cliff and left underwater for a month."
+	desc = "The UPP equivalent to the M41A Pulse Rifle, the AK-4047 is a cheap and reliable substitute. As such, the weapon often winds up in the hands of mercenaries and insurgents. While not as accurate as the M41A or Type 71, the AK-4047 is optimized for raw stopping power. Its considerable recoil can make it difficult to control, particularly during sustained fire."
 	icon = 'icons/obj/items/weapons/guns/guns_by_faction/UPP/assault_rifles.dmi'
 	icon_state = "ak4047"
 	item_state = "ak4047"
@@ -1930,7 +1930,7 @@
 	set_fire_delay(FIRE_DELAY_TIER_9)
 	set_burst_amount(BURST_AMOUNT_TIER_3)
 	set_burst_delay(FIRE_DELAY_TIER_11)
-	accuracy_mult = BASE_ACCURACY_MULT + HIT_ACCURACY_MULT_TIER_3
+	accuracy_mult = 1.05
 	accuracy_mult_unwielded = BASE_ACCURACY_MULT - HIT_ACCURACY_MULT_TIER_7
 	scatter = 4.5
 	burst_scatter_mult = SCATTER_AMOUNT_TIER_10

@@ -268,7 +268,7 @@
 
 /datum/ammo/bullet/shotgun/heavy/buckshot/setup_faction_clash_values()
 	. = ..()
-	damage = 35
+	damage = 40
 
 /datum/ammo/bullet/shotgun/heavy/buckshot/on_hit_mob(mob/M,obj/projectile/P)
 	knockback(M,P)

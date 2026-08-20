@@ -18,15 +18,20 @@
 	damage_falloff = DAMAGE_FALLOFF_TIER_7
 	max_range = 24 //So S8 users don't have their bullets magically disappaer at 22 tiles (S8 can see 24 tiles)
 
+/datum/ammo/bullet/rifle/m41a
+	name = "pulse rifle bullet"
+
+	damage = 48
+
 /datum/ammo/bullet/rifle/marksman
 	name = "marksman rifle bullet"
 
-	damage = 55
+	damage = 57
 
 /datum/ammo/bullet/rifle/ak4047
 	name = "assault rifle bullet"
 
-	damage = 60
+	damage = 57
 
 /datum/ammo/bullet/rifle/holo_target
 	name = "holo-targeting rifle bullet"
@@ -250,6 +255,12 @@
 	name = "carbine rifle bullet"
 
 	damage = 57
+	effective_range_max = 3
+	damage_falloff = DAMAGE_FALLOFF_TIER_4
+
+/datum/ammo/bullet/rifle/type71/carbine/setup_faction_clash_values()
+	. = ..()
+	accurate_range = 4
 
 /datum/ammo/bullet/rifle/type71/ap
 	name = "heavy armor-piercing rifle bullet"

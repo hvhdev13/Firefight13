@@ -16,7 +16,7 @@
 		WEAR_R_HAND = 'icons/mob/humans/onmob/inhands/weapons/ammo_righthand.dmi'
 		)
 	w_class = SIZE_MEDIUM
-	default_ammo = /datum/ammo/bullet/rifle
+	default_ammo = /datum/ammo/bullet/rifle/m41a
 	max_rounds = 45
 	gun_type = /obj/item/weapon/gun/rifle/m41a
 	ammo_band_icon = "+m41a_band"

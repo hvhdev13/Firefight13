@@ -54,6 +54,12 @@
 
 /datum/ammo/bullet/lever_action/xm88
 	name = ".458 SOCOM round"
+	penetration = 25
+	accuracy_falloff_per_tile = 2
+
+/datum/ammo/bullet/lever_action/xm88/setup_faction_clash_values()
+	. = ..()
+	accurate_range = 10
 
 	damage = 80
 	penetration = ARMOR_PENETRATION_TIER_2
