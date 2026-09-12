@@ -237,7 +237,8 @@
 			var/list/entry = ranked[i]
 			output += "[i]. [entry["name"]] ([entry["faction"]]) - [entry["kills"]] kills, [entry["deaths"]] deaths<br>"
 
-	var/top_env, var/top_env_count = 0
+	var/top_env
+	var/top_env_count = 0
 	for(var/cause in environment_kills)
 		if(environment_kills[cause] > top_env_count)
 			top_env_count = environment_kills[cause]

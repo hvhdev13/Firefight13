@@ -665,41 +665,6 @@ This is the proc mobs get to turn into a ghost. Forked from ghostize due to comp
 	qdel(src)
 	return TRUE
 
-/mob/dead/observer/verb/respawn_as_new_character()
-	set category = "Ghost"
-	set name = "Respawn"
-	set desc = "Return to the lobby to join the round as a new character."
-
-	if(!client)
-		return
-
-	if(!MODE_HAS_FLAG(MODE_FACTION_CLASH))
-		to_chat(src, SPAN_WARNING("Respawning is not enabled in this gamemode."))
-		return
-
-	if(SSticker.current_state != GAME_STATE_PLAYING)
-		to_chat(src, SPAN_WARNING("The round is either not ready, or has already finished!"))
-		return
-
-	if(mind?.original && !QDELETED(mind.original) && can_reenter_corpse)
-		var/mob/living/carbon/human/body = mind.original
-		if(istype(body) && body.stat == DEAD && body.check_tod() && body.is_revivable())
-			to_chat(src, SPAN_WARNING("Your body can still be revived. Respawning now would end that chance."))
-			if(tgui_alert(src, "Your body is still revivable. Respawn anyway?", "Confirm Respawn", list("Yes", "No")) != "Yes")
-				return
-
-	var/deathtime = world.time - timeofdeath
-	if(deathtime < RESPAWN_COOLDOWN && !bypass_time_of_death_checks && !check_client_rights(client, R_ADMIN, FALSE))
-		to_chat(src, SPAN_WARNING("You have been dead for [DisplayTimeText(deathtime)]."))
-		to_chat(src, SPAN_WARNING("You must wait at least [RESPAWN_COOLDOWN / 600] minute\s before respawning."))
-		return
-
-	if(tgui_alert(src, "Return to the lobby and join as a new character? Your current body will be left behind.", "Confirm Respawn", list("Yes", "No")) != "Yes")
-		return
-
-	can_reenter_corpse = FALSE
-	send_to_lobby()
-
 /mob/dead/observer/verb/enter_tech_tree()
 	set category = "Ghost"
 	set name = "Teleport to Techtree"

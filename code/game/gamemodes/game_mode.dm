@@ -179,10 +179,21 @@ GLOBAL_LIST_INIT(faction_clash_restricted_items, typecacheof(list(
 	/obj/item/ammo_box/rounds/type71/heap,
 )))
 
+GLOBAL_LIST_INIT(faction_clash_logged_ammo, list(
+	/datum/ammo/bullet/rifle,
+	/datum/ammo/bullet/rifle/type71,
+	/datum/ammo/bullet/rifle/marksman,
+	/datum/ammo/bullet/smg,
+	/datum/ammo/bullet/smg/m39,
+))
+
 /datum/game_mode/proc/adjust_ammo_values()
 	if(MODE_HAS_FLAG(MODE_FACTION_CLASH))
 		for(var/ammo in GLOB.ammo_list)
 			GLOB.ammo_list[ammo].setup_faction_clash_values()
+		for(var/ammo_path in GLOB.faction_clash_logged_ammo)
+			var/datum/ammo/logged_ammo = GLOB.ammo_list[ammo_path]
+			log_world("FACTION CLASH AMMO: [ammo_path] damage=[logged_ammo.damage] accuracy=[logged_ammo.accuracy] penetration=[logged_ammo.penetration] accurate_range=[logged_ammo.accurate_range]")
 
 /datum/game_mode/proc/restrict_faction_clash_supply()
 	if(!MODE_HAS_FLAG(MODE_FACTION_CLASH))

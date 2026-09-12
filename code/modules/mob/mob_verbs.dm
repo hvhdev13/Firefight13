@@ -132,6 +132,20 @@
 		var/deathtimeseconds = round((deathtime - deathtimeminutes * 600) / 10,1)
 		to_chat(usr, "You have been dead for[pluralcheck] [deathtimeseconds] seconds.")
 
+	//Faction clash respawn gate
+	if(MODE_HAS_FLAG(MODE_FACTION_CLASH) && !is_admin)
+		var/deathtime = world.time - src.timeofdeath
+		if(deathtime < RESPAWN_COOLDOWN)
+			to_chat(usr, SPAN_WARNING("You must wait at least [RESPAWN_COOLDOWN / 600] minute\s before respawning."))
+			return
+		var/mob/dead/observer/ghost = src
+		if(istype(ghost) && ghost.can_reenter_corpse && !QDELETED(ghost.mind?.original))
+			var/mob/living/carbon/human/body = ghost.mind.original
+			if(istype(body) && body.stat == DEAD && body.check_tod() && body.is_revivable())
+				if(alert(usr, "Your body can still be revived. Respawn anyway?", "Confirm Respawn", "Yes", "No") != "Yes")
+					return
+				ghost.can_reenter_corpse = FALSE
+
 	if(alert("Are you sure you want to respawn?",,"Yes","No") != "Yes")
 		return
 
