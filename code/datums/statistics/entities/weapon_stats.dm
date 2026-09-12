@@ -9,6 +9,7 @@
 	var/total_shots
 	var/total_shots_hit
 	var/total_friendly_fire
+	var/total_damage = 0
 	var/display_stat = TRUE
 
 /datum/entity/weapon_stats/Destroy(force)

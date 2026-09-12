@@ -20,6 +20,7 @@
 	var/total_projectiles_hit_human = 0
 	var/total_projectiles_hit_xeno = 0
 	var/total_friendly_fire_instances = 0
+	var/total_revives = 0
 	var/total_slashes = 0
 
 	// Sub entities

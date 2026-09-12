@@ -271,6 +271,23 @@
 		var/datum/entity/player_stats/job/R = GLOB.round_statistics.setup_job_stats(job)
 		R.total_shots += amount
 
+/datum/entity/player_stats/human/proc/count_weapon_damage(weapon, amount)
+	if(!weapon || amount <= 0)
+		return
+	var/datum/entity/weapon_stats/S = setup_weapon_stats(weapon)
+	S.total_damage += amount
+	if(GLOB.round_statistics)
+		var/datum/entity/weapon_stats/R = GLOB.round_statistics.setup_weapon_stats(weapon)
+		R.total_damage += amount
+
+/mob/proc/track_damage(weapon, amount)
+	if(statistic_exempt || !client || !ishuman(src) || !mind)
+		return
+	var/datum/entity/player_stats/human/human_stats = mind.setup_human_stats()
+	if(isnull(human_stats))
+		return
+	human_stats.count_weapon_damage(weapon, amount)
+
 /mob/proc/track_shot(weapon, amount = 1)
 	if(statistic_exempt || !client || !ishuman(src) || !mind)
 		return
@@ -362,6 +379,7 @@
 	if(GLOB.round_statistics)
 		var/datum/entity/player_stats/job/R = GLOB.round_statistics.setup_job_stats(job)
 		R.total_revives += amount
+		GLOB.round_statistics.total_revives += amount
 
 /mob/proc/track_revive(job, amount = 1)
 	if(statistic_exempt || !client || !ishuman(src) || !mind)

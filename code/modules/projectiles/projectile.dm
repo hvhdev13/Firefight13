@@ -1129,6 +1129,11 @@
 		. = TRUE
 		apply_damage(damage_result, bullet.ammo.damage_type, bullet.def_zone, firer=bullet.firer, enviro=bullet.ammo.damage_enviro)
 
+		if(damage_result > 1 && bullet.weapon_cause_data?.cause_name)
+			var/mob/damage_dealer = bullet.weapon_cause_data.resolve_mob()
+			if(istype(damage_dealer))
+				damage_dealer.track_damage(bullet.weapon_cause_data.cause_name, damage_result)
+
 		if(bullet.ammo.shrapnel_chance > 0 && prob(bullet.ammo.shrapnel_chance + floor(damage / 10)))
 			if(ammo_flags & AMMO_SPECIAL_EMBED)
 				bullet.ammo.on_embed(src, organ)
