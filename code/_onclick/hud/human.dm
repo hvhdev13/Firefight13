@@ -367,6 +367,8 @@
 /mob/living/carbon/human/create_hud()
 	if(client && client.prefs && !hud_used)
 		var/ui_datum = GLOB.custom_huds_list[client.prefs.UI_style]
+		if(faction == FACTION_UPP && SSticker.mode && MODE_HAS_FLAG(MODE_FACTION_CLASH))
+			ui_datum = GLOB.custom_huds_list[HUD_RED]
 		var/ui_color = client.prefs.UI_style_color
 		var/ui_alpha = client.prefs.UI_style_alpha
 		hud_used = new /datum/hud/human(src, ui_datum, ui_color, ui_alpha)

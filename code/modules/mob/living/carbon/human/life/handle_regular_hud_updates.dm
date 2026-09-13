@@ -221,7 +221,9 @@
 	var/status_effect_placement = 1
 
 	var/datum/custom_hud/ui_datum
-	if(client)
+	if(faction == FACTION_UPP && SSticker.mode && MODE_HAS_FLAG(MODE_FACTION_CLASH))
+		ui_datum = GLOB.custom_huds_list[HUD_RED]
+	else if(client)
 		ui_datum = GLOB.custom_huds_list[client.prefs.UI_style]
 	else
 		ui_datum = GLOB.custom_huds_list[HUD_MIDNIGHT]

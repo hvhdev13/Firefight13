@@ -57,6 +57,7 @@ GLOBAL_LIST_INIT(clash_streak_steps, list(3, 5, 7, 10, 15, 20))
 	round_end_time = world.time + round_time_limit
 	addtimer(CALLBACK(src, PROC_REF(round_time_expired)), round_time_limit)
 	respawn_timer_id = addtimer(CALLBACK(src, PROC_REF(update_respawn_huds)), 1 SECONDS, TIMER_LOOP|TIMER_STOPPABLE)
+	start_clash_radar()
 	log_debug("HVH: round timer armed for [round_time_limit / 600] minutes")
 
 /datum/game_mode/extended/faction_clash/cm_vs_upp/proc/count_side(faction)

@@ -58,41 +58,7 @@ let toLookUp = [
 ]
 var lookedUpProperties = {}
 
-let bigButtons = [
-	{
-		name: "Changelog",
-		command: "Changelog",
-		class: "changelog",
-		icon: "list-ul"
-	},
-	{
-		name: "Rules",
-		command: "rules",
-		icon: "scale-balanced"
-	},
-	{
-		name: "Wiki",
-		command: "wiki",
-		icon: "book"
-	},
-	{
-		name: "Forum",
-		command: "forum",
-		icon: "envelope"
-	},
-	{
-		name: "Submit Bug",
-		command: "submit-bug",
-		class: "bug-button",
-		icon: "bug"
-	},
-	{
-		name: "Discord",
-		command: "discord",
-		class: "discord-button",
-		icon: "comments"
-	}
-]
+let bigButtons = []
 
 let clientButtons = {
 	"File": [

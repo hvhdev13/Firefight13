@@ -431,8 +431,6 @@
 ///Give minimap action to wearer
 /obj/item/device/radio/headset/proc/add_minimap(mob/living/carbon/human/user)
 	remove_minimap(user)
-	if(SSticker.mode && MODE_HAS_FLAG(MODE_FACTION_CLASH))
-		return
 	var/datum/action/minimap/mini = new minimap_type
 	mini.give_to(user, mini)
 	INVOKE_NEXT_TICK(src, PROC_REF(update_minimap_icon)) //Mobs are spawned inside nullspace sometimes so this is to avoid that hijinks
