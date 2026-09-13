@@ -373,6 +373,12 @@
 	to_chat(user, SPAN_NOTICE("You set your headset's tracker to point to <b>[new_track]</b>."))
 	locate_setting = tracking_options[new_track]
 
+///Minimap flag of the wearer's own faction, falling back to the headset's
+/obj/item/device/radio/headset/proc/wearer_minimap_flag()
+	if(!wearer || !SSticker.mode || !MODE_HAS_FLAG(MODE_FACTION_CLASH))
+		return minimap_flag
+	return get_minimap_flag_for_faction(wearer.faction) || minimap_flag
+
 /obj/item/device/radio/headset/proc/update_minimap_icon()
 	SIGNAL_HANDLER
 	SSminimaps.remove_marker(wearer)
@@ -416,15 +422,17 @@
 			var/image/leader_trim = image('icons/ui_icons/map_blips.dmi', null, "leader_trim")
 			background.overlays += leader_trim
 
-		SSminimaps.add_marker(wearer, minimap_flag, background)
+		SSminimaps.add_marker(wearer, wearer_minimap_flag(), background)
 		return
 
 	background.overlays += image('icons/ui_icons/map_blips.dmi', null, icon_to_use)
-	SSminimaps.add_marker(wearer, minimap_flag, background)
+	SSminimaps.add_marker(wearer, wearer_minimap_flag(), background)
 
 ///Give minimap action to wearer
 /obj/item/device/radio/headset/proc/add_minimap(mob/living/carbon/human/user)
 	remove_minimap(user)
+	if(SSticker.mode && MODE_HAS_FLAG(MODE_FACTION_CLASH))
+		return
 	var/datum/action/minimap/mini = new minimap_type
 	mini.give_to(user, mini)
 	INVOKE_NEXT_TICK(src, PROC_REF(update_minimap_icon)) //Mobs are spawned inside nullspace sometimes so this is to avoid that hijinks

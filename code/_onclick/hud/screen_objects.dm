@@ -17,6 +17,28 @@
 	maptext_width = 480
 	appearance_flags = NO_CLIENT_COLOR|PIXEL_SCALE
 
+//Faction Clash score display
+/atom/movable/screen/faction_score
+	icon = null
+	icon_state = null
+	mouse_opacity = MOUSE_OPACITY_TRANSPARENT
+	screen_loc = "LEFT,TOP"
+	maptext_height = 48
+	maptext_width = 480
+	maptext_y = -22
+	maptext = ""
+
+//Faction Clash killfeed line
+/atom/movable/screen/faction_killfeed
+	icon = null
+	icon_state = null
+	mouse_opacity = MOUSE_OPACITY_TRANSPARENT
+	screen_loc = "RIGHT,TOP"
+	maptext_height = 16
+	maptext_width = 456
+	maptext_x = -448
+	maptext = ""
+
 /atom/movable/screen/cinematic
 	plane = CINEMATIC_PLANE
 	layer = CINEMATIC_LAYER

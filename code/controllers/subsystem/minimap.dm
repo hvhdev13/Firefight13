@@ -1105,6 +1105,8 @@ SUBSYSTEM_DEF(minimaps)
 		minimap_flags = new_minimap_flags
 	if(new_marker_flags)
 		marker_flags = new_marker_flags
+	if(SSticker.mode && MODE_HAS_FLAG(MODE_FACTION_CLASH))
+		live = TRUE
 	drawing_tools += list(/atom/movable/screen/minimap_tool/up/simple, /atom/movable/screen/minimap_tool/down/simple, /atom/movable/screen/minimap_tool/change_map)
 
 /datum/action/minimap/Destroy()

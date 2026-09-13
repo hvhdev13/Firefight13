@@ -540,6 +540,7 @@ GLOBAL_LIST_EMPTY(vending_products)
 
 	.["stock_listing"] = stock_values
 	.["current_m_points"] = points
+	add_clash_vendor_data(user, .)
 
 /obj/structure/machinery/cm_vending/ui_act(action, list/params, datum/tgui/ui, datum/ui_state/state)
 	. = ..()
@@ -553,6 +554,21 @@ GLOBAL_LIST_EMPTY(vending_products)
 		human_user = ui.user
 
 	switch (action)
+		if ("clash_save")
+			if(!human_user)
+				return TRUE
+			clash_save_loadout(human_user)
+			return TRUE
+		if ("clash_load")
+			if(!human_user)
+				return TRUE
+			clash_load_loadout(human_user, params["slot"])
+			return TRUE
+		if ("clash_delete")
+			if(!human_user)
+				return TRUE
+			clash_delete_loadout(human_user, params["slot"])
+			return TRUE
 		if ("vend")
 			if(stat & IN_USE)
 				return

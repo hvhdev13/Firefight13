@@ -53,6 +53,13 @@ interface VendingData {
   current_m_points?: number;
   reagents?: number;
   reagents_max?: number;
+  clash_enabled?: boolean;
+  clash_loadouts?: ClashLoadout[];
+}
+
+interface ClashLoadout {
+  name: string;
+  count: number;
 }
 
 interface VenableItem {
@@ -410,6 +417,29 @@ export const VendingSorted = () => {
               </Flex.Item>
             </Flex>
           </Box>
+        )}
+
+        {data.clash_enabled && (
+          <Section title="Saved Loadouts">
+            <Button icon="floppy-disk" onClick={() => act('clash_save')}>
+              Save current loadout
+            </Button>
+            {(data.clash_loadouts ?? []).map((loadout) => (
+              <Box key={loadout.name} mt={1}>
+                <Button
+                  icon="download"
+                  onClick={() => act('clash_load', { slot: loadout.name })}
+                >
+                  {loadout.name} ({loadout.count} items)
+                </Button>
+                <Button
+                  icon="trash"
+                  color="bad"
+                  onClick={() => act('clash_delete', { slot: loadout.name })}
+                />
+              </Box>
+            ))}
+          </Section>
         )}
 
         {isEmpty && (

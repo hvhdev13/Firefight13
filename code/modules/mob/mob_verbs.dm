@@ -137,6 +137,7 @@
 		var/deathtime = world.time - src.timeofdeath
 		if(deathtime < RESPAWN_COOLDOWN)
 			to_chat(usr, SPAN_WARNING("You must wait at least [RESPAWN_COOLDOWN / 600] minute\s before respawning."))
+			log_debug("HVH: respawn blocked for [key_name(usr)], dead [deathtime / 10]s")
 			return
 		var/mob/dead/observer/ghost = src
 		if(istype(ghost) && ghost.can_reenter_corpse && !QDELETED(ghost.mind?.original))
@@ -150,6 +151,8 @@
 		return
 
 	log_game("[usr.name]/[usr.key] used abandon mob.")
+	if(MODE_HAS_FLAG(MODE_FACTION_CLASH))
+		log_debug("HVH: respawn allowed for [key_name(usr)]")
 
 	to_chat(usr, SPAN_NOTICE("<B>Make sure to play a different character, and please roleplay correctly!</B>"))
 

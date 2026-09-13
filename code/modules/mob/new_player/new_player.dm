@@ -125,6 +125,11 @@
 		to_chat(usr, SPAN_WARNING("There is an administrative lock on entering the game! (The dropship likely crashed into the Almayer. This should take at most 20 minutes.)"))
 		return
 
+	var/datum/game_mode/extended/faction_clash/cm_vs_upp/clash_mode = SSticker.mode
+	if(istype(clash_mode) && !clash_mode.can_join_side(rank))
+		to_chat(usr, SPAN_WARNING("That side has too many players. Join the other side to keep the teams even."))
+		return
+
 	if(!client?.prefs.update_slot(player_rank.title))
 		return
 

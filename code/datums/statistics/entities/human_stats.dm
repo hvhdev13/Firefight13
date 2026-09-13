@@ -297,6 +297,9 @@
 	human_stats.total_shots += amount
 	human_stats.count_weapon_shot(weapon, amount)
 	human_stats.count_personal_shot(job, amount)
+	var/datum/game_mode/extended/faction_clash/cm_vs_upp/clash_mode = SSticker.mode
+	if(istype(clash_mode))
+		clash_mode.score_shot(real_name, faction, FALSE, amount, mind?.ckey || ckey)
 
 /datum/entity/player_stats/human/proc/count_weapon_shot_hit(weapon, amount = 1)
 	if(!weapon)
@@ -329,6 +332,9 @@
 	human_stats.total_shots_hit += amount
 	human_stats.count_weapon_shot_hit(weapon, amount)
 	human_stats.count_personal_shot_hit(job, amount)
+	var/datum/game_mode/extended/faction_clash/cm_vs_upp/clash_mode = SSticker.mode
+	if(istype(clash_mode))
+		clash_mode.score_shot(real_name, faction, TRUE, amount, mind?.ckey || ckey)
 	if(GLOB.round_statistics)
 		GLOB.round_statistics.total_projectiles_hit += amount
 		if(shot_mob)

@@ -2250,3 +2250,52 @@
 	armor_internaldamage = CLOTHING_ARMOR_HIGHPLUS
 	hood_type = /obj/item/clothing/head/helmet/marine/cbrn_hood/advanced
 
+
+//Faction Clash minimap access, tied to the uniform
+/obj/item/clothing/under/marine/equipped(mob/user, slot, silent)
+	. = ..()
+	if(slot != WEAR_BODY)
+		return
+	if(!SSticker.mode || !MODE_HAS_FLAG(MODE_FACTION_CLASH))
+		return
+	if(!ishuman(user))
+		return
+	grant_clash_minimap(user)
+
+/obj/item/clothing/under/marine/dropped(mob/user)
+	if(ishuman(user))
+		remove_clash_minimap(user)
+	return ..()
+
+/obj/item/clothing/under/marine/proc/grant_clash_minimap(mob/living/carbon/human/user)
+	remove_clash_minimap(user)
+	var/flag = get_minimap_flag_for_faction(user.faction)
+	if(!flag)
+		return
+	var/datum/action/minimap/mini = new(null, flag, flag)
+	mini.give_to(user, mini)
+	RegisterSignal(user, COMSIG_MOB_DEATH, PROC_REF(on_wearer_death), override = TRUE)
+	if(!user.client)
+		return
+	mini.toggle_minimap(TRUE)
+
+/obj/item/clothing/under/marine/proc/on_wearer_death(mob/living/carbon/human/user)
+	SIGNAL_HANDLER
+	for(var/datum/action/minimap/mini in user.actions)
+		mini.toggle_minimap(FALSE)
+
+/obj/item/clothing/under/marine/proc/remove_clash_minimap(mob/living/carbon/human/user)
+	UnregisterSignal(user, COMSIG_MOB_DEATH)
+	for(var/datum/action/action as anything in user.actions)
+		if(istype(action, /datum/action/minimap))
+			action.remove_from(user)
+
+/mob/living/carbon/human/verb/toggle_clash_minimap()
+	set name = "Toggle Minimap"
+	set desc = "Show or hide the tactical minimap."
+	set category = "IC"
+
+	for(var/datum/action/minimap/mini in actions)
+		mini.toggle_minimap()
+		return
+	to_chat(src, SPAN_WARNING("You have no minimap access."))

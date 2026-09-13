@@ -75,6 +75,9 @@
 
 	var/atom/movable/screen/screentip/overwatch/overwatch_text
 
+	var/atom/movable/screen/faction_score/faction_score
+	var/list/faction_killfeed = list()
+
 
 /datum/hud/New(mob/owner)
 	mymob = owner
@@ -99,6 +102,18 @@
 
 	overwatch_text = new(null, src)
 	static_inventory += overwatch_text
+
+	faction_score = new
+	static_inventory += faction_score
+	for(var/i = 1 to CLASH_KILLFEED_LINES)
+		var/atom/movable/screen/faction_killfeed/line = new
+		line.maptext_y = -4 - (i * 10)
+		faction_killfeed += line
+		static_inventory += line
+	var/datum/game_mode/extended/faction_clash/cm_vs_upp/clash_mode = SSticker.mode
+	if(istype(clash_mode))
+		faction_score.maptext = clash_mode.get_score_maptext()
+		clash_mode.render_killfeed_for(mymob)
 
 /datum/hud/Destroy()
 	if(mymob.hud_used == src)
@@ -171,6 +186,8 @@
 	QDEL_LIST_ASSOC_VAL(plane_master_controllers)
 
 	QDEL_NULL(overwatch_text)
+	QDEL_NULL(faction_score)
+	QDEL_LIST(faction_killfeed)
 
 	return ..()
 

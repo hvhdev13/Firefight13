@@ -382,6 +382,9 @@
 /obj/item/device/helmet_visor/leader/proc/add_minimap(mob/living/carbon/human/user)
 	remove_minimap(user)
 	var/datum/action/minimap/mini = new minimap_type
+	if(SSticker.mode && MODE_HAS_FLAG(MODE_FACTION_CLASH))
+		qdel(mini)
+		return
 	mini.give_to(user, mini)
 
 ///Remove all action of type minimap from the wearer, and make him disappear from the minimap

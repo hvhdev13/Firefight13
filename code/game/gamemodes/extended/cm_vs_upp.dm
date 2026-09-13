@@ -1,5 +1,15 @@
 /// How long to delay the round completion (command is immediately notified)
 #define ROUND_END_DELAY (2 MINUTES)
+/// How fast a line fades when it expires
+#define KILLFEED_FADE (5 DECISECONDS)
+/// How fast a line is flicked out when a newer kill pushes it off
+#define KILLFEED_PUSH_FADE (2 DECISECONDS)
+/// How long a killfeed line stays up
+#define KILLFEED_LIFETIME (8 SECONDS)
+/// Player gap that locks the larger side from being joined
+#define CLASH_TEAM_GAP 5
+/// Kill counts that trigger a streak announcement
+GLOBAL_LIST_INIT(clash_streak_steps, list(3, 5, 7, 10, 15, 20))
 
 /datum/game_mode/extended/faction_clash/cm_vs_upp
 	name = GAMEMODE_FACTION_CLASH_UPP_CM
@@ -30,6 +40,11 @@
 	var/list/faction_deaths = list()
 	var/list/player_scores = list()
 	var/list/environment_kills = list()
+	var/list/killfeed = list()
+	var/list/kill_streaks = list()
+	var/list/last_killed_by = list()
+	var/respawn_timer_id
+	var/round_end_time
 
 /datum/game_mode/extended/faction_clash/cm_vs_upp/pre_setup()
 	. = ..()
@@ -39,29 +54,231 @@
 	if(scoring_started)
 		return
 	scoring_started = TRUE
+	round_end_time = world.time + round_time_limit
 	addtimer(CALLBACK(src, PROC_REF(round_time_expired)), round_time_limit)
+	respawn_timer_id = addtimer(CALLBACK(src, PROC_REF(update_respawn_huds)), 1 SECONDS, TIMER_LOOP|TIMER_STOPPABLE)
+	log_debug("HVH: round timer armed for [round_time_limit / 600] minutes")
 
-/datum/game_mode/extended/faction_clash/cm_vs_upp/proc/score_kill(faction, mob_name)
+/datum/game_mode/extended/faction_clash/cm_vs_upp/proc/count_side(faction)
+	var/count = 0
+	for(var/mob/living/carbon/human/player as anything in GLOB.alive_human_list)
+		if(player.client && player.faction == faction)
+			count++
+	return count
+
+/datum/game_mode/extended/faction_clash/cm_vs_upp/proc/can_join_side(rank)
+	var/uscm = count_side(FACTION_MARINE)
+	var/upp = count_side(FACTION_UPP)
+	if(rank in UPP_JOB_LIST)
+		return upp - uscm < CLASH_TEAM_GAP
+	return uscm - upp < CLASH_TEAM_GAP
+
+/datum/game_mode/extended/faction_clash/cm_vs_upp/proc/faction_color(faction)
+	switch(faction)
+		if(FACTION_MARINE)
+			return "#5a8fe6"
+		if(FACTION_UPP)
+			return "#e61919"
+	return "#cccccc"
+
+/datum/game_mode/extended/faction_clash/cm_vs_upp/proc/get_score_entry(mob_name, faction, owner_ckey)
+	var/list/entry = player_scores[mob_name]
+	if(!entry)
+		entry = list("kills" = 0, "deaths" = 0, "shots" = 0, "hits" = 0, "best_streak" = 0, "faction" = faction, "ckey" = owner_ckey)
+		player_scores[mob_name] = entry
+	if(owner_ckey && !entry["ckey"])
+		entry["ckey"] = owner_ckey
+	return entry
+
+/datum/game_mode/extended/faction_clash/cm_vs_upp/proc/get_score_maptext()
+	var/uscm = faction_kills[FACTION_MARINE] || 0
+	var/upp = faction_kills[FACTION_UPP] || 0
+	var/list/lines = list("<span class='maptext center' style='font-size: 10px'><span style='color: #5a8fe6'>USCM [uscm]</span> | <span style='color: #e61919'>[upp] UPP</span></span>")
+	var/clock = get_round_clock()
+	if(clock)
+		lines += clock
+	return lines.Join("<br>")
+
+/datum/game_mode/extended/faction_clash/cm_vs_upp/proc/get_round_clock()
+	if(!round_end_time || round_finished)
+		return null
+	var/remaining = max(0, round_end_time - world.time)
+	var/seconds = CEILING(remaining / 10, 1)
+	var/minutes = floor(seconds / 60)
+	seconds = seconds % 60
+	return "<span class='maptext center'>[minutes]:[seconds < 10 ? "0[seconds]" : "[seconds]"] left</span>"
+
+/datum/game_mode/extended/faction_clash/cm_vs_upp/proc/get_killfeed_line(list/entry)
+	return "<span class='maptext' style='text-align: right'><span style='color: [entry["killer_color"]]'>[entry["killer"]]</span> killed <span style='color: [entry["victim_color"]]'>[entry["victim"]]</span>[entry["cause"] ? " ([entry["cause"]])" : ""]</span>"
+
+/datum/game_mode/extended/faction_clash/cm_vs_upp/proc/render_killfeed_for(mob/player)
+	var/list/lines = player.hud_used?.faction_killfeed
+	if(!length(lines))
+		return
+	for(var/i = 1 to length(lines))
+		var/atom/movable/screen/faction_killfeed/line = lines[i]
+		if(i > length(killfeed))
+			line.maptext = ""
+			line.alpha = 255
+			continue
+		line.maptext = get_killfeed_line(killfeed[i])
+		line.alpha = 255
+
+/datum/game_mode/extended/faction_clash/cm_vs_upp/proc/render_killfeed()
+	for(var/mob/player as anything in GLOB.player_list)
+		render_killfeed_for(player)
+
+/datum/game_mode/extended/faction_clash/cm_vs_upp/proc/fade_killfeed_line(index, duration)
+	for(var/mob/player as anything in GLOB.player_list)
+		var/list/lines = player.hud_used?.faction_killfeed
+		if(index > length(lines))
+			continue
+		var/atom/movable/screen/faction_killfeed/line = lines[index]
+		if(!line.maptext)
+			continue
+		animate(line, alpha = 0, time = duration)
+
+/datum/game_mode/extended/faction_clash/cm_vs_upp/proc/get_respawn_line(mob/player)
+	if(player.stat != DEAD && !isobserver(player))
+		return null
+	if(!player.timeofdeath)
+		return null
+	var/remaining = player.timeofdeath + RESPAWN_COOLDOWN - world.time
+	if(remaining <= 0)
+		return "<span class='maptext center'>Respawn available</span>"
+	var/seconds = CEILING(remaining / 10, 1)
+	var/minutes = floor(seconds / 60)
+	seconds = seconds % 60
+	return "<span class='maptext center'>Respawn in [minutes]:[seconds < 10 ? "0[seconds]" : "[seconds]"]</span>"
+
+/datum/game_mode/extended/faction_clash/cm_vs_upp/proc/compose_hud_maptext(mob/player, base)
+	var/line = get_respawn_line(player)
+	return line ? "[base]<br>[line]" : base
+
+/datum/game_mode/extended/faction_clash/cm_vs_upp/proc/update_score_huds()
+	var/base = get_score_maptext()
+	for(var/mob/player as anything in GLOB.player_list)
+		var/atom/movable/screen/faction_score/display = player.hud_used?.faction_score
+		if(display)
+			display.maptext = compose_hud_maptext(player, base)
+
+/datum/game_mode/extended/faction_clash/cm_vs_upp/proc/update_respawn_huds()
+	if(round_finished)
+		deltimer(respawn_timer_id)
+		respawn_timer_id = null
+		return
+	var/base = get_score_maptext()
+	for(var/mob/player as anything in GLOB.player_list)
+		var/atom/movable/screen/faction_score/display = player.hud_used?.faction_score
+		if(!display)
+			continue
+		var/text = compose_hud_maptext(player, base)
+		if(display.maptext != text)
+			display.maptext = text
+
+/datum/game_mode/extended/faction_clash/cm_vs_upp/proc/score_kill(faction, mob_name, owner_ckey)
 	if(faction)
 		faction_kills[faction] = (faction_kills[faction] || 0) + 1
 	if(mob_name)
-		var/list/entry = player_scores[mob_name]
-		if(!entry)
-			entry = list("kills" = 0, "deaths" = 0, "faction" = faction)
-			player_scores[mob_name] = entry
+		var/list/entry = get_score_entry(mob_name, faction, owner_ckey)
 		entry["kills"] += 1
+	update_score_huds()
+	log_debug("HVH: kill faction=[faction || "none"] killer=[mob_name || "none"]")
 
-/datum/game_mode/extended/faction_clash/cm_vs_upp/proc/score_death(faction, mob_name, cause)
+/datum/game_mode/extended/faction_clash/cm_vs_upp/proc/score_death(faction, mob_name, cause, owner_ckey)
 	if(faction)
 		faction_deaths[faction] = (faction_deaths[faction] || 0) + 1
 	if(mob_name)
-		var/list/entry = player_scores[mob_name]
-		if(!entry)
-			entry = list("kills" = 0, "deaths" = 0, "faction" = faction)
-			player_scores[mob_name] = entry
+		var/list/entry = get_score_entry(mob_name, faction, owner_ckey)
 		entry["deaths"] += 1
 	if(cause)
 		environment_kills[cause] = (environment_kills[cause] || 0) + 1
+	log_debug("HVH: death faction=[faction || "none"] victim=[mob_name || "none"] cause=[cause || "none"]")
+
+/datum/game_mode/extended/faction_clash/cm_vs_upp/proc/score_shot(mob_name, faction, hit, amount = 1, owner_ckey)
+	if(!mob_name)
+		return
+	var/list/entry = get_score_entry(mob_name, faction, owner_ckey)
+	if(hit)
+		entry["hits"] += amount
+	else
+		entry["shots"] += amount
+
+/datum/game_mode/extended/faction_clash/cm_vs_upp/proc/report_kill(mob/victim, mob/killer, cause)
+	var/health_left = 0
+	if(isliving(killer))
+		var/mob/living/living_killer = killer
+		health_left = max(0, round(living_killer.health / living_killer.maxHealth * 100))
+	to_chat(victim, SPAN_WARNING("Killed by [killer.real_name][cause ? " ([cause])" : ""] at [get_dist(victim, killer)] tiles. They had [health_left]% health left."))
+	to_chat(killer, SPAN_NOTICE("You killed [victim.real_name]."))
+
+/datum/game_mode/extended/faction_clash/cm_vs_upp/proc/report_environment_death(mob/victim, cause)
+	if(!cause)
+		return
+	to_chat(victim, SPAN_WARNING("Killed by [cause]."))
+
+/datum/game_mode/extended/faction_clash/cm_vs_upp/proc/add_killfeed(killer, killer_faction, victim, victim_faction, cause)
+	killfeed += list(list(
+		"killer" = killer,
+		"victim" = victim,
+		"cause" = cause,
+		"killer_color" = faction_color(killer_faction),
+		"victim_color" = faction_color(victim_faction),
+		"expiry" = world.time + KILLFEED_LIFETIME,
+		"fading" = FALSE,
+	))
+	if(length(killfeed) > CLASH_KILLFEED_LINES)
+		fade_killfeed_line(1, KILLFEED_PUSH_FADE)
+		addtimer(CALLBACK(src, PROC_REF(drop_oldest_killfeed)), KILLFEED_PUSH_FADE)
+	else
+		render_killfeed()
+	addtimer(CALLBACK(src, PROC_REF(prune_killfeed)), KILLFEED_LIFETIME + 1)
+
+/datum/game_mode/extended/faction_clash/cm_vs_upp/proc/drop_oldest_killfeed()
+	if(length(killfeed) > CLASH_KILLFEED_LINES)
+		killfeed.Cut(1, 2)
+	render_killfeed()
+
+/datum/game_mode/extended/faction_clash/cm_vs_upp/proc/prune_killfeed()
+	var/faded = FALSE
+	for(var/i = length(killfeed) to 1 step -1)
+		var/list/entry = killfeed[i]
+		if(entry["expiry"] > world.time || entry["fading"])
+			continue
+		entry["fading"] = TRUE
+		fade_killfeed_line(i, KILLFEED_FADE)
+		faded = TRUE
+	if(faded)
+		addtimer(CALLBACK(src, PROC_REF(drop_faded_killfeed)), KILLFEED_FADE)
+
+/datum/game_mode/extended/faction_clash/cm_vs_upp/proc/drop_faded_killfeed()
+	for(var/i = length(killfeed) to 1 step -1)
+		var/list/entry = killfeed[i]
+		if(entry["fading"])
+			killfeed.Cut(i, i + 1)
+	render_killfeed()
+
+/datum/game_mode/extended/faction_clash/cm_vs_upp/proc/announce_to_faction(faction, message)
+	for(var/mob/player as anything in GLOB.player_list)
+		if(player.faction == faction)
+			to_chat(player, SPAN_BOLDNOTICE(message))
+
+/datum/game_mode/extended/faction_clash/cm_vs_upp/proc/track_streak(killer, killer_faction, victim, victim_faction, killer_ckey)
+	kill_streaks[victim] = 0
+	if(!killer)
+		return
+	var/streak = (kill_streaks[killer] || 0) + 1
+	kill_streaks[killer] = streak
+	var/list/entry = get_score_entry(killer, killer_faction, killer_ckey)
+	if(streak > entry["best_streak"])
+		entry["best_streak"] = streak
+	if(last_killed_by[killer] == victim)
+		last_killed_by[killer] = null
+		announce_to_faction(killer_faction, "[killer] got revenge on [victim].")
+	last_killed_by[victim] = killer
+	if(streak in GLOB.clash_streak_steps)
+		announce_to_faction(killer_faction, "[killer] is on a [streak] kill streak.")
+		announce_to_faction(victim_faction, "[killer] is on a [streak] kill streak. Put them down.")
 
 /datum/game_mode/extended/faction_clash/cm_vs_upp/proc/round_time_expired()
 	if(round_finished)
@@ -74,6 +291,7 @@
 		round_finished = MODE_FACTION_CLASH_UPP_MAJOR
 	else
 		round_finished = MODE_FACTION_CLASH_DRAW
+	log_debug("HVH: time limit reached, uscm=[uscm] upp=[upp] result=[round_finished]")
 	roundend_ceasefire()
 	SSticker.roundend_check_paused = TRUE
 	addtimer(VARSET_CALLBACK(SSticker, roundend_check_paused, FALSE), ROUND_END_DELAY)
@@ -175,6 +393,7 @@
 	declare_completion_announce_medal_awards()
 	declare_fun_facts()
 	announce_scoreboard()
+	announce_personal_stats()
 	export_round_stats()
 
 	return TRUE
@@ -251,6 +470,41 @@
 		output += "Friendly fire incidents: [GLOB.round_statistics.total_friendly_fire_instances]<br>"
 	to_world(output.Join())
 
+/datum/game_mode/extended/faction_clash/cm_vs_upp/proc/announce_personal_stats()
+	for(var/mob/player as anything in GLOB.player_list)
+		var/owner_ckey = player.mind?.ckey || player.ckey
+		if(!owner_ckey)
+			continue
+		var/kills = 0
+		var/deaths = 0
+		var/shots = 0
+		var/hits = 0
+		var/best_streak = 0
+		var/found = FALSE
+		for(var/name in player_scores)
+			var/list/entry = player_scores[name]
+			if(entry["ckey"] != owner_ckey)
+				continue
+			found = TRUE
+			kills += entry["kills"]
+			deaths += entry["deaths"]
+			shots += entry["shots"]
+			hits += entry["hits"]
+			if(entry["best_streak"] > best_streak)
+				best_streak = entry["best_streak"]
+		if(!found)
+			continue
+		var/list/output = list("<br><b>Your round</b><br>")
+		output += "[kills] kills, [deaths] deaths"
+		if(deaths)
+			output += ", [round(kills / deaths, 0.01)] K/D"
+		output += "<br>"
+		if(shots)
+			output += "[hits] of [shots] shots on target ([round(hits / shots * 100, 0.1)]%)<br>"
+		if(best_streak > 1)
+			output += "Best streak: [best_streak]<br>"
+		to_chat(player, output.Join())
+
 /datum/game_mode/extended/faction_clash/cm_vs_upp/proc/export_round_stats()
 	if(!GLOB.round_statistics)
 		return
@@ -269,7 +523,7 @@
 	var/list/players = list()
 	for(var/name in player_scores)
 		var/list/entry = player_scores[name]
-		players[name] = list("kills" = entry["kills"], "deaths" = entry["deaths"], "faction" = entry["faction"])
+		players[name] = list("kills" = entry["kills"], "deaths" = entry["deaths"], "shots" = entry["shots"], "hits" = entry["hits"], "best_streak" = entry["best_streak"], "faction" = entry["faction"])
 
 	var/list/payload = list(
 		"round_id" = GLOB.round_id,
@@ -284,5 +538,10 @@
 	)
 	var/path = "data/hvh_stats/round_[GLOB.round_id || world.time].json"
 	WRITE_FILE(file(path), json_encode(payload))
+	log_debug("HVH: stats exported to [path], [length(players)] players, [length(weapons)] weapons")
 
 #undef ROUND_END_DELAY
+#undef KILLFEED_FADE
+#undef KILLFEED_PUSH_FADE
+#undef KILLFEED_LIFETIME
+#undef CLASH_TEAM_GAP
