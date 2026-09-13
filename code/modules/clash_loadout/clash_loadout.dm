@@ -129,7 +129,10 @@ GLOBAL_LIST_EMPTY(clash_loadouts)
 		if((vendor.use_points || vendor.use_snowflake_points) && !vendor.handle_points(user, itemspec))
 			missing += entry["name"]
 			continue
+		var/saved_delay = vendor.vend_delay
+		vendor.vend_delay = 0
 		vendor.vendor_successful_vend(itemspec, user)
+		vendor.vend_delay = saved_delay
 		granted[item_type] = TRUE
 	if(length(missing))
 		to_chat(user, SPAN_WARNING("Not available, and not restored: [english_list(missing)]."))

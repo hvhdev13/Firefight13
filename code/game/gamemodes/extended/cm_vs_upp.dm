@@ -117,11 +117,12 @@ GLOBAL_LIST_INIT(clash_streak_steps, list(3, 5, 7, 10, 15, 20))
 		return
 	for(var/i = 1 to length(lines))
 		var/atom/movable/screen/faction_killfeed/line = lines[i]
-		if(i > length(killfeed))
+		var/entry_index = length(killfeed) - i + 1
+		if(entry_index < 1)
 			line.maptext = ""
 			line.alpha = 255
 			continue
-		line.maptext = get_killfeed_line(killfeed[i])
+		line.maptext = get_killfeed_line(killfeed[entry_index])
 		line.alpha = 255
 
 /datum/game_mode/extended/faction_clash/cm_vs_upp/proc/render_killfeed()
@@ -129,11 +130,14 @@ GLOBAL_LIST_INIT(clash_streak_steps, list(3, 5, 7, 10, 15, 20))
 		render_killfeed_for(player)
 
 /datum/game_mode/extended/faction_clash/cm_vs_upp/proc/fade_killfeed_line(index, duration)
+	var/slot = length(killfeed) - index + 1
+	if(slot < 1)
+		return
 	for(var/mob/player as anything in GLOB.player_list)
 		var/list/lines = player.hud_used?.faction_killfeed
-		if(index > length(lines))
+		if(slot > length(lines))
 			continue
-		var/atom/movable/screen/faction_killfeed/line = lines[index]
+		var/atom/movable/screen/faction_killfeed/line = lines[slot]
 		if(!line.maptext)
 			continue
 		animate(line, alpha = 0, time = duration)

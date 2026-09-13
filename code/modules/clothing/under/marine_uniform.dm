@@ -2252,7 +2252,7 @@
 
 
 //Faction Clash minimap access, tied to the uniform
-/obj/item/clothing/under/marine/equipped(mob/user, slot, silent)
+/obj/item/clothing/under/equipped(mob/user, slot, silent)
 	. = ..()
 	if(slot != WEAR_BODY)
 		return
@@ -2262,12 +2262,12 @@
 		return
 	grant_clash_minimap(user)
 
-/obj/item/clothing/under/marine/dropped(mob/user)
+/obj/item/clothing/under/dropped(mob/user)
 	if(ishuman(user))
 		remove_clash_minimap(user)
 	return ..()
 
-/obj/item/clothing/under/marine/proc/grant_clash_minimap(mob/living/carbon/human/user)
+/obj/item/clothing/under/proc/grant_clash_minimap(mob/living/carbon/human/user)
 	remove_clash_minimap(user)
 	var/flag = get_minimap_flag_for_faction(user.faction)
 	if(!flag)
@@ -2275,16 +2275,27 @@
 	var/datum/action/minimap/mini = new(null, flag, flag)
 	mini.give_to(user, mini)
 	RegisterSignal(user, COMSIG_MOB_DEATH, PROC_REF(on_wearer_death), override = TRUE)
-	if(!user.client)
-		return
-	mini.toggle_minimap(TRUE)
+	open_clash_minimap(user)
 
-/obj/item/clothing/under/marine/proc/on_wearer_death(mob/living/carbon/human/user)
+/obj/item/clothing/under/proc/open_clash_minimap(mob/living/carbon/human/user, attempt = 1)
+	if(user.w_uniform != src || !user.client)
+		return
+	for(var/datum/action/minimap/mini in user.actions)
+		if(mini.minimap_displayed)
+			return
+		if(mini.try_initialize_map())
+			mini.toggle_minimap(TRUE)
+			return
+		break
+	if(attempt < 5)
+		addtimer(CALLBACK(src, PROC_REF(open_clash_minimap), user, attempt + 1), 2 SECONDS)
+
+/obj/item/clothing/under/proc/on_wearer_death(mob/living/carbon/human/user)
 	SIGNAL_HANDLER
 	for(var/datum/action/minimap/mini in user.actions)
 		mini.toggle_minimap(FALSE)
 
-/obj/item/clothing/under/marine/proc/remove_clash_minimap(mob/living/carbon/human/user)
+/obj/item/clothing/under/proc/remove_clash_minimap(mob/living/carbon/human/user)
 	UnregisterSignal(user, COMSIG_MOB_DEATH)
 	for(var/datum/action/action as anything in user.actions)
 		if(istype(action, /datum/action/minimap))
