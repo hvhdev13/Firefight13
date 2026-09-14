@@ -1,0 +1,28 @@
+{
+    "map_name": "TDM Kutjevo Mini",
+    "map_path": "map_files/TDM_KutjevoMini",
+    "map_file": "TDM_KutjevoMini.dmm",
+    "webmap_url": "Kutjevo",
+    "disable_ship_map": true,
+    "perf_mode": 31,
+    "camouflage": "desert",
+    "map_item_type": "/obj/item/map/kutjevo_map",
+    "traits": [
+        {
+            "Ground": true,
+            "Up": 1
+        },
+        {
+            "Ground": true,
+            "Up": 1,
+            "Down": -1
+        },
+        {
+            "Ground": true,
+            "Down": -1
+        }
+    ],
+    "gamemodes": [
+        "Faction Clash UPP CM"
+    ]
+}

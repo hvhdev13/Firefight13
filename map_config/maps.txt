@@ -78,3 +78,9 @@ endmap
 
 map tdm_kutjevo
 endmap
+
+map tdm_kutjevo_mini
+endmap
+
+map tdm_kutjevo_supermini
+endmap

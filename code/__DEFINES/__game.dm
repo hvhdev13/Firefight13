@@ -36,6 +36,8 @@
 #define MAP_CORSAT "CORSAT" // Highpop only
 #define MAP_KUTJEVO "Kutjevo Refinery"
 #define MAP_TDM_KUTJEVO "TDM Kutjevo"
+#define MAP_TDM_KUTJEVO_MINI "TDM Kutjevo Mini"
+#define MAP_TDM_KUTJEVO_SUPERMINI "TDM Kutjevo Super Mini"
 #define MAP_ICE_COLONY_V3 "Shivas Snowball" //Ice Rework, low pop enabled.
 #define MAP_RUNTIME "USS Runtime"
 #define MAP_LV522_CHANCES_CLAIM "LV-522 Chance's Claim"
