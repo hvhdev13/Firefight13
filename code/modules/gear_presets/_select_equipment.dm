@@ -209,6 +209,7 @@
 
 	new_human.hud_set_squad()
 	new_human.add_to_all_mob_huds()
+	new_human.refresh_hud_style()
 
 /datum/equipment_preset/proc/load_vanity(mob/living/carbon/human/new_human, client/mob_client)
 	if(!new_human.client || !new_human.client.prefs || !new_human.client.prefs.gear)

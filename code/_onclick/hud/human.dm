@@ -374,3 +374,14 @@
 		hud_used = new /datum/hud/human(src, ui_datum, ui_color, ui_alpha)
 	else
 		hud_used = new /datum/hud/human(src)
+
+/mob/living/carbon/human/proc/refresh_hud_style()
+	if(!client || !client.prefs || !hud_used)
+		return
+	if(faction != FACTION_UPP || !SSticker.mode || !MODE_HAS_FLAG(MODE_FACTION_CLASH))
+		return
+	var/hud_version = hud_used.hud_version
+	qdel(hud_used)
+	create_hud()
+	if(hud_used)
+		hud_used.show_hud(hud_version)

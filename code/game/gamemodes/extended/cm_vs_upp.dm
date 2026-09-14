@@ -8,6 +8,7 @@
 #define KILLFEED_LIFETIME (8 SECONDS)
 /// Player gap that locks the larger side from being joined
 #define CLASH_TEAM_GAP 5
+#define CLASH_USCM_SQUADS list(SQUAD_MARINE_1, SQUAD_MARINE_2)
 /// Kill counts that trigger a streak announcement
 GLOBAL_LIST_INIT(clash_streak_steps, list(3, 5, 7, 10, 15, 20))
 
@@ -45,10 +46,27 @@ GLOBAL_LIST_INIT(clash_streak_steps, list(3, 5, 7, 10, 15, 20))
 	var/list/last_killed_by = list()
 	var/respawn_timer_id
 	var/round_end_time
+	var/list/disabled_squads = list()
 
 /datum/game_mode/extended/faction_clash/cm_vs_upp/pre_setup()
 	. = ..()
 	GLOB.round_should_check_for_win = FALSE
+	restrict_uscm_squads()
+
+/datum/game_mode/extended/faction_clash/cm_vs_upp/proc/restrict_uscm_squads()
+	for(var/datum/squad/squad as anything in GLOB.RoleAuthority.squads)
+		if(squad.faction != FACTION_MARINE || !squad.roundstart || squad.name == "Root")
+			continue
+		if(squad.name in CLASH_USCM_SQUADS)
+			continue
+		squad.roundstart = FALSE
+		disabled_squads += squad
+		log_debug("HVH: squad [squad.name] withheld from roundstart")
+
+/datum/game_mode/extended/faction_clash/cm_vs_upp/proc/restore_uscm_squads()
+	for(var/datum/squad/squad as anything in disabled_squads)
+		squad.roundstart = TRUE
+	disabled_squads.Cut()
 
 /datum/game_mode/extended/faction_clash/cm_vs_upp/proc/start_round_timer()
 	if(scoring_started)
@@ -354,6 +372,7 @@ GLOBAL_LIST_INIT(clash_streak_steps, list(3, 5, 7, 10, 15, 20))
 
 
 /datum/game_mode/extended/faction_clash/cm_vs_upp/declare_completion()
+	restore_uscm_squads()
 	announce_ending()
 	var/musical_track
 	var/end_icon = "draw"

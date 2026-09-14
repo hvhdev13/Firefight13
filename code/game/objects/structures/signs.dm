@@ -78,6 +78,10 @@
 	desc = "To be Robust is not an action or a way of life, but a mental state. Only those with the force of Will strong enough to act during a crisis, saving friend from foe, are truly Robust. Stay Robust my friends."
 	icon_state = "goldenplaque"
 
+/obj/structure/sign/goldenplaque/upp
+	name = "\improper Monument to Premier Gao Melnikov"
+	desc = "Second Premier of the Union. Unity through Strength, Freedom through Unity."
+
 /obj/structure/sign/kiddieplaque
 	name = "AI developers plaque"
 	desc = "Next to the extremely long list of names and job titles, there is a drawing of a little child. Beneath the image, someone has scratched the word \"PACKETS\""

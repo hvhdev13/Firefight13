@@ -566,6 +566,16 @@
 	icon_state = "late_join_medical"
 	job = JOB_NURSE
 
+/obj/effect/landmark/late_join/cargo
+	name = "Cargo Technician late join"
+	icon_state = "late_join_misc"
+	job = JOB_CARGO_TECH
+
+/obj/effect/landmark/late_join/requisition
+	name = "Quartermaster late join"
+	icon_state = "late_join_misc"
+	job = JOB_CHIEF_REQUISITION
+
 /obj/effect/landmark/late_join/intel
 	name = "Intelligence Officer late join"
 	icon_state = "late_join_command"
