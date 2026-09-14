@@ -2683,7 +2683,8 @@
 	id = "cargdoor";
 	name = "Shutter View Access";
 	pixel_x = 6;
-	pixel_y = 2
+	pixel_y = 2;
+	req_one_access_txt = "230"
 	},
 /turf/open/floor/strata,
 /area/clash_arena/tdm_kutjevo/upp_base/req)
@@ -2767,10 +2768,6 @@
 /area/clash_arena/tdm_kutjevo/upp_base/medbay)
 "aiR" = (
 /obj/structure/window/framed/upp_ship/reinforced,
-/obj/structure/machinery/door/poddoor/almayer/open{
-	id = "Hangar Lock UPP";
-	name = "\improper Hangar Lockdown Blast Door"
-	},
 /turf/open/floor/plating,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "aiS" = (
@@ -2936,10 +2933,6 @@
 	},
 /obj/structure/machinery/door/firedoor/border_only/almayer{
 	dir = 2
-	},
-/obj/structure/machinery/door/poddoor/almayer/open{
-	id = "Hangar Lock UPP";
-	name = "\improper Hangar Lockdown Blast Door"
 	},
 /turf/open/floor/almayer/silverfull,
 /area/clash_arena/tdm_kutjevo/upp_base)
@@ -3224,7 +3217,8 @@
 	id = "cargdoor";
 	name = "Shutter View Access";
 	pixel_x = -4;
-	pixel_y = 2
+	pixel_y = 2;
+	req_one_access_txt = "230"
 	},
 /obj/item/tool/hand_labeler{
 	pixel_x = 8;
@@ -3371,7 +3365,8 @@
 	id = "cargent";
 	name = "Entrance Access";
 	pixel_x = 13;
-	pixel_y = -24
+	pixel_y = -24;
+	req_one_access_txt = "230"
 	},
 /turf/open/floor/strata/green4/west,
 /area/clash_arena/tdm_kutjevo/upp_base/req)
@@ -4481,7 +4476,8 @@
 	name = "Door Release";
 	normaldoorcontrol = 1;
 	pixel_x = 26;
-	pixel_y = -5
+	pixel_y = -5;
+	req_one_access_txt = "230"
 	},
 /turf/open/floor/almayer/silverfull,
 /area/clash_arena/tdm_kutjevo/upp_base/medbay)
@@ -7696,7 +7692,7 @@
 	name = "Medbay Lockdown";
 	pixel_y = 1;
 	pixel_x = 6;
-	req_access_txt = "19"
+	req_one_access_txt = "8;19"
 	},
 /obj/item/paper_bin/uscm{
 	pixel_y = 7;
@@ -12581,11 +12577,6 @@
 /turf/open/floor/almayer/mono,
 /area/clash_arena/tdm_kutjevo/uscm_base/req)
 "aEu" = (
-/obj/structure/machinery/door/poddoor/shutters/almayer{
-	dir = 2;
-	id = "bot_armory";
-	name = "\improper Armory Shutters"
-	},
 /obj/effect/decal/warning_stripes{
 	icon_state = "N"
 	},
@@ -13152,11 +13143,6 @@
 /obj/structure/machinery/light/small,
 /obj/item/ammo_box/magazine/empty,
 /obj/item/ammo_box/magazine/empty,
-/obj/structure/machinery/door_control{
-	id = "crate_room3";
-	name = "storage shutters";
-	pixel_x = -26
-	},
 /obj/effect/decal/cleanable/cobweb2/dynamic,
 /turf/open/floor/almayer/test_floor5,
 /area/clash_arena/tdm_kutjevo/uscm_base/req)
@@ -13612,11 +13598,6 @@
 	name = "broken M57 'Larry's Will' smartgun";
 	pixel_x = -7;
 	pixel_y = 3
-	},
-/obj/structure/machinery/door_control{
-	id = "crate_room4";
-	name = "storage shutters";
-	pixel_y = 26
 	},
 /obj/effect/decal/cleanable/cobweb2/dynamic,
 /obj/item/packageWrap,
