@@ -312,7 +312,7 @@
 			dat += "<hr>Marines:<br>"
 			roles_show ^= FLAG_SHOW_MARINES
 
-		dat += "<a href='byond://?src=\ref[src];lobby_choice=SelectedJob;antag=1;job_selected=[J.title]'>[J.disp_title] ([J.current_positions]) (Active: [active])</a><br>"
+		dat += "<a href='byond://?src=\ref[src];lobby_choice=SelectedJob;antag=1;job_selected=[J.title]'>[J.disp_title][J.counterpart ? " ([J.counterpart])" : ""] ([J.current_positions]) (Active: [active])</a><br>"
 
 	dat += "</center>"
 	show_browser(src, dat, "Late Join", "latechoices", width = 420, height = 700)

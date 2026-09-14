@@ -89,6 +89,7 @@
 
 /datum/job/antag/upp/rifleman
 	title = JOB_UPP
+	counterpart = "Rifleman"
 	flags_startup_parameters = ROLE_ADD_TO_SQUAD
 	gear_preset = /datum/equipment_preset/upp/soldier
 
@@ -230,13 +231,13 @@
 		list("Gas Mask", 0, /obj/item/clothing/mask/gas, MARINE_CAN_BUY_MASK, VENDOR_ITEM_REGULAR),
 
 		list("ACCESSORIES (CHOOSE 1)", 0, null, null, null),
-		list("Brown Webbing Vest", 10, /obj/item/clothing/accessory/storage/black_vest/brown_vest, MARINE_CAN_BUY_ACCESSORY, VENDOR_ITEM_RECOMMENDED),
-		list("Black Webbing Vest", 10, /obj/item/clothing/accessory/storage/black_vest, MARINE_CAN_BUY_ACCESSORY, VENDOR_ITEM_RECOMMENDED),
-		list("Shoulder Holster", 10, /obj/item/clothing/accessory/storage/holster, MARINE_CAN_BUY_ACCESSORY, VENDOR_ITEM_REGULAR),
-		list("Webbing", 10, /obj/item/clothing/accessory/storage/webbing, MARINE_CAN_BUY_ACCESSORY, VENDOR_ITEM_REGULAR),
-		list("Black Webbing", 10, /obj/item/clothing/accessory/storage/webbing/black, MARINE_CAN_BUY_ACCESSORY, VENDOR_ITEM_REGULAR),
-		list("Drop Pouch", 10, /obj/item/clothing/accessory/storage/droppouch, MARINE_CAN_BUY_ACCESSORY, VENDOR_ITEM_REGULAR),
-		list("Black Drop Pouch", 10, /obj/item/clothing/accessory/storage/droppouch/black, MARINE_CAN_BUY_ACCESSORY, VENDOR_ITEM_REGULAR),
+		list("Brown Webbing Vest", 0, /obj/item/clothing/accessory/storage/black_vest/brown_vest, MARINE_CAN_BUY_ACCESSORY, VENDOR_ITEM_RECOMMENDED),
+		list("Black Webbing Vest", 0, /obj/item/clothing/accessory/storage/black_vest, MARINE_CAN_BUY_ACCESSORY, VENDOR_ITEM_RECOMMENDED),
+		list("Shoulder Holster", 0, /obj/item/clothing/accessory/storage/holster, MARINE_CAN_BUY_ACCESSORY, VENDOR_ITEM_REGULAR),
+		list("Webbing", 0, /obj/item/clothing/accessory/storage/webbing, MARINE_CAN_BUY_ACCESSORY, VENDOR_ITEM_REGULAR),
+		list("Black Webbing", 0, /obj/item/clothing/accessory/storage/webbing/black, MARINE_CAN_BUY_ACCESSORY, VENDOR_ITEM_REGULAR),
+		list("Drop Pouch", 0, /obj/item/clothing/accessory/storage/droppouch, MARINE_CAN_BUY_ACCESSORY, VENDOR_ITEM_REGULAR),
+		list("Black Drop Pouch", 0, /obj/item/clothing/accessory/storage/droppouch/black, MARINE_CAN_BUY_ACCESSORY, VENDOR_ITEM_REGULAR),
 
 		list("ENGINEERING SUPPLIES", 0, null, null, null),
 		list("E-Tool", 5, /obj/item/tool/shovel/etool/folded, null, VENDOR_ITEM_REGULAR),
@@ -318,6 +319,7 @@
 
 /datum/job/antag/upp/medic
 	title = JOB_UPP_MEDIC
+	counterpart = "Hospital Corpsman"
 	gear_preset = /datum/equipment_preset/upp/medic
 	flags_startup_parameters = ROLE_ADD_TO_SQUAD
 
@@ -529,6 +531,7 @@
 //*****************************************************************************************************/
 /datum/job/antag/upp/sapper
 	title = JOB_UPP_ENGI
+	counterpart = "Combat Technician"
 	gear_preset = /datum/equipment_preset/upp/sapper
 	flags_startup_parameters = ROLE_ADD_TO_SQUAD
 
@@ -837,6 +840,7 @@
 //*****************************************************************************************************/
 /datum/job/antag/upp/machinegunner
 	title = JOB_UPP_SPECIALIST
+	counterpart = "Smartgunner"
 	gear_preset = /datum/equipment_preset/upp/machinegunner
 	flags_startup_parameters = ROLE_ADD_TO_SQUAD
 
@@ -988,6 +992,7 @@
 //*****************************************************************************************************/
 /datum/job/antag/upp/leader
 	title = JOB_UPP_LEADER
+	counterpart = "Squad Leader"
 	gear_preset = /datum/equipment_preset/upp/leader
 	flags_startup_parameters = ROLE_ADD_TO_SQUAD
 
@@ -1387,6 +1392,7 @@
 
 /datum/job/antag/upp/doctor
 	title = JOB_UPP_LT_DOKTOR
+	counterpart = "Doctor"
 	selection_class = "job_cmo"
 	gear_preset = /datum/equipment_preset/upp/doctor
 
@@ -1563,6 +1569,7 @@
 
 /datum/job/antag/upp/supply
 	title = JOB_UPP_SUPPLY
+	counterpart = "Requisitions"
 	selection_class = "job_ct"
 	gear_preset = /datum/equipment_preset/upp/supply
 

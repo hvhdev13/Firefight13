@@ -5,6 +5,8 @@
 	var/title = null
 	///Determined on new(). Usually the same as the title, but doesn't have to be. Set this to override what the player sees in the game as their title.
 	var/disp_title
+	///Equivalent role on the opposing faction, shown in brackets on the late join list only.
+	var/counterpart
 	///If the roleban title needs to be an extra check, like Xenomorphs = Alien.
 	var/role_ban_alternative
 
