@@ -3,7 +3,8 @@
 	icon = 'icons/turf/area_kutjevo.dmi'
 	icon_state = "kutjevo"
 	powernet_name = "ground"
-	unlimited_power = 1
+	requires_power = FALSE
+	unlimited_power = TRUE
 	temperature = 308.7
 	minimap_color = MINIMAP_AREA_ENGI
 

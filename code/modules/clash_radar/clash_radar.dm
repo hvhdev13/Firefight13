@@ -86,6 +86,10 @@ GLOBAL_LIST_EMPTY(clash_radar_dots)
 		if(player.stat == DEAD || !ishuman(player))
 			radar.clear()
 			continue
+		var/mob/living/carbon/human/human_player = player
+		if(!human_player.w_uniform)
+			radar.clear()
+			continue
 		radar.render(player)
 
 #undef RADAR_SIZE

@@ -1,5 +1,3 @@
-/// How long to delay the round completion (command is immediately notified)
-#define ROUND_END_DELAY (2 MINUTES)
 /// How fast a line fades when it expires
 #define KILLFEED_FADE (5 DECISECONDS)
 /// How fast a line is flicked out when a newer kill pushes it off
@@ -9,6 +7,7 @@
 /// Player gap that locks the larger side from being joined
 #define CLASH_TEAM_GAP 5
 #define CLASH_USCM_SQUADS list(SQUAD_MARINE_1, SQUAD_MARINE_2)
+#define CLASH_MAP_VOTE_LEAD (5 MINUTES)
 /// Kill counts that trigger a streak announcement
 GLOBAL_LIST_INIT(clash_streak_steps, list(3, 5, 7, 10, 15, 20))
 
@@ -34,6 +33,7 @@ GLOBAL_LIST_INIT(clash_streak_steps, list(3, 5, 7, 10, 15, 20))
 	)
 
 	taskbar_icon = 'icons/taskbar/gml_hvh.png'
+	skip_roundend_votes = TRUE
 	var/upp_ship = "ssv_rostock.dmm"
 	var/round_time_limit = 90 MINUTES
 	var/scoring_started = FALSE
@@ -47,11 +47,13 @@ GLOBAL_LIST_INIT(clash_streak_steps, list(3, 5, 7, 10, 15, 20))
 	var/respawn_timer_id
 	var/round_end_time
 	var/list/disabled_squads = list()
+	var/list/clamped_jobs = list()
 
 /datum/game_mode/extended/faction_clash/cm_vs_upp/pre_setup()
 	. = ..()
 	GLOB.round_should_check_for_win = FALSE
 	restrict_uscm_squads()
+	unlock_upp_job_slots()
 
 /datum/game_mode/extended/faction_clash/cm_vs_upp/proc/restrict_uscm_squads()
 	for(var/datum/squad/squad as anything in GLOB.RoleAuthority.squads)
@@ -62,6 +64,23 @@ GLOBAL_LIST_INIT(clash_streak_steps, list(3, 5, 7, 10, 15, 20))
 		squad.roundstart = FALSE
 		disabled_squads += squad
 		log_debug("HVH: squad [squad.name] withheld from roundstart")
+
+/datum/game_mode/extended/faction_clash/cm_vs_upp/proc/unlock_upp_job_slots()
+	for(var/title in UPP_JOB_LIST)
+		var/datum/job/job = GLOB.RoleAuthority.roles_by_name[title]
+		if(!job || job.total_positions == -1)
+			continue
+		clamped_jobs[job] = list(job.total_positions, job.spawn_positions)
+		job.total_positions = -1
+		job.spawn_positions = -1
+		log_debug("HVH: [title] slots unlocked")
+
+/datum/game_mode/extended/faction_clash/cm_vs_upp/proc/restore_upp_job_slots()
+	for(var/datum/job/job as anything in clamped_jobs)
+		var/list/saved = clamped_jobs[job]
+		job.total_positions = saved[1]
+		job.spawn_positions = saved[2]
+	clamped_jobs.Cut()
 
 /datum/game_mode/extended/faction_clash/cm_vs_upp/proc/restore_uscm_squads()
 	for(var/datum/squad/squad as anything in disabled_squads)
@@ -74,6 +93,7 @@ GLOBAL_LIST_INIT(clash_streak_steps, list(3, 5, 7, 10, 15, 20))
 	scoring_started = TRUE
 	round_end_time = world.time + round_time_limit
 	addtimer(CALLBACK(src, PROC_REF(round_time_expired)), round_time_limit)
+	addtimer(CALLBACK(src, PROC_REF(start_map_vote)), max(1, round_time_limit - CLASH_MAP_VOTE_LEAD))
 	respawn_timer_id = addtimer(CALLBACK(src, PROC_REF(update_respawn_huds)), 1 SECONDS, TIMER_LOOP|TIMER_STOPPABLE)
 	start_clash_radar()
 	log_debug("HVH: round timer armed for [round_time_limit / 600] minutes")
@@ -316,9 +336,13 @@ GLOBAL_LIST_INIT(clash_streak_steps, list(3, 5, 7, 10, 15, 20))
 		round_finished = MODE_FACTION_CLASH_DRAW
 	log_debug("HVH: time limit reached, uscm=[uscm] upp=[upp] result=[round_finished]")
 	roundend_ceasefire()
-	SSticker.roundend_check_paused = TRUE
-	addtimer(VARSET_CALLBACK(SSticker, roundend_check_paused, FALSE), ROUND_END_DELAY)
 
+
+/datum/game_mode/extended/faction_clash/cm_vs_upp/proc/start_map_vote()
+	if(round_finished)
+		return
+	log_debug("HVH: map vote opening, [CLASH_MAP_VOTE_LEAD / 600] minutes left")
+	SSvote.initiate_vote("groundmap", "SERVER", null, TRUE)
 
 /datum/game_mode/extended/faction_clash/cm_vs_upp/get_roles_list()
 	return GLOB.ROLES_CM_VS_UPP
@@ -373,6 +397,7 @@ GLOBAL_LIST_INIT(clash_streak_steps, list(3, 5, 7, 10, 15, 20))
 
 /datum/game_mode/extended/faction_clash/cm_vs_upp/declare_completion()
 	restore_uscm_squads()
+	restore_upp_job_slots()
 	announce_ending()
 	var/musical_track
 	var/end_icon = "draw"
@@ -564,7 +589,6 @@ GLOBAL_LIST_INIT(clash_streak_steps, list(3, 5, 7, 10, 15, 20))
 	WRITE_FILE(file(path), json_encode(payload))
 	log_debug("HVH: stats exported to [path], [length(players)] players, [length(weapons)] weapons")
 
-#undef ROUND_END_DELAY
 #undef KILLFEED_FADE
 #undef KILLFEED_PUSH_FADE
 #undef KILLFEED_LIFETIME

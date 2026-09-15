@@ -18,6 +18,7 @@ GLOBAL_VAR_INIT(cas_tracking_id_increment, 0) //this var used to assign unique t
 	var/name = "invalid"
 	var/config_tag = null
 	var/votable = TRUE
+	var/skip_roundend_votes = FALSE
 	var/vote_cycle = null
 	var/probability = 0
 	var/list/datum/mind/modePlayer = new

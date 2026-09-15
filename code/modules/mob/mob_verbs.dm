@@ -165,6 +165,11 @@
 		log_game("[usr.key] AM failed due to disconnect.")
 		return
 
+	var/mob/old_body = mind?.original
+	var/datum/job/old_job = old_body ? GLOB.RoleAuthority.roles_for_mode[old_body.job] : null
+	if(old_job)
+		GLOB.RoleAuthority.free_role(old_job, TRUE)
+
 	var/mob/new_player/M = new /mob/new_player()
 	if(!client)
 		log_game("[usr.key] AM failed due to disconnect.")

@@ -115,14 +115,17 @@ SUBSYSTEM_DEF(ticker)
 				mode.declare_completion(force_ending)
 				REDIS_PUBLISH("byond.round", "type" = "round-complete", "round_name" = GLOB.round_statistics.round_name, "round_finished" = mode.round_finished)
 				flash_clients()
-				addtimer(CALLBACK(
-					SSvote,
-					/datum/controller/subsystem/vote/proc/initiate_vote,
-					"gamemode",
-					"SERVER",
-					CALLBACK(src, PROC_REF(handle_map_reboot)),
-					TRUE
-				), 3 SECONDS)
+				if(mode.skip_roundend_votes)
+					addtimer(CALLBACK(src, PROC_REF(Reboot)), 3 SECONDS)
+				else
+					addtimer(CALLBACK(
+						SSvote,
+						/datum/controller/subsystem/vote/proc/initiate_vote,
+						"gamemode",
+						"SERVER",
+						CALLBACK(src, PROC_REF(handle_map_reboot)),
+						TRUE
+					), 3 SECONDS)
 				Master.SetRunLevel(RUNLEVEL_POSTGAME)
 
 /// Attempt to start game asynchronously if applicable
