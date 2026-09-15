@@ -173,7 +173,7 @@
 /obj/structure/machinery/cm_vending/clothing/super_snowflake/get_listed_products(mob/user)
 	//If we don't have an object type, we ask the user to supply it
 	if(!item_types)
-		var/obj/item/chosen = get_item_category_from_user()
+		var/obj/item/chosen = UNLINT(get_item_category_from_user())
 		if(!chosen)
 			return
 		item_types = list(chosen)

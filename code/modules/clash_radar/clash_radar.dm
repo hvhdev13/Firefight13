@@ -6,6 +6,7 @@
 #define RADAR_ALPHA 102
 /// Pixel size of a contact dot
 #define RADAR_DOT 4
+#define RADAR_EDGE 3
 /// How often contacts are redrawn
 #define RADAR_REFRESH (5 DECISECONDS)
 
@@ -19,20 +20,38 @@ GLOBAL_LIST_EMPTY(clash_radar_dots)
 	backdrop.Scale(RADAR_SIZE, RADAR_SIZE)
 	var/radius = RADAR_SIZE * 0.5
 	for(var/y = 1 to RADAR_SIZE)
-		var/offset = y - radius - 0.5
-		var/span = sqrt(max(0, radius * radius - offset * offset))
-		if(span < 1)
-			continue
-		backdrop.DrawBox(rgb(18, 26, 38), round(radius - span) + 1, y, round(radius + span), y)
+		for(var/x = 1 to RADAR_SIZE)
+			var/dx = x - radius - 0.5
+			var/dy = y - radius - 0.5
+			var/edge = radius - sqrt(dx * dx + dy * dy)
+			if(edge <= 0)
+				continue
+			var/coverage = edge < 1 ? edge : 1
+			if(edge < RADAR_EDGE)
+				backdrop.DrawBox(rgb(92, 124, 156, round(255 * coverage)), x, y)
+			else
+				backdrop.DrawBox(rgb(18, 26, 38, round(255 * coverage)), x, y)
 	GLOB.clash_radar_backdrop = backdrop
 	return backdrop
 
 /proc/get_clash_radar_dot(dot_color)
 	if(GLOB.clash_radar_dots[dot_color])
 		return GLOB.clash_radar_dots[dot_color]
+	var/red = hex2num(copytext(dot_color, 2, 4))
+	var/green = hex2num(copytext(dot_color, 4, 6))
+	var/blue = hex2num(copytext(dot_color, 6, 8))
 	var/icon/dot = icon('icons/effects/effects.dmi', "nothing")
 	dot.Scale(RADAR_DOT, RADAR_DOT)
-	dot.DrawBox(dot_color, 1, 1, RADAR_DOT, RADAR_DOT)
+	var/radius = RADAR_DOT * 0.5
+	for(var/y = 1 to RADAR_DOT)
+		for(var/x = 1 to RADAR_DOT)
+			var/dx = x - radius - 0.5
+			var/dy = y - radius - 0.5
+			var/edge = radius - sqrt(dx * dx + dy * dy)
+			if(edge <= 0)
+				continue
+			var/coverage = edge < 1 ? edge : 1
+			dot.DrawBox(rgb(red, green, blue, round(255 * coverage)), x, y)
 	GLOB.clash_radar_dots[dot_color] = dot
 	return dot
 
@@ -95,5 +114,6 @@ GLOBAL_LIST_EMPTY(clash_radar_dots)
 #undef RADAR_SIZE
 #undef RADAR_RANGE
 #undef RADAR_DOT
+#undef RADAR_EDGE
 #undef RADAR_ALPHA
 #undef RADAR_REFRESH

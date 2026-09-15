@@ -130,9 +130,12 @@ GLOBAL_LIST_EMPTY(clash_loadouts)
 			missing += entry["name"]
 			continue
 		var/saved_delay = vendor.vend_delay
+		var/saved_flags = vendor.vend_flags
 		vendor.vend_delay = 0
-		vendor.vendor_successful_vend(itemspec, user)
+		vendor.vend_flags = (vendor.vend_flags | VEND_UNIFORM_AUTOEQUIP) & ~VEND_TO_HAND
+		vendor.vendor_successful_vend(itemspec, user, get_turf(user))
 		vendor.vend_delay = saved_delay
+		vendor.vend_flags = saved_flags
 		granted[item_type] = TRUE
 	if(length(missing))
 		to_chat(user, SPAN_WARNING("Not available, and not restored: [english_list(missing)]."))

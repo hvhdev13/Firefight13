@@ -37,6 +37,9 @@
 	.=..()
 	access = get_access(ACCESS_LIST_UPP_ALL)
 
+/datum/equipment_preset/upp/load_status(mob/living/carbon/human/new_human)
+	new_human.nutrition = rand(NUTRITION_VERYLOW, NUTRITION_LOW)
+
 /datum/equipment_preset/upp/load_gear(mob/living/carbon/human/new_human)
 	.=..()
 	new_human.equip_to_slot_or_del(new /obj/item/storage/backpack/lightpack/upp, WEAR_BACK)

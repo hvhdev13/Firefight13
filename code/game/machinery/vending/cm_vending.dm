@@ -1416,12 +1416,12 @@ GLOBAL_LIST_INIT(cm_vending_gear_corresponding_types_list, list(
 	.["stock_listing"] = product_amounts
 	.["stock_listing_partials"] = product_partials
 
-/obj/structure/machinery/cm_vending/proc/vendor_successful_vend(list/itemspec, mob/living/carbon/human/user)
+/obj/structure/machinery/cm_vending/proc/vendor_successful_vend(list/itemspec, mob/living/carbon/human/user, turf/override_turf)
 	if(stat & IN_USE)
 		return
 	stat |= IN_USE
 
-	var/turf/target_turf = get_appropriate_vend_turf(user)
+	var/turf/target_turf = override_turf || get_appropriate_vend_turf(user)
 	if(LAZYLEN(itemspec)) //making sure it's not empty
 		if(vend_delay)
 			overlays.Cut()
