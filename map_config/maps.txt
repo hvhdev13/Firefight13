@@ -84,3 +84,6 @@ endmap
 
 map tdm_kutjevo_supermini
 endmap
+
+map tdm_deathmatch2000
+endmap
