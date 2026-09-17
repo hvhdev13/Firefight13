@@ -349,6 +349,9 @@ GLOBAL_LIST_INIT(clash_streak_steps, list(3, 5, 7, 10, 15, 20))
 
 /datum/game_mode/extended/faction_clash/cm_vs_upp/post_setup()
 	. = ..()
+	for(var/hivenumber in GLOB.hive_datum)
+		var/datum/hive_status/hive = GLOB.hive_datum[hivenumber]
+		hive.UnregisterSignal(SSdcs, COMSIG_GLOB_POST_SETUP)
 	start_round_timer()
 	SSweather.force_weather_holder(/datum/weather_ss_map_holder/faction_clash)
 	for(var/area/area in GLOB.all_areas)

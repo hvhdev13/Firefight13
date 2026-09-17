@@ -2,7 +2,7 @@ name: CI Suite
 on:
   pull_request:
     branches:
-    - master
+    - main
   merge_group:
 jobs:
   run_linters:
