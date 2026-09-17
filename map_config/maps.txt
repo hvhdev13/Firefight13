@@ -13,9 +13,11 @@ Format:
 endmap
 
 map lv624
+	disabled
 endmap
 
 map bigredv2
+	disabled
 endmap
 
 map prison_station_fop
@@ -24,6 +26,7 @@ endmap
 
 map fiorina_sciannex
 	minplayers 0
+	disabled
 endmap
 
 map corsat
@@ -34,6 +37,7 @@ endmap
 
 map desert_dam
 	minplayers 0
+	disabled
 endmap
 
 map ice_colony_v2
@@ -43,24 +47,29 @@ map ice_colony_v2
 endmap
 
 map shivas_snowball
+	disabled
 endmap
 
 map kutjevo
+	disabled
 endmap
 
 map sorokyne_strata
 	minplayers 0
+	disabled
 endmap
 
 map lv522_chances_claim
+	disabled
 endmap
 
 map lv759_hybrisa_prospera
 	minplayers 0
+	disabled
 endmap
 
 map new_varadero
-	default
+	disabled
 endmap
 
 map tyrargo_rift
@@ -77,13 +86,16 @@ map whiskey_outpost_v2
 endmap
 
 map tdm_kutjevo
+	disabled
 endmap
 
 map tdm_kutjevo_mini
+	disabled
 endmap
 
 map tdm_kutjevo_supermini
 endmap
 
 map tdm_deathmatch2000
+	default
 endmap
