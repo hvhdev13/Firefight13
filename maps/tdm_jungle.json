@@ -1,0 +1,15 @@
+{
+    "map_name": "TDM Jungle",
+    "map_path": "map_files/TDM_Jungle",
+    "map_file": "TDM_Jungle.dmm",
+    "disable_ship_map": true,
+    "perf_mode": 31,
+    "traits": [
+        {
+            "Ground": true
+        }
+    ],
+    "gamemodes": [
+        "Faction Clash UPP CM"
+    ]
+}

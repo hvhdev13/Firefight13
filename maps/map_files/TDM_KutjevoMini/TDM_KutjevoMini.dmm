@@ -910,7 +910,6 @@
 /area/clash_arena/tdm_kutjevo/upp_base)
 "acO" = (
 /obj/structure/machinery/cm_vending/gear/antag{
-	hacked = 1;
 	name = "\improper Response Team Automated Gear Rack"
 	},
 /turf/open/floor/corsat/spiralplate,
@@ -1329,7 +1328,6 @@
 /area/clash_arena/tdm_kutjevo/uscm_base)
 "adW" = (
 /obj/structure/machinery/cm_vending/gear/antag{
-	hacked = 1;
 	name = "\improper Automated Gear Rack"
 	},
 /turf/open/floor/corsat/spiralplate,
@@ -2243,7 +2241,6 @@
 	pixel_x = 2
 	},
 /obj/structure/machinery/cm_vending/gear/antag{
-	hacked = 1;
 	name = "\improper Response Team Automated Gear Rack"
 	},
 /turf/open/floor/strata/cyan3/north,
@@ -5907,7 +5904,6 @@
 /area/clash_arena/tdm_kutjevo/upp_base)
 "aqq" = (
 /obj/structure/machinery/cm_vending/gear/antag{
-	hacked = 1;
 	name = "\improper Response Team Automated Gear Rack";
 	density = 0
 	},
@@ -15074,7 +15070,6 @@
 /area/kutjevo/exterior/scrubland/south)
 "lIM" = (
 /obj/structure/machinery/cm_vending/gear/antag{
-	hacked = 1;
 	name = "\improper Response Team Automated Gear Rack"
 	},
 /turf/open/floor/strata/orange_edge,
@@ -16238,7 +16233,6 @@
 /area/kutjevo/interior/power)
 "wOU" = (
 /obj/structure/machinery/cm_vending/gear/antag{
-	hacked = 1;
 	name = "\improper Response Team Automated Gear Rack"
 	},
 /turf/open/floor/corsat/spiralplate,

@@ -2779,7 +2779,6 @@
 	pixel_x = 2
 	},
 /obj/structure/machinery/cm_vending/gear/antag{
-	hacked = 1;
 	name = "\improper Response Team Automated Gear Rack"
 	},
 /turf/open/floor/strata/cyan3/north,
@@ -4793,7 +4792,6 @@
 /area/clash_arena/tdm_deathmatch2000/uscm_base/medbay)
 "um" = (
 /obj/structure/machinery/cm_vending/gear/antag{
-	hacked = 1;
 	name = "\improper Response Team Automated Gear Rack";
 	density = 0
 	},
@@ -7341,7 +7339,6 @@
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "GV" = (
 /obj/structure/machinery/cm_vending/gear/antag{
-	hacked = 1;
 	name = "\improper Automated Gear Rack"
 	},
 /turf/open/floor/corsat/spiralplate,
@@ -7499,7 +7496,6 @@
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "HW" = (
 /obj/structure/machinery/cm_vending/gear/antag{
-	hacked = 1;
 	name = "\improper Response Team Automated Gear Rack"
 	},
 /turf/open/floor/corsat/spiralplate,
@@ -8388,7 +8384,6 @@
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
 "LC" = (
 /obj/structure/machinery/cm_vending/gear/antag{
-	hacked = 1;
 	name = "\improper Response Team Automated Gear Rack"
 	},
 /turf/open/floor/strata/floor3/east,

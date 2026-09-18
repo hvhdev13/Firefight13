@@ -59,3 +59,31 @@
 /area/clash_arena/tdm_deathmatch2000/battlefield
 	name = "\improper Contested Zone"
 	minimap_color = MINIMAP_AREA_ENGI
+
+/area/clash_arena/tdm_jungle/uscm_base
+	name = "\improper USCM Staging"
+	ceiling = CEILING_METAL
+	minimap_color = MINIMAP_AREA_COMMAND
+
+/area/clash_arena/tdm_jungle/uscm_base/req
+	name = "\improper USCM Requisitions"
+
+/area/clash_arena/tdm_jungle/uscm_base/medbay
+	name = "\improper USCM Medical"
+	minimap_color = MINIMAP_AREA_MEDBAY
+
+/area/clash_arena/tdm_jungle/upp_base
+	name = "\improper UPP Staging"
+	ceiling = CEILING_METAL
+	minimap_color = MINIMAP_AREA_COMMAND
+
+/area/clash_arena/tdm_jungle/upp_base/req
+	name = "\improper UPP Requisitions"
+
+/area/clash_arena/tdm_jungle/upp_base/medbay
+	name = "\improper UPP Medical"
+	minimap_color = MINIMAP_AREA_MEDBAY
+
+/area/clash_arena/tdm_jungle/battlefield
+	name = "\improper Contested Zone"
+	minimap_color = MINIMAP_AREA_ENGI

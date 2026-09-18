@@ -180,6 +180,7 @@ GLOBAL_LIST_INIT_TYPED(map_type_list, /obj/item/map, setup_all_maps())
 		MAP_TDM_KUTJEVO_MINI = new /obj/item/map/kutjevo_map(),
 		MAP_TDM_KUTJEVO_SUPERMINI = new /obj/item/map/kutjevo_map(),
 		MAP_TDM_DEATHMATCH2000 = new /obj/item/map/kutjevo_map(),
+		MAP_TDM_JUNGLE = new /obj/item/map/kutjevo_map(),
 		MAP_LV522_CHANCES_CLAIM = new /obj/item/map/lv522_map(),
 		MAP_LV759_HYBRISA_PROSPERA = new /obj/item/map/lv759_map(),
 		MAP_NEW_VARADERO = new /obj/item/map/new_varadero(),
