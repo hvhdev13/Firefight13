@@ -3119,6 +3119,17 @@
 "lJ" = (
 /turf/open/floor/strata/orange_edge/east,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
+"lK" = (
+/obj/structure/machinery/door/airlock/upp/medical/solid/autoname,
+/obj/structure/blocker/clash_gate/upp,
+/obj/structure/machinery/door/airlock/upp/medical/solid/autoname{
+	unacidable = 1;
+	not_weldable = 1;
+	masterkey_resist = 1;
+	no_panel = 1
+	},
+/turf/open/floor/strata/multi_tiles,
+/area/clash_arena/tdm_deathmatch2000/battlefield)
 "lL" = (
 /turf/open/floor/strata/orange_edge/northeast,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
@@ -3786,9 +3797,6 @@
 	},
 /turf/open/floor/strata/floor2,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
-"pF" = (
-/turf/closed/wall/upp_ship/reinforced/outer,
-/area/space)
 "pG" = (
 /obj/structure/pipes/vents/scrubber{
 	dir = 1
@@ -3965,6 +3973,9 @@
 	},
 /turf/open/floor/almayer/dark_sterile,
 /area/clash_arena/tdm_deathmatch2000/uscm_base/medbay)
+"qH" = (
+/turf/closed/wall/upp_ship/reinforced/outer,
+/area/space)
 "qI" = (
 /obj/structure/machinery/door/airlock/multi_tile/almayer/medidoor{
 	dir = 2;
@@ -8466,17 +8477,6 @@
 "LM" = (
 /turf/open/floor/strata,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
-"LQ" = (
-/obj/structure/machinery/door/airlock/upp/medical/solid/autoname,
-/obj/structure/blocker/clash_gate/upp,
-/obj/structure/machinery/door/airlock/upp/medical/solid/autoname{
-	unacidable = 1;
-	not_weldable = 1;
-	masterkey_resist = 1;
-	no_panel = 1
-	},
-/turf/open/floor/strata/multi_tiles,
-/area/clash_arena/tdm_deathmatch2000/battlefield)
 "LS" = (
 /obj/structure/pipes/vents/pump{
 	dir = 4
@@ -23238,8 +23238,8 @@ Hk
 aM
 Hk
 Vm
-pF
-pF
+qH
+qH
 ES
 ES
 ES
@@ -23520,7 +23520,7 @@ hb
 PG
 hb
 PG
-LQ
+lK
 PG
 hb
 PG
@@ -24076,7 +24076,7 @@ ES
 ES
 ES
 CF
-at
+dw
 ut
 at
 at
@@ -24220,7 +24220,7 @@ ES
 CF
 at
 at
-at
+dw
 ut
 at
 at
@@ -24229,7 +24229,7 @@ ut
 at
 at
 at
-ut
+at
 at
 at
 at
@@ -24366,7 +24366,7 @@ at
 at
 at
 at
-dw
+at
 at
 at
 at
@@ -25076,7 +25076,7 @@ kV
 kV
 kV
 Pg
-dr
+Pg
 kV
 kV
 kV
@@ -25216,7 +25216,7 @@ kV
 Pg
 kV
 kV
-kV
+cZ
 kV
 kV
 kV
@@ -25355,7 +25355,7 @@ ES
 ES
 CF
 kV
-cZ
+kV
 kV
 kV
 kV
@@ -26356,7 +26356,7 @@ kV
 cV
 kV
 dr
-dr
+Pg
 Pg
 kV
 kV
@@ -28484,7 +28484,7 @@ kV
 kV
 kV
 Pg
-cZ
+kV
 cZ
 kV
 kV

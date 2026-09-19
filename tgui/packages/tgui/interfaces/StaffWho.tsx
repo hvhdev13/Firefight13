@@ -23,7 +23,7 @@ export const StaffWho = (props, context) => {
   const { base_data, admin_additional, admin_stealthed_additional } = data;
 
   const total_admins = mergeArrays(
-    base_data.total_admins,
+    admin_additional ? undefined : base_data.total_admins,
     admin_additional?.total_admins,
     admin_stealthed_additional?.total_admins,
   );

@@ -235,6 +235,7 @@ SUBSYSTEM_DEF(who)
 				listings[category][2] += client
 				break
 
+	var/list/public_rank_counts = list()
 	for(var/category in listings)
 		base_data["categories"] += list(list(
 			"category" = category,
@@ -259,7 +260,9 @@ SUBSYSTEM_DEF(who)
 				admin_additional["total_admins"] += list(list("[client.key] ([rank])" = list(admin_payload)))
 			else
 				admin_additional["total_admins"] += list(list("[client.key] ([rank])" = list(admin_payload)))
-				base_data["total_admins"] += list(list("[client.key] ([rank])" = list(admin_payload.Copy())))
+				public_rank_counts[rank] = (public_rank_counts[rank] || 0) + 1
+				var/public_label = public_rank_counts[rank] > 1 ? "[rank] #[public_rank_counts[rank]]" : rank
+				base_data["total_admins"] += list(list("[public_label]" = list(admin_payload.Copy())))
 
 			admin_payload["text"] = ""
 			if(istype(client.mob, /mob/dead/observer))

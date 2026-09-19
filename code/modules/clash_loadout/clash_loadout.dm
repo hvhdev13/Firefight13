@@ -38,18 +38,43 @@ GLOBAL_LIST_EMPTY(clash_loadouts)
 	job = user.job
 	items.Cut()
 	for(var/obj/item/thing in user.get_equipped_items())
-		record(thing)
-		for(var/obj/item/inner in thing.contents)
-			record(inner)
+		record(thing, FALSE)
+		record_contents(thing)
 
-/datum/clash_loadout/proc/record(obj/item/thing)
-	items += list(list("type" = thing.type, "name" = thing.name))
+/datum/clash_loadout/proc/record_contents(obj/item/holder)
+	for(var/obj/item/inner in holder.contents)
+		record(inner, TRUE)
+		record_contents(inner)
+
+/datum/clash_loadout/proc/record(obj/item/thing, inner)
+	items += list(list("type" = thing.type, "name" = thing.name, "inner" = inner))
+
+/// Uniform first, then armor, then the rest of the worn gear, then what goes inside it
+/proc/clash_equip_order(list/entry)
+	if(entry["inner"])
+		return 4
+	var/item_type = entry["type"]
+	if(ispath(item_type, /obj/item/clothing/under))
+		return 1
+	if(ispath(item_type, /obj/item/clothing/suit))
+		return 2
+	return 3
+
+/datum/clash_loadout/proc/get_sorted_items()
+	var/list/sorted = list()
+	for(var/rank in 1 to 4)
+		for(var/list/entry in items)
+			if(clash_equip_order(entry) == rank)
+				sorted += list(entry)
+	return sorted
 
 /// Every vendor this user is allowed to buy from
 /proc/get_clash_vendors(mob/living/carbon/human/user)
 	var/list/vendors = list()
 	for(var/obj/structure/machinery/cm_vending/vendor in GLOB.machines)
-		if(vendor.inoperable())
+		if(vendor.z != user.z || vendor.inoperable())
+			continue
+		if(vendor.squad_tag && (!user.assigned_squad || (!user.assigned_squad.omni_squad_vendor && user.assigned_squad.name != vendor.squad_tag)))
 			continue
 		if(!vendor.can_access_to_vend(user, FALSE))
 			continue
@@ -61,11 +86,9 @@ GLOBAL_LIST_EMPTY(clash_loadouts)
 	for(var/obj/structure/machinery/cm_vending/vendor as anything in vendors)
 		for(var/list/itemspec in vendor.get_available_products(user))
 			var/prod_type = itemspec[3]
-			if(islist(prod_type))
+			if(islist(prod_type) ? !(item_type in prod_type) : prod_type != item_type)
 				continue
-			if(prod_type != item_type)
-				continue
-			if((vendor.vend_flags & VEND_LIMITED_INVENTORY) && itemspec[2] <= 0)
+			if(!vendor.use_points && !vendor.use_snowflake_points && itemspec[2] <= 0)
 				continue
 			return list(vendor, itemspec)
 	return null
@@ -73,10 +96,13 @@ GLOBAL_LIST_EMPTY(clash_loadouts)
 /datum/clash_loadout/proc/can_afford(mob/living/carbon/human/user, list/vendors)
 	var/points_cost = 0
 	var/snowflake_cost = 0
+	var/list/needed = list()
 	for(var/list/entry in items)
-		if(clash_user_has_type(user, entry["type"]))
+		var/item_type = entry["type"]
+		needed[item_type] = (needed[item_type] || 0) + 1
+		if(clash_count_type(user, item_type) >= needed[item_type])
 			continue
-		var/list/found = find_clash_product(vendors, user, entry["type"])
+		var/list/found = find_clash_product(vendors, user, item_type)
 		if(!found)
 			continue
 		var/obj/structure/machinery/cm_vending/vendor = found[1]
@@ -93,14 +119,29 @@ GLOBAL_LIST_EMPTY(clash_loadouts)
 		return "You need [snowflake_cost] specialist points and have [user.vendor_snowflake_points]."
 	return null
 
-/proc/clash_user_has_type(mob/living/carbon/human/user, item_type)
-	for(var/obj/item/thing in user.contents)
+/proc/clash_count_type(atom/holder, item_type)
+	. = 0
+	for(var/obj/item/thing in holder.contents)
 		if(thing.type == item_type)
-			return TRUE
-		for(var/obj/item/inner in thing.contents)
-			if(inner.type == item_type)
-				return TRUE
-	return FALSE
+			.++
+		. += clash_count_type(thing, item_type)
+
+/// Mirrors the checks of the vendor's own vend action, returns TRUE if the item was handed out
+/proc/clash_vend(obj/structure/machinery/cm_vending/vendor, list/itemspec, mob/living/carbon/human/user)
+	if(vendor.stat & IN_USE)
+		return FALSE
+	if(vendor.vend_flags & VEND_CATEGORY_CHECK)
+		if(itemspec[4] == MARINE_CAN_BUY_ESSENTIALS)
+			return FALSE
+		if(itemspec[4] && !vendor.handle_vend(itemspec, user))
+			return FALSE
+	if((vendor.use_points || vendor.use_snowflake_points) && !vendor.handle_points(user, itemspec))
+		return FALSE
+	var/saved_flags = vendor.vend_flags
+	vendor.vend_flags = (vendor.vend_flags | VEND_UNIFORM_AUTOEQUIP) & ~VEND_TO_HAND
+	vendor.vendor_successful_vend(itemspec, user, get_turf(user))
+	vendor.vend_flags = saved_flags
+	return TRUE
 
 /datum/clash_loadout/proc/restore(mob/living/carbon/human/user)
 	var/list/vendors = get_clash_vendors(user)
@@ -109,34 +150,15 @@ GLOBAL_LIST_EMPTY(clash_loadouts)
 		to_chat(user, SPAN_WARNING("Loadout not restored. [shortfall]"))
 		return FALSE
 	var/list/missing = list()
-	var/list/granted = list()
-	for(var/list/entry in items)
+	var/list/needed = list()
+	for(var/list/entry in get_sorted_items())
 		var/item_type = entry["type"]
-		if(!granted[item_type] && clash_user_has_type(user, item_type))
+		needed[item_type] = (needed[item_type] || 0) + 1
+		if(clash_count_type(user, item_type) >= needed[item_type])
 			continue
 		var/list/found = find_clash_product(vendors, user, item_type)
-		if(!found)
+		if(!found || !clash_vend(found[1], found[2], user))
 			missing += entry["name"]
-			continue
-		var/obj/structure/machinery/cm_vending/vendor = found[1]
-		var/list/itemspec = found[2]
-		if(vendor.stat & IN_USE)
-			missing += entry["name"]
-			continue
-		if(!vendor.handle_vend(itemspec, user))
-			missing += entry["name"]
-			continue
-		if((vendor.use_points || vendor.use_snowflake_points) && !vendor.handle_points(user, itemspec))
-			missing += entry["name"]
-			continue
-		var/saved_delay = vendor.vend_delay
-		var/saved_flags = vendor.vend_flags
-		vendor.vend_delay = 0
-		vendor.vend_flags = (vendor.vend_flags | VEND_UNIFORM_AUTOEQUIP) & ~VEND_TO_HAND
-		vendor.vendor_successful_vend(itemspec, user, get_turf(user))
-		vendor.vend_delay = saved_delay
-		vendor.vend_flags = saved_flags
-		granted[item_type] = TRUE
 	if(length(missing))
 		to_chat(user, SPAN_WARNING("Not available, and not restored: [english_list(missing)]."))
 	return TRUE
