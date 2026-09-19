@@ -29,6 +29,7 @@
 		return
 
 	var/rendered = "<span class='game deadsay'><span class='prefix'>DEAD:</span> <span class='name'>[stafftype]([src.username()])</span> says, <span class='message'>\"[msg]\"</span></span>"
+	var/player_rendered = "<span class='game deadsay'><span class='prefix'>DEAD:</span> <span class='name'>[stafftype]</span> says, <span class='message'>\"[msg]\"</span></span>"
 
 	for (var/mob/M in GLOB.player_list)
 		if (istype(M, /mob/new_player))
@@ -38,7 +39,7 @@
 			M.show_message(rendered, SHOW_MESSAGE_AUDIBLE)
 
 		else if((M.stat == DEAD || isobserver(M)) && M && M.client && M.client.prefs && (M.client.prefs.toggles_chat & CHAT_DEAD)) // show the message to regular ghosts who have deadchat toggled on
-			M.show_message(rendered, SHOW_MESSAGE_AUDIBLE)
+			M.show_message(player_rendered, SHOW_MESSAGE_AUDIBLE)
 
 /client/proc/get_dead_say()
 	var/msg = input(src, null, "dsay \"text\"") as text|null

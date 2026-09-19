@@ -261,7 +261,7 @@ SET_PROTECTED_DATUM(/datum/admin_help)
 	if(is_bwoink)
 		var/admin_initiating = key_name_admin(usr, FALSE)
 		AddInteraction(SPAN_BLUE("[admin_initiating] PM'd [LinkedReplyName()]"),
-		plain_message = "[admin_initiating] PM'd [initiator_key_name]")
+		plain_message = "[admin_initiating] PM'd [initiator_key_name]", player_message = SPAN_BLUE("An Administrator PM'd you"))
 		message_admins(SPAN_BLUE("Ticket [TicketHref("#[id]")] created"))
 	else
 		MessageNoRecipient(msg_raw, urgent)
@@ -370,7 +370,7 @@ SET_PROTECTED_DATUM(/datum/admin_help)
 	GLOB.ahelp_tickets.resolved_tickets -= src
 	return ..()
 
-/datum/admin_help/proc/AddInteraction(formatted_message, plain_message = null, message_type = "admin", link_data = null)
+/datum/admin_help/proc/AddInteraction(formatted_message, plain_message = null, message_type = "admin", link_data = null, player_message = null, hide_from_player = FALSE)
 	var/ckey_to_use = null
 	var/username_to_use = null
 
@@ -410,8 +410,8 @@ SET_PROTECTED_DATUM(/datum/admin_help)
 
 	ticket_interactions[html_message] = structured_data
 
-	if (formatted_message)
-		player_interactions += "[time_stamp()]: [formatted_message]"
+	if (formatted_message && !hide_from_player)
+		player_interactions += "[time_stamp()]: [player_message || formatted_message]"
 	if(plain_text)
 		latest_message = plain_text
 
@@ -513,7 +513,7 @@ SET_PROTECTED_DATUM(/datum/admin_help)
 		initiator.current_ticket = src
 
 	AddInteraction(SPAN_PURPLE("Reopened by [key_name_admin(usr, FALSE)]"),
-	plain_message = "Reopened by [usr.username()]", message_type = "system")
+	plain_message = "Reopened by [usr.username()]", message_type = "system", player_message = SPAN_PURPLE("Reopened by an Administrator"))
 	var/msg = SPAN_ADMINHELP("Ticket [TicketHref("#[id]")] reopened by [key_name_admin(usr)].")
 	message_admins(msg)
 	log_ahelp(id, "Reopened", "Reopened by [usr.username()]", usr.ckey)
@@ -543,7 +543,7 @@ SET_PROTECTED_DATUM(/datum/admin_help)
 	RemoveActive()
 	state = AHELP_CLOSED
 	GLOB.ahelp_tickets.ListInsert(src)
-	AddInteraction(SPAN_RED("Closed by [key_name]."), plain_message = "Closed by [usr.username()]", message_type = "system")
+	AddInteraction(SPAN_RED("Closed by [key_name]."), plain_message = "Closed by [usr.username()]", message_type = "system", player_message = SPAN_RED("Closed by an Administrator."))
 	if(!silent)
 		var/msg = "Ticket [TicketHref("#[id]")] closed by [key_name]."
 		message_admins(msg)
@@ -567,7 +567,7 @@ SET_PROTECTED_DATUM(/datum/admin_help)
 	addtimer(CALLBACK(initiator, /client/proc/giveadminhelpverb), 50)
 
 	AddInteraction(SPAN_GREEN("Resolved by [key_name]."),
-	plain_message = "Resolved by [usr.username()]", message_type = "system")
+	plain_message = "Resolved by [usr.username()]", message_type = "system", player_message = SPAN_GREEN("Resolved by an Administrator."))
 	to_chat(initiator, SPAN_ADMINHELP("Your ticket has been resolved by an admin. The Adminhelp verb will be returned to you shortly."), confidential = TRUE)
 	if(!silent)
 		var/msg = "Ticket [TicketHref("#[id]")] resolved by [key_name]"
@@ -598,7 +598,7 @@ SET_PROTECTED_DATUM(/datum/admin_help)
 			var/custom_msg = tgui_input_text(usr, "Text to Send to Mentors", "Defer to Mentors")
 			if(!custom_msg)
 				return
-			message = "DEFERRED BY ADMIN [usr.username()]: [custom_msg]\n\nOriginal message: [initial_message]"
+			message = "DEFERRED BY ADMIN: [custom_msg]\n\nOriginal message: [initial_message]"
 
 	if(!message)
 		return
@@ -607,8 +607,8 @@ SET_PROTECTED_DATUM(/datum/admin_help)
 	MH.subject = subject
 	MH.broadcast_unhandled(message, initiator)
 
-	AddInteraction("Deferred to Mentors by [key_name_admin(usr, FALSE)].", plain_message = "Deferred to Mentors by [usr.username()]", message_type = "system")
-	to_chat(initiator, SPAN_ADMINHELP("[usr.username()] has deferred your ticket to Mentors."))
+	AddInteraction("Deferred to Mentors by [key_name_admin(usr, FALSE)].", plain_message = "Deferred to Mentors by [usr.username()]", message_type = "system", player_message = "Deferred to Mentors by an Administrator.")
+	to_chat(initiator, SPAN_ADMINHELP("An Administrator has deferred your ticket to Mentors."))
 	log_admin_private("Ticket [TicketHref("#[id]")] deferred to mentors by [usr.username()].")
 	for(var/client/admin in GLOB.admins)
 		if(CLIENT_IS_STAFF(admin) || CLIENT_IS_MENTOR(admin))
@@ -635,7 +635,7 @@ SET_PROTECTED_DATUM(/datum/admin_help)
 
 	var/key_name = key_name_admin(user, FALSE)
 	AddInteraction("Marked by [key_name].",
-		plain_message = "Marked by [user.username()]", message_type = "system")
+		plain_message = "Marked by [user.username()]", message_type = "system", player_message = "Marked by an Administrator.")
 	to_chat(initiator, SPAN_ADMINHELP("An admin is preparing to respond to your ticket."))
 	var/msg = "Ticket [TicketHref("#[id]")] marked by [key_name]."
 	message_admins(msg)
@@ -646,7 +646,7 @@ SET_PROTECTED_DATUM(/datum/admin_help)
 /datum/admin_help/proc/unmark_ticket()
 	var/key_name = key_name_admin(usr, FALSE)
 	AddInteraction("Unmarked by [key_name] (previously [marked_admin_key_name]).",
-		plain_message = "Unmarked by [usr.username()] (previously [marked_admin_key_name])", message_type = "system")
+		plain_message = "Unmarked by [usr.username()] (previously [marked_admin_key_name])", message_type = "system", player_message = "Unmarked by an Administrator.")
 	var/msg = "Ticket [TicketHref("#[id]")] unmarked by [key_name]."
 	message_admins(msg)
 	log_ahelp(id, "Unmarked", "Unmarked by [usr.username()] (previously [marked_admin_key_name])", sender = usr.ckey)
@@ -674,7 +674,7 @@ SET_PROTECTED_DATUM(/datum/admin_help)
 	var/msg = "Ticket [TicketHref("#[id]")] rejected by [key_name]"
 	message_admins(msg)
 	AddInteraction("Rejected by [key_name].",
-		plain_message = "Rejected by [usr.username()]", message_type = "system")
+		plain_message = "Rejected by [usr.username()]", message_type = "system", player_message = "Rejected by an Administrator.")
 	log_ahelp(id, "Rejected", "Rejected by [usr.username()]", null, usr.ckey)
 	Close(silent = TRUE)
 
@@ -707,7 +707,7 @@ SET_PROTECTED_DATUM(/datum/admin_help)
 	msg = "Ticket [TicketHref("#[id]")] marked as [response.title] by [key_name]"
 	message_admins(msg)
 	AddInteraction("Marked as [response.title] by [key_name]",
-		plain_message = "Marked as [response.title] by [usr.username()]", message_type = "system")
+		plain_message = "Marked as [response.title] by [usr.username()]", message_type = "system", player_message = "Marked as [response.title] by an Administrator")
 	log_ahelp(id, "Autoreply", "Marked as [response.title] by [usr.username()]", null,  usr.ckey)
 	if(response.closer)
 		Resolve(silent = TRUE)
@@ -1044,9 +1044,9 @@ CLIENT_VERB(view_latest_ticket)
 	if(istype(mob_client) && mob_client.current_ticket)
 		if (isnull(player_message))
 			mob_client.current_ticket.AddInteraction(message,
-			plain_message = raw_message)
+			plain_message = raw_message, hide_from_player = TRUE)
 		else
-			mob_client.current_ticket.AddInteraction(message, player_message,
+			mob_client.current_ticket.AddInteraction(message, player_message = player_message,
 			plain_message = raw_player_message, message_type = "legacy")
 		if(log_in_blackbox)
 			log_ahelp(mob_client.current_ticket.id, "Interaction", message, mob_client.ckey, usr.ckey)
@@ -1056,9 +1056,9 @@ CLIENT_VERB(view_latest_ticket)
 		if(active_admin_help)
 			if (isnull(player_message))
 				active_admin_help.AddInteraction(message,
-				plain_message = raw_message)
+				plain_message = raw_message, hide_from_player = TRUE)
 			else
-				active_admin_help.AddInteraction(message, player_message,
+				active_admin_help.AddInteraction(message, player_message = player_message,
 				plain_message = raw_player_message, message_type = "legacy")
 			if(log_in_blackbox)
 				log_ahelp(active_admin_help.id, "Interaction", message, what, usr.ckey)

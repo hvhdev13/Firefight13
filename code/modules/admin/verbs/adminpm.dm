@@ -142,7 +142,7 @@ SET_PROTECTED_PROC(/client/proc/cmd_admin_pm)
 
 	//get message text, limit it's length.and clean/escape html
 	if(!msg)
-		msg = tgui_input_text(src, "Message:", "Private message to [recipient.admin_holder?.fakekey ? "an Administrator" : key_name(recipient, 0, 0)]", multiline = TRUE)
+		msg = tgui_input_text(src, "Message:", "Private message to [recipient.admin_holder?.fakekey || should_hide_staff_key(recipient, src) ? "an Administrator" : key_name(recipient, 0, 0)]", multiline = TRUE)
 		msg = trim(msg)
 		if(!msg)
 			return
@@ -262,7 +262,7 @@ SET_PROTECTED_PROC(/client/proc/cmd_admin_pm)
 				confidential = TRUE)
 			to_chat(recipient,
 				type = MESSAGE_TYPE_ADMINPM,
-				html = SPAN_ADMINSAY("Admin PM from-<b>[key_name(src, recipient, 0)]</b>: <span class='linkify'>[msg]</span>"),
+				html = SPAN_ADMINSAY("Admin PM from-<b>[should_hide_staff_key(src, recipient) ? "<a href='byond://?priv_msg=[ckey]'>Administrator</a>" : key_name(src, recipient, 0)]</b>: <span class='linkify'>[msg]</span>"),
 				confidential = TRUE)
 			to_chat(recipient,
 				type = MESSAGE_TYPE_ADMINPM,
@@ -274,7 +274,7 @@ SET_PROTECTED_PROC(/client/proc/cmd_admin_pm)
 				confidential = TRUE)
 
 			admin_ticket_log(recipient, SPAN_GREEN("PM From [key_name_admin(src, FALSE)]: [msg]"), log_in_blackbox = FALSE,
-				player_message = SPAN_GREEN("PM From [key_name_with_username(src, include_name = FALSE)]: [msg]"),
+				player_message = SPAN_GREEN("PM From [should_hide_staff_key(src, recipient) ? "Administrator" : key_name_with_username(src, include_name = FALSE)]: [msg]"),
 				raw_message = "PM from-[src.username()] to-[recipient.username()]: [msg]",
 				raw_player_message = "[msg]")
 

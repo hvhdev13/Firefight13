@@ -166,7 +166,7 @@ GLOBAL_DATUM_INIT(mentorhelp_manager, /datum/mentorhelp_manager, new)
 	if(viewer && CLIENT_IS_STAFF(viewer))
 		return subject_ic ? "[subject_key]/([subject_ic])" : subject_key
 
-	return subject_key
+	return viewer?.admin_holder ? subject_key : "Mentor"
 
 /datum/mentorhelp/proc/get_author_role()
 	if(author && author.mob)
@@ -737,7 +737,7 @@ GLOBAL_DATUM_INIT(mentorhelp_manager, /datum/mentorhelp_manager, new)
 
 	var/datum/admin_help/help_ticket = new /datum/admin_help(message, author, FALSE)
 	help_ticket.subject = subject
-	help_ticket.AddInteraction("Deferred from Mentorhelp by [deferrer.username()].", plain_message = "Deferred from Mentorhelp by [deferrer.username()]", message_type = "system")
+	help_ticket.AddInteraction("Deferred from Mentorhelp by [deferrer.username()].", plain_message = "Deferred from Mentorhelp by [deferrer.username()]", message_type = "system", player_message = "Deferred from Mentorhelp by a Mentor.")
 
 	notify("[SPAN_RED(deferrer.username())] deferred this ticket to admins.",
 		unformatted_text = "[deferrer.username()] deferred this ticket to admins.")

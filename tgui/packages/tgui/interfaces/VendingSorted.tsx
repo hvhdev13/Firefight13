@@ -60,6 +60,8 @@ interface VendingData {
 interface ClashLoadout {
   name: string;
   count: number;
+  role: string;
+  faction: string;
 }
 
 const CLASH_SLOT_COUNT = 3;
@@ -84,6 +86,7 @@ const ClashLoadoutSlots = () => {
                 <>
                   <Box className="ClashSlot__name">{loadout.name}</Box>
                   <Box className="ClashSlot__meta">
+                    {loadout.faction} &middot; {loadout.role} &middot;{' '}
                     {loadout.count} {loadout.count === 1 ? 'item' : 'items'}
                   </Box>
                 </>

@@ -10,8 +10,9 @@
 	if(confirm == "Cancel")
 		return
 	if(confirm == "Yes")
-		to_world(SPAN_DANGER("<b>Restarting world!</b> [SPAN_NOTICE("Initiated by [usr.client.admin_holder.fakekey ? "Admin" : usr.client.username()]!")]"))
+		to_world(SPAN_DANGER("<b>Restarting world!</b> [SPAN_NOTICE("Initiated by an Administrator!")]"))
 		log_admin("[key_name(usr)] initiated a reboot.")
+		message_admins("[key_name_admin(usr)] initiated a reboot.")
 
 		sleep(50)
 		world.Reboot()

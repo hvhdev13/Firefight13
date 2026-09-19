@@ -23,9 +23,9 @@
 	icon_state = null
 	mouse_opacity = MOUSE_OPACITY_TRANSPARENT
 	screen_loc = "LEFT,TOP"
-	maptext_height = 48
+	maptext_height = 80
 	maptext_width = 480
-	maptext_y = -22
+	maptext_y = -54
 	maptext = ""
 
 //Faction Clash killfeed line

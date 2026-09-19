@@ -9,6 +9,7 @@
 	minimap_color = MINIMAP_AREA_ENGI
 
 /area/clash_arena/tdm_kutjevo/uscm_base
+	clash_faction = FACTION_MARINE
 	name = "\improper USCM Staging"
 	ceiling = CEILING_METAL
 	minimap_color = MINIMAP_AREA_COMMAND
@@ -21,6 +22,7 @@
 	minimap_color = MINIMAP_AREA_MEDBAY
 
 /area/clash_arena/tdm_kutjevo/upp_base
+	clash_faction = FACTION_UPP
 	name = "\improper UPP Staging"
 	ceiling = CEILING_METAL
 	minimap_color = MINIMAP_AREA_COMMAND
@@ -33,6 +35,7 @@
 	minimap_color = MINIMAP_AREA_MEDBAY
 
 /area/clash_arena/tdm_deathmatch2000/uscm_base
+	clash_faction = FACTION_MARINE
 	name = "\improper USCM Staging"
 	ceiling = CEILING_METAL
 	minimap_color = MINIMAP_AREA_COMMAND
@@ -45,6 +48,7 @@
 	minimap_color = MINIMAP_AREA_MEDBAY
 
 /area/clash_arena/tdm_deathmatch2000/upp_base
+	clash_faction = FACTION_UPP
 	name = "\improper UPP Staging"
 	ceiling = CEILING_METAL
 	minimap_color = MINIMAP_AREA_COMMAND
@@ -61,6 +65,7 @@
 	minimap_color = MINIMAP_AREA_ENGI
 
 /area/clash_arena/tdm_jungle/uscm_base
+	clash_faction = FACTION_MARINE
 	name = "\improper USCM Staging"
 	ceiling = CEILING_METAL
 	minimap_color = MINIMAP_AREA_COMMAND
@@ -73,6 +78,7 @@
 	minimap_color = MINIMAP_AREA_MEDBAY
 
 /area/clash_arena/tdm_jungle/upp_base
+	clash_faction = FACTION_UPP
 	name = "\improper UPP Staging"
 	ceiling = CEILING_METAL
 	minimap_color = MINIMAP_AREA_COMMAND

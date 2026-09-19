@@ -133,8 +133,10 @@ GLOBAL_LIST_INIT(clash_streak_steps, list(3, 5, 7, 10, 15, 20))
 	var/uscm = faction_kills[FACTION_MARINE] || 0
 	var/upp = faction_kills[FACTION_UPP] || 0
 	var/list/lines = list("<span class='maptext center' style='font-size: 10px'><span style='color: #5a8fe6'>USCM [uscm]</span> | <span style='color: #e61919'>[upp] UPP</span></span>")
+	lines += "<span class='maptext center'><span style='color: #5a8fe6'>Players: [count_side(FACTION_MARINE)]</span> | <span style='color: #e61919'>Players: [count_side(FACTION_UPP)]</span></span>"
 	var/clock = get_round_clock()
 	if(clock)
+		lines += ""
 		lines += clock
 	return lines.Join("<br>")
 
@@ -212,6 +214,7 @@ GLOBAL_LIST_INIT(clash_streak_steps, list(3, 5, 7, 10, 15, 20))
 		return
 	var/base = get_score_maptext()
 	for(var/mob/player as anything in GLOB.player_list)
+		player.hud_used?.clash_respawn?.update(player)
 		var/atom/movable/screen/faction_score/display = player.hud_used?.faction_score
 		if(!display)
 			continue

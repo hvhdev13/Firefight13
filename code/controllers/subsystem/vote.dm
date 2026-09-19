@@ -356,10 +356,11 @@ SUBSYSTEM_DEF(vote)
 		initiator = initiator_key
 		started_time = world.time
 		on_vote_end = on_end
-		var/text = "[capitalize(mode)] vote started by [initiator]."
+		var/shown_initiator = (admin && initiator != "SERVER") ? "an Administrator" : initiator
+		var/text = "[capitalize(mode)] vote started by [shown_initiator]."
 		if(mode == "custom")
 			text += "<br>[question]"
-		log_vote(text)
+		log_vote(shown_initiator == initiator ? text : "[text] ([initiator])")
 		var/vp = CONFIG_GET(number/vote_period)
 		SEND_SOUND(world, sound(vote_sound, channel = SOUND_CHANNEL_VOX, volume = vote_sound_vol))
 		to_chat(world, SPAN_CENTERBOLD("<br><br><font color='purple'><b>[text]</b><br>Type <b>vote</b> or click <a href='byond://?src=[REF(src)]'>here</a> to place your votes.<br>You have [DisplayTimeText(vp)] to vote.</font><br><br>"))

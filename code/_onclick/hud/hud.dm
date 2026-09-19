@@ -78,6 +78,7 @@
 	var/atom/movable/screen/faction_score/faction_score
 	var/list/faction_killfeed = list()
 	var/atom/movable/screen/clash_radar/clash_radar
+	var/atom/movable/screen/clash_respawn/clash_respawn
 
 
 /datum/hud/New(mob/owner)
@@ -108,6 +109,8 @@
 	static_inventory += faction_score
 	clash_radar = new
 	static_inventory += clash_radar
+	clash_respawn = new
+	static_inventory += clash_respawn
 	for(var/i = 1 to CLASH_KILLFEED_LINES)
 		var/atom/movable/screen/faction_killfeed/line = new
 		line.maptext_y = -4 - (i * 10)
@@ -192,6 +195,7 @@
 	QDEL_NULL(faction_score)
 	QDEL_LIST(faction_killfeed)
 	QDEL_NULL(clash_radar)
+	QDEL_NULL(clash_respawn)
 
 	return ..()
 

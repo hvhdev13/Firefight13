@@ -258,9 +258,14 @@
 /turf/open/floor/almayer/sterile_green_side/west,
 /area/clash_arena/tdm_deathmatch2000/uscm_base/medbay)
 "aO" = (
+/obj/structure/blocker/clash_gate/uscm,
 /obj/structure/machinery/door/airlock/multi_tile/almayer/glass{
 	name = "\improper Briefing Room";
-	dir = 1
+	dir = 1;
+	not_weldable = 1;
+	unacidable = 1;
+	no_panel = 1;
+	masterkey_resist = 1
 	},
 /turf/open/hybrisa/street/cement1,
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
@@ -2080,7 +2085,13 @@
 /turf/open/floor/strata/orange_edge/west,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "hb" = (
-/obj/structure/machinery/door/airlock/upp/medical/solid/autoname,
+/obj/structure/machinery/door/airlock/upp/medical/solid/autoname{
+	unacidable = 1;
+	not_weldable = 1;
+	masterkey_resist = 1;
+	no_panel = 1
+	},
+/obj/structure/blocker/clash_gate/upp,
 /turf/open/floor/strata/multi_tiles,
 /area/clash_arena/tdm_deathmatch2000/battlefield)
 "he" = (
@@ -3220,6 +3231,7 @@
 /turf/open/floor/almayer/sterile_green,
 /area/clash_arena/tdm_deathmatch2000/upp_base/medbay)
 "mv" = (
+/obj/structure/blocker/clash_gate/uscm,
 /turf/open/hybrisa/street/cement1,
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
 "mA" = (
@@ -3298,14 +3310,12 @@
 /turf/open/floor/almayer/dark_sterile,
 /area/clash_arena/tdm_deathmatch2000/uscm_base/medbay)
 "ne" = (
-/obj/structure/sign/nosmoking_2{
-	pixel_x = 28
-	},
 /obj/structure/machinery/light{
 	dir = 4;
 	light_color = "#ccecff"
 	},
-/turf/open/floor/almayer/silverfull,
+/obj/structure/machinery/chem_dispenser/corpsman,
+/turf/open/floor/almayer/sterile_green,
 /area/clash_arena/tdm_deathmatch2000/upp_base/medbay)
 "ng" = (
 /obj/structure/machinery/cm_vending/sorted/cargo_guns/upp_squad_guns,
@@ -3776,6 +3786,9 @@
 	},
 /turf/open/floor/strata/floor2,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
+"pF" = (
+/turf/closed/wall/upp_ship/reinforced/outer,
+/area/space)
 "pG" = (
 /obj/structure/pipes/vents/scrubber{
 	dir = 1
@@ -4512,6 +4525,13 @@
 "sZ" = (
 /obj/structure/machinery/light,
 /obj/structure/machinery/door/airlock/upp/medical/solid/autoname,
+/obj/structure/machinery/door/airlock/upp/medical/solid/autoname{
+	unacidable = 1;
+	not_weldable = 1;
+	masterkey_resist = 1;
+	no_panel = 1
+	},
+/obj/structure/blocker/clash_gate/upp,
 /turf/open/floor/strata/multi_tiles,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "ta" = (
@@ -6175,6 +6195,13 @@
 /area/clash_arena/tdm_deathmatch2000/uscm_base/medbay)
 "Bf" = (
 /obj/structure/machinery/door/airlock/upp/medical/solid/autoname,
+/obj/structure/machinery/door/airlock/upp/medical/solid/autoname{
+	unacidable = 1;
+	not_weldable = 1;
+	masterkey_resist = 1;
+	no_panel = 1
+	},
+/obj/structure/blocker/clash_gate/upp,
 /turf/open/floor/strata/multi_tiles,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "Bg" = (
@@ -7913,6 +7940,10 @@
 "Jg" = (
 /turf/open/floor/almayer/orange,
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
+"Ji" = (
+/obj/structure/blocker/clash_gate/uscm,
+/turf/open/floor/almayer/red,
+/area/clash_arena/tdm_deathmatch2000/uscm_base)
 "Jj" = (
 /obj/structure/pipes/standard/simple/hidden/supply,
 /obj/effect/decal/medical_decals{
@@ -8237,9 +8268,17 @@
 /turf/open/floor/almayer/sterile_green,
 /area/clash_arena/tdm_deathmatch2000/upp_base/medbay)
 "KX" = (
-/obj/structure/machinery/chem_dispenser/corpsman,
-/turf/open/floor/almayer/sterile_green,
-/area/clash_arena/tdm_deathmatch2000/upp_base/medbay)
+/obj/structure/machinery/door/airlock/multi_tile/almayer/glass{
+	name = "\improper Briefing Room";
+	dir = 1;
+	not_weldable = 1;
+	unacidable = 1;
+	no_panel = 1;
+	masterkey_resist = 1
+	},
+/obj/structure/blocker/clash_gate/uscm,
+/turf/open/hybrisa/street/cement1,
+/area/clash_arena/tdm_deathmatch2000/uscm_base)
 "Lc" = (
 /obj/structure/barricade/handrail{
 	dir = 4;
@@ -8427,6 +8466,17 @@
 "LM" = (
 /turf/open/floor/strata,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
+"LQ" = (
+/obj/structure/machinery/door/airlock/upp/medical/solid/autoname,
+/obj/structure/blocker/clash_gate/upp,
+/obj/structure/machinery/door/airlock/upp/medical/solid/autoname{
+	unacidable = 1;
+	not_weldable = 1;
+	masterkey_resist = 1;
+	no_panel = 1
+	},
+/turf/open/floor/strata/multi_tiles,
+/area/clash_arena/tdm_deathmatch2000/battlefield)
 "LS" = (
 /obj/structure/pipes/vents/pump{
 	dir = 4
@@ -10955,6 +11005,10 @@
 /obj/structure/machinery/cm_vending/sorted/tech/tool_storage/antag,
 /turf/open/floor/strata/floor3/east,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
+"Xp" = (
+/obj/structure/blocker/clash_gate/uscm,
+/turf/open/floor/almayer,
+/area/clash_arena/tdm_deathmatch2000/uscm_base)
 "Xr" = (
 /obj/structure/machinery/cryopod{
 	pixel_y = 14;
@@ -11212,17 +11266,19 @@
 /turf/open/floor/strata/floor3/east,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "Yu" = (
+/obj/structure/blocker/clash_gate/uscm,
 /obj/structure/machinery/door/airlock/multi_tile/almayer/glass{
 	name = "\improper Briefing Room";
-	dir = 1
+	dir = 1;
+	not_weldable = 1;
+	unacidable = 1;
+	no_panel = 1;
+	masterkey_resist = 1
 	},
 /turf/open/floor/almayer/orange/north,
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
 "Yw" = (
-/obj/structure/sign/safety/ladder{
-	pixel_x = 39
-	},
-/turf/open/floor/almayer/silverfull,
+/turf/closed/wall/upp_ship/reinforced/outer,
 /area/clash_arena/tdm_deathmatch2000/upp_base/medbay)
 "Yx" = (
 /obj/structure/machinery/cm_vending/sorted/cargo_guns/cargo/blend,
@@ -11232,9 +11288,14 @@
 /turf/open/floor/strata/cyan3,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "YB" = (
+/obj/structure/blocker/clash_gate/uscm,
 /obj/structure/machinery/door/airlock/multi_tile/almayer/glass{
 	name = "\improper Briefing Room";
-	dir = 1
+	dir = 1;
+	not_weldable = 1;
+	unacidable = 1;
+	no_panel = 1;
+	masterkey_resist = 1
 	},
 /turf/open/floor/almayer,
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
@@ -22887,7 +22948,7 @@ Af
 UT
 bb
 bb
-KX
+mu
 Vm
 AM
 aM
@@ -23171,14 +23232,14 @@ Af
 bq
 ne
 Yw
-mu
+Yw
 Vm
 Hk
 aM
 Hk
 Vm
-ES
-ES
+pF
+pF
 ES
 ES
 ES
@@ -23313,13 +23374,13 @@ PG
 PG
 PG
 PG
-PG
-PG
+ax
+ax
 ax
 ap
 ax
-PG
-PG
+ax
+ax
 PG
 PG
 PG
@@ -23454,16 +23515,16 @@ at
 at
 at
 at
-dw
-dw
 PG
 hb
 PG
 hb
 PG
+LQ
+PG
+hb
+PG
 dw
-dw
-at
 at
 at
 at
@@ -23603,7 +23664,7 @@ at
 at
 at
 at
-dw
+at
 at
 at
 at
@@ -30979,20 +31040,20 @@ eQ
 eQ
 eQ
 az
-cu
-cu
+az
+az
+mv
+KX
+az
+az
+az
 mv
 aO
-cu
-cu
-cu
-mv
-aO
-cu
-cu
-cu
-cu
-cu
+az
+az
+az
+az
+az
 az
 az
 az
@@ -31690,10 +31751,10 @@ aK
 az
 az
 az
-rk
+Ji
 YB
 cu
-mA
+Xp
 Yu
 az
 mA
@@ -32688,7 +32749,7 @@ rk
 SR
 gp
 jB
-uH
+aK
 cE
 cu
 az
