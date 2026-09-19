@@ -250,7 +250,7 @@
 /obj/structure/disposalpipe/segment{
 	dir = 4
 	},
-/turf/open/floor/almayer/red/north,
+/turf/open/floor/cafeteria,
 /area/clash_arena/tdm_jungle/uscm_base)
 "aK" = (
 /obj/structure/platform_decoration/metal/strata/east,
@@ -724,7 +724,6 @@
 /obj/structure/pipes/standard/simple/hidden/supply{
 	dir = 9
 	},
-/obj/structure/bed/chair,
 /turf/open/floor/interior/wood,
 /area/clash_arena/tdm_jungle/uscm_base)
 "bR" = (
@@ -3659,13 +3658,17 @@
 /turf/open/floor/strata/red3/south,
 /area/clash_arena/tdm_jungle/upp_base)
 "mw" = (
-/obj/structure/prop/colorable_rock/colorable/alt{
-	color = "#5F5F70";
-	dir = 8;
-	pixel_x = -16;
-	pixel_y = -7
+/obj/effect/decal/strata_decals/grasses,
+/obj/structure/barricade/sandbags/weak_wired{
+	dir = 4;
+	pixel_x = 0;
+	pixel_y = 5
 	},
-/turf/open/auto_turf/snow/brown_base,
+/obj/structure/barricade/sandbags/weak_wired{
+	pixel_x = 0;
+	pixel_y = -9
+	},
+/turf/open/auto_turf/tyrargo_grass,
 /area/clash_arena/tdm_jungle/battlefield)
 "my" = (
 /obj/structure/medical_supply_link/green,
@@ -4458,14 +4461,13 @@
 "pX" = (
 /obj/effect/decal/strata_decals/grasses,
 /obj/structure/barricade/sandbags/weak_wired{
-	dir = 3;
-	pixel_x = -1;
-	pixel_y = -10
-	},
-/obj/structure/barricade/sandbags/weak_wired{
 	dir = 4;
 	pixel_x = 0;
 	pixel_y = 2
+	},
+/obj/structure/barricade/sandbags/weak_wired{
+	pixel_x = 0;
+	pixel_y = -9
 	},
 /turf/open/auto_turf/snow/brown_base,
 /area/clash_arena/tdm_jungle/battlefield)
@@ -4930,7 +4932,7 @@
 /obj/structure/pipes/standard/simple/hidden/supply{
 	dir = 4
 	},
-/turf/open/floor/almayer/red,
+/turf/open/floor/cafeteria,
 /area/clash_arena/tdm_jungle/uscm_base)
 "sn" = (
 /turf/open/floor/strata/orange_icorner,
@@ -5931,6 +5933,12 @@
 /turf/open/floor/almayer/dark_sterile,
 /area/clash_arena/tdm_jungle/uscm_base/medbay)
 "vW" = (
+/obj/structure/disposalpipe/segment{
+	dir = 4
+	},
+/obj/structure/pipes/standard/simple/hidden/supply{
+	dir = 4
+	},
 /obj/structure/bed/chair,
 /turf/open/floor/interior/wood,
 /area/clash_arena/tdm_jungle/uscm_base)
@@ -7182,14 +7190,13 @@
 /area/clash_arena/tdm_jungle/uscm_base/req)
 "Bs" = (
 /obj/structure/barricade/sandbags/weak_wired{
-	dir = 3;
-	pixel_x = -1;
-	pixel_y = -10
-	},
-/obj/structure/barricade/sandbags/weak_wired{
 	dir = 4;
 	pixel_x = 0;
 	pixel_y = 2
+	},
+/obj/structure/barricade/sandbags/weak_wired{
+	pixel_x = 0;
+	pixel_y = -9
 	},
 /turf/open/auto_turf/snow/brown_base,
 /area/clash_arena/tdm_jungle/battlefield)
@@ -7354,7 +7361,7 @@
 /obj/structure/barricade/sandbags/weak_wired{
 	dir = 4;
 	pixel_x = 0;
-	pixel_y = 5
+	pixel_y = 2
 	},
 /turf/open/auto_turf/tyrargo_grass/layer0_mud,
 /area/clash_arena/tdm_jungle/battlefield)
@@ -7383,9 +7390,8 @@
 /area/clash_arena/tdm_jungle/uscm_base)
 "Cu" = (
 /obj/structure/barricade/sandbags/weak_wired{
-	dir = 3;
-	pixel_x = -1;
-	pixel_y = -10
+	pixel_x = 0;
+	pixel_y = -9
 	},
 /turf/open/auto_turf/tyrargo_grass/layer0,
 /area/clash_arena/tdm_jungle/battlefield)
@@ -7768,7 +7774,7 @@
 /obj/structure/disposalpipe/segment{
 	dir = 4
 	},
-/turf/open/floor/interior/wood,
+/turf/open/floor/cafeteria,
 /area/clash_arena/tdm_jungle/uscm_base)
 "DU" = (
 /obj/effect/decal/warning_stripes{
@@ -9193,9 +9199,12 @@
 /area/clash_arena/tdm_jungle/uscm_base/medbay)
 "JI" = (
 /obj/structure/barricade/sandbags/weak_wired{
-	dir = 3;
-	pixel_x = -1;
-	pixel_y = -10
+	pixel_x = 0;
+	pixel_y = -9
+	},
+/obj/structure/barricade/sandbags/weak_wired{
+	pixel_x = 0;
+	pixel_y = -9
 	},
 /turf/open/auto_turf/snow/brown_base,
 /area/clash_arena/tdm_jungle/battlefield)
@@ -11620,7 +11629,7 @@
 /area/clash_arena/tdm_jungle/uscm_base)
 "TB" = (
 /obj/structure/machinery/door/firedoor/border_only/almayer,
-/turf/open/floor/interior/wood,
+/turf/open/floor/cafeteria,
 /area/clash_arena/tdm_jungle/uscm_base)
 "TC" = (
 /obj/structure/machinery/light{
@@ -36472,7 +36481,7 @@ Up
 TF
 Hq
 Up
-JI
+DR
 tJ
 qe
 tJ
@@ -36876,7 +36885,7 @@ tJ
 TF
 Up
 TF
-JI
+DR
 Up
 tJ
 tJ
@@ -39101,7 +39110,7 @@ Up
 Ng
 PZ
 tJ
-JI
+DR
 tJ
 Up
 yR
@@ -39504,7 +39513,7 @@ Up
 MQ
 JL
 im
-JI
+DR
 Up
 tJ
 tJ
@@ -43561,7 +43570,7 @@ ZH
 vD
 ls
 TF
-mw
+TF
 vD
 PZ
 vD
@@ -43967,7 +43976,7 @@ uZ
 ZH
 ZH
 ZH
-vD
+kU
 vD
 vD
 XQ
@@ -44973,7 +44982,7 @@ vD
 ZH
 vD
 ZH
-Zx
+nQ
 PZ
 TF
 vD
@@ -45174,7 +45183,7 @@ ZH
 vD
 ZH
 ZH
-Zx
+nQ
 PZ
 vD
 vD
@@ -45375,7 +45384,7 @@ vD
 vD
 vD
 vD
-vD
+ls
 PZ
 Lr
 vD
@@ -45981,7 +45990,7 @@ nQ
 PZ
 ZH
 ZH
-PZ
+qg
 ZH
 vD
 vD
@@ -46183,7 +46192,7 @@ TF
 PZ
 ZH
 vD
-PZ
+qg
 Zx
 Xr
 ZH
@@ -47193,8 +47202,8 @@ nQ
 TF
 ZH
 AY
-Xr
-PZ
+mw
+qg
 Zx
 ZH
 AY
@@ -48002,8 +48011,8 @@ kz
 kz
 kz
 kz
-kz
 aE
+kz
 BB
 yD
 yD
@@ -48204,8 +48213,8 @@ kz
 kz
 kz
 kz
-kz
 aE
+kz
 am
 am
 am
@@ -48406,8 +48415,8 @@ kz
 kz
 kz
 kz
-kz
 aE
+kz
 am
 am
 ZL
@@ -48608,8 +48617,8 @@ kz
 kz
 MN
 MN
-MN
 HN
+kz
 am
 ZL
 ZL
@@ -56282,7 +56291,7 @@ Cp
 jh
 jh
 jh
-jh
+wF
 TZ
 jh
 jh
@@ -59107,7 +59116,7 @@ oY
 xy
 xo
 FJ
-dd
+kM
 RI
 FH
 JW
@@ -59309,7 +59318,7 @@ kM
 kM
 Ay
 bQ
-au
+kM
 Jt
 IG
 uQ
@@ -59510,8 +59519,8 @@ GX
 kM
 Iv
 jl
-vW
-au
+kM
+kM
 Jt
 kM
 eM
@@ -59711,9 +59720,9 @@ hg
 GX
 kM
 CB
+dd
 kM
 kM
-Ob
 Jt
 WB
 GX
@@ -59912,8 +59921,8 @@ TO
 TO
 GX
 kM
-CB
-kM
+vW
+au
 kM
 uF
 Jt
@@ -60114,8 +60123,8 @@ XN
 XN
 GX
 kM
-CB
-kM
+vW
+au
 kM
 kM
 RI
@@ -60317,7 +60326,7 @@ Jt
 rL
 kM
 CB
-kM
+Ob
 kM
 kM
 RI
