@@ -578,8 +578,8 @@
 	style_postfix = list("right_shoulder", "left_shoulder", "right_chest", "left_chest")
 
 /obj/item/clothing/accessory/patch/falcon
-	name = "USCM Falling Falcons patch"
-	desc = "A fire-resistant shoulder patch, worn by the men and women of the Falling Falcons, the 2nd battalion of the 4th brigade of the USCM."
+	name = "USCM Diving Ospreys patch"
+	desc = "A fire-resistant shoulder patch, worn by the men and women of the Diving Ospreys, the 2nd battalion of the 4th brigade of the USCM."
 	icon_state = "fallingfalconspatch"
 
 /obj/item/clothing/accessory/patch/devils
@@ -623,8 +623,8 @@
 	icon_state = "uasquare"
 
 /obj/item/clothing/accessory/patch/falconalt
-	name = "USCM Falling Falcons UA patch"
-	desc = "A fire-resistant shoulder patch, worn by the men and women of the Falling Falcons, the 2nd battalion of the 4th brigade of the USCM."
+	name = "USCM Diving Ospreys UA patch"
+	desc = "A fire-resistant shoulder patch, worn by the men and women of the Diving Ospreys, the 2nd battalion of the 4th brigade of the USCM."
 	icon_state = "fallingfalconsaltpatch"
 
 /obj/item/clothing/accessory/patch/twe
@@ -634,7 +634,7 @@
 
 /obj/item/clothing/accessory/patch/uscmlarge
 	name = "USCM large chest patch"
-	desc = "A fire-resistant chest patch, worn by the men and women of the Falling Falcons, the 2nd battalion of the 4th brigade of the USCM."
+	desc = "A fire-resistant chest patch, worn by the men and women of the Diving Ospreys, the 2nd battalion of the 4th brigade of the USCM."
 	icon_state = "fallingfalconsbigpatch"
 
 /obj/item/clothing/accessory/patch/army
@@ -683,8 +683,8 @@
 	icon_state = "upppatch_alt"
 
 /obj/item/clothing/accessory/patch/falcon/squad_main
-	name = "USCM Falling Falcons squad patch"
-	desc = "A fire-resistant shoulder patch, a squad patch worn by the Falling Falcons—2nd Battalion, 4th Brigade, USCM. Stitched in squad colors."
+	name = "USCM Diving Ospreys squad patch"
+	desc = "A fire-resistant shoulder patch, a squad patch worn by the Diving Ospreys—2nd Battalion, 4th Brigade, USCM. Stitched in squad colors."
 	icon_state = "fallingfalcons_squad"
 	var/dummy_icon_state = "fallingfalcons_%SQUAD%"
 	var/static/list/valid_icon_states

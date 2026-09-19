@@ -15,7 +15,7 @@
 
 /datum/emergency_call/us_army/New()
 	..()
-	arrival_message = "Break, break. This is USS Victory, local Army elements confirm your sector is free of hostile tangos. Be advised, the 32nd Armour is en-route, forward elements should be entering your AO shortly to assist in mop-up. You may have just saved a lot of lives today Falling Falcons. Over and out."
+	arrival_message = "Break, break. This is USS Victory, local Army elements confirm your sector is free of hostile tangos. Be advised, the 32nd Armour is en-route, forward elements should be entering your AO shortly to assist in mop-up. You may have just saved a lot of lives today Diving Ospreys. Over and out."
 	objectives = "Assist the Marines in securing the area of operations."
 
 /datum/emergency_call/us_army/create_member(datum/mind/new_mind, turf/override_spawn_loc)
@@ -51,5 +51,5 @@
 		arm_equipment(mob, /datum/equipment_preset/us_army/standard, TRUE, TRUE)
 		to_chat(mob, SPAN_ROLE_HEADER("You are a US Army Trooper!"))
 
-	to_chat(mob, SPAN_ROLE_BODY("You are a member of the US Army 32nd Armored Division. You and your division have been held in reserve until the Falling Falcons could secure a beachhead. Now that this is true, you are being sent in to help secure the breach!"))
+	to_chat(mob, SPAN_ROLE_BODY("You are a member of the US Army 32nd Armored Division. You and your division have been held in reserve until the Diving Ospreys could secure a beachhead. Now that this is true, you are being sent in to help secure the breach!"))
 	addtimer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(to_chat), mob, SPAN_BOLD("Objectives:</b> [objectives]")), 1 SECONDS)

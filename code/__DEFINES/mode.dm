@@ -145,7 +145,7 @@ GLOBAL_LIST_INIT(ROLES_CM_VS_UPP, list(JOB_SQUAD_MARINE, JOB_SQUAD_ENGI, JOB_SQU
 
 
 GLOBAL_LIST_INIT(ROLES_UNASSIGNED, list(JOB_SQUAD_MARINE))
-//Role lists used for switch() checks in show_blurb_uscm(). Cosmetic, determines ex. "Engineering, USS Almayer", "2nd Bat. 'Falling Falcons'" etc.
+//Role lists used for switch() checks in show_blurb_uscm(). Cosmetic, determines ex. "Engineering, USS Almayer", "2nd Bat. 'Diving Ospreys'" etc.
 #define BLURB_USCM_COMBAT JOB_CO, JOB_XO, JOB_SO, JOB_WO_CO, JOB_WO_XO, JOB_WO_CHIEF_POLICE, JOB_WO_SO, JOB_WO_WARDEN, JOB_WO_POLICE, JOB_SEA,\
 						JOB_SQUAD_LEADER, JOB_SQUAD_TEAM_LEADER, JOB_SQUAD_SPECIALIST, JOB_SQUAD_SMARTGUN, JOB_SQUAD_MEDIC, JOB_SQUAD_ENGI, JOB_SQUAD_MARINE
 #define BLURB_USCM_FLIGHT JOB_CAS_PILOT, JOB_DROPSHIP_PILOT, JOB_DROPSHIP_CREW_CHIEF

@@ -10,7 +10,7 @@
 
 /datum/spaceport/uscm
 	name = "Mont-Blanc 41 LG Station"
-	docking_message = "Attention, USS Almayer. This is Captain Pereira with the Solar Devils Battalion, for a ship from the Falcons you're far off course.. Initiate docking procedures, we're sending in a team now."
+	docking_message = "Attention, USS Almayer. This is Captain Pereira with the Solar Devils Battalion, for a ship from the Ospreys you're far off course.. Initiate docking procedures, we're sending in a team now."
 	allies = list(
 		/datum/emergency_call/solar_devils,
 		/datum/emergency_call/solar_devils_full,

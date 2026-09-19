@@ -75,8 +75,8 @@ GLOBAL_LIST_INIT(cm_vending_clothing_sea, list(
 		list("Security HUD-Glasses", 0, /obj/item/clothing/glasses/sunglasses/sechud, MARINE_CAN_BUY_GLASSES, VENDOR_ITEM_REGULAR),
 
 		list("PATCHES", 0, null, null, null),
-		list("Falling Falcons Shoulder Patch", 1, /obj/item/clothing/accessory/patch/falcon, null, VENDOR_ITEM_REGULAR),
-		list("Falling Falcons UA Shoulder Patch", 1, /obj/item/clothing/accessory/patch/falconalt, null, VENDOR_ITEM_REGULAR),
+		list("Diving Ospreys Shoulder Patch", 1, /obj/item/clothing/accessory/patch/falcon, null, VENDOR_ITEM_REGULAR),
+		list("Diving Ospreys UA Shoulder Patch", 1, /obj/item/clothing/accessory/patch/falconalt, null, VENDOR_ITEM_REGULAR),
 		list("USCM Large Chest Patch", 1, /obj/item/clothing/accessory/patch/uscmlarge, null, VENDOR_ITEM_REGULAR),
 		list("USCM Shoulder Patch", 1, /obj/item/clothing/accessory/patch/uscmpatch, null, VENDOR_ITEM_REGULAR),
 		list("United Americas Shoulder patch", 1, /obj/item/clothing/accessory/patch/ua, null, VENDOR_ITEM_REGULAR),

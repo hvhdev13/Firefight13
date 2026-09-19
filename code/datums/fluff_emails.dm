@@ -67,7 +67,7 @@
 					up six months ago from Bernice 378 (that base is a sanitation nightmare), and they need to be steamed on a regular basis.
 					<br>
 					<br>
-					For all the effort it's been worth to me, the moment the "Falling Falcons" have the misfortune of falling on what is probably
+					For all the effort it's been worth to me, the moment the "Diving Ospreys" have the misfortune of falling on what is probably
 					the last ice planet in the galaxy, I'm making sure we stay there for another two cycles.
 				</html>
 				"}

@@ -64,8 +64,6 @@ SUBSYSTEM_DEF(ticker)
 /datum/controller/subsystem/ticker/fire(resumed = FALSE)
 	switch(current_state)
 		if(GAME_STATE_STARTUP)
-			if(Master.initializations_finished_with_no_players_logged_in && !length(GLOB.clients))
-				return
 			if(isnull(start_at))
 				start_at = time_left || world.time + (CONFIG_GET(number/lobby_countdown) * 10)
 			to_chat_spaced(world, type = MESSAGE_TYPE_SYSTEM, margin_top = 2, margin_bottom = 0, html = SPAN_ROUNDHEADER("Welcome to the pre-game lobby of [CONFIG_GET(string/servername)]!"))

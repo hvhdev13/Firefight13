@@ -300,7 +300,6 @@ const LobbyButtons = (props: {
     round_start,
     readied,
     predator_enabled,
-    fax_responder_enabled,
     upp_enabled,
     tutorials_ready,
     xenomorph_enabled,
@@ -479,27 +478,6 @@ const LobbyButtons = (props: {
                 </Stack.Item>
               </Stack>
             </Stack.Item>
-            <Stack.Item>
-              <Stack>
-                <Stack.Item grow>
-                  <LobbyButton
-                    index={7}
-                    icon="viruses"
-                    onClick={() => act('late_join_xeno')}
-                  >
-                    Join the Hive
-                  </LobbyButton>
-                </Stack.Item>
-                <Stack.Item>
-                  <LobbyButton
-                    icon="users-rays"
-                    tooltip="View Hive Leaders"
-                    index={7 + SMALL_BUTTON_DELAY}
-                    onClick={() => act('hiveleaders')}
-                  />
-                </Stack.Item>
-              </Stack>
-            </Stack.Item>
             {!!upp_enabled && (
               <Stack.Item>
                 <LobbyButton
@@ -543,37 +521,6 @@ const LobbyButtons = (props: {
                     </Flex.Item>
                     <Flex.Item>Join the Hunt</Flex.Item>
                   </Flex>
-                </LobbyButton>
-              </Stack.Item>
-            )}
-            {!!fax_responder_enabled && (
-              <Stack.Item>
-                <LobbyButton
-                  index={9 + (upp_enabled ? 1 : 0) + (predator_enabled ? 1 : 0)}
-                  icon="fax"
-                  onClick={() => {
-                    setModal(
-                      <ModalConfirm>
-                        <Box>
-                          <Stack vertical>
-                            <Stack.Item>
-                              Are you sure want to attempt joining as a Fax
-                              Responder?
-                            </Stack.Item>
-                          </Stack>
-                          <Stack justify="center">
-                            <Stack.Item>
-                              <Button onClick={() => act('late_join_faxes')}>
-                                Confirm
-                              </Button>
-                            </Stack.Item>
-                          </Stack>
-                        </Box>
-                      </ModalConfirm>,
-                    );
-                  }}
-                >
-                  Respond to Faxes
                 </LobbyButton>
               </Stack.Item>
             )}

@@ -1308,7 +1308,7 @@ GLOBAL_LIST_EMPTY(roles_with_gear)
 	allowed_origins = USCM_ORIGINS
 
 /datum/gear/misc/patch_uscm
-	display_name = "Falling Falcons shoulder patch, squad specific"
+	display_name = "Diving Ospreys shoulder patch, squad specific"
 	path = /obj/item/clothing/accessory/patch/falcon/squad_main
 	fluff_cost = 1
 	slot = WEAR_IN_ACCESSORY

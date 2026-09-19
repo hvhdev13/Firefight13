@@ -211,8 +211,8 @@ Template
 
 /datum/poster/poster_41
 	icon_state="poster41"
-	name = "Falling Falcons"
-	desc = "Promotional material for the 2nd Company of the 2nd Battalion of the 4th Brigade, the Falling Falcons. Designed by an unknown artist and printed in an effort to bolster the ranks of the Falling Falcons."
+	name = "Diving Ospreys"
+	desc = "Promotional material for the 2nd Company of the 2nd Battalion of the 4th Brigade, the Diving Ospreys. Designed by an unknown artist and printed in an effort to bolster the ranks of the Diving Ospreys."
 
 // Hybrisa Posters //
 

@@ -246,6 +246,12 @@ AUTOOOCMUTE
 ## Default gamemode to auto-switch back to after a round has concluded
 GAMEMODE_DEFAULT Faction Clash UPP CM
 
+## Seconds the pre-game lobby counts down before the round starts
+LOBBY_COUNTDOWN 30
+
+## Keep the server running with nobody connected, so rounds start and cycle on an empty server
+RESUME_AFTER_INITIALIZATIONS
+
 ## How long the mob will take to chestburst, in seconds
 #EMBRYO_BURST_TIMER 450
 
