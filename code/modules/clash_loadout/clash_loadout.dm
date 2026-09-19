@@ -153,13 +153,13 @@ GLOBAL_LIST_EMPTY(clash_loadouts)
 		var/datum/clash_loadout/loadout = slots[slot_name]
 		data["clash_loadouts"] += list(list("name" = slot_name, "count" = length(loadout.items)))
 
-/obj/structure/machinery/cm_vending/proc/clash_save_loadout(mob/living/carbon/human/user)
+/obj/structure/machinery/cm_vending/proc/clash_save_loadout(mob/living/carbon/human/user, overwrite_slot)
 	var/key = clash_loadout_key(user)
 	if(!key)
 		return
 	var/list/all_slots = get_clash_loadouts(key)
 	var/list/job_slots = get_clash_loadouts_for_job(key, user.job)
-	var/slot_name = tgui_input_text(user, "Name this loadout.", "Save Loadout", max_length = 24)
+	var/slot_name = job_slots[overwrite_slot] ? overwrite_slot : tgui_input_text(user, "Name this loadout.", "Save Loadout", max_length = 24)
 	if(!slot_name)
 		return
 	if(!all_slots[slot_name] && length(job_slots) >= CLASH_LOADOUT_SLOTS)

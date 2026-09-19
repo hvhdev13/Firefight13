@@ -62,6 +62,79 @@ interface ClashLoadout {
   count: number;
 }
 
+const CLASH_SLOT_COUNT = 3;
+
+const ClashLoadoutSlots = () => {
+  const { data, act } = useBackend<VendingData>();
+  const loadouts = data.clash_loadouts ?? [];
+
+  return (
+    <Section title="Saved Loadouts" className="ClashLoadouts">
+      {Array.from({ length: CLASH_SLOT_COUNT }, (_, i) => {
+        const loadout = loadouts[i];
+        return (
+          <Flex
+            key={i}
+            align="center"
+            className={classes(['ClashSlot', !loadout && 'ClashSlot--empty'])}
+          >
+            <Flex.Item className="ClashSlot__index">{i + 1}</Flex.Item>
+            <Flex.Item grow basis={0} className="ClashSlot__info">
+              {loadout ? (
+                <>
+                  <Box className="ClashSlot__name">{loadout.name}</Box>
+                  <Box className="ClashSlot__meta">
+                    {loadout.count} {loadout.count === 1 ? 'item' : 'items'}
+                  </Box>
+                </>
+              ) : (
+                <Box className="ClashSlot__meta">Empty slot</Box>
+              )}
+            </Flex.Item>
+            {loadout ? (
+              <>
+                <Flex.Item>
+                  <Button
+                    icon="download"
+                    color="good"
+                    onClick={() => act('clash_load', { slot: loadout.name })}
+                  >
+                    Equip
+                  </Button>
+                </Flex.Item>
+                <Flex.Item ml={0.5}>
+                  <Button.Confirm
+                    icon="floppy-disk"
+                    tooltip="Overwrite with current gear"
+                    confirmColor="average"
+                    confirmContent="Overwrite?"
+                    onClick={() => act('clash_save', { slot: loadout.name })}
+                  />
+                </Flex.Item>
+                <Flex.Item ml={0.5}>
+                  <Button.Confirm
+                    icon="trash"
+                    color="transparent"
+                    tooltip="Delete loadout"
+                    confirmContent="Delete?"
+                    onClick={() => act('clash_delete', { slot: loadout.name })}
+                  />
+                </Flex.Item>
+              </>
+            ) : (
+              <Flex.Item>
+                <Button icon="plus" onClick={() => act('clash_save')}>
+                  Save current
+                </Button>
+              </Flex.Item>
+            )}
+          </Flex>
+        );
+      })}
+    </Section>
+  );
+};
+
 interface VenableItem {
   readonly record: VendingRecord;
 }
@@ -419,28 +492,7 @@ export const VendingSorted = () => {
           </Box>
         )}
 
-        {data.clash_enabled && (
-          <Section title="Saved Loadouts">
-            <Button icon="floppy-disk" onClick={() => act('clash_save')}>
-              Save current loadout
-            </Button>
-            {(data.clash_loadouts ?? []).map((loadout) => (
-              <Box key={loadout.name} mt={1}>
-                <Button
-                  icon="download"
-                  onClick={() => act('clash_load', { slot: loadout.name })}
-                >
-                  {loadout.name} ({loadout.count} items)
-                </Button>
-                <Button
-                  icon="trash"
-                  color="bad"
-                  onClick={() => act('clash_delete', { slot: loadout.name })}
-                />
-              </Box>
-            ))}
-          </Section>
-        )}
+        {data.clash_enabled && <ClashLoadoutSlots />}
 
         {isEmpty && (
           <NoticeBox danger className="ItemContainer">

@@ -557,7 +557,7 @@ GLOBAL_LIST_EMPTY(vending_products)
 		if ("clash_save")
 			if(!human_user)
 				return TRUE
-			clash_save_loadout(human_user)
+			clash_save_loadout(human_user, params["slot"])
 			return TRUE
 		if ("clash_load")
 			if(!human_user)

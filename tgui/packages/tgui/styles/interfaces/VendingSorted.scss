@@ -204,3 +204,54 @@ $mandatory-color: hsl(39, 100%, 25%);
     margin-top: -0px;
   }
 }
+
+.Vendor {
+  .ClashSlot {
+    min-height: 2.6em;
+    padding: 0.35em 0.5em;
+    margin-bottom: 0.4em;
+    border: 1px solid rgba(colors.$primary, 0.6);
+    border-left: 3px solid colors.$primary;
+    border-radius: 2px;
+    background-color: rgba(colors.$primary, 0.12);
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .ClashSlot--empty {
+    border: 1px dashed rgba(base.$color-fg, 0.25);
+    border-left: 3px solid rgba(base.$color-fg, 0.25);
+    background-color: rgba(base.$color-fg, 0.03);
+
+    .ClashSlot__index {
+      opacity: 0.4;
+    }
+  }
+
+  .ClashSlot__index {
+    width: 1.6em;
+    font-size: base.em(16px);
+    font-weight: bold;
+    text-align: center;
+    opacity: 0.8;
+  }
+
+  .ClashSlot__info {
+    min-width: 0;
+    padding: 0 0.5em;
+  }
+
+  .ClashSlot__name {
+    font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .ClashSlot__meta {
+    font-size: base.em(11px);
+    opacity: 0.6;
+  }
+}

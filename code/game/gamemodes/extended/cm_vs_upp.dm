@@ -35,7 +35,7 @@ GLOBAL_LIST_INIT(clash_streak_steps, list(3, 5, 7, 10, 15, 20))
 	taskbar_icon = 'icons/taskbar/gml_hvh.png'
 	skip_roundend_votes = TRUE
 	var/upp_ship = "ssv_rostock.dmm"
-	var/round_time_limit = 90 MINUTES
+	var/round_time_limit = 30 MINUTES
 	var/scoring_started = FALSE
 	var/list/faction_kills = list()
 	var/list/faction_deaths = list()
