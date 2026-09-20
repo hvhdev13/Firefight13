@@ -10,6 +10,8 @@
 #define RADAR_SWEEP_TAIL 45
 /// Deciseconds for one full sweep
 #define RADAR_SWEEP_PERIOD 30
+/// How faint a contact goes before the sweep reaches it again
+#define RADAR_BLIP_FADED_ALPHA 30
 
 #define RADAR_COLOR_BEVEL rgb(77, 86, 94)
 #define RADAR_COLOR_SHADOW rgb(21, 24, 27)
@@ -136,6 +138,12 @@ GLOBAL_LIST_EMPTY(clash_radar_marks)
 	animate(transform = turn(matrix(), 240), time = RADAR_SWEEP_PERIOD / 3)
 	animate(transform = null, time = RADAR_SWEEP_PERIOD / 3)
 
+/atom/movable/clash_radar_blip
+	icon = null
+	mouse_opacity = MOUSE_OPACITY_TRANSPARENT
+	vis_flags = VIS_INHERIT_ID|VIS_INHERIT_PLANE|VIS_INHERIT_LAYER
+	alpha = 0
+
 /atom/movable/screen/clash_radar
 	name = ""
 	icon = null
@@ -144,16 +152,20 @@ GLOBAL_LIST_EMPTY(clash_radar_marks)
 	screen_loc = "LEFT:6,TOP:-134"
 	alpha = 0
 	var/atom/movable/clash_radar_sweep/sweep
+	var/sweep_started
+	var/list/blips = list()
 
 /atom/movable/screen/clash_radar/Initialize(mapload, ...)
 	. = ..()
 	icon = get_clash_radar_backdrop()
 	sweep = new
+	sweep_started = world.time
 	vis_contents += sweep
 
 /atom/movable/screen/clash_radar/Destroy()
 	vis_contents.Cut()
 	QDEL_NULL(sweep)
+	QDEL_LIST(blips)
 	return ..()
 
 /atom/movable/screen/clash_radar/proc/clear()
@@ -161,21 +173,41 @@ GLOBAL_LIST_EMPTY(clash_radar_marks)
 		return
 	alpha = 0
 	overlays.Cut()
+	for(var/atom/movable/clash_radar_blip/blip as anything in blips)
+		animate(blip)
+		blip.alpha = 0
 
-/atom/movable/screen/clash_radar/proc/make_mark(dx, dy, kind, angle)
+/// Degrees the sweep has turned from north, clockwise
+/atom/movable/screen/clash_radar/proc/get_sweep_angle()
+	var/elapsed = world.time - sweep_started
+	return 360 * (elapsed - RADAR_SWEEP_PERIOD * floor(elapsed / RADAR_SWEEP_PERIOD)) / RADAR_SWEEP_PERIOD
+
+/atom/movable/screen/clash_radar/proc/get_blip(index)
+	while(length(blips) < index)
+		var/atom/movable/clash_radar_blip/new_blip = new
+		blips += new_blip
+		vis_contents += new_blip
+	return blips[index]
+
+/// Bright as the sweep crosses the contact, fading to RADAR_BLIP_FADED_ALPHA by the time it comes back around
+/atom/movable/screen/clash_radar/proc/fade_blip(atom/movable/clash_radar_blip/blip, behind)
+	var/faded = behind + 360 * RADAR_REFRESH / RADAR_SWEEP_PERIOD
+	animate(blip)
+	blip.alpha = 255 - (255 - RADAR_BLIP_FADED_ALPHA) * behind / 360
+	animate(blip, alpha = 255 - (255 - RADAR_BLIP_FADED_ALPHA) * min(faded, 360) / 360, time = RADAR_REFRESH)
+
+/atom/movable/screen/clash_radar/proc/place_mark(atom/movable/clash_radar_blip/blip, dx, dy, kind)
 	var/icon/mark_icon = get_clash_radar_mark(kind)
-	var/image/mark = image(mark_icon)
+	if(blip.icon != mark_icon)
+		blip.icon = mark_icon
 	var/per_tile = (RADAR_SIZE * 0.5 - RADAR_EDGE_MARGIN) / RADAR_RANGE
-	mark.pixel_x = round(RADAR_SIZE * 0.5 + dx * per_tile - mark_icon.Width() * 0.5)
-	mark.pixel_y = round(RADAR_SIZE * 0.5 + dy * per_tile - mark_icon.Height() * 0.5)
-	if(angle)
-		mark.transform = turn(matrix(), angle)
-	return mark
+	blip.pixel_x = round(RADAR_SIZE * 0.5 + dx * per_tile - mark_icon.Width() * 0.5)
+	blip.pixel_y = round(RADAR_SIZE * 0.5 + dy * per_tile - mark_icon.Height() * 0.5)
 
 /atom/movable/screen/clash_radar/proc/render(mob/living/carbon/human/viewer)
 	alpha = 255
-	var/list/contacts = list()
-	var/list/leaders = list()
+	var/sweep_angle = get_sweep_angle()
+	var/shown = 0
 	for(var/mob/living/carbon/human/ally as anything in GLOB.alive_human_list)
 		if(ally == viewer || ally.faction != viewer.faction || ally.z != viewer.z)
 			continue
@@ -183,13 +215,20 @@ GLOBAL_LIST_EMPTY(clash_radar_marks)
 		var/dy = ally.y - viewer.y
 		if(sqrt(dx * dx + dy * dy) > RADAR_RANGE)
 			continue
-		if(ally.assigned_squad?.squad_leader == ally)
-			leaders += make_mark(dx, dy, "leader")
-		else
-			contacts += make_mark(dx, dy, "ally")
-	contacts += leaders
-	contacts += make_mark(0, 0, "self", dir2angle(viewer.dir))
-	overlays = contacts
+		shown++
+		var/atom/movable/clash_radar_blip/blip = get_blip(shown)
+		place_mark(blip, dx, dy, ally.assigned_squad?.squad_leader == ally ? "leader" : "ally")
+		fade_blip(blip, (sweep_angle - (90 - arctan(dx, dy)) + 720) % 360)
+	for(var/index = shown + 1 to length(blips))
+		var/atom/movable/clash_radar_blip/spare = blips[index]
+		animate(spare)
+		spare.alpha = 0
+	var/icon/self_icon = get_clash_radar_mark("self")
+	var/image/self_mark = image(self_icon)
+	self_mark.pixel_x = round(RADAR_SIZE * 0.5 - self_icon.Width() * 0.5)
+	self_mark.pixel_y = round(RADAR_SIZE * 0.5 - self_icon.Height() * 0.5)
+	self_mark.transform = turn(matrix(), dir2angle(viewer.dir))
+	overlays = list(self_mark)
 
 /datum/game_mode/extended/faction_clash/cm_vs_upp/var/radar_timer_id
 
@@ -216,6 +255,7 @@ GLOBAL_LIST_EMPTY(clash_radar_marks)
 #undef RADAR_REFRESH
 #undef RADAR_SWEEP_TAIL
 #undef RADAR_SWEEP_PERIOD
+#undef RADAR_BLIP_FADED_ALPHA
 #undef RADAR_COLOR_BEVEL
 #undef RADAR_COLOR_SHADOW
 #undef RADAR_COLOR_TICK
