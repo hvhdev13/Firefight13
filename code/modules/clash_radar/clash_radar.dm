@@ -2,6 +2,8 @@
 #define RADAR_SIZE 96
 /// Tiles shown in each direction from the viewer
 #define RADAR_RANGE 7
+/// Pixels kept clear between the furthest contact and the rim, so marks stay inside the glass
+#define RADAR_EDGE_MARGIN 8
 /// How often contacts are redrawn
 #define RADAR_REFRESH (5 DECISECONDS)
 /// Degrees covered by the fading tail of the sweep
@@ -163,7 +165,7 @@ GLOBAL_LIST_EMPTY(clash_radar_marks)
 /atom/movable/screen/clash_radar/proc/make_mark(dx, dy, kind, angle)
 	var/icon/mark_icon = get_clash_radar_mark(kind)
 	var/image/mark = image(mark_icon)
-	var/per_tile = RADAR_SIZE / (RADAR_RANGE * 2 + 1)
+	var/per_tile = (RADAR_SIZE * 0.5 - RADAR_EDGE_MARGIN) / RADAR_RANGE
 	mark.pixel_x = round(RADAR_SIZE * 0.5 + dx * per_tile - mark_icon.Width() * 0.5)
 	mark.pixel_y = round(RADAR_SIZE * 0.5 + dy * per_tile - mark_icon.Height() * 0.5)
 	if(angle)
@@ -179,7 +181,7 @@ GLOBAL_LIST_EMPTY(clash_radar_marks)
 			continue
 		var/dx = ally.x - viewer.x
 		var/dy = ally.y - viewer.y
-		if(abs(dx) > RADAR_RANGE || abs(dy) > RADAR_RANGE)
+		if(sqrt(dx * dx + dy * dy) > RADAR_RANGE)
 			continue
 		if(ally.assigned_squad?.squad_leader == ally)
 			leaders += make_mark(dx, dy, "leader")
@@ -210,6 +212,7 @@ GLOBAL_LIST_EMPTY(clash_radar_marks)
 
 #undef RADAR_SIZE
 #undef RADAR_RANGE
+#undef RADAR_EDGE_MARGIN
 #undef RADAR_REFRESH
 #undef RADAR_SWEEP_TAIL
 #undef RADAR_SWEEP_PERIOD
