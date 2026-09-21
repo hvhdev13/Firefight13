@@ -17,9 +17,17 @@
 #define RADAR_COLOR_SHADOW rgb(21, 24, 27)
 #define RADAR_COLOR_TICK rgb(106, 116, 124)
 
+GLOBAL_VAR(clash_turn_sign)
 GLOBAL_DATUM(clash_radar_backdrop, /icon)
 GLOBAL_DATUM(clash_radar_sweep, /icon)
 GLOBAL_LIST_EMPTY(clash_radar_marks)
+
+/// 1 when turn() rotates clockwise on screen, -1 when it rotates counter clockwise
+/proc/get_clash_turn_sign()
+	if(isnull(GLOB.clash_turn_sign))
+		var/matrix/probe = turn(matrix(), 90)
+		GLOB.clash_turn_sign = probe.d > 0 ? -1 : 1
+	return GLOB.clash_turn_sign
 
 /// Builds an icon from rows of characters, top row first, each character looked up in palette
 /proc/clash_pattern_icon(list/rows, list/palette)
@@ -83,7 +91,7 @@ GLOBAL_LIST_EMPTY(clash_radar_marks)
 			var/distance = sqrt(dx * dx + dy * dy)
 			if(distance < 1 || distance > radius - 4)
 				continue
-			var/behind = (arctan(dx, dy) + 270) % 360
+			var/behind = (360 - delta_to_angle(dx, dy)) % 360
 			if(behind >= RADAR_SWEEP_TAIL)
 				continue
 			sweep.DrawBox(rgb(76, 175, 80, round(80 * (1 - behind / RADAR_SWEEP_TAIL))), x, y)
@@ -134,8 +142,9 @@ GLOBAL_LIST_EMPTY(clash_radar_marks)
 /atom/movable/clash_radar_sweep/Initialize(mapload, ...)
 	. = ..()
 	icon = get_clash_radar_sweep()
-	animate(src, transform = turn(matrix(), 120), time = RADAR_SWEEP_PERIOD / 3, loop = -1)
-	animate(transform = turn(matrix(), 240), time = RADAR_SWEEP_PERIOD / 3)
+	var/spin = get_clash_turn_sign()
+	animate(src, transform = turn(matrix(), spin * 120), time = RADAR_SWEEP_PERIOD / 3, loop = -1)
+	animate(transform = turn(matrix(), spin * 240), time = RADAR_SWEEP_PERIOD / 3)
 	animate(transform = null, time = RADAR_SWEEP_PERIOD / 3)
 
 /atom/movable/clash_radar_blip
@@ -218,7 +227,7 @@ GLOBAL_LIST_EMPTY(clash_radar_marks)
 		shown++
 		var/atom/movable/clash_radar_blip/blip = get_blip(shown)
 		place_mark(blip, dx, dy, ally.assigned_squad?.squad_leader == ally ? "leader" : "ally")
-		fade_blip(blip, (sweep_angle - (90 - arctan(dx, dy)) + 720) % 360)
+		fade_blip(blip, (sweep_angle - delta_to_angle(dx, dy) + 720) % 360)
 	for(var/index = shown + 1 to length(blips))
 		var/atom/movable/clash_radar_blip/spare = blips[index]
 		animate(spare)
@@ -227,7 +236,7 @@ GLOBAL_LIST_EMPTY(clash_radar_marks)
 	var/image/self_mark = image(self_icon)
 	self_mark.pixel_x = round(RADAR_SIZE * 0.5 - self_icon.Width() * 0.5)
 	self_mark.pixel_y = round(RADAR_SIZE * 0.5 - self_icon.Height() * 0.5)
-	self_mark.transform = turn(matrix(), dir2angle(viewer.dir))
+	self_mark.transform = turn(matrix(), get_clash_turn_sign() * dir2angle(viewer.dir))
 	overlays = list(self_mark)
 
 /datum/game_mode/extended/faction_clash/cm_vs_upp/var/radar_timer_id

@@ -4,6 +4,8 @@
 	var/equipment_preset
 	/// Deciseconds before a replacement is sent out, 0 to never respawn
 	var/respawn_delay = 30 SECONDS
+	/// Tiles the bot will stray from this spawner to take cover
+	var/hold_radius = 6
 	var/datum/clash_bot/bot
 
 /obj/effect/landmark/clash_npc/Initialize(mapload, ...)
