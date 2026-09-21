@@ -2,6 +2,9 @@
 	name = "Clash NPC spawner"
 	icon_state = "late_join_misc"
 	var/equipment_preset
+	var/bot_gun
+	var/bot_magazine
+	var/bot_magazines = 4
 	/// Deciseconds before a replacement is sent out, 0 to never respawn
 	var/respawn_delay = 30 SECONDS
 	/// Tiles the bot will stray from this spawner to take cover
@@ -25,6 +28,12 @@
 	arm_equipment(npc, equipment_preset, TRUE, FALSE)
 	npc.statistic_exempt = TRUE
 	npc.setDir(dir)
+	for(var/obj/item/unwanted in npc.get_contents())
+		if(istype(unwanted, /obj/item/weapon/gun) || istype(unwanted, /obj/item/ammo_magazine/handful))
+			qdel(unwanted)
+	npc.put_in_hands(new bot_gun(npc), FALSE)
+	for(var/count in 1 to bot_magazines)
+		npc.equip_to_appropriate_slot(new bot_magazine(npc))
 	bot = new(npc, src)
 
 /obj/effect/landmark/clash_npc/proc/bot_died()
@@ -35,11 +44,17 @@
 /obj/effect/landmark/clash_npc/uscm
 	name = "Clash NPC spawner (USCM Rifleman)"
 	equipment_preset = /datum/equipment_preset/uscm/private_equipped
+	bot_gun = /obj/item/weapon/gun/rifle/m41a
+	bot_magazine = /obj/item/ammo_magazine/rifle
 
 /obj/effect/landmark/clash_npc/upp
 	name = "Clash NPC spawner (UPP Soldier)"
 	equipment_preset = /datum/equipment_preset/upp/soldier/dressed
+	bot_gun = /obj/item/weapon/gun/rifle/type71
+	bot_magazine = /obj/item/ammo_magazine/rifle/type71
 
 /obj/effect/landmark/clash_npc/clf
 	name = "Clash NPC spawner (CLF Soldier)"
 	equipment_preset = /datum/equipment_preset/clf/soldier
+	bot_gun = /obj/item/weapon/gun/rifle/ak4047
+	bot_magazine = /obj/item/ammo_magazine/rifle/ak4047

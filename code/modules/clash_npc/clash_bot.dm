@@ -71,6 +71,8 @@ GLOBAL_VAR(clash_bot_timer)
 	body.put_in_hands(gun, FALSE)
 	if(gun.flags_item & TWOHANDED)
 		gun.wield(body)
+	if(gun.gun_firemode != GUN_FIREMODE_BURSTFIRE && (GUN_FIREMODE_BURSTFIRE in gun.gun_firemode_list))
+		gun.do_toggle_firemode(body, null, GUN_FIREMODE_BURSTFIRE)
 	RegisterSignal(gun, COMSIG_GUN_BEFORE_FIRE, PROC_REF(on_gun_fire))
 
 /datum/clash_bot/proc/on_gun_fire(obj/item/weapon/gun/source, obj/projectile/bullet)
@@ -101,8 +103,6 @@ GLOBAL_VAR(clash_bot_timer)
 		INVOKE_ASYNC(src, PROC_REF(reload))
 		return
 	gun.Fire(target, body)
-	if(istype(gun, /obj/item/weapon/gun/shotgun/pump))
-		gun.unique_action(body)
 	next_fire = world.time + rand(3, 8)
 
 /datum/clash_bot/proc/can_engage(mob/living/carbon/human/candidate)
@@ -139,8 +139,9 @@ GLOBAL_VAR(clash_bot_timer)
 	if(!spare)
 		dry = TRUE
 		return
-	if(gun.current_mag && !(gun.flags_gun_features & GUN_INTERNAL_MAG))
+	if(gun.current_mag)
 		gun.unload(body, TRUE, TRUE)
+	gun.unwield(body)
 	var/obj/item/storage/holder = spare.loc
 	if(istype(holder))
 		holder.remove_from_storage(spare, get_turf(body))
