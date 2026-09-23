@@ -62,14 +62,9 @@
 /turf/open/floor/almayer/dark_sterile,
 /area/clash_arena/tdm_kutjevo/uscm_base/medbay)
 "aap" = (
-/obj/structure/medical_supply_link,
-/obj/structure/machinery/cm_vending/sorted/medical/marinemed/upp,
-/obj/structure/machinery/light{
-	dir = 4;
-	invisibility = 101
-	},
-/turf/open/floor/corsat/spiralplate,
-/area/clash_arena/tdm_kutjevo/upp_base)
+/obj/structure/fence/slim/upp/door,
+/turf/open/floor/strata/green3/northwest,
+/area/clash_arena/tdm_kutjevo/upp_base/req)
 "aaq" = (
 /obj/structure/platform/metal/kutjevo/north,
 /obj/structure/largecrate/random,
@@ -161,7 +156,7 @@
 /obj/structure/sign/poster/clf{
 	pixel_x = -30
 	},
-/turf/open/floor/strata/red1,
+/turf/open/floor/strata/red2,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "aaG" = (
 /obj/structure/barricade/handrail/medical{
@@ -1329,14 +1324,8 @@
 /turf/open/desert/desert_shore/desert_shore1/west,
 /area/kutjevo/exterior)
 "adN" = (
-/obj/structure/machinery/light{
-	dir = 4;
-	invisibility = 101
-	},
-/obj/structure/machinery/cm_vending/sorted/marine_food{
-	name = "\improper UnionBest Food Vendor"
-	},
-/turf/open/floor/corsat/spiralplate,
+/obj/structure/machinery/cm_vending/sorted/cargo_guns/upp_squad_guns,
+/turf/open/floor/strata/multi_tiles/southeast,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "adP" = (
 /obj/effect/decal/warning_stripes{
@@ -1918,14 +1907,15 @@
 /turf/open/auto_turf/sand/layer1,
 /area/kutjevo/exterior/Northwest_Colony)
 "afN" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "E";
-	pixel_x = 2
-	},
 /obj/structure/pipes/standard/simple/hidden/supply{
 	dir = 4
 	},
-/turf/open/floor/strata/red4,
+/obj/effect/decal/warning_stripes{
+	icon_state = "SE-out";
+	pixel_x = 2;
+	pixel_y = -1
+	},
+/turf/open/floor/strata/floor2,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "afO" = (
 /obj/structure/prop/colorable_rock/colorable{
@@ -2090,6 +2080,11 @@
 	pixel_x = 2;
 	pixel_y = -1
 	},
+/obj/effect/decal/warning_stripes{
+	icon_state = "NE-out";
+	pixel_x = 2;
+	pixel_y = 2
+	},
 /turf/open/floor/strata/floor2,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "agy" = (
@@ -2198,7 +2193,7 @@
 /area/clash_arena/tdm_kutjevo/upp_base)
 "ahc" = (
 /obj/structure/machinery/cm_vending/clothing/antag/upp,
-/turf/open/floor/strata/cyan3/north,
+/turf/open/floor/strata/cyan3,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "ahd" = (
 /turf/open/floor/plating/plating_catwalk/strata,
@@ -2206,29 +2201,22 @@
 "ahe" = (
 /obj/structure/medical_supply_link,
 /obj/structure/machinery/cm_vending/sorted/medical/upp,
-/turf/open/floor/strata/cyan3,
+/turf/open/floor/strata/cyan3/north,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "ahf" = (
-/obj/structure/machinery/cm_vending/sorted/attachments/upp_squad,
-/obj/structure/sign/safety/ammunition{
-	pixel_x = 40;
-	pixel_y = 27
-	},
-/obj/structure/pipes/standard/simple/hidden/supply{
-	dir = 4
-	},
-/turf/open/floor/strata/floor3/east,
-/area/clash_arena/tdm_kutjevo/upp_base)
+/turf/open/floor/strata/floor3,
+/area/clash_arena/tdm_kutjevo/upp_base/req)
 "ahg" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "N";
-	pixel_y = 1
-	},
-/turf/open/floor/plating/plating_catwalk/strata,
+/obj/structure/machinery/cm_vending/sorted/attachments/upp_squad,
+/turf/open/floor/strata/floor3/east,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "ahh" = (
 /obj/effect/decal/warning_stripes{
 	icon_state = "S"
+	},
+/obj/effect/decal/warning_stripes{
+	icon_state = "N";
+	pixel_y = 1
 	},
 /turf/open/floor/strata/floor3/east,
 /area/clash_arena/tdm_kutjevo/upp_base)
@@ -2261,7 +2249,7 @@
 /turf/open/floor/strata/red3,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "ahm" = (
-/turf/open/floor/strata/red1,
+/turf/open/floor/strata/red2,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "ahn" = (
 /obj/effect/decal/warning_stripes{
@@ -2271,22 +2259,23 @@
 /obj/structure/machinery/cm_vending/gear/antag{
 	name = "\improper Response Team Automated Gear Rack"
 	},
-/turf/open/floor/strata/cyan3/north,
+/turf/open/floor/strata/cyan3,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "aho" = (
-/obj/structure/medical_supply_link,
-/obj/structure/machinery/cm_vending/sorted/medical/marinemed/upp,
-/turf/open/floor/strata/cyan3,
+/obj/structure/sign/poster/upp,
+/turf/closed/wall/upp_ship/reinforced,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "ahp" = (
 /turf/open/auto_turf/sand/layer0,
 /area/kutjevo/exterior)
 "ahq" = (
-/obj/structure/machinery/cm_vending/sorted/cargo_guns/upp_squad,
 /obj/structure/pipes/standard/simple/hidden/supply{
 	dir = 4
 	},
-/turf/open/floor/strata/floor3/east,
+/obj/effect/decal/warning_stripes{
+	icon_state = "S"
+	},
+/turf/open/floor/strata/floor2,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "ahr" = (
 /obj/structure/machinery/cm_vending/sorted/cargo_guns/upp_squad,
@@ -2303,20 +2292,23 @@
 /obj/item/storage/firstaid/regular/empty,
 /obj/item/storage/firstaid/regular/empty,
 /obj/item/storage/firstaid/regular/empty,
-/turf/open/floor/strata/cyan3/north,
-/area/clash_arena/tdm_kutjevo/upp_base)
-"aht" = (
-/obj/structure/machinery/chem_dispenser/corpsman{
-	pixel_y = 3
-	},
 /turf/open/floor/strata/cyan3,
 /area/clash_arena/tdm_kutjevo/upp_base)
-"ahu" = (
+"aht" = (
 /obj/structure/machinery/cm_vending/sorted/cargo_ammo/upp_squad,
+/turf/open/floor/strata/floor3/east,
+/area/clash_arena/tdm_kutjevo/upp_base)
+"ahu" = (
 /obj/structure/pipes/standard/simple/hidden/supply{
 	dir = 4
 	},
-/turf/open/floor/strata/floor3/east,
+/obj/structure/pipes/standard/simple/hidden/supply{
+	dir = 4
+	},
+/obj/effect/decal/warning_stripes{
+	icon_state = "S"
+	},
+/turf/open/floor/strata/floor2,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "ahv" = (
 /obj/structure/machinery/cm_vending/sorted/cargo_ammo/upp_squad,
@@ -2330,40 +2322,28 @@
 /turf/open/floor/almayer/cargo_arrow/north,
 /area/clash_arena/tdm_kutjevo/uscm_base)
 "ahx" = (
-/obj/structure/machinery/light{
-	dir = 4;
-	light_color = "#66ccff";
-	invisibility = 101
-	},
-/obj/effect/landmark/start/upp{
-	name = "UPP soldier join";
-	job_list = list("UPP Ryadovoy","UPP MSzht Engineer","UPP MSzht Medic","UPP Serzhant","UPP Starshiy Serzhant")
-	},
-/obj/effect/landmark/late_join/upp{
-	name = "UPP late soldier join";
-	job_list = list("UPP Ryadovoy","UPP MSzht Engineer","UPP MSzht Medic","UPP Serzhant","UPP Starshiy Serzhant")
-	},
-/turf/open/floor/plating/plating_catwalk/prison,
+/obj/structure/machinery/cm_vending/sorted/cargo_guns/upp_squad,
+/turf/open/floor/strata/floor3/east,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "ahy" = (
 /obj/structure/machinery/cm_vending/sorted/medical/upp,
-/turf/open/floor/strata/cyan3/north,
+/turf/open/floor/strata/cyan4/west,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "ahz" = (
 /turf/open/auto_turf/sand/layer1,
 /area/kutjevo/exterior)
 "ahA" = (
-/turf/open/floor/strata/cyan3,
+/turf/open/floor/strata/red3/south,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "ahB" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "W";
-	layer = 2.5
-	},
 /obj/structure/pipes/standard/simple/hidden/supply{
 	dir = 4
 	},
-/turf/open/floor/strata/red4/north,
+/obj/effect/decal/warning_stripes{
+	icon_state = "SW-out";
+	layer = 2.5
+	},
+/turf/open/floor/strata/floor2,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "ahC" = (
 /obj/structure/prop/hybrisa/misc/floorprops/grate2,
@@ -2379,6 +2359,11 @@
 /obj/effect/decal/warning_stripes{
 	icon_state = "SW-out";
 	layer = 2.5
+	},
+/obj/effect/decal/warning_stripes{
+	icon_state = "NW-out";
+	layer = 2.5;
+	pixel_y = 1
 	},
 /turf/open/floor/strata/red3/east,
 /area/clash_arena/tdm_kutjevo/upp_base)
@@ -2415,14 +2400,13 @@
 /turf/open/floor/strata/red4/west,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "ahJ" = (
+/turf/closed/wall/kutjevo/rock,
+/area/clash_arena/tdm_kutjevo/upp_base)
+"ahK" = (
 /obj/structure/machinery/light{
 	dir = 1
 	},
-/obj/structure/machinery/cm_vending/sorted/medical/marinemed/upp,
-/turf/open/floor/strata/cyan4/north,
-/area/clash_arena/tdm_kutjevo/upp_base)
-"ahK" = (
-/turf/open/floor/strata/cyan4/west,
+/turf/open/floor/strata/floor2,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "ahL" = (
 /obj/structure/machinery/light,
@@ -2435,7 +2419,7 @@
 /obj/structure/pipes/standard/simple/hidden/supply{
 	dir = 4
 	},
-/turf/closed/wall/upp_ship,
+/turf/closed/wall/upp_ship/reinforced,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "ahN" = (
 /turf/closed/wall/upp_ship/reinforced/outer,
@@ -2456,11 +2440,8 @@
 /turf/open/floor/plating,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "ahS" = (
-/obj/structure/machinery/light{
-	dir = 1
-	},
-/turf/open/floor/strata/cyan3/northeast,
-/area/clash_arena/tdm_kutjevo/upp_base)
+/turf/closed/wall/upp_ship/reinforced,
+/area/clash_arena/tdm_kutjevo/upp_base/req)
 "ahT" = (
 /obj/structure/pipes/standard/simple/hidden/supply{
 	dir = 4
@@ -2491,7 +2472,7 @@
 /obj/structure/pipes/standard/simple/hidden/supply{
 	dir = 4
 	},
-/turf/closed/wall/upp_ship,
+/turf/closed/wall/upp_ship/reinforced,
 /area/clash_arena/tdm_kutjevo/upp_base/req)
 "ahZ" = (
 /obj/structure/surface/table/almayer,
@@ -2618,9 +2599,7 @@
 /turf/open/floor/strata/green3,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "aix" = (
-/obj/structure/barricade/handrail{
-	pixel_x = 2
-	},
+/obj/structure/fence/slim/upp,
 /turf/open/floor/strata/green3/west,
 /area/clash_arena/tdm_kutjevo/upp_base/req)
 "aiy" = (
@@ -2742,7 +2721,7 @@
 /turf/open/floor/plating,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "aiS" = (
-/obj/structure/barricade/handrail/medical,
+/obj/structure/barricade/handrail,
 /turf/open/floor/strata/cyan3/north,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "aiT" = (
@@ -3171,9 +3150,7 @@
 /turf/open/floor/almayer/sterile_green,
 /area/clash_arena/tdm_kutjevo/upp_base/medbay)
 "ajU" = (
-/obj/structure/barricade/handrail{
-	pixel_x = 2
-	},
+/obj/structure/fence/slim/upp,
 /turf/open/floor/strata/green3/east,
 /area/clash_arena/tdm_kutjevo/upp_base/req)
 "ajV" = (
@@ -3312,9 +3289,9 @@
 /turf/closed/wall/upp_ship,
 /area/clash_arena/tdm_kutjevo/upp_base/medbay)
 "akf" = (
-/obj/structure/machinery/line_nexter/med,
-/turf/open/floor/strata/floor2,
-/area/clash_arena/tdm_kutjevo/upp_base)
+/obj/structure/fence/slim/upp,
+/turf/open/floor/strata/multi_tiles/southeast,
+/area/clash_arena/tdm_kutjevo/upp_base/req)
 "akg" = (
 /obj/structure/pipes/standard/simple/hidden/supply{
 	dir = 4
@@ -3348,7 +3325,7 @@
 /obj/structure/pipes/standard/simple/hidden/supply{
 	dir = 4
 	},
-/turf/closed/wall/upp_ship,
+/turf/closed/wall/upp_ship/reinforced,
 /area/clash_arena/tdm_kutjevo/upp_base/req)
 "akl" = (
 /obj/structure/machinery/light{
@@ -3533,7 +3510,7 @@
 /obj/structure/pipes/standard/simple/hidden/supply{
 	dir = 4
 	},
-/turf/closed/wall/upp_ship,
+/turf/closed/wall/upp_ship/reinforced,
 /area/clash_arena/tdm_kutjevo/upp_base/req)
 "akE" = (
 /obj/structure/machinery/computer/supply/asrs/upp,
@@ -3811,17 +3788,21 @@
 "alo" = (
 /obj/structure/pipes/standard/simple/hidden/supply,
 /obj/structure/disposalpipe/segment,
-/turf/closed/wall/upp_ship,
+/obj/structure/sign/poster/upp,
+/turf/closed/wall/upp_ship/reinforced,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "alp" = (
 /obj/structure/pipes/standard/simple/hidden/supply,
 /obj/structure/disposalpipe/segment,
+/obj/structure/machinery/light{
+	dir = 1
+	},
 /turf/open/floor/strata/cyan3/northeast,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "alq" = (
 /obj/structure/pipes/standard/simple/hidden/supply,
 /obj/structure/disposalpipe/segment,
-/turf/open/floor/strata/floor2,
+/turf/open/floor/strata/red3/south,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "alr" = (
 /obj/structure/disposalpipe/segment,
@@ -5079,7 +5060,7 @@
 /obj/structure/disposalpipe/segment{
 	dir = 4
 	},
-/turf/open/floor/almayer/silverfull,
+/turf/open/floor/corsat/marked,
 /area/clash_arena/tdm_kutjevo/upp_base/medbay)
 "aoD" = (
 /obj/structure/closet/emcloset,
@@ -5873,9 +5854,11 @@
 /turf/open/floor/almayer/mono,
 /area/supply/station/uscm)
 "aqp" = (
-/obj/structure/machinery/chem_dispenser/corpsman,
-/turf/open/floor/almayer/sterile_green,
-/area/clash_arena/tdm_kutjevo/upp_base/medbay)
+/obj/structure/machinery/chem_dispenser/corpsman{
+	pixel_y = 3
+	},
+/turf/open/floor/strata/cyan4/north,
+/area/clash_arena/tdm_kutjevo/upp_base)
 "aqq" = (
 /obj/structure/machinery/cm_vending/gear/antag{
 	name = "\improper Response Team Automated Gear Rack";
@@ -5906,21 +5889,16 @@
 /turf/open/floor/almayer/silverfull,
 /area/clash_arena/tdm_kutjevo/upp_base/medbay)
 "aqt" = (
-/obj/structure/sign/nosmoking_2{
-	pixel_x = 28
-	},
 /obj/structure/machinery/light{
 	dir = 4;
 	light_color = "#ccecff"
 	},
-/turf/open/floor/almayer/silverfull,
+/obj/structure/machinery/chem_dispenser/corpsman,
+/turf/open/floor/almayer/sterile_green,
 /area/clash_arena/tdm_kutjevo/upp_base/medbay)
 "aqu" = (
-/obj/structure/sign/safety/ladder{
-	pixel_x = 39
-	},
-/turf/open/floor/almayer/silverfull,
-/area/clash_arena/tdm_kutjevo/upp_base/medbay)
+/turf/closed/wall/strata_ice/forest/rock,
+/area/space)
 "aqv" = (
 /obj/structure/surface/rack,
 /obj/item/storage/firstaid/toxin/empty,
@@ -7303,7 +7281,7 @@
 /obj/structure/machinery/door/airlock/upp/medical/solid/autoname{
 	dir = 2
 	},
-/turf/open/floor/almayer/silverfull,
+/turf/open/floor/corsat/marked,
 /area/clash_arena/tdm_kutjevo/upp_base/medbay)
 "atz" = (
 /obj/structure/sign/safety/four,
@@ -12956,6 +12934,14 @@
 /obj/structure/platform/metal/kutjevo_smooth/north,
 /turf/open/hybrisa/street/asphalt,
 /area/kutjevo/exterior/stonyfields)
+"cGa" = (
+/obj/effect/decal/warning_stripes{
+	icon_state = "S";
+	pixel_y = -1
+	},
+/obj/structure/machinery/light,
+/turf/open/floor/kutjevo/colors/red/tile,
+/area/clash_arena/tdm_kutjevo/upp_base)
 "cJt" = (
 /obj/structure/platform_decoration/metal/kutjevo/east,
 /turf/open/floor/kutjevo/colors/orange,
@@ -13306,6 +13292,10 @@
 "gsq" = (
 /turf/closed/wall/kutjevo/rock,
 /area/space)
+"gvV" = (
+/obj/structure/machinery/cm_vending/sorted/medical/marinemed/upp,
+/turf/open/floor/strata/cyan3/north,
+/area/clash_arena/tdm_kutjevo/upp_base)
 "gxb" = (
 /turf/open/desert/desert_shore/shore_corner2/east,
 /area/kutjevo/exterior/Northwest_Colony)
@@ -13443,6 +13433,10 @@
 "iHS" = (
 /turf/open/space/basic,
 /area/sky)
+"iNH" = (
+/obj/structure/fence/slim/upp/door,
+/turf/open/floor/strata/green3/northeast,
+/area/clash_arena/tdm_kutjevo/upp_base/req)
 "iOS" = (
 /turf/open/slippery/hull,
 /area/sky)
@@ -13506,6 +13500,12 @@
 /obj/item/fuel_cell,
 /turf/open/floor/kutjevo/multi_tiles/southeast,
 /area/kutjevo/interior/power)
+"jNm" = (
+/obj/structure/pipes/standard/simple/hidden/supply{
+	dir = 4
+	},
+/turf/open/floor/strata/floor3,
+/area/clash_arena/tdm_kutjevo/upp_base)
 "jXq" = (
 /turf/open/auto_turf/sand/layer2,
 /area/kutjevo/exterior/lz_river)
@@ -13709,6 +13709,11 @@
 	pixel_y = 11
 	},
 /turf/open/floor/corsat/spiralplate,
+/area/clash_arena/tdm_kutjevo/upp_base)
+"mul" = (
+/obj/structure/medical_supply_link,
+/obj/structure/machinery/cm_vending/sorted/medical/marinemed/upp,
+/turf/open/floor/strata/cyan3/north,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "mxB" = (
 /turf/closed/wall/kutjevo/rock/border,
@@ -14285,6 +14290,10 @@
 /obj/structure/flag/plantable/upp,
 /turf/open/floor/kutjevo/colors/orange,
 /area/clash_arena/tdm_kutjevo/upp_base)
+"tDe" = (
+/obj/structure/fence/slim/upp/door,
+/turf/open/floor/strata/floor3,
+/area/clash_arena/tdm_kutjevo/upp_base/req)
 "tEj" = (
 /obj/structure/surface/rack,
 /obj/item/fuel_cell,
@@ -14327,6 +14336,16 @@
 /obj/structure/barricade/handrail/hybrisa/road/metal/metaldark2/middle,
 /turf/open/desert/desert_shore/desert_shore1/west,
 /area/kutjevo/exterior)
+"uiP" = (
+/obj/effect/decal/warning_stripes{
+	icon_state = "E";
+	pixel_x = 2
+	},
+/obj/structure/machinery/light{
+	dir = 4
+	},
+/turf/open/floor/strata/red4,
+/area/clash_arena/tdm_kutjevo/upp_base)
 "ujk" = (
 /turf/open/floor/strata/orange_icorner,
 /area/clash_arena/tdm_kutjevo/upp_base)
@@ -14599,6 +14618,42 @@
 /obj/structure/flora/grass/desert/heavygrass_8,
 /turf/open/desert/rock/deep/rock3,
 /area/kutjevo/exterior/Northwest_Colony)
+"xuj" = (
+/obj/effect/decal/warning_stripes{
+	icon_state = "W";
+	layer = 2.5
+	},
+/turf/open/floor/strata/red4/north,
+/area/clash_arena/tdm_kutjevo/upp_base)
+"xwV" = (
+/obj/structure/surface/table/reinforced/rostock_table,
+/obj/item/book/manual/upphistory{
+	pixel_x = 7;
+	pixel_y = 8
+	},
+/obj/item/book/manual/upphistory{
+	pixel_x = -6;
+	pixel_y = 8
+	},
+/obj/item/book/manual/upphistory{
+	pixel_x = 7;
+	pixel_y = 0
+	},
+/obj/item/book/manual/upphistory{
+	pixel_x = -6;
+	pixel_y = 0
+	},
+/obj/item/book/codebook/upp,
+/turf/open/floor/strata/red3/south,
+/area/clash_arena/tdm_kutjevo/upp_base)
+"xzq" = (
+/obj/structure/machinery/line_nexter{
+	id = "uppline1";
+	dir = 4
+	},
+/obj/structure/barricade/handrail,
+/turf/open/floor/strata/cyan3/north,
+/area/clash_arena/tdm_kutjevo/upp_base)
 "xzI" = (
 /obj/structure/prop/hybrisa/misc/floorprops/grate2,
 /turf/open/gm/river/desert/shallow_edge/north,
@@ -31815,18 +31870,18 @@ abU
 abZ
 adJ
 adN
-acQ
-acO
+adN
+adN
 adP
 acV
-adn
-acQ
-acO
+adN
+adN
+adN
 acU
-acV
-aap
-acQ
-acO
+cGa
+abB
+abB
+abB
 osL
 ahN
 vEW
@@ -33409,16 +33464,16 @@ gsq
 gsq
 gsq
 ahN
-aau
-aax
-adr
-aaC
+ait
+ait
+ait
+ait
 ahm
 abU
 aev
 aev
 aev
-aev
+ahA
 aeC
 aev
 aev
@@ -33676,18 +33731,18 @@ gsq
 gsq
 gsq
 ahN
-abR
-abR
-abR
-abR
-abU
-abZ
+aev
+aev
+aev
+ait
 aeI
-aeK
+abZ
 afk
-afo
+aeK
+aeK
+ahA
 afN
-agZ
+uiP
 agv
 agF
 agZ
@@ -33943,17 +33998,17 @@ gsq
 gsq
 gsq
 ahN
-adE
-abR
-abR
-abR
-abU
-aad
-ahc
-ahd
+aev
+aev
+aev
+ait
 ahe
-aad
-ahf
+aev
+ahc
+aeK
+aeK
+ahA
+ahq
 ahg
 ahh
 ahi
@@ -34210,18 +34265,18 @@ gsq
 gsq
 gsq
 ahN
-acC
-acD
-acE
-acH
-ahm
-aad
+aev
+aev
+aev
+ait
+mul
+aev
 ahn
-ahd
-aho
-aad
+aeK
+aeK
+ahA
 ahq
-ahg
+ahx
 ahh
 ahi
 ahj
@@ -34477,18 +34532,18 @@ gsq
 gsq
 gsq
 ahN
-aau
-aax
-adr
-aaC
-ahm
-aad
+aev
+aev
+aev
+ait
+gvV
+aev
 ahs
-ahd
-aht
-aad
+aeK
+aeK
+ahA
 ahu
-ahg
+aht
 ahh
 ahi
 ahj
@@ -34744,18 +34799,18 @@ gsq
 gsq
 gsq
 ahN
-abR
-abR
-ahx
-abR
-abU
-aad
+aev
+aev
+aev
+ait
+aqp
+aev
 ahy
 aeK
-ahA
 aeK
+ahA
 ahB
-ahG
+xuj
 ahE
 ahF
 ahG
@@ -34998,9 +35053,9 @@ hSA
 dCP
 dCP
 dCP
-gsq
-gsq
-gsq
+dCP
+dCP
+dCP
 gsq
 gsq
 gsq
@@ -35017,21 +35072,21 @@ ait
 ait
 ait
 ait
-ahJ
-aeK
+ait
+ait
 ahK
-aeK
+ahA
 ahL
-aad
+ait
 oJv
 oJv
 oJv
 ahM
-aad
-aad
-aad
-aad
-aad
+ait
+ait
+ait
+ait
+ait
 ahN
 ahN
 ahN
@@ -35265,12 +35320,12 @@ hSA
 dCP
 dCP
 dCP
-gsq
-gsq
-gsq
-gsq
-gsq
-gsq
+dCP
+dCP
+dCP
+dCP
+dCP
+aqu
 ahN
 ain
 ain
@@ -35285,11 +35340,11 @@ ahQ
 ahQ
 aoB
 ppX
-aad
+aho
 aiv
-aeK
+ahA
 ahT
-ahU
+aap
 ahV
 ahU
 ahX
@@ -35305,7 +35360,7 @@ aig
 aih
 aii
 aij
-aic
+ahS
 aik
 ail
 ahN
@@ -35532,12 +35587,12 @@ hSA
 dCP
 dCP
 dCP
-gsq
-gsq
-gsq
-gsq
-gsq
-gsq
+dCP
+dCP
+dCP
+dCP
+dCP
+aqu
 uTo
 ain
 aio
@@ -35554,7 +35609,7 @@ air
 ais
 ait
 aiv
-aeK
+ahA
 aiw
 aix
 aiy
@@ -35799,12 +35854,12 @@ hSA
 dCP
 dCP
 dCP
-gsq
-gsq
-gsq
-gsq
-gsq
-gsq
+dCP
+dCP
+dCP
+dCP
+dCP
+aqu
 uTo
 aiL
 aiL
@@ -35821,9 +35876,9 @@ aio
 aiQ
 aiR
 aiS
-aeK
+ahA
 aiT
-aiy
+akf
 aiU
 aiV
 aiX
@@ -36066,12 +36121,12 @@ hSA
 dCP
 dCP
 dCP
-gsq
-gsq
-gsq
-gsq
-gsq
-gsq
+dCP
+dCP
+dCP
+dCP
+dCP
+aqu
 uTo
 aji
 aio
@@ -36088,12 +36143,12 @@ ajn
 ajo
 ajp
 aiS
-aeK
-aiT
-aiG
-aiG
-aiG
-aiG
+ahA
+jNm
+tDe
+ahf
+ahf
+ahf
 ajq
 ajr
 ajs
@@ -36333,12 +36388,12 @@ hSA
 dCP
 dCP
 dCP
-gsq
-gsq
-gsq
-gsq
-gsq
-gsq
+dCP
+dCP
+dCP
+dCP
+dCP
+aqu
 uTo
 ajz
 ajA
@@ -36355,9 +36410,9 @@ aio
 aiQ
 aiR
 aiS
-aeK
+ahA
 aiT
-aiy
+akf
 ajE
 ajF
 ajG
@@ -36600,12 +36655,12 @@ hSA
 dCP
 dCP
 dCP
-gsq
-gsq
-gsq
-gsq
-gsq
-gsq
+dCP
+dCP
+dCP
+dCP
+dCP
+aqu
 uTo
 aiL
 aiL
@@ -36621,8 +36676,8 @@ ajS
 air
 ajT
 aiR
-aiS
-aeK
+xzq
+ahA
 aiw
 ajU
 aiy
@@ -36867,12 +36922,12 @@ hSA
 dCP
 dCP
 dCP
-gsq
-gsq
-gsq
-gsq
-gsq
-gsq
+dCP
+dCP
+dCP
+dCP
+dCP
+aqu
 uTo
 aji
 aio
@@ -36888,10 +36943,10 @@ ake
 aim
 aim
 ait
-akf
 aeK
+ahA
 akg
-akh
+iNH
 aki
 akh
 akj
@@ -37134,12 +37189,12 @@ hSA
 dCP
 dCP
 dCP
-gsq
-gsq
-gsq
-gsq
-gsq
-gsq
+dCP
+dCP
+dCP
+aqu
+aqu
+aqu
 uTo
 ajz
 ajA
@@ -37156,9 +37211,9 @@ akz
 akA
 aad
 akB
-aeK
+ahA
 ahL
-aic
+ahS
 akC
 akC
 akC
@@ -37401,10 +37456,10 @@ hSA
 dCP
 dCP
 dCP
-gsq
-gsq
-gsq
-gsq
+dCP
+dCP
+dCP
+aqu
 uTo
 uTo
 uTo
@@ -37423,7 +37478,7 @@ akU
 akV
 aad
 aiv
-aeK
+ahA
 aiw
 akW
 akX
@@ -37441,7 +37496,7 @@ ald
 ald
 ald
 ale
-aic
+ahS
 alf
 alg
 ahN
@@ -37668,10 +37723,10 @@ hSA
 dCP
 dCP
 dCP
-gsq
-gsq
-gsq
-gsq
+dCP
+dCP
+dCP
+aqu
 uTo
 alh
 ali
@@ -37708,9 +37763,9 @@ ald
 ald
 ald
 ale
-aic
-aic
-aic
+ahS
+ahS
+ahS
 ahN
 agt
 afr
@@ -37935,10 +37990,10 @@ hSA
 dCP
 dCP
 dCP
-gsq
-gsq
-gsq
-gsq
+dCP
+dCP
+dCP
+aqu
 uTo
 alB
 aio
@@ -37956,8 +38011,8 @@ alE
 aio
 aio
 ahR
-ahS
-aeK
+aiv
+ahA
 abU
 akW
 alF
@@ -38202,10 +38257,10 @@ hSA
 dCP
 dCP
 dCP
-gsq
-gsq
-gsq
-gsq
+dCP
+dCP
+dCP
+aqu
 uTo
 alS
 aio
@@ -38224,10 +38279,10 @@ aio
 alY
 ahR
 aiv
-aeK
+ahA
 alZ
-aic
-aic
+ahS
+ahS
 ama
 amc
 amd
@@ -38469,10 +38524,10 @@ hSA
 dCP
 dCP
 dCP
-gsq
-gsq
-gsq
-gsq
+dCP
+dCP
+dCP
+aqu
 uTo
 amn
 aio
@@ -38491,7 +38546,7 @@ aio
 aio
 amu
 abU
-aeK
+ahA
 abU
 akW
 amv
@@ -38736,10 +38791,10 @@ hSA
 dCP
 dCP
 dCP
-gsq
-gsq
-gsq
-gsq
+dCP
+dCP
+dCP
+aqu
 uTo
 amF
 aio
@@ -38758,7 +38813,7 @@ amR
 amS
 amT
 abU
-aeK
+ahA
 abU
 akW
 amV
@@ -39003,10 +39058,10 @@ hSA
 dCP
 dCP
 dCP
-gsq
-gsq
-gsq
-gsq
+dCP
+dCP
+dCP
+aqu
 uTo
 ana
 aio
@@ -39025,9 +39080,9 @@ apw
 anf
 ahR
 abU
-aeK
+ahA
 abU
-aic
+ahS
 ang
 anh
 ani
@@ -39270,10 +39325,10 @@ hSA
 dCP
 dCP
 dCP
-gsq
-gsq
-gsq
-gsq
+dCP
+dCP
+dCP
+aqu
 uTo
 anm
 ann
@@ -39292,7 +39347,7 @@ apw
 anx
 ahR
 abU
-aeK
+ahA
 abU
 akW
 any
@@ -39537,10 +39592,10 @@ hSA
 dCP
 dCP
 dCP
-gsq
-gsq
-gsq
-gsq
+dCP
+dCP
+dCP
+aqu
 uTo
 anA
 anB
@@ -39557,9 +39612,9 @@ aio
 amt
 apw
 anf
-aad
-abU
-aeK
+ait
+aop
+xwV
 abU
 akW
 anJ
@@ -39804,10 +39859,10 @@ hSA
 dCP
 dCP
 dCP
-gsq
-gsq
-gsq
-gsq
+dCP
+dCP
+dCP
+aqu
 uTo
 anP
 aio
@@ -39825,10 +39880,10 @@ anU
 anV
 aiP
 ait
-abU
-aeK
-alZ
-aic
+ahN
+ahN
+ahN
+ahO
 aic
 ama
 anW
@@ -40071,10 +40126,10 @@ hSA
 dCP
 dCP
 dCP
-gsq
-gsq
-gsq
-gsq
+dCP
+dCP
+dCP
+aqu
 uTo
 uTo
 uTo
@@ -40092,9 +40147,9 @@ aom
 aon
 aoo
 ait
-aop
-aeK
-abU
+ahJ
+ahJ
+ahJ
 ahO
 aoq
 aos
@@ -40338,15 +40393,15 @@ hSA
 dCP
 dCP
 dCP
-gsq
-gsq
-gsq
-gsq
-gsq
-gsq
-gsq
-gsq
-gsq
+dCP
+dCP
+dCP
+aqu
+aqu
+aqu
+aqu
+aqu
+aqu
 uTo
 aim
 aoB
@@ -40359,9 +40414,9 @@ aoC
 aim
 aim
 ahN
-ahN
-ahN
-ahN
+ahJ
+ahJ
+ahJ
 ahO
 aoD
 ajv
@@ -40605,15 +40660,15 @@ hSA
 dCP
 dCP
 dCP
-gsq
-gsq
-gsq
-gsq
-gsq
-gsq
 dCP
-gsq
-gsq
+dCP
+dCP
+dCP
+dCP
+dCP
+dCP
+dCP
+aqu
 uTo
 aoN
 aoO
@@ -40879,8 +40934,8 @@ dCP
 dCP
 dCP
 dCP
-gsq
-gsq
+dCP
+aqu
 uTo
 apc
 apc
@@ -41146,8 +41201,8 @@ dCP
 dCP
 dCP
 dCP
-gsq
-gsq
+dCP
+aqu
 uTo
 apc
 apc
@@ -41414,7 +41469,7 @@ dCP
 dCP
 dCP
 dCP
-gsq
+aqu
 uTo
 apJ
 apK
@@ -41681,7 +41736,7 @@ dCP
 dCP
 dCP
 dCP
-gsq
+aqu
 uTo
 uTo
 uTo
@@ -41948,12 +42003,12 @@ dCP
 dCP
 dCP
 dCP
-gsq
-gsq
-gsq
-gsq
-gsq
-gsq
+aqu
+aqu
+aqu
+aqu
+aqu
+aqu
 uTo
 aqh
 aqi
@@ -42218,15 +42273,15 @@ dCP
 dCP
 dCP
 dCP
-gsq
-gsq
-gsq
+dCP
+dCP
+aqu
 uTo
 aqm
 aqn
 aio
 aio
-aqp
+aqv
 ahN
 gsq
 gsq
@@ -42486,8 +42541,8 @@ dCP
 dCP
 dCP
 dCP
-gsq
-gsq
+dCP
+aqu
 uTo
 aqq
 aqn
@@ -42754,13 +42809,13 @@ dCP
 dCP
 dCP
 dCP
-gsq
+aqu
 uTo
 aqm
 aqs
 aqt
-aqu
-aqv
+uTo
+uTo
 ahN
 gsq
 dCP

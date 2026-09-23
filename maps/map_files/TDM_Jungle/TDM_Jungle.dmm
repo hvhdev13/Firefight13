@@ -11,6 +11,7 @@
 	pixel_x = -2;
 	pixel_y = 4
 	},
+/obj/effect/landmark/clash_npc/clf,
 /turf/open/auto_turf/tyrargo_grass/layer0_mud_alt,
 /area/clash_arena/tdm_jungle/battlefield)
 "ac" = (
@@ -777,13 +778,6 @@
 "bV" = (
 /turf/closed/wall/almayer/outer,
 /area/clash_arena/tdm_jungle/uscm_base/req)
-"bW" = (
-/obj/structure/machinery/light{
-	dir = 1
-	},
-/obj/structure/machinery/cm_vending/sorted/medical/marinemed/upp,
-/turf/open/floor/strata/cyan4/north,
-/area/clash_arena/tdm_jungle/upp_base)
 "bX" = (
 /obj/structure/machinery/cm_vending/clothing/marine/bravo{
 	density = 0;
@@ -1222,7 +1216,7 @@
 /obj/structure/machinery/cm_vending/gear/antag{
 	name = "\improper Response Team Automated Gear Rack"
 	},
-/turf/open/floor/strata/cyan3/north,
+/turf/open/floor/strata/cyan3,
 /area/clash_arena/tdm_jungle/upp_base)
 "dm" = (
 /obj/structure/machinery/light{
@@ -1236,7 +1230,7 @@
 /area/clash_arena/tdm_jungle/upp_base)
 "do" = (
 /obj/structure/machinery/cm_vending/sorted/medical/upp,
-/turf/open/floor/strata/cyan3/north,
+/turf/open/floor/strata/cyan4/west,
 /area/clash_arena/tdm_jungle/upp_base)
 "dp" = (
 /obj/effect/landmark/start/upp{
@@ -1267,7 +1261,7 @@
 /obj/structure/machinery/chem_dispenser/corpsman{
 	pixel_y = 3
 	},
-/turf/open/floor/strata/cyan3,
+/turf/open/floor/strata/cyan4/north,
 /area/clash_arena/tdm_jungle/upp_base)
 "dt" = (
 /obj/effect/decal/warning_stripes{
@@ -2709,7 +2703,7 @@
 "hV" = (
 /obj/structure/medical_supply_link,
 /obj/structure/machinery/cm_vending/sorted/medical/upp,
-/turf/open/floor/strata/cyan3,
+/turf/open/floor/strata/cyan3/north,
 /area/clash_arena/tdm_jungle/upp_base)
 "hW" = (
 /obj/structure/bed/chair/comfy/bravo{
@@ -3248,7 +3242,10 @@
 /turf/open/auto_turf/tyrargo_grass,
 /area/clash_arena/tdm_jungle/battlefield)
 "jI" = (
-/turf/open/floor/strata/cyan4/west,
+/obj/structure/machinery/light{
+	dir = 1
+	},
+/turf/open/floor/strata/floor2,
 /area/clash_arena/tdm_jungle/upp_base)
 "jJ" = (
 /turf/open/space/basic,
@@ -4571,13 +4568,6 @@
 	},
 /turf/open/auto_turf/tyrargo_grass/layer0,
 /area/clash_arena/tdm_jungle/battlefield)
-"oQ" = (
-/obj/effect/decal/strata_decals/grasses,
-/obj/structure/barricade/sandbags/weak_wired{
-	dir = 4
-	},
-/turf/open/auto_turf/tyrargo_grass,
-/area/clash_arena/tdm_jungle/battlefield)
 "oU" = (
 /obj/effect/decal/warning_stripes{
 	icon_state = "SW-out";
@@ -4669,7 +4659,12 @@
 /turf/open/floor/almayer/mono,
 /area/clash_arena/tdm_jungle/upp_base)
 "pj" = (
-/turf/open/floor/strata/cyan3,
+/obj/effect/decal/warning_stripes{
+	icon_state = "S";
+	pixel_y = -1
+	},
+/obj/structure/machinery/light,
+/turf/open/floor/kutjevo/colors/red/tile,
 /area/clash_arena/tdm_jungle/upp_base)
 "pk" = (
 /obj/structure/pipes/vents/pump{
@@ -5084,20 +5079,8 @@
 /turf/open/gm/river/desert/tyrargo/no_slowdown,
 /area/clash_arena/tdm_jungle/battlefield)
 "qw" = (
-/obj/structure/machinery/light{
-	dir = 4;
-	light_color = "#66ccff";
-	invisibility = 101
-	},
-/obj/effect/landmark/start/upp{
-	name = "UPP soldier join";
-	job_list = list("UPP Ryadovoy","UPP MSzht Engineer","UPP MSzht Medic","UPP Serzhant","UPP Starshiy Serzhant")
-	},
-/obj/effect/landmark/late_join/upp{
-	name = "UPP late soldier join";
-	job_list = list("UPP Ryadovoy","UPP MSzht Engineer","UPP MSzht Medic","UPP Serzhant","UPP Starshiy Serzhant")
-	},
-/turf/open/floor/plating/plating_catwalk/prison,
+/obj/structure/machinery/cm_vending/sorted/medical/marinemed/upp,
+/turf/open/floor/strata/cyan3/north,
 /area/clash_arena/tdm_jungle/upp_base)
 "qx" = (
 /obj/structure/machinery/door/airlock/upp/medical/solid/autoname{
@@ -6366,10 +6349,6 @@
 	},
 /turf/open/gm/river/desert/tyrargo/no_slowdown,
 /area/clash_arena/tdm_jungle/battlefield)
-"vk" = (
-/obj/effect/landmark/clash_npc/clf,
-/turf/open/auto_turf/tyrargo_grass,
-/area/clash_arena/tdm_jungle/battlefield)
 "vn" = (
 /obj/structure/flora/pottedplant{
 	icon_state = "pottedplant_21"
@@ -6885,10 +6864,6 @@
 /obj/item/tool/shovel/etool/folded,
 /obj/item/tool/shovel/etool/folded,
 /obj/item/tool/shovel/etool/folded,
-/obj/item/weapon/gun/launcher/rocket/upp{
-	pixel_x = -6;
-	pixel_y = 9
-	},
 /turf/open/floor/strata/green3/north,
 /area/clash_arena/tdm_jungle/upp_base)
 "wA" = (
@@ -7788,14 +7763,8 @@
 /turf/open/floor/almayer/cargo,
 /area/clash_arena/tdm_jungle/uscm_base/req)
 "Aj" = (
-/obj/structure/machinery/light{
-	dir = 4;
-	invisibility = 101
-	},
-/obj/structure/machinery/cm_vending/sorted/marine_food{
-	name = "\improper UnionBest Food Vendor"
-	},
-/turf/open/floor/corsat/spiralplate,
+/obj/structure/machinery/cm_vending/sorted/cargo_guns/upp_squad_guns,
+/turf/open/floor/strata/multi_tiles/southeast,
 /area/clash_arena/tdm_jungle/upp_base)
 "Aq" = (
 /obj/structure/machinery/cm_vending/gear/tl{
@@ -9391,11 +9360,6 @@
 /obj/structure/surface/table/almayer,
 /turf/open/floor/almayer/plate,
 /area/clash_arena/tdm_jungle/uscm_base/req)
-"Gh" = (
-/obj/structure/medical_supply_link,
-/obj/structure/machinery/cm_vending/sorted/medical/marinemed/upp,
-/turf/open/floor/strata/cyan3,
-/area/clash_arena/tdm_jungle/upp_base)
 "Gi" = (
 /obj/structure/window/framed/almayer,
 /turf/open/floor/plating,
@@ -10375,7 +10339,7 @@
 /obj/item/storage/firstaid/regular/empty,
 /obj/item/storage/firstaid/regular/empty,
 /obj/item/storage/firstaid/regular/empty,
-/turf/open/floor/strata/cyan3/north,
+/turf/open/floor/strata/cyan3,
 /area/clash_arena/tdm_jungle/upp_base)
 "Js" = (
 /obj/effect/decal/strata_decals/grasses,
@@ -11354,11 +11318,6 @@
 /obj/structure/disposalpipe/segment,
 /turf/open/floor/almayer/orange/north,
 /area/clash_arena/tdm_jungle/uscm_base)
-"Nb" = (
-/obj/structure/machinery/cm_vending/clothing/antag/upp,
-/obj/item/ammo_magazine/rocket/upp,
-/turf/open/floor/corsat/spiralplate,
-/area/clash_arena/tdm_jungle/upp_base)
 "Nd" = (
 /obj/structure/bed/roller/hospital_empty/bigrollerempty3,
 /turf/open/floor/almayer/sterile_green_side,
@@ -12036,7 +11995,6 @@
 /obj/structure/barricade/sandbags/weak_wired{
 	dir = 4
 	},
-/obj/effect/landmark/clash_npc/clf,
 /turf/open/auto_turf/tyrargo_grass/layer0_mud_alt,
 /area/clash_arena/tdm_jungle/battlefield)
 "Pw" = (
@@ -13472,7 +13430,7 @@
 /area/clash_arena/tdm_jungle/uscm_base/medbay)
 "UF" = (
 /obj/structure/machinery/cm_vending/clothing/antag/upp,
-/turf/open/floor/strata/cyan3/north,
+/turf/open/floor/strata/cyan3,
 /area/clash_arena/tdm_jungle/upp_base)
 "UG" = (
 /turf/open/hybrisa/street/cement1,
@@ -14440,17 +14398,14 @@
 "XV" = (
 /obj/structure/medical_supply_link,
 /obj/structure/machinery/cm_vending/sorted/medical/marinemed/upp,
-/obj/structure/machinery/light{
-	dir = 4;
-	invisibility = 101
-	},
-/turf/open/floor/corsat/spiralplate,
+/turf/open/floor/strata/cyan3/north,
 /area/clash_arena/tdm_jungle/upp_base)
 "XW" = (
 /obj/structure/prop/tyrargo/boards/boards_1{
 	pixel_x = 2;
 	pixel_y = 20
 	},
+/obj/effect/landmark/clash_npc/clf,
 /turf/open/auto_turf/tyrargo_grass/layer0_mud_alt,
 /area/clash_arena/tdm_jungle/battlefield)
 "XY" = (
@@ -27834,18 +27789,18 @@ oH
 rB
 cq
 Aj
-Nb
-lk
+Aj
+Aj
 bA
 SJ
-Qu
-ru
-lk
+Aj
+Aj
+Aj
 qK
-SJ
-XV
-ru
-lk
+pj
+so
+so
+so
 pn
 fU
 aw
@@ -29038,10 +28993,10 @@ jJ
 jJ
 aw
 fU
-RA
-zo
-bP
-us
+AS
+AS
+AS
+AS
 fr
 oH
 Fc
@@ -29240,15 +29195,15 @@ jJ
 jJ
 aw
 fU
-oF
-oF
-oF
-oF
-oH
-rB
+Fc
+Fc
+Fc
+AS
 Px
-jF
+rB
 yn
+jF
+jF
 XD
 Hl
 aW
@@ -29442,15 +29397,15 @@ jJ
 jJ
 aw
 fU
-Hm
-oF
-oF
-oF
-oH
-HX
-UF
-yl
+Fc
+Fc
+Fc
+AS
 hV
+Fc
+UF
+jF
+jF
 XD
 eX
 Ug
@@ -29644,15 +29599,15 @@ jJ
 jJ
 aw
 fU
-gj
-Au
-di
-XI
-fr
-HX
+Fc
+Fc
+Fc
+AS
+XV
+Fc
 dl
-yl
-Gh
+jF
+jF
 XD
 eX
 OZ
@@ -29846,15 +29801,15 @@ jJ
 jJ
 aw
 fU
-RA
-zo
-bP
-us
-fr
-HX
+Fc
+Fc
+Fc
+AS
+qw
+Fc
 Jr
-yl
-ds
+jF
+jF
 XD
 Oo
 wB
@@ -30048,15 +30003,15 @@ aw
 aw
 aw
 fU
-oF
-oF
-qw
-oF
-oH
-HX
+Fc
+Fc
+Fc
+AS
+ds
+Fc
 do
 jF
-pj
+jF
 XD
 nZ
 ae
@@ -30256,8 +30211,8 @@ AS
 AS
 AS
 AS
-bW
-jF
+AS
+AS
 jI
 XD
 rZ
@@ -37542,7 +37497,7 @@ yR
 cB
 ij
 cB
-lf
+XP
 iO
 Ks
 Xa
@@ -37741,7 +37696,7 @@ fj
 dG
 aq
 WF
-zi
+yR
 ZH
 vD
 yR
@@ -38755,7 +38710,7 @@ BD
 Iq
 cB
 cB
-oQ
+ZH
 Pv
 QD
 SB
@@ -39770,7 +39725,7 @@ IC
 yR
 XP
 vD
-zi
+yR
 yR
 DV
 Yd
@@ -40377,7 +40332,7 @@ vD
 Bw
 HO
 gB
-vk
+vD
 fj
 Yd
 aS
@@ -40778,7 +40733,7 @@ fj
 HK
 rY
 vD
-zi
+yR
 hk
 FD
 yH

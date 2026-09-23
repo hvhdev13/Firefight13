@@ -1,6 +1,6 @@
 //MAP CONVERTED BY dmm2tgm.py THIS HEADER COMMENT PREVENTS RECONVERSION, DO NOT REMOVE
 "aa" = (
-/turf/closed/wall/kutjevo/rock,
+/turf/closed/wall/strata_ice/forest/rock,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "ad" = (
 /turf/open/floor/almayer/sterile_green,
@@ -99,8 +99,9 @@
 /turf/open/floor/almayer/sterile_green_side/east,
 /area/clash_arena/tdm_deathmatch2000/uscm_base/medbay)
 "ap" = (
-/turf/open/floor/strata/red3/south,
-/area/clash_arena/tdm_deathmatch2000/battlefield)
+/obj/structure/blocker/clash_gate/upp,
+/turf/closed/wall/upp_ship/reinforced/outer,
+/area/clash_arena/tdm_deathmatch2000/upp_base)
 "aq" = (
 /obj/structure/machinery/sleep_console{
 	dir = 8;
@@ -121,9 +122,6 @@
 "at" = (
 /turf/open/hybrisa/street/cement2,
 /area/clash_arena/tdm_deathmatch2000/battlefield)
-"au" = (
-/turf/closed/wall/strata_outpost,
-/area/clash_arena/tdm_deathmatch2000/upp_base)
 "aw" = (
 /obj/structure/window/framed/almayer,
 /obj/structure/machinery/door/firedoor/border_only/almayer{
@@ -427,14 +425,6 @@
 	},
 /turf/open/floor/almayer/green/west,
 /area/clash_arena/tdm_deathmatch2000/uscm_base/req)
-"bq" = (
-/obj/effect/decal/medical_decals{
-	icon_state = "triagedecaldir";
-	pixel_y = 18
-	},
-/obj/structure/machinery/power/apc/upp/east,
-/turf/open/floor/almayer/silverfull,
-/area/clash_arena/tdm_deathmatch2000/upp_base/medbay)
 "br" = (
 /obj/structure/surface/rack,
 /obj/item/ammo_box/magazine/type71,
@@ -1729,9 +1719,9 @@
 /turf/open/floor/almayer/green/southwest,
 /area/clash_arena/tdm_deathmatch2000/uscm_base/req)
 "fe" = (
-/obj/item/ammo_magazine/rocket/upp/at,
-/obj/item/ammo_magazine/rocket/upp/at,
-/turf/open/floor/strata/floor3/east,
+/obj/structure/medical_supply_link,
+/obj/structure/machinery/cm_vending/sorted/medical/upp,
+/turf/open/floor/strata/cyan3/north,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "ff" = (
 /obj/effect/decal/warning_stripes{
@@ -2035,17 +2025,10 @@
 /turf/open/floor/strata/floor2,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "gL" = (
-/obj/structure/machinery/light{
-	dir = 1
-	},
-/obj/structure/machinery/cm_vending/sorted/medical/marinemed/upp,
-/turf/open/floor/strata/cyan4/north,
-/area/clash_arena/tdm_deathmatch2000/upp_base)
-"gM" = (
 /obj/structure/machinery/chem_dispenser/corpsman{
 	pixel_y = 3
 	},
-/turf/open/floor/strata/cyan3,
+/turf/open/floor/strata/cyan4/north,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "gO" = (
 /obj/structure/bed/chair{
@@ -2805,10 +2788,9 @@
 	pixel_x = 2
 	},
 /obj/structure/machinery/cm_vending/gear/antag{
-	hacked = 1;
 	name = "\improper Response Team Automated Gear Rack"
 	},
-/turf/open/floor/strata/cyan3/north,
+/turf/open/floor/strata/cyan3,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "ki" = (
 /obj/structure/pipes/standard/simple/hidden/supply{
@@ -2981,8 +2963,8 @@
 /turf/open/floor/almayer/sterile_green_side/west,
 /area/clash_arena/tdm_deathmatch2000/uscm_base/medbay)
 "kM" = (
-/obj/structure/window/framed/strata,
-/turf/open/asphalt/cementalt,
+/obj/structure/window/framed/upp_ship,
+/turf/closed/wall/upp_ship,
 /area/clash_arena/tdm_deathmatch2000/battlefield)
 "kN" = (
 /obj/structure/surface/table/reinforced/prison{
@@ -3098,13 +3080,6 @@
 /obj/structure/pipes/standard/manifold/fourway/hidden/supply,
 /turf/open/floor/almayer/silverfull,
 /area/clash_arena/tdm_deathmatch2000/upp_base/medbay)
-"lA" = (
-/obj/item/ammo_magazine/rocket/upp/incen,
-/obj/item/ammo_magazine/rocket/upp/incen,
-/obj/item/ammo_magazine/rocket/upp/incen,
-/obj/item/ammo_magazine/rocket/upp/incen,
-/turf/open/floor/strata/floor3/east,
-/area/clash_arena/tdm_deathmatch2000/upp_base)
 "lB" = (
 /obj/structure/machinery/door/airlock/multi_tile/upp/generic,
 /turf/open/floor/corsat/marked,
@@ -3509,8 +3484,9 @@
 /turf/open/asphalt/cementalt,
 /area/clash_arena/tdm_deathmatch2000/battlefield)
 "og" = (
-/obj/structure/flora/grass/desert/lightgrass_10,
-/turf/closed/wall/kutjevo/rock,
+/obj/structure/medical_supply_link,
+/obj/structure/machinery/cm_vending/sorted/medical/marinemed/upp,
+/turf/open/floor/strata/cyan3/north,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "oi" = (
 /obj/vehicle/powerloader/jd{
@@ -3705,6 +3681,9 @@
 "pd" = (
 /obj/structure/pipes/standard/simple/hidden/supply,
 /obj/structure/disposalpipe/segment,
+/obj/structure/machinery/light{
+	dir = 1
+	},
 /turf/open/floor/strata/cyan3/northeast,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "pe" = (
@@ -3907,14 +3886,8 @@
 /turf/open/floor/almayer/mono,
 /area/clash_arena/tdm_deathmatch2000/uscm_base/req)
 "qt" = (
-/obj/structure/machinery/light{
-	dir = 4;
-	invisibility = 101
-	},
-/obj/structure/machinery/cm_vending/sorted/marine_food{
-	name = "\improper UnionBest Food Vendor"
-	},
-/turf/open/floor/corsat/spiralplate,
+/obj/structure/machinery/cm_vending/sorted/cargo_guns/upp_squad_guns,
+/turf/open/floor/strata/multi_tiles/southeast,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "qu" = (
 /obj/structure/bed/chair/comfy/alpha{
@@ -4007,7 +3980,7 @@
 /obj/structure/machinery/door/airlock/upp/medical/solid/autoname{
 	dir = 2
 	},
-/turf/open/floor/almayer/silverfull,
+/turf/open/floor/corsat/marked,
 /area/clash_arena/tdm_deathmatch2000/upp_base/medbay)
 "qO" = (
 /obj/structure/window/framed/almayer/white,
@@ -4324,7 +4297,7 @@
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
 "sb" = (
 /obj/structure/machinery/cm_vending/sorted/medical/upp,
-/turf/open/floor/strata/cyan3/north,
+/turf/open/floor/strata/cyan4/west,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "sc" = (
 /obj/structure/disposalpipe/segment{
@@ -4535,15 +4508,14 @@
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
 "sZ" = (
 /obj/structure/machinery/light,
-/obj/structure/machinery/door/airlock/upp/medical/solid/autoname,
+/obj/structure/blocker/clash_gate/upp,
 /obj/structure/machinery/door/airlock/upp/medical/solid/autoname{
 	unacidable = 1;
 	not_weldable = 1;
 	masterkey_resist = 1;
 	no_panel = 1
 	},
-/obj/structure/blocker/clash_gate/upp,
-/turf/open/floor/strata/multi_tiles,
+/turf/open/floor/corsat/marked,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "ta" = (
 /obj/structure/sign/poster/clf{
@@ -4853,7 +4825,6 @@
 /area/clash_arena/tdm_deathmatch2000/uscm_base/medbay)
 "um" = (
 /obj/structure/machinery/cm_vending/gear/antag{
-	hacked = 1;
 	name = "\improper Response Team Automated Gear Rack";
 	density = 0
 	},
@@ -4977,7 +4948,7 @@
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "uS" = (
 /obj/structure/machinery/cm_vending/clothing/antag/upp,
-/turf/open/floor/strata/cyan3/north,
+/turf/open/floor/strata/cyan3,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "uW" = (
 /turf/open/floor/strata/red3/east,
@@ -5432,7 +5403,10 @@
 /turf/open/floor/almayer/test_floor4,
 /area/clash_arena/tdm_deathmatch2000/uscm_base/medbay)
 "xw" = (
-/turf/open/floor/strata/cyan4/west,
+/obj/structure/machinery/light{
+	dir = 1
+	},
+/turf/open/floor/strata/floor2,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "xy" = (
 /obj/structure/machinery/power/apc/almayer{
@@ -5616,10 +5590,12 @@
 /turf/open/floor/almayer/plate,
 /area/clash_arena/tdm_deathmatch2000/uscm_base/req)
 "yI" = (
-/obj/structure/machinery/light{
-	dir = 1
+/obj/effect/decal/warning_stripes{
+	icon_state = "S";
+	pixel_y = -1
 	},
-/turf/open/floor/strata/cyan3/northeast,
+/obj/structure/machinery/light,
+/turf/open/floor/kutjevo/colors/red/tile,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "yJ" = (
 /obj/effect/decal/warning_stripes{
@@ -6205,15 +6181,14 @@
 /turf/open/floor/almayer/sterile_green_side,
 /area/clash_arena/tdm_deathmatch2000/uscm_base/medbay)
 "Bf" = (
-/obj/structure/machinery/door/airlock/upp/medical/solid/autoname,
+/obj/structure/blocker/clash_gate/upp,
 /obj/structure/machinery/door/airlock/upp/medical/solid/autoname{
 	unacidable = 1;
 	not_weldable = 1;
 	masterkey_resist = 1;
 	no_panel = 1
 	},
-/obj/structure/blocker/clash_gate/upp,
-/turf/open/floor/strata/multi_tiles,
+/turf/open/floor/corsat/marked,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "Bg" = (
 /turf/open/floor/almayer/greencorner,
@@ -6483,13 +6458,8 @@
 /turf/open/floor/almayer/redcorner,
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
 "Cv" = (
-/obj/structure/medical_supply_link,
 /obj/structure/machinery/cm_vending/sorted/medical/marinemed/upp,
-/obj/structure/machinery/light{
-	dir = 4;
-	invisibility = 101
-	},
-/turf/open/floor/corsat/spiralplate,
+/turf/open/floor/strata/cyan3/north,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "Cw" = (
 /obj/structure/pipes/standard/simple/hidden/supply{
@@ -7039,10 +7009,6 @@
 	},
 /turf/open/floor/almayer/orange,
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
-"Fd" = (
-/obj/structure/window/framed/upp_ship,
-/turf/open/hybrisa/street/cement2,
-/area/clash_arena/tdm_deathmatch2000/battlefield)
 "Fg" = (
 /obj/effect/decal/warning_stripes{
 	icon_state = "W"
@@ -7126,23 +7092,14 @@
 	},
 /turf/open/floor/almayer/green,
 /area/clash_arena/tdm_deathmatch2000/uscm_base/req)
-"FC" = (
-/obj/item/ammo_magazine/rocket/upp,
-/obj/item/ammo_magazine/rocket/upp,
-/obj/item/ammo_magazine/rocket/upp,
-/obj/item/ammo_magazine/rocket/upp,
-/turf/open/floor/strata/floor3/east,
-/area/clash_arena/tdm_deathmatch2000/upp_base)
 "FH" = (
 /obj/structure/medical_supply_link,
 /obj/structure/machinery/cm_vending/sorted/medical/upp,
 /turf/open/floor/almayer/sterile_green,
 /area/clash_arena/tdm_deathmatch2000/upp_base/medbay)
 "FJ" = (
-/obj/structure/medical_supply_link,
-/obj/structure/machinery/cm_vending/sorted/medical/upp,
-/turf/open/floor/strata/cyan3,
-/area/clash_arena/tdm_deathmatch2000/upp_base)
+/turf/open/floor/strata/floor3/east,
+/area/clash_arena/tdm_deathmatch2000/battlefield)
 "FK" = (
 /obj/structure/machinery/disposal,
 /obj/structure/disposalpipe/trunk{
@@ -7257,20 +7214,7 @@
 /turf/open/floor/almayer/sterile_green,
 /area/clash_arena/tdm_deathmatch2000/uscm_base/medbay)
 "GB" = (
-/obj/structure/machinery/light{
-	dir = 4;
-	light_color = "#66ccff";
-	invisibility = 101
-	},
-/obj/effect/landmark/start/upp{
-	name = "UPP soldier join";
-	job_list = list("UPP Ryadovoy","UPP MSzht Engineer","UPP MSzht Medic","UPP Serzhant","UPP Starshiy Serzhant")
-	},
-/obj/effect/landmark/late_join/upp{
-	name = "UPP late soldier join";
-	job_list = list("UPP Ryadovoy","UPP MSzht Engineer","UPP MSzht Medic","UPP Serzhant","UPP Starshiy Serzhant")
-	},
-/turf/open/floor/plating/plating_catwalk/prison,
+/turf/open/space/basic,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "GD" = (
 /obj/structure/noticeboard{
@@ -7374,7 +7318,6 @@
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "GV" = (
 /obj/structure/machinery/cm_vending/gear/antag{
-	hacked = 1;
 	name = "\improper Automated Gear Rack"
 	},
 /turf/open/floor/corsat/spiralplate,
@@ -7532,7 +7475,6 @@
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "HW" = (
 /obj/structure/machinery/cm_vending/gear/antag{
-	hacked = 1;
 	name = "\improper Response Team Automated Gear Rack"
 	},
 /turf/open/floor/corsat/spiralplate,
@@ -7913,11 +7855,6 @@
 	},
 /turf/open/floor/almayer/cargo,
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
-"IU" = (
-/obj/structure/machinery/cm_vending/clothing/antag/upp,
-/obj/item/ammo_magazine/rocket/upp,
-/turf/open/floor/corsat/spiralplate,
-/area/clash_arena/tdm_deathmatch2000/upp_base)
 "IV" = (
 /obj/structure/surface/table/almayer,
 /obj/item/tool/pen{
@@ -7987,11 +7924,6 @@
 /obj/structure/surface/table/almayer,
 /turf/open/floor/almayer/dark_sterile,
 /area/clash_arena/tdm_deathmatch2000/uscm_base/medbay)
-"Jv" = (
-/obj/structure/medical_supply_link,
-/obj/structure/machinery/cm_vending/sorted/medical/marinemed/upp,
-/turf/open/floor/strata/cyan3,
-/area/clash_arena/tdm_deathmatch2000/upp_base)
 "Jx" = (
 /obj/structure/machinery/light{
 	dir = 4
@@ -8433,7 +8365,6 @@
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
 "LC" = (
 /obj/structure/machinery/cm_vending/gear/antag{
-	hacked = 1;
 	name = "\improper Response Team Automated Gear Rack"
 	},
 /turf/open/floor/strata/floor3/east,
@@ -9638,7 +9569,7 @@
 /obj/item/storage/firstaid/regular/empty,
 /obj/item/storage/firstaid/regular/empty,
 /obj/item/storage/firstaid/regular/empty,
-/turf/open/floor/strata/cyan3/north,
+/turf/open/floor/strata/cyan3,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "Qd" = (
 /obj/structure/disposalpipe/segment{
@@ -10989,7 +10920,7 @@
 /obj/structure/disposalpipe/segment{
 	dir = 4
 	},
-/turf/open/floor/almayer/silverfull,
+/turf/open/floor/corsat/marked,
 /area/clash_arena/tdm_deathmatch2000/upp_base/medbay)
 "Xl" = (
 /obj/structure/window/framed/almayer,
@@ -11284,9 +11215,6 @@
 /obj/structure/machinery/cm_vending/sorted/cargo_guns/cargo/blend,
 /turf/open/floor/almayer/green/southwest,
 /area/clash_arena/tdm_deathmatch2000/uscm_base/req)
-"Yz" = (
-/turf/open/floor/strata/cyan3,
-/area/clash_arena/tdm_deathmatch2000/upp_base)
 "YB" = (
 /obj/structure/blocker/clash_gate/uscm,
 /obj/structure/machinery/door/airlock/multi_tile/almayer/glass{
@@ -17412,18 +17340,18 @@ Hk
 PX
 lr
 qt
-IU
-HW
+qt
+qt
 tr
 bu
-Il
-lU
-HW
+qt
+qt
+qt
 zY
-bu
-Cv
-lU
-HW
+yI
+ng
+ng
+ng
 zf
 Vm
 aa
@@ -18256,10 +18184,10 @@ ES
 ES
 aa
 Vm
-JY
-Ws
-eS
-op
+jf
+jf
+jf
+jf
 zJ
 Hk
 jM
@@ -18267,9 +18195,9 @@ jM
 jM
 aM
 Cz
-FC
-fe
-lA
+jM
+jM
+jM
 jM
 Cz
 jM
@@ -18398,15 +18326,15 @@ ES
 ES
 aa
 Vm
-My
-My
-My
-My
-Hk
-PX
+jM
+jM
+jM
+jf
 El
-Uy
+PX
 QY
+Uy
+Uy
 aM
 ZE
 wV
@@ -18540,15 +18468,15 @@ ES
 ES
 aa
 Vm
-yo
-My
-My
-My
-Hk
-Up
+jM
+jM
+jM
+jf
+fe
+jM
 uS
-VI
-FJ
+Uy
+Uy
 aM
 Dr
 tv
@@ -18682,15 +18610,15 @@ ES
 ES
 aa
 Vm
-DV
-Bi
-ca
-eX
-zJ
-Up
+jM
+jM
+jM
+jf
+og
+jM
 kd
-VI
-Jv
+Uy
+Uy
 aM
 Dr
 cC
@@ -18824,15 +18752,15 @@ ES
 ES
 aa
 Vm
-JY
-Ws
-eS
-op
-zJ
-Up
+jM
+jM
+jM
+jf
+Cv
+jM
 Qc
-VI
-gM
+Uy
+Uy
 aM
 sr
 tS
@@ -18966,15 +18894,15 @@ aa
 aa
 aa
 Vm
-My
-My
-GB
-My
-Hk
-Up
+jM
+jM
+jM
+jf
+gL
+jM
 sb
 Uy
-Yz
+Uy
 aM
 wf
 pS
@@ -19114,8 +19042,8 @@ dc
 dc
 dc
 dc
-gL
-Uy
+jf
+jf
 xw
 aM
 PS
@@ -20678,7 +20606,7 @@ pj
 bb
 bb
 sC
-yI
+Um
 aM
 Hk
 nX
@@ -21673,7 +21601,7 @@ zC
 nG
 jf
 Bf
-Vm
+ap
 sZ
 Vm
 Up
@@ -22084,7 +22012,7 @@ ES
 ES
 ES
 ES
-aa
+GB
 aa
 Vm
 Wl
@@ -22226,7 +22154,7 @@ ES
 ES
 ES
 ES
-aa
+GB
 aa
 Vm
 Xs
@@ -22368,7 +22296,7 @@ ES
 ES
 ES
 ES
-aa
+GB
 aa
 Vm
 Xs
@@ -22547,7 +22475,7 @@ zQ
 ow
 oi
 Vm
-og
+aa
 ES
 ES
 ES
@@ -22939,9 +22867,9 @@ ES
 ES
 ES
 ES
-aa
-aa
-aa
+GB
+GB
+GB
 aa
 Vm
 Af
@@ -22954,26 +22882,26 @@ AM
 aM
 Hk
 Vm
-Vm
-Vm
-Up
-Up
-Up
-Up
-Up
-Up
-Up
-au
-au
-au
-au
-au
-au
-au
-au
-au
-au
-au
+aa
+aa
+aa
+aa
+aa
+aa
+aa
+aa
+aa
+aa
+aa
+aa
+aa
+aa
+aa
+aa
+aa
+aa
+aa
+aa
 ES
 ES
 ES
@@ -23081,9 +23009,9 @@ ES
 ES
 ES
 ES
-aa
-aa
-aa
+GB
+GB
+GB
 aa
 Vm
 um
@@ -23092,11 +23020,11 @@ bb
 bb
 hh
 Vm
-Hk
-aM
-Hk
+iy
+iy
+iy
 Vm
-ES
+qH
 ES
 ES
 ES
@@ -23223,21 +23151,21 @@ ES
 ES
 ES
 ES
-aa
-aa
-aa
+GB
+GB
+GB
 aa
 Vm
 Af
-bq
+UT
 ne
 Yw
 Yw
-Vm
+iy
 Hk
-aM
 Hk
-Vm
+Hk
+iy
 qH
 qH
 ES
@@ -23374,13 +23302,13 @@ PG
 PG
 PG
 PG
+FJ
 ax
+FJ
 ax
+FJ
 ax
-ap
-ax
-ax
-ax
+FJ
 PG
 PG
 PG
@@ -23794,7 +23722,7 @@ ES
 CF
 at
 at
-ut
+at
 at
 at
 at
@@ -24077,23 +24005,23 @@ ES
 ES
 CF
 dw
+at
+at
+at
+of
+of
+at
+at
+of
+of
+at
+at
+at
+of
+at
+at
 ut
-at
-at
-of
-of
-at
-at
-of
-of
-at
-at
-at
-of
-at
-at
-Fd
-of
+kM
 ut
 at
 at
@@ -24233,7 +24161,7 @@ at
 at
 at
 at
-ut
+at
 at
 at
 at
@@ -24653,11 +24581,11 @@ kV
 kV
 kV
 kV
-ut
-ut
+kV
+kV
 cZ
-ut
-ut
+kV
+kV
 kV
 Pg
 kV
@@ -25216,7 +25144,7 @@ kV
 Pg
 kV
 kV
-cZ
+kV
 kV
 kV
 kV
@@ -25228,7 +25156,7 @@ kV
 ut
 ut
 cZ
-ut
+kV
 kV
 kV
 kV
@@ -26080,7 +26008,7 @@ cV
 cV
 cV
 Pg
-kM
+Pg
 kV
 kV
 kV
@@ -26355,7 +26283,7 @@ kV
 kV
 cV
 kV
-dr
+Pg
 Pg
 Pg
 kV
@@ -26502,7 +26430,7 @@ kV
 kV
 kV
 kV
-cZ
+kV
 kV
 cV
 kV
@@ -26511,7 +26439,7 @@ kV
 kV
 kV
 kV
-cZ
+kV
 CF
 ES
 ES
@@ -26638,7 +26566,7 @@ kV
 kV
 kV
 cV
-cZ
+kV
 kV
 Pg
 cV
@@ -26650,10 +26578,10 @@ cV
 kV
 kV
 kV
-cZ
 kV
 kV
-cZ
+kV
+kV
 CF
 ES
 ES
@@ -26934,8 +26862,8 @@ kV
 kV
 kV
 kV
-cZ
-cZ
+kV
+kV
 kV
 kV
 CF
@@ -27059,8 +26987,8 @@ ES
 ES
 CF
 cZ
-cV
-cV
+kV
+kV
 kV
 kV
 kV
@@ -27076,7 +27004,7 @@ kV
 kV
 kV
 kV
-cZ
+kV
 kV
 kV
 kV
@@ -27497,7 +27425,7 @@ kV
 kV
 kV
 kV
-cZ
+kV
 cV
 kV
 kV
@@ -27633,7 +27561,7 @@ kV
 Pg
 cV
 kV
-cZ
+kV
 kV
 kV
 kV
@@ -27929,7 +27857,7 @@ kV
 kV
 kV
 kV
-cZ
+kV
 kV
 kV
 CF
@@ -28196,7 +28124,7 @@ ES
 CF
 kV
 kV
-cZ
+kV
 kV
 kV
 kV
@@ -28485,14 +28413,14 @@ kV
 kV
 Pg
 kV
-cZ
 kV
 kV
 kV
 kV
 kV
 kV
-cZ
+kV
+kV
 kV
 kV
 kV
