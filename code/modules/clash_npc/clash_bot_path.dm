@@ -75,6 +75,8 @@
 				continue
 			if(LinkBlockedWithAccess(current, next, id_card))
 				continue
+			if(locate(/obj/flamer_fire) in next)
+				continue
 			var/next_cost = cost[current] + 1
 			if(!isnull(cost[next]) && next_cost >= cost[next])
 				continue

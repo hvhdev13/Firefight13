@@ -145,9 +145,10 @@
 		if(cause_mob && ismob(cause_mob) && cause_mob != src && new_death.cause_faction_name)
 			var/mob/killer = cause_mob
 			var/killer_ckey = killer.mind?.ckey || killer.ckey
-			clash_mode.score_kill(new_death.cause_faction_name, killer.real_name, killer_ckey)
+			if(!killer.statistic_exempt)
+				clash_mode.score_kill(new_death.cause_faction_name, killer.real_name, killer_ckey)
+				clash_mode.track_streak(killer.real_name, new_death.cause_faction_name, new_death.mob_name, new_death.faction_name, killer_ckey)
 			clash_mode.add_killfeed(killer.real_name, new_death.cause_faction_name, new_death.mob_name, new_death.faction_name, new_death.cause_name)
-			clash_mode.track_streak(killer.real_name, new_death.cause_faction_name, new_death.mob_name, new_death.faction_name, killer_ckey)
 			clash_mode.report_kill(src, killer, new_death.cause_name)
 		else
 			clash_mode.report_environment_death(src, new_death.cause_name)

@@ -20,6 +20,12 @@
 #define CLASH_BOT_WOUNDED 0.45
 /// Failed steps before a bot gives up on its current route
 #define CLASH_BOT_STUCK_LIMIT 3
+/// Deciseconds between sweeps for a new target
+#define CLASH_BOT_SEARCH_DELAY 6
+/// Deciseconds between attempts to patch itself up
+#define CLASH_BOT_HEAL_DELAY 100
+/// Tiles a bot will go to fetch a magazine from the ground or a body
+#define CLASH_BOT_SCAVENGE_RANGE 8
 
 GLOBAL_LIST_EMPTY(clash_bots)
 GLOBAL_LIST_EMPTY(clash_bot_cover_claims)
@@ -56,6 +62,8 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 	var/next_step = 0
 	var/next_repath = 0
 	var/next_cover_scan = 0
+	var/next_search = 0
+	var/next_heal = 0
 	var/stuck_for = 0
 	var/firing = FALSE
 	var/shots_left = 0
@@ -164,6 +172,10 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 	if(body.is_mob_incapacitated())
 		stop_volley()
 		return
+	if(body.on_fire)
+		stop_volley()
+		body.resist_fire()
+		return
 	var/ceasefire = MODE_HAS_MODIFIER(/datum/gamemode_modifier/ceasefire)
 	update_target()
 	if(ceasefire)
@@ -175,6 +187,8 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 		stop_volley()
 	else if(contact_recent() && prob(25))
 		suppress()
+	else
+		try_heal()
 	handle_movement()
 
 /datum/clash_bot/proc/contact_recent()
@@ -188,7 +202,8 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 		target = null
 	if(threat && threat != target && world.time - threat_at < CLASH_BOT_MEMORY && can_engage(threat))
 		target = threat
-	if(!target)
+	if(!target && world.time >= next_search)
+		next_search = world.time + CLASH_BOT_SEARCH_DELAY + rand(0, 3)
 		target = find_target()
 	if(!target)
 		return
@@ -237,7 +252,7 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 	if(!gun)
 		return
 	if(firing)
-		if(has_ammo())
+		if(has_ammo() && clear_shot(get_turf(target), target))
 			gun.set_target(target)
 		else
 			stop_volley()
@@ -295,6 +310,85 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 	gun.replace_magazine(body, spare)
 	if(gun.flags_item & TWOHANDED)
 		gun.wield(body)
+
+/datum/clash_bot/proc/try_heal()
+	if(world.time < next_heal || contact_recent() || firing)
+		return
+	if(body.health >= body.maxHealth * CLASH_BOT_WOUNDED)
+		return
+	var/obj/item/medicine = find_medicine()
+	if(!medicine)
+		return
+	next_heal = world.time + CLASH_BOT_HEAL_DELAY
+	INVOKE_ASYNC(src, PROC_REF(heal_with), medicine)
+
+/datum/clash_bot/proc/heal_with(obj/item/medicine)
+	stop_volley()
+	gun?.unwield(body)
+	var/obj/item/storage/holder = medicine.loc
+	if(istype(holder))
+		holder.remove_from_storage(medicine, get_turf(body))
+	body.put_in_hands(medicine, FALSE)
+	if(medicine.loc == body)
+		medicine.attack(body, body)
+	if(QDELETED(body) || body.stat == DEAD)
+		return
+	if(!QDELETED(medicine) && medicine.loc == body)
+		body.drop_inv_item_to_loc(medicine, get_turf(body))
+	if(gun?.flags_item & TWOHANDED)
+		gun.wield(body)
+
+/datum/clash_bot/proc/find_medicine()
+	for(var/obj/item/reagent_container/hypospray/autoinjector/shot in body.get_contents())
+		return shot
+	for(var/obj/item/stack/medical/dressing in body.get_contents())
+		return dressing
+	return null
+
+/datum/clash_bot/proc/find_loose_magazine()
+	var/obj/item/ammo_magazine/closest
+	var/closest_distance = CLASH_BOT_SCAVENGE_RANGE + 1
+	for(var/obj/item/ammo_magazine/spare in range(CLASH_BOT_SCAVENGE_RANGE, body))
+		if(!magazine_fits(spare) || get_dist(body, spare) >= closest_distance)
+			continue
+		closest = spare
+		closest_distance = get_dist(body, spare)
+	for(var/mob/living/carbon/human/corpse in range(CLASH_BOT_SCAVENGE_RANGE, body))
+		if(corpse.stat != DEAD || get_dist(body, corpse) >= closest_distance)
+			continue
+		for(var/obj/item/ammo_magazine/spare in corpse.get_contents())
+			if(!magazine_fits(spare))
+				continue
+			closest = spare
+			closest_distance = get_dist(body, corpse)
+			break
+	return closest
+
+/datum/clash_bot/proc/magazine_fits(obj/item/ammo_magazine/spare)
+	if(spare.current_rounds <= 0 || istype(spare, /obj/item/ammo_magazine/handful))
+		return FALSE
+	return istype(gun, spare.gun_type) || (spare.type in gun.accepted_ammo)
+
+/datum/clash_bot/proc/grab_magazine(obj/item/ammo_magazine/spare)
+	var/obj/item/storage/holder = spare.loc
+	if(istype(holder))
+		holder.remove_from_storage(spare, get_turf(body))
+	else if(ishuman(spare.loc))
+		var/mob/living/carbon/human/corpse = spare.loc
+		corpse.drop_inv_item_to_loc(spare, get_turf(body), force = TRUE)
+	body.put_in_hands(spare, FALSE)
+	if(spare.loc != body)
+		return
+	dry = FALSE
+	INVOKE_ASYNC(src, PROC_REF(reload))
+
+/datum/clash_bot/proc/rearm()
+	if(!post?.bot_magazine)
+		return
+	for(var/count in 1 to post.bot_magazines)
+		body.equip_to_appropriate_slot(new post.bot_magazine(body))
+	dry = FALSE
+	INVOKE_ASYNC(src, PROC_REF(reload))
 
 /datum/clash_bot/proc/find_magazine()
 	for(var/obj/item/ammo_magazine/spare in body.get_contents())
@@ -371,10 +465,13 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 	path = null
 
 /datum/clash_bot/proc/choose_destination()
+	if(dry)
+		resupply()
+		return
 	if(target || contact_recent())
 		if(world.time < next_cover_scan)
 			return
-		next_cover_scan = world.time + CLASH_BOT_COVER_RESCAN
+		next_cover_scan = world.time + CLASH_BOT_COVER_RESCAN + rand(0, 10)
 		var/turf/spot = pick_cover(body.health < body.maxHealth * CLASH_BOT_WOUNDED)
 		if(spot)
 			claim_cover(spot)
@@ -383,13 +480,31 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 	if(get_dist(body, anchor) > hold_radius)
 		release_cover()
 		set_destination(anchor)
-	else if(!destination && !dry && prob(1))
+	else if(!destination && prob(1))
 		var/list/nearby = list()
 		for(var/turf/open/spot in range(2, anchor))
 			if(!spot_blocked(spot) && can_enter(spot) && !GLOB.clash_bot_cover_claims[spot])
 				nearby += spot
 		if(length(nearby))
 			set_destination(pick(nearby))
+
+/datum/clash_bot/proc/resupply()
+	var/obj/item/ammo_magazine/spare = find_loose_magazine()
+	if(spare)
+		if(get_dist(body, spare) <= 1)
+			grab_magazine(spare)
+			destination = null
+		else
+			set_destination(get_turf(spare))
+		return
+	var/turf/depot = get_turf(post)
+	if(!depot)
+		return
+	if(get_dist(body, depot) <= 1)
+		rearm()
+		destination = null
+		return
+	set_destination(depot)
 
 /datum/clash_bot/proc/handle_movement()
 	if(world.time < next_step)
@@ -421,6 +536,9 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 		path = null
 		stuck_for = 0
 		return
+	var/obj/structure/machinery/door/blocking_door = locate() in next
+	if(blocking_door?.density)
+		return
 	stuck_for++
 	if(stuck_for < CLASH_BOT_STUCK_LIMIT)
 		return
@@ -441,3 +559,6 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 #undef CLASH_BOT_MEMORY
 #undef CLASH_BOT_WOUNDED
 #undef CLASH_BOT_STUCK_LIMIT
+#undef CLASH_BOT_SEARCH_DELAY
+#undef CLASH_BOT_HEAL_DELAY
+#undef CLASH_BOT_SCAVENGE_RANGE

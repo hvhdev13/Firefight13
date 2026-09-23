@@ -1,7 +1,7 @@
 /// Most bots one faction may have alive at once
-#define CLASH_BOT_TEAM_CAP 12
-/// Team fill tops a side up to at least this many fighters, counting players and bots
-#define CLASH_BOT_MIN_TEAM 4
+#define CLASH_BOT_TEAM_CAP 10
+/// Team fill tops each side up to this many fighters, counting players and bots
+#define CLASH_BOT_TEAM_SIZE 10
 /// Deciseconds between team fill checks
 #define CLASH_BOT_FILL_INTERVAL (10 SECONDS)
 /// Deciseconds a dead bot's body stays before it is cleared away
@@ -32,6 +32,7 @@ GLOBAL_VAR(clash_bot_fill_timer)
 	var/bot_magazine
 	var/bot_magazines = 4
 	var/bot_firemode
+	var/bot_medical = /obj/item/storage/pouch/firstaid/full
 	/// Deciseconds before a replacement is sent out, 0 to never respawn
 	var/respawn_delay = 30 SECONDS
 	/// Tiles the bot will stray from its hold point to take cover
@@ -81,12 +82,16 @@ GLOBAL_VAR(clash_bot_fill_timer)
 	arm_equipment(npc, equipment_preset, TRUE, FALSE)
 	npc.statistic_exempt = TRUE
 	npc.setDir(dir)
+	npc.real_name = "[npc.real_name] \[BOT\]"
+	npc.name = npc.real_name
 	for(var/obj/item/unwanted in npc.get_contents())
 		if(istype(unwanted, /obj/item/weapon/gun) || istype(unwanted, /obj/item/ammo_magazine/handful))
 			qdel(unwanted)
 	npc.put_in_hands(new bot_gun(npc), FALSE)
 	for(var/count in 1 to bot_magazines)
 		npc.equip_to_appropriate_slot(new bot_magazine(npc))
+	if(bot_medical && !(locate(/obj/item/reagent_container/hypospray/autoinjector) in npc.get_contents()))
+		npc.equip_to_appropriate_slot(new bot_medical(npc))
 	bot = new(npc, src)
 
 /obj/effect/landmark/clash_npc/proc/bot_died(mob/living/carbon/human/body)
@@ -118,12 +123,9 @@ GLOBAL_VAR(clash_bot_fill_timer)
 
 /// Sends fill bots to whichever side has fewer players, and stops replacing them as players arrive
 /proc/clash_bot_fill()
-	var/marines = clash_player_count(FACTION_MARINE)
-	var/union = clash_player_count(FACTION_UPP)
-	var/team_size = max(CLASH_BOT_MIN_TEAM, marines, union)
 	var/list/wanted = list()
-	wanted[FACTION_MARINE] = team_size - marines
-	wanted[FACTION_UPP] = team_size - union
+	wanted[FACTION_MARINE] = CLASH_BOT_TEAM_SIZE - clash_player_count(FACTION_MARINE)
+	wanted[FACTION_UPP] = CLASH_BOT_TEAM_SIZE - clash_player_count(FACTION_UPP)
 	for(var/obj/effect/landmark/clash_npc/spawner as anything in GLOB.clash_npc_spawners)
 		if(!spawner.team_fill)
 			continue
@@ -167,6 +169,6 @@ GLOBAL_VAR(clash_bot_fill_timer)
 	bot_magazine = /obj/item/ammo_magazine/rifle/ak4047
 
 #undef CLASH_BOT_TEAM_CAP
-#undef CLASH_BOT_MIN_TEAM
+#undef CLASH_BOT_TEAM_SIZE
 #undef CLASH_BOT_FILL_INTERVAL
 #undef CLASH_BOT_CORPSE_TIME
