@@ -133,6 +133,7 @@
 		to_chat(usr, "You have been dead for[pluralcheck] [deathtimeseconds] seconds.")
 
 	//Faction clash respawn gate
+	var/mob/dead/observer/abandoning_ghost
 	if(MODE_HAS_FLAG(MODE_FACTION_CLASH) && !is_admin)
 		var/deathtime = world.time - src.timeofdeath
 		if(deathtime < RESPAWN_COOLDOWN)
@@ -145,10 +146,12 @@
 			if(istype(body) && body.stat == DEAD && body.check_tod() && body.is_revivable())
 				if(alert(usr, "Your body can still be revived. Respawn anyway?", "Confirm Respawn", "Yes", "No") != "Yes")
 					return
-				ghost.can_reenter_corpse = FALSE
+				abandoning_ghost = ghost
 
 	if(alert("Are you sure you want to respawn?",,"Yes","No") != "Yes")
 		return
+
+	abandoning_ghost?.can_reenter_corpse = FALSE
 
 	log_game("[usr.name]/[usr.key] used abandon mob.")
 	if(MODE_HAS_FLAG(MODE_FACTION_CLASH))

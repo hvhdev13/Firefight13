@@ -237,6 +237,7 @@ GLOBAL_LIST_INIT(clash_streak_steps, list(3, 5, 7, 10, 15, 20))
 	if(mob_name)
 		var/list/entry = get_score_entry(mob_name, faction, owner_ckey)
 		entry["deaths"] += 1
+		kill_streaks[mob_name] = 0
 	if(cause)
 		environment_kills[cause] = (environment_kills[cause] || 0) + 1
 	log_debug("HVH: death faction=[faction || "none"] victim=[mob_name || "none"] cause=[cause || "none"]")
@@ -310,7 +311,6 @@ GLOBAL_LIST_INIT(clash_streak_steps, list(3, 5, 7, 10, 15, 20))
 			to_chat(player, SPAN_BOLDNOTICE(message))
 
 /datum/game_mode/extended/faction_clash/cm_vs_upp/proc/track_streak(killer, killer_faction, victim, victim_faction, killer_ckey)
-	kill_streaks[victim] = 0
 	if(!killer)
 		return
 	var/streak = (kill_streaks[killer] || 0) + 1
