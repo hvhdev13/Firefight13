@@ -1,25 +1,38 @@
 /// How often a bot looks around, shoots and steps
 #define CLASH_BOT_TICK 3
-/// Tiles a bot will engage within
-#define CLASH_BOT_RANGE 9
+/// Tiles a bot can see and engage within
+#define CLASH_BOT_SIGHT 9
 /// Accuracy a bot keeps compared to a player firing the same gun
 #define CLASH_BOT_ACCURACY 0.7
 /// Deciseconds a bot spends swapping a magazine
 #define CLASH_BOT_RELOAD_DELAY 25
-/// Deciseconds between steps, a bot walks rather than runs
-#define CLASH_BOT_STEP_DELAY 4
-/// Tiles a bot searches for cover to fight from
+/// Tiles a bot searches when picking a place to fight from
 #define CLASH_BOT_COVER_RANGE 5
-/// Ticks of no progress before a bot gives up on where it was heading
-#define CLASH_BOT_STUCK_LIMIT 4
+/// Deciseconds between cover searches while in a fight
+#define CLASH_BOT_COVER_RESCAN 30
+/// Deciseconds between path searches for one bot
+#define CLASH_BOT_REPATH_DELAY 20
+/// Path searches allowed across every bot in one tick
+#define CLASH_BOT_PATHS_PER_TICK 2
+/// Deciseconds a bot remembers where an enemy was or who shot at it
+#define CLASH_BOT_MEMORY 60
+/// Health fraction below which a bot fights from further back
+#define CLASH_BOT_WOUNDED 0.45
+/// Failed steps before a bot gives up on its current route
+#define CLASH_BOT_STUCK_LIMIT 3
 
 GLOBAL_LIST_EMPTY(clash_bots)
+GLOBAL_LIST_EMPTY(clash_bot_cover_claims)
 GLOBAL_VAR(clash_bot_timer)
+GLOBAL_VAR_INIT(clash_bot_paths_this_tick, 0)
+GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 
 /proc/think_clash_bots()
-	for(var/index = length(GLOB.clash_bots) to 1 step -1)
-		var/datum/clash_bot/bot = GLOB.clash_bots[index]
-		bot.think()
+	GLOB.clash_bot_paths_this_tick = 0
+	if(GLOB.clash_bots_enabled)
+		for(var/index = length(GLOB.clash_bots) to 1 step -1)
+			var/datum/clash_bot/bot = GLOB.clash_bots[index]
+			bot.think()
 	if(!length(GLOB.clash_bots))
 		deltimer(GLOB.clash_bot_timer)
 		GLOB.clash_bot_timer = null
@@ -29,36 +42,59 @@ GLOBAL_VAR(clash_bot_timer)
 	var/obj/effect/landmark/clash_npc/post
 	var/obj/item/weapon/gun/gun
 	var/mob/living/carbon/human/target
+	var/mob/living/carbon/human/threat
+	var/threat_at = 0
+	var/turf/contact_turf
+	var/contact_at = 0
 	var/turf/anchor
-	var/turf/heading
 	var/hold_radius = 6
-	var/next_fire
-	var/next_step
+	var/turf/destination
+	var/list/path
+	var/turf/claimed
+	var/list/watched_turfs = list()
+	var/next_fire = 0
+	var/next_step = 0
+	var/next_repath = 0
+	var/next_cover_scan = 0
 	var/stuck_for = 0
+	var/firing = FALSE
+	var/shots_left = 0
 	var/dry = FALSE
 
 /datum/clash_bot/New(mob/living/carbon/human/new_body, obj/effect/landmark/clash_npc/new_post)
 	. = ..()
 	body = new_body
 	post = new_post
-	anchor = get_turf(new_post || new_body)
+	anchor = new_post ? new_post.get_hold_turf() : get_turf(new_body)
 	if(new_post)
 		hold_radius = new_post.hold_radius
 	take_out_gun()
+	RegisterSignal(body, COMSIG_HUMAN_BULLET_ACT, PROC_REF(on_shot))
+	RegisterSignal(body, COMSIG_MOB_FIRED_GUN, PROC_REF(on_fired))
+	RegisterSignal(body, COMSIG_MOVABLE_MOVED, PROC_REF(watch_nearby_turfs))
+	watch_nearby_turfs()
 	GLOB.clash_bots += src
 	if(!GLOB.clash_bot_timer)
 		GLOB.clash_bot_timer = addtimer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(think_clash_bots)), CLASH_BOT_TICK, TIMER_LOOP|TIMER_STOPPABLE)
 
 /datum/clash_bot/Destroy(force)
+	stop_volley()
+	release_cover()
+	unwatch_turfs()
 	GLOB.clash_bots -= src
 	if(!QDELETED(gun))
 		UnregisterSignal(gun, COMSIG_GUN_BEFORE_FIRE)
+	if(!QDELETED(body))
+		UnregisterSignal(body, list(COMSIG_HUMAN_BULLET_ACT, COMSIG_MOB_FIRED_GUN, COMSIG_MOVABLE_MOVED))
 	body = null
 	post = null
 	gun = null
 	target = null
+	threat = null
+	contact_turf = null
 	anchor = null
-	heading = null
+	destination = null
+	path = null
 	return ..()
 
 /datum/clash_bot/proc/take_out_gun()
@@ -71,60 +107,122 @@ GLOBAL_VAR(clash_bot_timer)
 	body.put_in_hands(gun, FALSE)
 	if(gun.flags_item & TWOHANDED)
 		gun.wield(body)
-	if(gun.gun_firemode != GUN_FIREMODE_BURSTFIRE && (GUN_FIREMODE_BURSTFIRE in gun.gun_firemode_list))
-		gun.do_toggle_firemode(body, null, GUN_FIREMODE_BURSTFIRE)
+	var/wanted_firemode = post?.bot_firemode
+	if(wanted_firemode && gun.gun_firemode != wanted_firemode && (wanted_firemode in gun.gun_firemode_list))
+		gun.do_toggle_firemode(body, null, wanted_firemode)
 	RegisterSignal(gun, COMSIG_GUN_BEFORE_FIRE, PROC_REF(on_gun_fire))
 
 /datum/clash_bot/proc/on_gun_fire(obj/item/weapon/gun/source, obj/projectile/bullet)
 	SIGNAL_HANDLER
 	bullet.accuracy *= CLASH_BOT_ACCURACY
 
+/datum/clash_bot/proc/on_fired(mob/source, obj/item/weapon/gun/fired)
+	SIGNAL_HANDLER
+	if(!firing || gun.gun_firemode != GUN_FIREMODE_AUTOMATIC)
+		return
+	shots_left--
+	if(shots_left <= 0)
+		stop_volley()
+
+/datum/clash_bot/proc/on_shot(mob/source, damage_result, ammo_flags, obj/projectile/bullet)
+	SIGNAL_HANDLER
+	note_threat(bullet.firer)
+
+/datum/clash_bot/proc/on_bullet_near(turf/source, atom/movable/entering)
+	SIGNAL_HANDLER
+	if(istype(entering, /obj/projectile))
+		var/obj/projectile/bullet = entering
+		note_threat(bullet.firer)
+
+/datum/clash_bot/proc/note_threat(atom/firer)
+	var/mob/living/carbon/human/shooter = firer
+	if(!istype(shooter) || shooter.faction == body.faction)
+		return
+	threat = shooter
+	threat_at = world.time
+	contact_turf = get_turf(shooter)
+	contact_at = world.time
+	next_cover_scan = 0
+
+/datum/clash_bot/proc/watch_nearby_turfs()
+	SIGNAL_HANDLER
+	unwatch_turfs()
+	for(var/turf/open/nearby in range(1, body))
+		RegisterSignal(nearby, COMSIG_TURF_ENTERED, PROC_REF(on_bullet_near))
+		watched_turfs += nearby
+
+/datum/clash_bot/proc/unwatch_turfs()
+	for(var/turf/watched as anything in watched_turfs)
+		UnregisterSignal(watched, COMSIG_TURF_ENTERED)
+	watched_turfs.Cut()
+
 /datum/clash_bot/proc/think()
 	if(QDELETED(body) || body.stat == DEAD)
-		post?.bot_died()
+		post?.bot_died(body)
 		qdel(src)
 		return
-	if(!can_engage(target))
-		target = find_target()
-	if(target)
-		body.setDir(get_dir(body, target))
+	if(body.is_mob_incapacitated())
+		stop_volley()
+		return
+	var/ceasefire = MODE_HAS_MODIFIER(/datum/gamemode_modifier/ceasefire)
+	update_target()
+	if(ceasefire)
+		stop_volley()
+	else if(target)
+		body.face_atom(target)
 		fight()
-	else
-		heading = null
+	else if(firing)
+		stop_volley()
+	else if(contact_recent() && prob(25))
+		suppress()
 	handle_movement()
 
-/datum/clash_bot/proc/fight()
-	if(world.time < next_fire || !gun)
+/datum/clash_bot/proc/contact_recent()
+	return contact_turf && world.time - contact_at < CLASH_BOT_MEMORY
+
+/datum/clash_bot/proc/update_target()
+	var/mob/living/carbon/human/previous = target
+	if(QDELETED(threat))
+		threat = null
+	if(!can_engage(target))
+		target = null
+	if(threat && threat != target && world.time - threat_at < CLASH_BOT_MEMORY && can_engage(threat))
+		target = threat
+	if(!target)
+		target = find_target()
+	if(!target)
 		return
-	if(!gun.current_mag || (!gun.current_mag.current_rounds && !gun.in_chamber))
-		if(dry)
-			return
-		next_fire = world.time + CLASH_BOT_RELOAD_DELAY
-		INVOKE_ASYNC(src, PROC_REF(reload))
-		return
-	gun.Fire(target, body)
-	next_fire = world.time + rand(3, 8)
+	contact_turf = get_turf(target)
+	contact_at = world.time
+	if(target != previous)
+		stop_volley()
+		next_fire = max(next_fire, world.time + rand(3, 8))
 
 /datum/clash_bot/proc/can_engage(mob/living/carbon/human/candidate)
 	if(QDELETED(candidate) || candidate.stat == DEAD || candidate.faction == body.faction)
 		return FALSE
-	if(get_dist(body, candidate) > CLASH_BOT_RANGE || candidate.z != body.z)
+	if(candidate.z != body.z || get_dist(body, candidate) > CLASH_BOT_SIGHT)
 		return FALSE
-	for(var/turf/line_turf as anything in get_line(body, candidate, include_start_atom = FALSE))
+	if(!can_enter(get_turf(candidate)))
+		return FALSE
+	return clear_shot(get_turf(candidate), candidate)
+
+/datum/clash_bot/proc/clear_shot(turf/aim, mob/candidate)
+	for(var/turf/line_turf as anything in get_line(body, aim, include_start_atom = FALSE))
 		if(line_turf.density || line_turf.opacity)
 			return FALSE
-		for(var/obj/structure/blocker in line_turf)
-			if(blocker.opacity)
+		for(var/obj/thing in line_turf)
+			if(thing.opacity || (thing.density && thing.projectile_coverage >= PROJECTILE_COVERAGE_HIGH && line_turf != aim))
 				return FALSE
 		for(var/mob/living/carbon/human/ally in line_turf)
-			if(ally != candidate && ally.faction == body.faction && ally.stat != DEAD)
+			if(ally != candidate && ally.faction == body.faction && ally.stat != DEAD && ally.body_position != LYING_DOWN)
 				return FALSE
 	return TRUE
 
 /datum/clash_bot/proc/find_target()
 	var/mob/living/carbon/human/closest
-	var/closest_distance = CLASH_BOT_RANGE + 1
-	for(var/mob/living/carbon/human/candidate in oview(CLASH_BOT_RANGE, body))
+	var/closest_distance = CLASH_BOT_SIGHT + 1
+	for(var/mob/living/carbon/human/candidate in oview(CLASH_BOT_SIGHT, body))
 		var/distance = get_dist(body, candidate)
 		if(distance >= closest_distance || !can_engage(candidate))
 			continue
@@ -132,9 +230,57 @@ GLOBAL_VAR(clash_bot_timer)
 		closest_distance = distance
 	return closest
 
+/datum/clash_bot/proc/has_ammo()
+	return gun && (gun.in_chamber || gun.current_mag?.current_rounds > 0)
+
+/datum/clash_bot/proc/fight()
+	if(!gun)
+		return
+	if(firing)
+		if(has_ammo())
+			gun.set_target(target)
+		else
+			stop_volley()
+		return
+	if(world.time < next_fire)
+		return
+	if(!has_ammo())
+		if(!dry)
+			next_fire = world.time + CLASH_BOT_RELOAD_DELAY
+			INVOKE_ASYNC(src, PROC_REF(reload))
+		return
+	start_volley(target, rand(4, 8))
+
+/// Keeps a recently seen enemy's head down by firing a short string at where they were last seen
+/datum/clash_bot/proc/suppress()
+	if(firing || world.time < next_fire || !has_ammo())
+		return
+	if(get_dist(body, contact_turf) > CLASH_BOT_SIGHT || !clear_shot(contact_turf))
+		return
+	body.face_atom(contact_turf)
+	start_volley(contact_turf, rand(2, 4))
+
+/datum/clash_bot/proc/start_volley(atom/aim, rounds)
+	firing = TRUE
+	shots_left = rounds
+	gun.set_target(aim)
+	gun.start_fire(body, aim, get_turf(aim), null, null, TRUE)
+	if(gun.gun_firemode == GUN_FIREMODE_AUTOMATIC)
+		return
+	firing = FALSE
+	next_fire = world.time + (gun.gun_firemode == GUN_FIREMODE_BURSTFIRE ? rand(6, 11) : rand(4, 8))
+
+/datum/clash_bot/proc/stop_volley()
+	if(!firing)
+		return
+	firing = FALSE
+	gun?.stop_fire()
+	next_fire = world.time + rand(5, 10)
+
 /datum/clash_bot/proc/reload()
 	if(QDELETED(body) || body.stat == DEAD)
 		return
+	stop_volley()
 	var/obj/item/ammo_magazine/spare = find_magazine()
 	if(!spare)
 		dry = TRUE
@@ -158,49 +304,140 @@ GLOBAL_VAR(clash_bot_timer)
 			return spare
 	return null
 
-/// Barricades shield the side their facing points at, so the spot worth holding is the one with cover between the bot and its target
-/datum/clash_bot/proc/find_cover()
+/datum/clash_bot/proc/claim_cover(turf/spot)
+	release_cover()
+	GLOB.clash_bot_cover_claims[spot] = src
+	claimed = spot
+
+/datum/clash_bot/proc/release_cover()
+	if(claimed && GLOB.clash_bot_cover_claims[claimed] == src)
+		GLOB.clash_bot_cover_claims -= claimed
+	claimed = null
+
+/datum/clash_bot/proc/spot_blocked(turf/spot)
+	if(spot.density)
+		return TRUE
+	for(var/atom/movable/thing in spot)
+		if(thing.density && !ismob(thing) && !istype(thing, /obj/structure/barricade))
+			return TRUE
+	return FALSE
+
+/// Higher is better. Barricades facing the enemy and walls on the enemy side count for most, crowding teammates counts against
+/datum/clash_bot/proc/score_spot(turf/spot, turf/enemy, wounded)
+	var/score = 0
+	var/facing = get_dir(spot, enemy)
+	for(var/obj/structure/barricade/cade in spot)
+		if(!cade.closed && (cade.dir & facing))
+			score += cade.projectile_coverage / 5
+	for(var/direction in GLOB.cardinals)
+		if(istype(get_step(spot, direction), /turf/closed))
+			score += (direction & facing) ? 6 : 1
+	var/distance = get_dist(spot, enemy)
+	if(wounded)
+		score += distance * 1.5
+	else if(distance > CLASH_BOT_SIGHT)
+		score -= 30
+	else if(distance < 3)
+		score -= 8
+	for(var/mob/living/carbon/human/ally in range(1, spot))
+		if(ally != body && ally.faction == body.faction && ally.stat != DEAD)
+			score -= 5
+	return score
+
+/datum/clash_bot/proc/pick_cover(wounded)
+	var/turf/here = get_turf(body)
+	var/turf/enemy = target ? get_turf(target) : contact_turf
+	if(!here || !enemy)
+		return null
 	var/turf/best
-	var/best_distance = CLASH_BOT_COVER_RANGE + 1
-	for(var/obj/structure/barricade/cover in orange(CLASH_BOT_COVER_RANGE, body))
-		var/turf/spot = get_turf(cover)
-		if(cover.closed || get_dist(spot, anchor) > hold_radius)
+	var/best_score = score_spot(here, enemy, wounded) + 4
+	for(var/turf/open/spot in range(CLASH_BOT_COVER_RANGE, body))
+		if(spot == here || get_dist(spot, anchor) > hold_radius || !can_enter(spot) || spot_blocked(spot))
 			continue
-		if(!(cover.dir & get_dir(spot, target)))
+		var/datum/clash_bot/owner = GLOB.clash_bot_cover_claims[spot]
+		if(owner && owner != src)
 			continue
-		var/distance = get_dist(body, spot)
-		if(distance >= best_distance)
+		var/score = score_spot(spot, enemy, wounded) - get_dist(here, spot)
+		if(score <= best_score)
 			continue
 		best = spot
-		best_distance = distance
+		best_score = score
 	return best
+
+/datum/clash_bot/proc/set_destination(turf/spot)
+	if(spot == destination)
+		return
+	destination = spot
+	path = null
+
+/datum/clash_bot/proc/choose_destination()
+	if(target || contact_recent())
+		if(world.time < next_cover_scan)
+			return
+		next_cover_scan = world.time + CLASH_BOT_COVER_RESCAN
+		var/turf/spot = pick_cover(body.health < body.maxHealth * CLASH_BOT_WOUNDED)
+		if(spot)
+			claim_cover(spot)
+			set_destination(spot)
+		return
+	if(get_dist(body, anchor) > hold_radius)
+		release_cover()
+		set_destination(anchor)
+	else if(!destination && !dry && prob(1))
+		var/list/nearby = list()
+		for(var/turf/open/spot in range(2, anchor))
+			if(!spot_blocked(spot) && can_enter(spot) && !GLOB.clash_bot_cover_claims[spot])
+				nearby += spot
+		if(length(nearby))
+			set_destination(pick(nearby))
 
 /datum/clash_bot/proc/handle_movement()
 	if(world.time < next_step)
 		return
-	if(target)
-		if(get_turf(body) != heading)
-			heading = find_cover()
-	else if(get_dist(body, anchor) > hold_radius)
-		heading = anchor
-	if(!heading || get_turf(body) == heading)
+	choose_destination()
+	var/turf/here = get_turf(body)
+	if(!destination || here == destination)
+		destination = null
+		path = null
 		return
-	next_step = world.time + CLASH_BOT_STEP_DELAY
-	var/turf/before = get_turf(body)
-	step_to(body, heading, 0)
-	if(get_turf(body) != before)
+	if(!length(path))
+		if(world.time < next_repath || GLOB.clash_bot_paths_this_tick >= CLASH_BOT_PATHS_PER_TICK)
+			return
+		GLOB.clash_bot_paths_this_tick++
+		next_repath = world.time + CLASH_BOT_REPATH_DELAY
+		path = find_path(destination)
+		if(!length(path))
+			destination = null
+			return
+	var/turf/next = path[1]
+	next_step = world.time + max(2, body.movement_delay())
+	step(body, get_dir(here, next))
+	var/turf/arrived = get_turf(body)
+	if(arrived == next)
+		path.Cut(1, 2)
+		stuck_for = 0
+		return
+	if(arrived != here)
+		path = null
 		stuck_for = 0
 		return
 	stuck_for++
 	if(stuck_for < CLASH_BOT_STUCK_LIMIT)
 		return
 	stuck_for = 0
-	heading = null
+	path = null
+	if(destination == claimed)
+		release_cover()
+	destination = null
 
 #undef CLASH_BOT_TICK
-#undef CLASH_BOT_RANGE
+#undef CLASH_BOT_SIGHT
 #undef CLASH_BOT_ACCURACY
 #undef CLASH_BOT_RELOAD_DELAY
-#undef CLASH_BOT_STEP_DELAY
 #undef CLASH_BOT_COVER_RANGE
+#undef CLASH_BOT_COVER_RESCAN
+#undef CLASH_BOT_REPATH_DELAY
+#undef CLASH_BOT_PATHS_PER_TICK
+#undef CLASH_BOT_MEMORY
+#undef CLASH_BOT_WOUNDED
 #undef CLASH_BOT_STUCK_LIMIT
