@@ -120,6 +120,13 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 		gun.do_toggle_firemode(body, null, wanted_firemode)
 	RegisterSignal(gun, COMSIG_GUN_BEFORE_FIRE, PROC_REF(on_gun_fire))
 
+/datum/clash_bot/proc/lose_gun()
+	if(!QDELETED(gun))
+		UnregisterSignal(gun, COMSIG_GUN_BEFORE_FIRE)
+	gun = null
+	firing = FALSE
+	dry = FALSE
+
 /datum/clash_bot/proc/on_gun_fire(obj/item/weapon/gun/source, obj/projectile/bullet)
 	SIGNAL_HANDLER
 	bullet.accuracy *= CLASH_BOT_ACCURACY
@@ -169,6 +176,8 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 		post?.bot_died(body)
 		qdel(src)
 		return
+	if(gun && gun.loc != body)
+		lose_gun()
 	if(body.is_mob_incapacitated())
 		stop_volley()
 		return
@@ -333,14 +342,15 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 		medicine.attack(body, body)
 	if(QDELETED(body) || body.stat == DEAD)
 		return
-	if(!QDELETED(medicine) && medicine.loc == body)
+	if(!QDELETED(medicine) && medicine.loc == body && !(istype(holder) && holder.can_be_inserted(medicine, body, TRUE) && holder.handle_item_insertion(medicine, TRUE, body)))
 		body.drop_inv_item_to_loc(medicine, get_turf(body))
 	if(gun?.flags_item & TWOHANDED)
 		gun.wield(body)
 
 /datum/clash_bot/proc/find_medicine()
 	for(var/obj/item/reagent_container/hypospray/autoinjector/shot in body.get_contents())
-		return shot
+		if(shot.uses_left > 0)
+			return shot
 	for(var/obj/item/stack/medical/dressing in body.get_contents())
 		return dressing
 	return null
@@ -349,15 +359,15 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 	var/obj/item/ammo_magazine/closest
 	var/closest_distance = CLASH_BOT_SCAVENGE_RANGE + 1
 	for(var/obj/item/ammo_magazine/spare in range(CLASH_BOT_SCAVENGE_RANGE, body))
-		if(!magazine_fits(spare) || get_dist(body, spare) >= closest_distance)
+		if(!magazine_fits(spare) || get_dist(body, spare) >= closest_distance || !can_enter(get_turf(spare)))
 			continue
 		closest = spare
 		closest_distance = get_dist(body, spare)
 	for(var/mob/living/carbon/human/corpse in range(CLASH_BOT_SCAVENGE_RANGE, body))
-		if(corpse.stat != DEAD || get_dist(body, corpse) >= closest_distance)
+		if(corpse.stat != DEAD || get_dist(body, corpse) >= closest_distance || !can_enter(get_turf(corpse)))
 			continue
 		for(var/obj/item/ammo_magazine/spare in corpse.get_contents())
-			if(!magazine_fits(spare))
+			if(!magazine_fits(spare) || istype(spare.loc, /obj/item/weapon/gun))
 				continue
 			closest = spare
 			closest_distance = get_dist(body, corpse)
@@ -537,7 +547,7 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 		stuck_for = 0
 		return
 	var/obj/structure/machinery/door/blocking_door = locate() in next
-	if(blocking_door?.density)
+	if(blocking_door?.density && blocking_door.operating == DOOR_OPERATING_OPENING)
 		return
 	stuck_for++
 	if(stuck_for < CLASH_BOT_STUCK_LIMIT)

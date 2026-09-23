@@ -18,6 +18,8 @@
 	heap[1] = heap[length(heap)]
 	heap.len--
 	var/size = length(heap)
+	if(!size)
+		return top[2]
 	var/index = 1
 	while(TRUE)
 		var/smallest = index

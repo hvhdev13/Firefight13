@@ -184,7 +184,11 @@ GLOBAL_LIST_EMPTY(clash_loadouts)
 	var/slot_name = (overwrite_slot && job_slots[overwrite_slot]) ? overwrite_slot : tgui_input_text(user, "Name this loadout.", "Save Loadout", max_length = 24)
 	if(!slot_name)
 		return
-	if(!all_slots[slot_name] && length(job_slots) >= CLASH_LOADOUT_SLOTS)
+	var/datum/clash_loadout/existing = all_slots[slot_name]
+	if(existing && existing.job != user.job)
+		to_chat(user, SPAN_WARNING("You already have a loadout called [slot_name] for [existing.job]. Pick another name."))
+		return
+	if(!existing && length(job_slots) >= CLASH_LOADOUT_SLOTS)
 		to_chat(user, SPAN_WARNING("You already have [CLASH_LOADOUT_SLOTS] saved loadouts for this role. Overwrite one instead."))
 		return
 	var/datum/clash_loadout/loadout = new
