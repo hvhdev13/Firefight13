@@ -77,7 +77,7 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 	anchor = new_post ? new_post.get_hold_turf() : get_turf(new_body)
 	if(new_post)
 		hold_radius = new_post.hold_radius
-	take_out_gun()
+	arm_up()
 	RegisterSignal(body, COMSIG_HUMAN_BULLET_ACT, PROC_REF(on_shot))
 	RegisterSignal(body, COMSIG_MOB_FIRED_GUN, PROC_REF(on_fired))
 	RegisterSignal(body, COMSIG_MOVABLE_MOVED, PROC_REF(watch_nearby_turfs))
@@ -98,6 +98,11 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 	body = null
 	post = null
 	gun = null
+	primary = null
+	sidearm = null
+	knife = null
+	grenade = null
+	homes = null
 	target = null
 	threat = null
 	contact_turf = null
@@ -105,28 +110,6 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 	destination = null
 	path = null
 	return ..()
-
-/datum/clash_bot/proc/take_out_gun()
-	for(var/obj/item/weapon/gun/carried in body.contents)
-		gun = carried
-		break
-	if(!gun)
-		return
-	body.drop_inv_item_to_loc(gun, body, force = TRUE)
-	body.put_in_hands(gun, FALSE)
-	if(gun.flags_item & TWOHANDED)
-		gun.wield(body)
-	var/wanted_firemode = post?.bot_firemode
-	if(wanted_firemode && gun.gun_firemode != wanted_firemode && (wanted_firemode in gun.gun_firemode_list))
-		gun.do_toggle_firemode(body, null, wanted_firemode)
-	RegisterSignal(gun, COMSIG_GUN_BEFORE_FIRE, PROC_REF(on_gun_fire))
-
-/datum/clash_bot/proc/lose_gun()
-	if(!QDELETED(gun))
-		UnregisterSignal(gun, COMSIG_GUN_BEFORE_FIRE)
-	gun = null
-	firing = FALSE
-	dry = FALSE
 
 /datum/clash_bot/proc/on_gun_fire(obj/item/weapon/gun/source, obj/projectile/bullet)
 	SIGNAL_HANDLER
@@ -177,8 +160,6 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 		post?.bot_died(body)
 		qdel(src)
 		return
-	if(gun && gun.loc != body)
-		lose_gun()
 	if(body.is_mob_incapacitated())
 		stop_volley()
 		return
@@ -186,20 +167,32 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 		stop_volley()
 		body.resist_fire()
 		return
+	if(!check_hands() || world.time < busy_until)
+		return
 	var/ceasefire = MODE_HAS_MODIFIER(/datum/gamemode_modifier/ceasefire)
 	update_target()
-	if(ceasefire)
-		stop_volley()
-	else if(target)
-		body.face_atom(target)
-		fight()
-	else if(firing)
-		stop_volley()
-	else if(contact_recent() && prob(25))
-		suppress()
+	var/obj/item/weapon/gun/wanted = pick_gun()
+	charging = !ceasefire && should_charge(wanted)
+	bleed_out(HAS_TRAIT(body, TRAIT_FLOORED) && !(wanted && gun_ready(wanted)))
+	if(charging)
+		stab()
 	else
-		try_heal()
-	handle_movement()
+		if(wanted != gun || (wanted && body.get_active_hand() != wanted))
+			ready_gun(wanted)
+		if(ceasefire)
+			stop_volley()
+		else if(target)
+			body.face_atom(target)
+			if(!try_grenade())
+				fight()
+		else if(firing)
+			stop_volley()
+		else if(contact_recent() && prob(25))
+			suppress()
+		else
+			try_heal()
+	if(!HAS_TRAIT(body, TRAIT_FLOORED))
+		handle_movement()
 
 /datum/clash_bot/proc/contact_recent()
 	return contact_turf && world.time - contact_at < CLASH_BOT_MEMORY
@@ -270,7 +263,7 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 	if(world.time < next_fire)
 		return
 	if(!has_ammo())
-		if(!dry)
+		if(!dry && hands == 2)
 			next_fire = world.time + CLASH_BOT_RELOAD_DELAY
 			INVOKE_ASYNC(src, PROC_REF(reload))
 		return
@@ -306,10 +299,12 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 	if(QDELETED(body) || body.stat == DEAD)
 		return
 	stop_volley()
-	var/obj/item/ammo_magazine/spare = find_magazine()
+	var/obj/item/ammo_magazine/spare = find_magazine(gun)
 	if(!spare)
-		dry = TRUE
+		if(gun == primary)
+			dry = TRUE
 		return
+	busy_until = world.time + 5 SECONDS
 	if(gun.current_mag)
 		gun.unload(body, TRUE, TRUE)
 	gun.unwield(body)
@@ -320,9 +315,10 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 	gun.replace_magazine(body, spare)
 	if(gun.flags_item & TWOHANDED)
 		gun.wield(body)
+	busy_until = 0
 
 /datum/clash_bot/proc/try_heal()
-	if(world.time < next_heal || contact_recent() || firing)
+	if(world.time < next_heal || contact_recent() || firing || hands < 2)
 		return
 	if(body.health >= body.maxHealth * CLASH_BOT_WOUNDED)
 		return
@@ -334,6 +330,7 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 
 /datum/clash_bot/proc/heal_with(obj/item/medicine)
 	stop_volley()
+	busy_until = world.time + 10 SECONDS
 	gun?.unwield(body)
 	var/obj/item/storage/holder = medicine.loc
 	if(istype(holder))
@@ -341,6 +338,7 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 	body.put_in_hands(medicine, FALSE)
 	if(medicine.loc == body)
 		medicine.attack(body, body)
+	busy_until = 0
 	if(QDELETED(body) || body.stat == DEAD)
 		return
 	if(!QDELETED(medicine) && medicine.loc == body && !(istype(holder) && holder.can_be_inserted(medicine, body, TRUE) && holder.handle_item_insertion(medicine, TRUE, body)))
@@ -378,7 +376,7 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 /datum/clash_bot/proc/magazine_fits(obj/item/ammo_magazine/spare)
 	if(spare.current_rounds <= 0 || istype(spare, /obj/item/ammo_magazine/handful))
 		return FALSE
-	return istype(gun, spare.gun_type) || (spare.type in gun.accepted_ammo)
+	return primary && (istype(primary, spare.gun_type) || (spare.type in primary.accepted_ammo))
 
 /datum/clash_bot/proc/grab_magazine(obj/item/ammo_magazine/spare)
 	var/obj/item/storage/holder = spare.loc
@@ -391,7 +389,8 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 	if(spare.loc != body)
 		return
 	dry = FALSE
-	INVOKE_ASYNC(src, PROC_REF(reload))
+	if(primary && gun == primary)
+		INVOKE_ASYNC(src, PROC_REF(reload))
 
 /datum/clash_bot/proc/rearm()
 	if(!post?.bot_magazine)
@@ -399,13 +398,14 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 	for(var/count in 1 to post.bot_magazines)
 		body.equip_to_appropriate_slot(new post.bot_magazine(body))
 	dry = FALSE
-	INVOKE_ASYNC(src, PROC_REF(reload))
+	if(primary && gun == primary)
+		INVOKE_ASYNC(src, PROC_REF(reload))
 
-/datum/clash_bot/proc/find_magazine()
+/datum/clash_bot/proc/find_magazine(obj/item/weapon/gun/weapon)
 	for(var/obj/item/ammo_magazine/spare in body.get_contents())
-		if(spare.current_rounds <= 0 || spare == gun.current_mag)
+		if(spare.current_rounds <= 0 || spare == weapon.current_mag)
 			continue
-		if(istype(gun, spare.gun_type) || (spare.type in gun.accepted_ammo))
+		if(istype(weapon, spare.gun_type) || (spare.type in weapon.accepted_ammo))
 			return spare
 	return null
 
@@ -514,7 +514,12 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 	path = null
 
 /datum/clash_bot/proc/choose_destination()
-	if(dry)
+	if(charging)
+		var/turf/aim = get_turf(target)
+		if(!destination || get_dist(destination, aim) > 2)
+			set_destination(aim)
+		return
+	if(dry && hands == 2)
 		resupply()
 		return
 	if(target || contact_recent())

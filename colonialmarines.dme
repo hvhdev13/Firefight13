@@ -1724,6 +1724,7 @@
 #include "code\modules\clash_hit\clash_hit_flinch.dm"
 #include "code\modules\clash_loadout\clash_loadout.dm"
 #include "code\modules\clash_npc\clash_bot.dm"
+#include "code\modules\clash_npc\clash_bot_arms.dm"
 #include "code\modules\clash_npc\clash_bot_path.dm"
 #include "code\modules\clash_npc\clash_npc.dm"
 #include "code\modules\clash_npc\clash_observer.dm"

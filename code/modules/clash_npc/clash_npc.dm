@@ -43,6 +43,10 @@ GLOBAL_VAR(clash_bot_fill_timer)
 	var/bot_magazine
 	var/bot_magazines = 4
 	var/bot_firemode
+	var/bot_sidearm
+	var/bot_sidearm_magazine
+	var/bot_sidearm_magazines = 2
+	var/bot_grenade = /obj/item/explosive/grenade/high_explosive
 	var/bot_medical = /obj/item/storage/pouch/firstaid/full
 	/// Deciseconds before a replacement is sent out, 0 to never respawn
 	var/respawn_delay = 30 SECONDS
@@ -111,6 +115,12 @@ GLOBAL_VAR(clash_bot_fill_timer)
 	npc.put_in_hands(new bot_gun(npc), FALSE)
 	for(var/count in 1 to bot_magazines)
 		npc.equip_to_appropriate_slot(new bot_magazine(npc))
+	if(bot_sidearm)
+		npc.equip_to_appropriate_slot(new bot_sidearm(npc))
+		for(var/count in 1 to bot_sidearm_magazines)
+			npc.equip_to_appropriate_slot(new bot_sidearm_magazine(npc))
+	if(bot_grenade)
+		npc.equip_to_appropriate_slot(new bot_grenade(npc))
 	if(bot_medical && !(locate(/obj/item/reagent_container/hypospray/autoinjector) in npc.get_contents()))
 		npc.equip_to_appropriate_slot(new bot_medical(npc))
 	bot = new(npc, src)
@@ -165,6 +175,8 @@ GLOBAL_VAR(clash_bot_fill_timer)
 	equipment_preset = /datum/equipment_preset/uscm/private_equipped
 	bot_gun = /obj/item/weapon/gun/rifle/m41a
 	bot_magazine = /obj/item/ammo_magazine/rifle
+	bot_sidearm = /obj/item/weapon/gun/pistol/m4a3
+	bot_sidearm_magazine = /obj/item/ammo_magazine/pistol
 
 /obj/effect/landmark/clash_npc/uscm/fill
 	name = "Clash NPC team fill spawner (USCM Rifleman)"
@@ -176,6 +188,8 @@ GLOBAL_VAR(clash_bot_fill_timer)
 	equipment_preset = /datum/equipment_preset/upp/soldier/dressed
 	bot_gun = /obj/item/weapon/gun/rifle/type71
 	bot_magazine = /obj/item/ammo_magazine/rifle/type71
+	bot_sidearm = /obj/item/weapon/gun/pistol/t73
+	bot_sidearm_magazine = /obj/item/ammo_magazine/pistol/t73
 	bot_firemode = GUN_FIREMODE_BURSTFIRE
 
 /obj/effect/landmark/clash_npc/upp/fill
