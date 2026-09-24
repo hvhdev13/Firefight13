@@ -16,11 +16,21 @@
 
 /obj/structure/machinery/cm_vending/sorted/cargo_ammo/upp_squad/populate_product_list(scale)
 	listed_products = list(
+		list("AMMUNITION", -1, null, null),
+		list("Type 71 Magazine (5.45x39mm)", 1.9, /obj/item/ammo_magazine/rifle/type71, VENDOR_ITEM_REGULAR),
+		list("Type 71 Carbine Magazine (5.45x39mm)", 1.8, /obj/item/ammo_magazine/rifle/type71/carbine, VENDOR_ITEM_REGULAR),
+		list("AK-4047 Magazine (10x24mm)", 1.8, /obj/item/ammo_magazine/rifle/ak4047, VENDOR_ITEM_REGULAR),
+		list("Type 64 Helical Magazine (7.62x19mm)", 1.8, /obj/item/ammo_magazine/smg/bizon, VENDOR_ITEM_REGULAR),
+
+		list("SPECIAL AMMUNITION", -1, null, null),
+		list("QYJ-72 Ammo Box (7.62x54mmR)", 4, /obj/item/ammo_magazine/pkp, VENDOR_ITEM_REGULAR),
+
 		list("EXPLOSIVES", -1, null, null),
 		list("M40 HEDP Grenade", floor(scale * 10), /obj/item/explosive/grenade/high_explosive, VENDOR_ITEM_REGULAR),
 
 		list("RESTRICTED FIREARM AMMUNITION", -1, null, null),
 		list("M240 Incinerator Tank", floor(scale * 8), /obj/item/ammo_magazine/flamer_tank, VENDOR_ITEM_REGULAR),
+		list("M2C Box Magazine", floor(scale * 2), /obj/item/ammo_magazine/m2c, VENDOR_ITEM_REGULAR),
 		)
 
 //--------------UPP SQUAD ARMAMENTS VENDOR--------------
@@ -43,6 +53,7 @@
 	listed_products = list(
 		list("FOOD", -1, null, null),
 		list("Ration", floor(scale * 20), /obj/item/storage/box/mre/upp, VENDOR_ITEM_REGULAR),
+		list("Ration Box", floor(scale * 1), /obj/item/ammo_box/magazine/misc/mre/upp, VENDOR_ITEM_REGULAR),
 
 		list("TOOLS", -1, null, null),
 		list("Entrenching Tool (ET)", floor(scale * 2), /obj/item/tool/shovel/etool/folded, VENDOR_ITEM_REGULAR),
@@ -58,7 +69,7 @@
 		list("Box of Flashlight", floor(scale * 1), /obj/item/ammo_box/magazine/misc/flashlight, VENDOR_ITEM_REGULAR),
 		list("Box of Flares", floor(scale * 1), /obj/item/ammo_box/magazine/misc/flares, VENDOR_ITEM_REGULAR),
 		list("M94 Marking Flare Pack", floor(scale * 10), /obj/item/storage/box/m94, VENDOR_ITEM_REGULAR),
-//		list("M89-S Signal Flare Pack", floor(scale * 1), /obj/item/storage/box/m94/signal, VENDOR_ITEM_REGULAR), (removed until signal flares work per faction)
+		list("M89-S Signal Flare Pack", floor(scale * 1), /obj/item/storage/box/m94/signal, VENDOR_ITEM_REGULAR),
 
 		list("MISCELLANEOUS", -1, null, null),
 		list("Engineer Kit", floor(scale * 1), /obj/item/storage/toolkit/empty, VENDOR_ITEM_REGULAR),
@@ -140,7 +151,7 @@
 		list("Type 64 Submachinegun", floor(scale * 20), /obj/item/weapon/gun/smg/bizon/upp, VENDOR_ITEM_REGULAR),
 		list("Type 23 Riot Shotgun", floor(scale * 20), /obj/item/weapon/gun/shotgun/type23, VENDOR_ITEM_REGULAR),
 
-		list("REGULAR AMMUNITION", -1, null, null),
+		list("PRIMARY AMMUNITION", -1, null, null),
 		list("Type 71 Magazine (5.45x39mm)", floor(scale * 30), /obj/item/ammo_magazine/rifle/type71, VENDOR_ITEM_REGULAR),
 		list("Type 71 Carbine Magazine (5.45x39mm)", floor(scale * 30), /obj/item/ammo_magazine/rifle/type71/carbine, VENDOR_ITEM_REGULAR),
 		list("AK-4047 Magazine (10x24mm)", floor(scale * 30), /obj/item/ammo_magazine/rifle/ak4047, VENDOR_ITEM_REGULAR),

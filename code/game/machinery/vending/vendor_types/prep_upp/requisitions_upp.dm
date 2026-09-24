@@ -30,6 +30,7 @@
 
 		list("EXPLOSIVES", -1, null, null),
 		list("Type 6 Shrapnel Grenade", floor(scale * 25), /obj/item/explosive/grenade/high_explosive/upp, VENDOR_ITEM_REGULAR),
+		list("M40 HEDP Grenade", floor(scale * 25), /obj/item/explosive/grenade/high_explosive, VENDOR_ITEM_REGULAR),
 		list("Type 8 WP Grenade", floor(scale * 4), /obj/item/explosive/grenade/phosphorus/upp, VENDOR_ITEM_REGULAR),
 		list("Smoke Grenade", floor(scale * 5), /obj/item/explosive/grenade/smokebomb, VENDOR_ITEM_REGULAR),
 		list("Plastic Explosives", floor(scale * 4), /obj/item/explosive/plastic, VENDOR_ITEM_REGULAR),
@@ -88,16 +89,20 @@
 		list("Large Magazine Pouch", floor(scale * 1), /obj/item/storage/pouch/magazine/large, VENDOR_ITEM_REGULAR),
 		list("Large Shotgun Shell Pouch", floor(scale * 1), /obj/item/storage/pouch/shotgun/large, VENDOR_ITEM_REGULAR),
 
-		list("MISCELLANEOUS", -1, null, null),
+		list("FLARE AND LIGHT", -1, null, null),
 		list("Combat Flashlight", floor(scale * 8), /obj/item/device/flashlight/combat, VENDOR_ITEM_REGULAR),
-		list("Entrenching Tool", floor(scale * 4), /obj/item/tool/shovel/etool/folded, VENDOR_ITEM_REGULAR),
-		list("Gas Mask", floor(scale * 10), /obj/item/clothing/mask/gas, VENDOR_ITEM_REGULAR),
 		list("M89-S Signal Flare Pack", floor(scale * 2), /obj/item/storage/box/m94/signal, VENDOR_ITEM_REGULAR),
 		list("M94 Marking Flare Pack", floor(scale * 10), /obj/item/storage/box/m94, VENDOR_ITEM_REGULAR),
-		list("Machete Scabbard (Full)", floor(scale * 6), /obj/item/storage/large_holster/machete/full, VENDOR_ITEM_REGULAR),
+
+		list("ESSENTIAL DEVICES", -1, null, null),
 		list("Binoculars", floor(scale * 2), /obj/item/device/binoculars, VENDOR_ITEM_REGULAR),
 		list("Rangefinder", floor(scale * 1), /obj/item/device/binoculars/range, VENDOR_ITEM_REGULAR),
 		list("Laser Designator", floor(scale * 1), /obj/item/device/binoculars/range/designator, VENDOR_ITEM_REGULAR),
+
+		list("MISCELLANEOUS", -1, null, null),
+		list("Entrenching Tool", floor(scale * 4), /obj/item/tool/shovel/etool/folded, VENDOR_ITEM_REGULAR),
+		list("Gas Mask", floor(scale * 10), /obj/item/clothing/mask/gas, VENDOR_ITEM_REGULAR),
+		list("Machete Scabbard (Full)", floor(scale * 6), /obj/item/storage/large_holster/machete/full, VENDOR_ITEM_REGULAR),
 		list("Welding Goggles", floor(scale * 3), /obj/item/clothing/glasses/welding, VENDOR_ITEM_REGULAR),
 		list("Fire Extinguisher (Portable)", floor(scale * 3), /obj/item/tool/extinguisher/mini, VENDOR_ITEM_REGULAR),
 		list("High-Capacity Power Cell", floor(scale * 1), /obj/item/cell/high, VENDOR_ITEM_REGULAR),
@@ -166,6 +171,7 @@
 
 		list("RESTRICTED FIREARM AMMUNITION", -1, null, null),
 		list("M240 Incinerator Tank", floor(scale * 3), /obj/item/ammo_magazine/flamer_tank, VENDOR_ITEM_REGULAR),
+		list("Type-19 Stick Magazine (7.62x25mm)", floor(scale * 10), /obj/item/ammo_magazine/smg/pps43, VENDOR_ITEM_REGULAR),
 
 		list("MAGAZINE BOXES", -1, null, null),
 		list("Magazine box (Type 71 Rifle x 10)", 0, /obj/item/ammo_box/magazine/type71, VENDOR_ITEM_REGULAR),
@@ -213,7 +219,6 @@
 		list("Suppressor", 6.5, /obj/item/attachable/suppressor, VENDOR_ITEM_REGULAR),
 
 		list("RAIL", -1, null, null),
-		list("B8 Smart-Scope", 3.5, /obj/item/attachable/alt_iff_scope, VENDOR_ITEM_REGULAR),
 		list("Magnetic Harness", 8.5, /obj/item/attachable/magnetic_harness, VENDOR_ITEM_REGULAR),
 		list("Rail Flashlight", 10.5, /obj/item/attachable/flashlight, VENDOR_ITEM_REGULAR),
 		list("S4 2x Telescopic Mini-Scope", 4.5, /obj/item/attachable/scope/mini, VENDOR_ITEM_REGULAR),

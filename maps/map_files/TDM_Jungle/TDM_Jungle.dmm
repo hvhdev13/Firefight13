@@ -999,7 +999,6 @@
 /turf/open/floor/almayer/cargo,
 /area/clash_arena/tdm_jungle/uscm_base/req)
 "fI" = (
-/obj/structure/flora/tree/tyrargo/tree_2,
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
 	dir = 1
 	},
@@ -1081,15 +1080,6 @@
 	},
 /obj/structure/machinery/light,
 /turf/open/floor/almayer,
-/area/clash_arena/tdm_jungle/uscm_base)
-"gb" = (
-/obj/structure/flora/pottedplant{
-	desc = "It is made of Fiberbush(tm). It contains asbestos.";
-	icon_state = "pottedplant_22";
-	name = "synthetic potted plant";
-	pixel_y = 8
-	},
-/turf/open/floor/almayer/red,
 /area/clash_arena/tdm_jungle/uscm_base)
 "gc" = (
 /obj/structure/machinery/door/poddoor/railing/upp{
@@ -3113,10 +3103,14 @@
 /turf/open/auto_turf/tyrargo_grass/layer1,
 /area/clash_arena/tdm_jungle/battlefield)
 "tP" = (
-/obj/effect/landmark/corpsespawner/upp,
-/obj/effect/decal/siding,
-/turf/open/floor/strata/fake_wood,
-/area/clash_arena/tdm_jungle/battlefield)
+/obj/structure/flora/pottedplant{
+	desc = "It is made of Fiberbush(tm). It contains asbestos.";
+	icon_state = "pottedplant_22";
+	name = "synthetic potted plant";
+	pixel_y = 8
+	},
+/turf/open/floor/almayer,
+/area/clash_arena/tdm_jungle/uscm_base)
 "tQ" = (
 /obj/structure/flora/tree/tyrargo/tree_2,
 /turf/open/auto_turf/snow/brown_base/layer3,
@@ -3535,11 +3529,6 @@
 	},
 /turf/open/floor/almayer/mono,
 /area/clash_arena/tdm_jungle/uscm_base/req)
-"xq" = (
-/obj/effect/decal/strata_decals/grasses,
-/obj/effect/landmark/corpsespawner/tyrargo/us_army_trooper,
-/turf/open/auto_turf/tyrargo_grass/layer0_mud,
-/area/clash_arena/tdm_jungle/battlefield)
 "xu" = (
 /obj/structure/flora/tree/tyrargo/tree_3,
 /turf/open/auto_turf/tyrargo_grass/layer0_mud_alt,
@@ -3558,14 +3547,6 @@
 /obj/structure/prop/tyrargo/boards/boards_2,
 /turf/open/gm/river/desert/tyrargo/no_slowdown,
 /area/clash_arena/tdm_jungle/battlefield)
-"xy" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "NW-out";
-	pixel_x = -1;
-	pixel_y = 1
-	},
-/turf/open/floor/interior/wood,
-/area/clash_arena/tdm_jungle/uscm_base)
 "xB" = (
 /obj/effect/decal/warning_stripes{
 	icon_state = "S"
@@ -5016,10 +4997,6 @@
 "HE" = (
 /turf/open/floor/strata,
 /area/clash_arena/tdm_jungle/upp_base)
-"HF" = (
-/obj/effect/landmark/corpsespawner/upp,
-/turf/open/auto_turf/tyrargo_grass/layer1,
-/area/clash_arena/tdm_jungle/battlefield)
 "HH" = (
 /obj/structure/machinery/chem_dispenser/corpsman{
 	pixel_y = 3
@@ -5221,17 +5198,6 @@
 /obj/effect/decal/strata_decals/grasses,
 /turf/open/auto_turf/tyrargo_grass,
 /area/clash_arena/tdm_jungle/battlefield)
-"Jc" = (
-/obj/structure/machinery/cm_vending/clothing/marine/alpha{
-	density = 0;
-	layer = 4.1;
-	pixel_y = -29
-	},
-/obj/structure/machinery/cm_vending/sorted/cargo_guns/squad_prep{
-	pixel_y = -29
-	},
-/turf/open/floor/almayer/cargo_arrow,
-/area/clash_arena/tdm_jungle/uscm_base)
 "Jd" = (
 /obj/structure/machinery/cm_vending/sorted/cargo_ammo/upp_squad,
 /turf/open/floor/strata/red3,
@@ -5314,10 +5280,6 @@
 	pixel_y = -9
 	},
 /turf/open/auto_turf/snow/brown_base,
-/area/clash_arena/tdm_jungle/battlefield)
-"JJ" = (
-/obj/effect/landmark/corpsespawner/upp,
-/turf/open/auto_turf/tyrargo_grass/layer0_mud,
 /area/clash_arena/tdm_jungle/battlefield)
 "JK" = (
 /obj/structure/machinery/door/poddoor/railing/upp{
@@ -7461,10 +7423,6 @@
 	},
 /turf/open/floor/almayer/green/east,
 /area/clash_arena/tdm_jungle/uscm_base/req)
-"Yx" = (
-/obj/effect/landmark/corpsespawner/tyrargo/us_army_trooper,
-/turf/open/auto_turf/tyrargo_grass/layer0_mud,
-/area/clash_arena/tdm_jungle/battlefield)
 "Yy" = (
 /obj/structure/flora/bush/ausbushes/var3/fullgrass,
 /turf/open/gm/river/red,
@@ -7502,12 +7460,10 @@
 /turf/open/auto_turf/tyrargo_grass/layer1,
 /area/clash_arena/tdm_jungle/battlefield)
 "YK" = (
-/obj/effect/landmark/corpsespawner/tyrargo/us_army_trooper,
-/turf/open/floor/strata/fake_wood,
-/area/clash_arena/tdm_jungle/battlefield)
-"YU" = (
-/obj/effect/decal/strata_decals/grasses,
-/obj/effect/landmark/corpsespawner/upp,
+/obj/effect/decal/strata_decals/tyrargo_mud_corner{
+	dir = 0
+	},
+/obj/structure/flora/tree/tyrargo/tree_2,
 /turf/open/auto_turf/tyrargo_grass,
 /area/clash_arena/tdm_jungle/battlefield)
 "YV" = (
@@ -34212,7 +34168,7 @@ tJ
 FN
 Fz
 Fz
-HF
+tJ
 WF
 vD
 WF
@@ -34614,7 +34570,7 @@ Hq
 Hq
 tJ
 He
-YK
+wL
 wL
 Cu
 mV
@@ -35623,7 +35579,7 @@ bd
 bd
 bd
 oL
-tP
+He
 wL
 nG
 qy
@@ -36033,7 +35989,7 @@ nG
 ko
 Cn
 Fz
-Yx
+Fz
 Fz
 HS
 Yg
@@ -36227,7 +36183,7 @@ Fz
 Fz
 aO
 Fz
-Yx
+Fz
 Zs
 He
 wL
@@ -37041,7 +36997,7 @@ vD
 oa
 cZ
 Fz
-xq
+cZ
 yQ
 ji
 Zl
@@ -39267,7 +39223,7 @@ vD
 lB
 lB
 ZH
-YU
+ZH
 Fz
 Lr
 Zw
@@ -41280,7 +41236,7 @@ Yq
 Fz
 Fz
 Fz
-kU
+YK
 gv
 Fz
 cZ
@@ -41484,7 +41440,7 @@ Fz
 Fz
 kU
 gv
-VK
+Fz
 cZ
 Fz
 Fz
@@ -41687,7 +41643,7 @@ SR
 vD
 Yq
 ZR
-JJ
+Fz
 Fz
 Fz
 pq
@@ -43101,7 +43057,7 @@ ZA
 Xy
 Ec
 kz
-gb
+ye
 kz
 kz
 kz
@@ -43504,14 +43460,14 @@ vD
 Yq
 DU
 Ec
-kz
+tP
 ye
 kz
 kz
 kz
 wF
 kz
-kz
+tP
 Ec
 jJ
 jJ
@@ -47950,7 +47906,7 @@ aP
 aP
 wG
 ye
-Jc
+hR
 Jt
 bX
 wF
@@ -51785,7 +51741,7 @@ Ec
 Zb
 kM
 kM
-xy
+kM
 kM
 kM
 kM
@@ -53197,7 +53153,7 @@ pm
 MK
 MK
 CC
-Zb
+kM
 kM
 kM
 kM
