@@ -81,6 +81,7 @@ GLOBAL_VAR(clash_bot_fill_timer)
 	var/mob/living/carbon/human/npc = new(get_turf(src))
 	arm_equipment(npc, equipment_preset, TRUE, FALSE)
 	npc.statistic_exempt = TRUE
+	npc.AddElement(/datum/element/clash_hit_flinch)
 	npc.setDir(dir)
 	npc.real_name = "[npc.real_name] \[BOT\]"
 	npc.name = npc.real_name

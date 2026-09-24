@@ -628,7 +628,6 @@
 
 			. = TRUE
 		else if(target_living.body_position != LYING_DOWN)
-			animatation_displace_reset(target_living)
 			if(ammo.sound_miss)
 				playsound_client(target_living.client, ammo.sound_miss, get_turf(target_living), 75, TRUE)
 			target_living.visible_message(SPAN_AVOIDHARM("[src] misses [target_living]!"),
