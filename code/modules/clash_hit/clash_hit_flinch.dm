@@ -41,8 +41,8 @@ SUBSYSTEM_DEF(clash_hit_flinch)
 	play_clash_hit_effect(source, bullet, damage_result, push_x, push_y)
 	if(source.body_position == LYING_DOWN)
 		return
-	var/strength = clamp(2 + damage_result / 6, 2, 6)
-	if(bullet.def_zone == "head")
-		strength += 2
+	var/strength = clamp(1 + damage_result / 12, 1, 3)
+	if(bullet.def_zone in list("head", "eyes", "mouth"))
+		strength += 1
 	animate(source, pixel_w = push_x * strength, pixel_z = push_y * strength, time = 1, easing = CUBIC_EASING|EASE_OUT, flags = ANIMATION_PARALLEL)
 	animate(pixel_w = 0, pixel_z = 0, time = 2, easing = CUBIC_EASING|EASE_IN)

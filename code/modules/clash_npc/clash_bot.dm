@@ -62,6 +62,7 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 	var/next_step = 0
 	var/next_repath = 0
 	var/next_cover_scan = 0
+	var/last_cover_scan = 0
 	var/next_search = 0
 	var/next_heal = 0
 	var/stuck_for = 0
@@ -157,7 +158,7 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 	threat_at = world.time
 	contact_turf = get_turf(shooter)
 	contact_at = world.time
-	next_cover_scan = 0
+	next_cover_scan = min(next_cover_scan, last_cover_scan + 1 SECONDS)
 
 /datum/clash_bot/proc/watch_nearby_turfs()
 	SIGNAL_HANDLER
@@ -426,19 +427,56 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 			return TRUE
 	return FALSE
 
-/// Higher is better. Barricades facing the enemy and walls on the enemy side count for most, crowding teammates counts against
-/datum/clash_bot/proc/score_spot(turf/spot, turf/enemy, wounded)
-	var/score = 0
+/datum/clash_bot/proc/known_enemy_turfs()
+	var/list/enemies = list()
+	if(target)
+		enemies |= get_turf(target)
+	if(!QDELETED(threat) && world.time - threat_at < CLASH_BOT_MEMORY)
+		enemies |= get_turf(threat)
+	if(contact_recent())
+		enemies |= contact_turf
+	enemies -= null
+	return enemies
+
+/datum/clash_bot/proc/line_clear(turf/from, turf/into)
+	for(var/turf/line_turf as anything in get_line(from, into, include_start_atom = FALSE))
+		if(line_turf.density || line_turf.opacity)
+			return FALSE
+		for(var/obj/thing in line_turf)
+			if(thing.opacity)
+				return FALSE
+	return TRUE
+
+/datum/clash_bot/proc/cover_against(turf/spot, turf/enemy)
 	var/facing = get_dir(spot, enemy)
-	for(var/obj/structure/barricade/cade in spot)
-		if(!cade.closed && (cade.dir & facing))
-			score += cade.projectile_coverage / 5
-	for(var/direction in GLOB.cardinals)
-		if(istype(get_step(spot, direction), /turf/closed))
-			score += (direction & facing) ? 6 : 1
-	var/distance = get_dist(spot, enemy)
-	if(wounded)
-		score += distance * 1.5
+	var/best = 0
+	for(var/obj/structure/thing in spot)
+		var/obj/structure/barricade/cade = thing
+		if(!(thing.flags_atom & ON_BORDER) || !thing.density || !thing.throwpass || !(thing.dir & facing) || (istype(cade) && cade.closed))
+			continue
+		best = max(best, thing.projectile_coverage)
+	for(var/obj/structure/thing in get_step(spot, facing))
+		if(!(thing.flags_atom & ON_BORDER) && thing.density && thing.throwpass)
+			best = max(best, thing.projectile_coverage * 0.7)
+	return best / 5
+
+/// Higher is better. Rewards cover facing every known enemy and a firing line to the main one, or staying out of sight while hurt or reloading
+/datum/clash_bot/proc/score_spot(turf/spot, list/enemies, hiding)
+	var/score = 0
+	var/turf/primary = enemies[1]
+	for(var/turf/enemy as anything in enemies)
+		var/protection = cover_against(spot, enemy)
+		if(!line_clear(enemy, spot))
+			score += hiding ? 12 : protection * 0.3
+			if(!hiding && enemy == primary)
+				score -= 10
+			continue
+		score += hiding ? protection * 0.5 : protection
+		if(!protection)
+			score -= 6
+	var/distance = get_dist(spot, primary)
+	if(hiding)
+		score += distance
 	else if(distance > CLASH_BOT_SIGHT)
 		score -= 30
 	else if(distance < 3)
@@ -448,20 +486,21 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 			score -= 5
 	return score
 
-/datum/clash_bot/proc/pick_cover(wounded)
+/datum/clash_bot/proc/pick_cover()
 	var/turf/here = get_turf(body)
-	var/turf/enemy = target ? get_turf(target) : contact_turf
-	if(!here || !enemy)
+	var/list/enemies = known_enemy_turfs()
+	if(!here || !length(enemies))
 		return null
+	var/hiding = body.health < body.maxHealth * CLASH_BOT_WOUNDED || !has_ammo()
 	var/turf/best
-	var/best_score = score_spot(here, enemy, wounded) + 4
+	var/best_score = score_spot(here, enemies, hiding) + 4
 	for(var/turf/open/spot in range(CLASH_BOT_COVER_RANGE, body))
 		if(spot == here || get_dist(spot, anchor) > hold_radius || !can_enter(spot) || spot_blocked(spot))
 			continue
 		var/datum/clash_bot/owner = GLOB.clash_bot_cover_claims[spot]
 		if(owner && owner != src)
 			continue
-		var/score = score_spot(spot, enemy, wounded) - get_dist(here, spot)
+		var/score = score_spot(spot, enemies, hiding) - get_dist(here, spot)
 		if(score <= best_score)
 			continue
 		best = spot
@@ -482,7 +521,8 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 		if(world.time < next_cover_scan)
 			return
 		next_cover_scan = world.time + CLASH_BOT_COVER_RESCAN + rand(0, 10)
-		var/turf/spot = pick_cover(body.health < body.maxHealth * CLASH_BOT_WOUNDED)
+		last_cover_scan = world.time
+		var/turf/spot = pick_cover()
 		if(spot)
 			claim_cover(spot)
 			set_destination(spot)

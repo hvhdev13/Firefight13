@@ -14,6 +14,17 @@ GLOBAL_VAR(clash_bot_fill_timer)
 /obj/effect/landmark/clash_bot_rally
 	name = "Clash bot rally point"
 	var/rally_id = "center"
+	var/faction
+
+/obj/effect/landmark/clash_bot_rally/uscm
+	name = "Clash bot rally point (USCM)"
+	rally_id = null
+	faction = FACTION_MARINE
+
+/obj/effect/landmark/clash_bot_rally/upp
+	name = "Clash bot rally point (UPP)"
+	rally_id = null
+	faction = FACTION_UPP
 
 /obj/effect/landmark/clash_bot_rally/Initialize(mapload, ...)
 	. = ..()
@@ -64,13 +75,20 @@ GLOBAL_VAR(clash_bot_fill_timer)
 		INVOKE_ASYNC(src, PROC_REF(spawn_npc))
 
 /obj/effect/landmark/clash_npc/proc/get_hold_turf()
-	if(!rally_id)
-		return get_turf(src)
-	var/list/rallies = list()
+	var/turf/best = get_turf(src)
+	var/best_count
 	for(var/obj/effect/landmark/clash_bot_rally/rally as anything in GLOB.clash_bot_rallies)
-		if(rally.rally_id == rally_id && rally.z == z)
-			rallies += rally
-	return length(rallies) ? get_turf(pick(rallies)) : get_turf(src)
+		if(rally.z != z || (rally_id ? rally.rally_id != rally_id : rally.faction != faction))
+			continue
+		var/turf/rally_turf = get_turf(rally)
+		var/count = rand(0, 1)
+		for(var/datum/clash_bot/other as anything in GLOB.clash_bots)
+			if(other.anchor == rally_turf)
+				count += 2
+		if(isnull(best_count) || count < best_count)
+			best = rally_turf
+			best_count = count
+	return best
 
 /obj/effect/landmark/clash_npc/proc/spawn_npc()
 	if(bot || !active)
@@ -81,6 +99,8 @@ GLOBAL_VAR(clash_bot_fill_timer)
 	var/mob/living/carbon/human/npc = new(get_turf(src))
 	arm_equipment(npc, equipment_preset, TRUE, FALSE)
 	npc.statistic_exempt = TRUE
+	if(clash_fed_spawns())
+		npc.nutrition = NUTRITION_NORMAL
 	npc.AddElement(/datum/element/clash_hit_flinch)
 	npc.setDir(dir)
 	npc.real_name = "[npc.real_name] \[BOT\]"

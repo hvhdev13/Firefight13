@@ -43,6 +43,15 @@
 	var/area/clash_arena/zone = get_area(spot)
 	return !(istype(zone) && zone.clash_faction && zone.clash_faction != body.faction)
 
+/datum/clash_bot/proc/border_blocked(turf/from, turf/into, direction)
+	for(var/obj/structure/thing in from)
+		if((thing.flags_atom & ON_BORDER) && !istype(thing, /obj/structure/machinery/door) && thing.BlockedExitDirs(body, direction))
+			return TRUE
+	for(var/obj/structure/thing in into)
+		if((thing.flags_atom & ON_BORDER) && !istype(thing, /obj/structure/machinery/door) && thing.BlockedPassDirs(body, direction))
+			return TRUE
+	return FALSE
+
 /// Returns the steps toward goal, or toward the closest reachable tile when the search runs out of budget
 /datum/clash_bot/proc/find_path(turf/goal)
 	var/turf/start = get_turf(body)
@@ -75,7 +84,7 @@
 			var/turf/next = get_step(current, direction)
 			if(!next || next.density || closed[next] || !can_enter(next))
 				continue
-			if(LinkBlockedWithAccess(current, next, id_card))
+			if(LinkBlockedWithAccess(current, next, id_card) || border_blocked(current, next, direction))
 				continue
 			if(locate(/obj/flamer_fire) in next)
 				continue
