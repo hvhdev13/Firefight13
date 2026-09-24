@@ -35,8 +35,8 @@
 	mouse_opacity = MOUSE_OPACITY_TRANSPARENT
 	screen_loc = "RIGHT,TOP"
 	maptext_height = 16
-	maptext_width = 456
-	maptext_x = -448
+	maptext_width = 184
+	maptext_x = -158
 	maptext = ""
 
 /atom/movable/screen/cinematic

@@ -183,6 +183,11 @@ GLOBAL_LIST_EMPTY(clash_loadouts)
 		if(worn.can_attach_accessory(thing))
 			worn.attach_accessory(user, thing)
 			return
+	if(istype(thing, /obj/item/clothing/accessory))
+		for(var/obj/item/clothing/worn in list(user.w_uniform, user.wear_suit, user.head))
+			if(worn.can_attach_accessory(thing))
+				worn.attach_accessory(user, thing)
+				return
 	if(slot && user.equip_to_slot_if_possible(thing, slot, TRUE, FALSE, TRUE))
 		return
 	if(!user.equip_to_appropriate_slot(thing))

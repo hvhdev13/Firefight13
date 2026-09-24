@@ -150,7 +150,7 @@ GLOBAL_LIST_INIT(clash_streak_steps, list(3, 5, 7, 10, 15, 20))
 	return "<span class='maptext center'>[minutes]:[seconds < 10 ? "0[seconds]" : "[seconds]"] left</span>"
 
 /datum/game_mode/extended/faction_clash/cm_vs_upp/proc/get_killfeed_line(list/entry)
-	return "<span class='maptext' style='text-align: right'><span style='color: [entry["killer_color"]]'>[entry["killer"]]</span> killed <span style='color: [entry["victim_color"]]'>[entry["victim"]]</span>[entry["cause"] ? " ([entry["cause"]])" : ""]</span>"
+	return "<span class='maptext' style='text-align: right; font-size: 6px'><span style='color: [entry["killer_color"]]'>[entry["killer"]]</span> killed <span style='color: [entry["victim_color"]]'>[entry["victim"]]</span>[entry["cause"] ? " ([entry["cause"]])" : ""]</span>"
 
 /datum/game_mode/extended/faction_clash/cm_vs_upp/proc/render_killfeed_for(mob/player)
 	var/list/lines = player.hud_used?.faction_killfeed

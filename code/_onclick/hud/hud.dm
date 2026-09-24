@@ -113,7 +113,7 @@
 	static_inventory += clash_respawn
 	for(var/i = 1 to CLASH_KILLFEED_LINES)
 		var/atom/movable/screen/faction_killfeed/line = new
-		line.maptext_y = -4 - (i * 10)
+		line.maptext_y = -8 - (i * 16)
 		faction_killfeed += line
 		static_inventory += line
 	var/datum/game_mode/extended/faction_clash/cm_vs_upp/clash_mode = SSticker.mode
