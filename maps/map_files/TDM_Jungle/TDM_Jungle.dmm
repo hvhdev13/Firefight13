@@ -104,24 +104,12 @@
 /turf/open/floor/strata/floor3/east,
 /area/clash_arena/tdm_jungle/upp_base)
 "ax" = (
-/obj/structure/surface/table/reinforced/prison,
-/obj/structure/sign/nosmoking_1{
-	pixel_x = 25;
-	pixel_y = 8
+/obj/structure/machinery/cm_vending/sorted/cargo_guns/squad_prep{
+	pixel_y = -29;
+	density = 0;
+	layer = 4.1
 	},
-/obj/item/device/multitool{
-	desc = "A large handheld tool used to override various machine functions. Primarily used to pulse Airlock and APC wires on a shortwave frequency. It contains a small data buffer as well. This one is comically oversized. Made in Texas.";
-	icon_state = "multitool_big";
-	name = "\improper Oversized Security Access Tuner";
-	pixel_x = 4;
-	pixel_y = 11
-	},
-/obj/item/tool/crowbar/red,
-/obj/item/tool/wrench{
-	pixel_x = 1;
-	pixel_y = 10
-	},
-/turf/open/floor/almayer,
+/turf/open/floor/almayer/cargo_arrow,
 /area/clash_arena/tdm_jungle/uscm_base)
 "az" = (
 /obj/structure/flora/grass/ice/brown/snowgrassbb_1,
@@ -357,14 +345,12 @@
 /turf/open/floor/almayer/test_floor4,
 /area/clash_arena/tdm_jungle/uscm_base/req)
 "bS" = (
-/obj/structure/surface/table/reinforced/prison,
-/obj/item/clothing/mask/gas{
-	pixel_y = 7
+/obj/structure/machinery/cm_vending/sorted/cargo_ammo/squad{
+	req_access = null;
+	req_one_access = null;
+	req_one_access_txt = "15;16;21";
+	vend_x_offset = 0
 	},
-/obj/item/clothing/mask/gas{
-	pixel_y = 3
-	},
-/obj/item/tool/shovel/etool/folded,
 /turf/open/floor/almayer,
 /area/clash_arena/tdm_jungle/uscm_base)
 "bV" = (
@@ -469,16 +455,15 @@
 	},
 /turf/open/floor/almayer/test_floor4,
 /area/clash_arena/tdm_jungle/uscm_base/req)
-"cw" = (
-/obj/effect/landmark/clash_npc/upp,
-/turf/open/floor/strata/floor3/east,
-/area/clash_arena/tdm_jungle/upp_base)
 "cx" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "W"
+/obj/structure/machinery/cm_vending/sorted/attachments/squad{
+	req_access = null;
+	req_one_access = null;
+	req_one_access_txt = "15;16;21";
+	vend_y_offset = 0
 	},
-/turf/open/floor/strata/red4/east,
-/area/clash_arena/tdm_jungle/upp_base)
+/turf/open/floor/almayer,
+/area/clash_arena/tdm_jungle/uscm_base)
 "cy" = (
 /obj/effect/landmark/start/marine/bravo,
 /obj/effect/landmark/late_join/bravo,
@@ -1087,10 +1072,15 @@
 /turf/open/gm/river/desert/tyrargo/deep,
 /area/clash_arena/tdm_jungle/battlefield)
 "fZ" = (
-/obj/structure/machinery/cm_vending/sorted/cargo_guns/squad_prep{
-	pixel_y = -29
+/obj/structure/machinery/cm_vending/sorted/cargo_guns/squad{
+	req_access = null;
+	req_one_access = null;
+	req_one_access_txt = "15;16;21";
+	vend_x_offset = 0;
+	vend_y_offset = 0
 	},
-/turf/open/floor/almayer/cargo_arrow,
+/obj/structure/machinery/light,
+/turf/open/floor/almayer,
 /area/clash_arena/tdm_jungle/uscm_base)
 "gb" = (
 /obj/structure/flora/pottedplant{
@@ -3117,7 +3107,7 @@
 /obj/structure/machinery/light{
 	dir = 1
 	},
-/turf/open/floor/almayer/plate,
+/turf/open/floor/almayer,
 /area/clash_arena/tdm_jungle/uscm_base)
 "tJ" = (
 /turf/open/auto_turf/tyrargo_grass/layer1,
@@ -4421,20 +4411,11 @@
 /turf/closed/wall/almayer,
 /area/clash_arena/tdm_jungle/uscm_base)
 "CN" = (
-/obj/structure/surface/table/reinforced/prison,
-/obj/item/book/manual/engineering_guide{
-	pixel_x = 6;
-	pixel_y = 6
+/obj/structure/machinery/door/airlock/multi_tile/upp/medical/autoname{
+	req_one_access = null
 	},
-/obj/item/prop/helmetgarb/gunoil{
-	pixel_x = -8
-	},
-/obj/structure/sign/nosmoking_1{
-	pixel_x = 25;
-	pixel_y = -7
-	},
-/turf/open/floor/almayer,
-/area/clash_arena/tdm_jungle/uscm_base)
+/turf/open/floor/strata/red3/west,
+/area/clash_arena/tdm_jungle/upp_base)
 "CR" = (
 /obj/structure/sign/flag/upp{
 	dir = 1;
@@ -5716,10 +5697,10 @@
 /turf/open/auto_turf/tyrargo_grass/layer1,
 /area/clash_arena/tdm_jungle/battlefield)
 "LK" = (
+/obj/structure/machinery/cm_vending/sorted/attachments/upp_squad,
 /obj/structure/sign/poster/clf{
 	pixel_x = -30
 	},
-/obj/structure/machinery/cm_vending/sorted/cargo_guns/upp_squad_guns,
 /turf/open/floor/corsat/spiralplate,
 /area/clash_arena/tdm_jungle/upp_base)
 "LL" = (
@@ -25329,12 +25310,12 @@ Nx
 km
 so
 LK
-OM
+so
 wz
 Vs
 so
-IB
 jz
+IB
 ws
 AU
 jF
@@ -25536,10 +25517,10 @@ xJ
 VW
 gk
 gk
-cx
-Wc
-Bz
-XD
+gk
+xJ
+CN
+Jo
 Fc
 wA
 jX
@@ -26347,7 +26328,7 @@ hJ
 hJ
 eY
 AS
-XD
+lY
 mv
 wA
 fU
@@ -26540,13 +26521,13 @@ rB
 Cz
 SJ
 Aj
-Aj
 qF
+Aj
 Cz
 pj
 so
-so
 OM
+so
 pn
 AS
 wT
@@ -26751,7 +26732,7 @@ kj
 kj
 Tt
 Zm
-XD
+lY
 Fc
 jF
 jX
@@ -27155,7 +27136,7 @@ sn
 jF
 Lk
 sv
-lY
+XD
 Fc
 jF
 fU
@@ -27358,7 +27339,7 @@ jF
 DL
 AU
 XD
-cw
+Fc
 jF
 fU
 rT
@@ -33833,7 +33814,7 @@ fj
 vD
 yR
 yR
-vD
+dP
 vD
 WF
 rE
@@ -44128,7 +44109,7 @@ Dp
 aS
 aS
 Ec
-Uu
+cx
 kz
 ye
 kz
@@ -44136,7 +44117,7 @@ Ue
 kz
 wF
 kz
-Uu
+yu
 Ec
 jJ
 jJ
@@ -44338,7 +44319,7 @@ tZ
 kz
 wF
 kz
-Yz
+fZ
 Ec
 jJ
 jJ
@@ -44532,7 +44513,7 @@ lv
 aS
 aS
 Ec
-yu
+bS
 kz
 ye
 kz
@@ -44540,7 +44521,7 @@ tZ
 kz
 wF
 kz
-yu
+bS
 Ec
 jJ
 jJ
@@ -44936,7 +44917,7 @@ aS
 aS
 aS
 Ec
-Uu
+bS
 kz
 ye
 kz
@@ -45141,9 +45122,9 @@ Ec
 tI
 kz
 ye
-kz
-kz
-kz
+fo
+fo
+fo
 wF
 kz
 Yz
@@ -45340,12 +45321,12 @@ aS
 Ec
 Ec
 Ec
-yu
+cx
 kz
 ye
 ax
-bS
-CN
+CM
+te
 wF
 kz
 yu
@@ -45545,9 +45526,9 @@ Jt
 aP
 wG
 ye
-aP
-aP
-aP
+hR
+Jt
+bX
 wF
 Io
 aP
@@ -45747,9 +45728,9 @@ zS
 aP
 Ds
 ye
-kz
-kz
-kz
+fo
+fo
+fo
 wF
 Ya
 aP
@@ -45949,9 +45930,9 @@ aL
 BP
 wG
 ye
-kz
-kz
-kz
+ax
+CM
+te
 wF
 CI
 NB
@@ -46151,9 +46132,9 @@ Jt
 aP
 wG
 ye
-kz
-kz
-kz
+hR
+Jt
+bX
 wF
 Io
 aP
@@ -46555,7 +46536,7 @@ aP
 uw
 hy
 ye
-fZ
+ax
 CM
 te
 wF
@@ -47161,7 +47142,7 @@ lf
 aP
 wG
 ye
-fZ
+ax
 CM
 te
 wF
@@ -47767,7 +47748,7 @@ kL
 aP
 wG
 ye
-fZ
+ax
 CM
 te
 wF
@@ -48373,7 +48354,7 @@ SE
 aP
 wG
 ye
-fZ
+ax
 CM
 te
 wF
@@ -48979,7 +48960,7 @@ aP
 aP
 wG
 ye
-fZ
+ax
 CM
 te
 wF
@@ -49585,7 +49566,7 @@ aP
 kz
 kz
 ye
-fZ
+ax
 CM
 te
 wF

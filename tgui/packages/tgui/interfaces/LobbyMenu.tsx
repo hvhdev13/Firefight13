@@ -32,7 +32,6 @@ type LobbyData = {
   xeno_prefix: string;
   xeno_postfix: string;
 
-  tutorials_ready: BooleanLike;
   round_start: BooleanLike;
   readied: BooleanLike;
 
@@ -301,7 +300,6 @@ const LobbyButtons = (props: {
     readied,
     predator_enabled,
     upp_enabled,
-    tutorials_ready,
     xenomorph_enabled,
   } = data;
 
@@ -382,37 +380,24 @@ const LobbyButtons = (props: {
 
         <LobbyButton
           index={1}
-          onClick={() => act('tutorial')}
-          disabled={!tutorials_ready}
-          tooltip={
-            !tutorials_ready
-              ? 'Tutorials can only be started after the game is running.'
-              : ''
-          }
-          icon="book-open"
-        >
-          Tutorial
-        </LobbyButton>
-        <LobbyButton
-          index={2}
           onClick={() => act('preferences')}
           icon="file-lines"
         >
           Setup Character
         </LobbyButton>
 
-        <LobbyButton index={3} icon="check-to-slot" onClick={() => act('poll')}>
+        <LobbyButton index={2} icon="check-to-slot" onClick={() => act('poll')}>
           Polls
         </LobbyButton>
 
-        <LobbyButton index={4} onClick={() => act('playtimes')} icon="list-ul">
+        <LobbyButton index={3} onClick={() => act('playtimes')} icon="list-ul">
           View Playtimes
         </LobbyButton>
 
         <TimedDivider />
 
         <LobbyButton
-          index={5}
+          index={4}
           icon="eye"
           onClick={() => {
             setModal(
@@ -420,13 +405,6 @@ const LobbyButtons = (props: {
                 <Box>
                   <Stack vertical>
                     <Stack.Item>Are you sure you wish to observe?</Stack.Item>
-                    <Stack.Item>
-                      When you observe, you will not be able to join as marine.
-                    </Stack.Item>
-                    <Stack.Item>
-                      It might also take some time to become a xeno or
-                      responder!
-                    </Stack.Item>
                   </Stack>
                   <Stack justify="center">
                     <Stack.Item>
@@ -444,7 +422,7 @@ const LobbyButtons = (props: {
         {round_start ? (
           <Stack.Item>
             <LobbyButton
-              index={6}
+              index={5}
               selected={!!readied}
               onClick={() => act(readied ? 'unready' : 'ready')}
               icon={readied ? 'check' : 'xmark'}
@@ -461,7 +439,7 @@ const LobbyButtons = (props: {
               <Stack>
                 <Stack.Item grow>
                   <LobbyButton
-                    index={6}
+                    index={5}
                     onClick={() => act('late_join')}
                     icon="users"
                   >
@@ -472,7 +450,7 @@ const LobbyButtons = (props: {
                   <LobbyButton
                     icon="list"
                     tooltip="View Crew Manifest"
-                    index={6 + SMALL_BUTTON_DELAY}
+                    index={5 + SMALL_BUTTON_DELAY}
                     onClick={() => act('manifest')}
                   />
                 </Stack.Item>
@@ -481,7 +459,7 @@ const LobbyButtons = (props: {
             {!!upp_enabled && (
               <Stack.Item>
                 <LobbyButton
-                  index={8}
+                  index={7}
                   onClick={() => act('late_join_upp')}
                   icon="users-between-lines"
                 >
@@ -492,7 +470,7 @@ const LobbyButtons = (props: {
             {!!predator_enabled && (
               <Stack.Item>
                 <LobbyButton
-                  index={8 + (upp_enabled ? 1 : 0)}
+                  index={7 + (upp_enabled ? 1 : 0)}
                   onClick={() => {
                     setModal(
                       <ModalConfirm>

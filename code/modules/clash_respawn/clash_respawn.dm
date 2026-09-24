@@ -50,8 +50,7 @@ GLOBAL_LIST_EMPTY(clash_respawn_button_icons)
 	icon = null
 	screen_loc = "CENTER-2:16,CENTER-3"
 	maptext_width = RESPAWN_BUTTON_WIDTH
-	maptext_height = 16
-	maptext_y = 7
+	maptext_height = RESPAWN_BUTTON_HEIGHT
 	alpha = 0
 	mouse_opacity = MOUSE_OPACITY_TRANSPARENT
 	var/state
@@ -92,7 +91,7 @@ GLOBAL_LIST_EMPTY(clash_respawn_button_icons)
 			label = "RESPAWN [floor(shown_seconds / 60)]:[shown_seconds % 60 < 10 ? "0" : ""][shown_seconds % 60]"
 		if(RESPAWN_STATE_HOVER)
 			text_color = "#ffffff"
-	maptext = MAPTEXT_VCR_OSD_MONO("<span style='font-size: 12px; text-align: center; color: [text_color]'>[label]</span>")
+	maptext = "<span style='font-family: \"VCR OSD Mono\"; font-size: 12px; text-align: center; vertical-align: middle; color: [text_color]'>[label]</span>"
 
 /atom/movable/screen/clash_respawn/MouseEntered(location, control, params)
 	hovered = TRUE

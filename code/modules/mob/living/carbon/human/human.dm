@@ -225,8 +225,8 @@
 	var/obj/limb/take_blast = pick(limbs)
 	if(take_blast)
 		take_blast.take_damage(b_loss * 0.5, f_loss * 0.5, used_weapon = "Explosive blast", attack_source = attack_source)
-		if(MODE_HAS_FLAG(MODE_FACTION_CLASH) && stat != DEAD && !(chem_effect_flags & CHEM_EFFECT_RESIST_FRACTURE) && !(take_blast.status & LIMB_DESTROYED) && !(take_blast.body_part & (BODY_FLAG_HEAD|BODY_FLAG_CHEST|BODY_FLAG_GROIN)) && attack_source?.faction != faction && prob(damage * 2))
-			take_blast.limb_delimb(last_damage_data)
+		if(MODE_HAS_FLAG(MODE_FACTION_CLASH))
+			clash_blast_delimb(src, take_blast, damage, attack_source)
 	pain?.apply_pain(b_loss * 0.5, BRUTE)
 	pain?.apply_pain(f_loss * 0.5, BURN)
 
