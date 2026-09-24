@@ -388,6 +388,7 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 	body.put_in_hands(spare, FALSE)
 	if(spare.loc != body)
 		return
+	track_clash_bot_gear(spare)
 	dry = FALSE
 	if(primary && gun == primary)
 		INVOKE_ASYNC(src, PROC_REF(reload))
@@ -396,7 +397,9 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 	if(!post?.bot_magazine)
 		return
 	for(var/count in 1 to post.bot_magazines)
-		body.equip_to_appropriate_slot(new post.bot_magazine(body))
+		var/obj/item/ammo_magazine/spare = new post.bot_magazine(body)
+		body.equip_to_appropriate_slot(spare)
+		track_clash_bot_gear(spare)
 	dry = FALSE
 	if(primary && gun == primary)
 		INVOKE_ASYNC(src, PROC_REF(reload))

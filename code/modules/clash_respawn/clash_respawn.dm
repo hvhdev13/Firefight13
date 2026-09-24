@@ -83,15 +83,10 @@ GLOBAL_LIST_EMPTY(clash_respawn_button_icons)
 	if(state != new_state)
 		state = new_state
 		icon = get_clash_respawn_button_icon(state)
-	var/text_color = "#e6f5e8"
-	var/label = "RESPAWN"
-	switch(state)
-		if(RESPAWN_STATE_COOLDOWN)
-			text_color = "#828a92"
-			label = "RESPAWN [floor(shown_seconds / 60)]:[shown_seconds % 60 < 10 ? "0" : ""][shown_seconds % 60]"
-		if(RESPAWN_STATE_HOVER)
-			text_color = "#ffffff"
-	maptext = "<span style='font-family: \"VCR OSD Mono\"; font-size: 12px; text-align: center; vertical-align: middle; color: [text_color]'>[label]</span>"
+	if(state == RESPAWN_STATE_COOLDOWN)
+		maptext = "<span style='font-family: \"Small Fonts\"; font-size: 7px; -dm-text-outline: 1px black; text-align: center; vertical-align: middle; color: #a4acb4'>RESPAWN [floor(shown_seconds / 60)]:[shown_seconds % 60 < 10 ? "0" : ""][shown_seconds % 60]</span>"
+		return
+	maptext = "<span style='font-family: \"VCR OSD Mono\"; font-size: 12px; text-align: center; vertical-align: middle; color: [state == RESPAWN_STATE_HOVER ? "#ffffff" : "#e6f5e8"]'>RESPAWN</span>"
 
 /atom/movable/screen/clash_respawn/MouseEntered(location, control, params)
 	hovered = TRUE

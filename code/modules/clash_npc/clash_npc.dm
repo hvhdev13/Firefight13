@@ -6,10 +6,16 @@
 #define CLASH_BOT_FILL_INTERVAL (10 SECONDS)
 /// Deciseconds a dead bot's body stays before it is cleared away
 #define CLASH_BOT_CORPSE_TIME (90 SECONDS)
+/// Deciseconds gear a bot dropped lies on the ground before it is cleared away
+#define CLASH_BOT_LITTER_TIME (30 SECONDS)
+/// Deciseconds between checks for dropped bot gear
+#define CLASH_BOT_LITTER_SWEEP (5 SECONDS)
 
 GLOBAL_LIST_EMPTY(clash_npc_spawners)
 GLOBAL_LIST_EMPTY(clash_bot_rallies)
 GLOBAL_VAR(clash_bot_fill_timer)
+GLOBAL_LIST_EMPTY(clash_bot_gear)
+GLOBAL_VAR(clash_bot_litter_timer)
 
 /obj/effect/landmark/clash_bot_rally
 	name = "Clash bot rally point"
@@ -123,6 +129,8 @@ GLOBAL_VAR(clash_bot_fill_timer)
 		npc.equip_to_appropriate_slot(new bot_grenade(npc))
 	if(bot_medical && !(locate(/obj/item/reagent_container/hypospray/autoinjector) in npc.get_contents()))
 		npc.equip_to_appropriate_slot(new bot_medical(npc))
+	for(var/obj/item/gear in npc.get_contents())
+		track_clash_bot_gear(gear)
 	bot = new(npc, src)
 
 /obj/effect/landmark/clash_npc/proc/bot_died(mob/living/carbon/human/body)
@@ -136,6 +144,37 @@ GLOBAL_VAR(clash_bot_fill_timer)
 	var/mob/living/carbon/human/body = body_ref?.resolve()
 	if(body && !body.client && body.stat == DEAD)
 		qdel(body)
+
+/proc/track_clash_bot_gear(obj/item/gear)
+	GLOB.clash_bot_gear[WEAKREF(gear)] = 0
+	if(!GLOB.clash_bot_litter_timer)
+		GLOB.clash_bot_litter_timer = addtimer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(sweep_clash_bot_litter)), CLASH_BOT_LITTER_SWEEP, TIMER_LOOP|TIMER_STOPPABLE)
+
+/// Clears bot gear that has lain loose on the ground too long, and stops tracking gear a player has taken
+/proc/sweep_clash_bot_litter()
+	for(var/datum/weakref/gear_ref as anything in GLOB.clash_bot_gear.Copy())
+		var/obj/item/gear = gear_ref.resolve()
+		if(!gear)
+			GLOB.clash_bot_gear -= gear_ref
+			continue
+		if(!isturf(gear.loc))
+			var/atom/holder = gear.loc
+			while(holder && !ismob(holder) && !isturf(holder))
+				holder = holder.loc
+			var/mob/owner = holder
+			if(ismob(owner) && owner.mind)
+				GLOB.clash_bot_gear -= gear_ref
+			else
+				GLOB.clash_bot_gear[gear_ref] = 0
+			continue
+		if(!GLOB.clash_bot_gear[gear_ref])
+			GLOB.clash_bot_gear[gear_ref] = world.time
+		else if(world.time - GLOB.clash_bot_gear[gear_ref] >= CLASH_BOT_LITTER_TIME)
+			GLOB.clash_bot_gear -= gear_ref
+			qdel(gear)
+	if(!length(GLOB.clash_bot_gear))
+		deltimer(GLOB.clash_bot_litter_timer)
+		GLOB.clash_bot_litter_timer = null
 
 /proc/clash_bot_count(faction)
 	. = 0
@@ -207,3 +246,5 @@ GLOBAL_VAR(clash_bot_fill_timer)
 #undef CLASH_BOT_TEAM_SIZE
 #undef CLASH_BOT_FILL_INTERVAL
 #undef CLASH_BOT_CORPSE_TIME
+#undef CLASH_BOT_LITTER_TIME
+#undef CLASH_BOT_LITTER_SWEEP

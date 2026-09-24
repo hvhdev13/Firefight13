@@ -37,17 +37,14 @@ GLOBAL_LIST_EMPTY(clash_loadouts)
 	name = slot_name
 	job = user.job
 	items.Cut()
-	for(var/obj/item/thing in user.get_equipped_items())
-		record(thing, FALSE)
-		record_contents(thing)
+	for(var/obj/item/thing in user.get_equipped_items() + list(user.s_store, user.l_store, user.r_store, user.l_hand, user.r_hand))
+		record(thing, null, user.get_slot_by_item(thing))
 
-/datum/clash_loadout/proc/record_contents(obj/item/holder)
-	for(var/obj/item/inner in holder.contents)
-		record(inner, TRUE)
-		record_contents(inner)
-
-/datum/clash_loadout/proc/record(obj/item/thing, inner)
-	items += list(list("type" = thing.type, "name" = thing.name, "inner" = inner))
+/datum/clash_loadout/proc/record(obj/item/thing, parent, slot)
+	items += list(list("type" = thing.type, "name" = thing.name, "inner" = !isnull(parent), "parent" = parent, "slot" = slot))
+	var/index = length(items)
+	for(var/obj/item/inner in thing.contents)
+		record(inner, index)
 
 /// Uniform first, then armor, then the rest of the worn gear, then what goes inside it
 /proc/clash_equip_order(list/entry)
@@ -60,12 +57,12 @@ GLOBAL_LIST_EMPTY(clash_loadouts)
 		return 2
 	return 3
 
-/datum/clash_loadout/proc/get_sorted_items()
+/datum/clash_loadout/proc/get_sorted_indexes()
 	var/list/sorted = list()
 	for(var/rank in 1 to 4)
-		for(var/list/entry in items)
-			if(clash_equip_order(entry) == rank)
-				sorted += list(entry)
+		for(var/index in 1 to length(items))
+			if(clash_equip_order(items[index]) == rank)
+				sorted += index
 	return sorted
 
 /// Every vendor this user is allowed to buy from
@@ -126,22 +123,70 @@ GLOBAL_LIST_EMPTY(clash_loadouts)
 			.++
 		. += clash_count_type(thing, item_type)
 
-/// Mirrors the checks of the vendor's own vend action, returns TRUE if the item was handed out
-/proc/clash_vend(obj/structure/machinery/cm_vending/vendor, list/itemspec, mob/living/carbon/human/user)
+/proc/clash_find_unclaimed(list/candidates, item_type, list/claimed)
+	for(var/obj/item/thing in candidates)
+		if(thing.type == item_type && !(thing in claimed))
+			return thing
+	return null
+
+/// Mirrors the checks of the vendor's own vend action, returns the item of item_type that was handed out
+/proc/clash_vend(obj/structure/machinery/cm_vending/vendor, list/itemspec, mob/living/carbon/human/user, item_type)
 	if(vendor.stat & IN_USE)
-		return FALSE
+		return null
 	if(vendor.vend_flags & VEND_CATEGORY_CHECK)
 		if(itemspec[4] == MARINE_CAN_BUY_ESSENTIALS)
-			return FALSE
+			return null
 		if(itemspec[4] && !vendor.handle_vend(itemspec, user))
-			return FALSE
+			return null
 	if((vendor.use_points || vendor.use_snowflake_points) && !vendor.handle_points(user, itemspec))
-		return FALSE
+		return null
+	var/turf/drop_turf = get_turf(user)
+	var/list/before = drop_turf.contents.Copy()
 	var/saved_flags = vendor.vend_flags
-	vendor.vend_flags = (vendor.vend_flags | VEND_UNIFORM_AUTOEQUIP) & ~VEND_TO_HAND
-	vendor.vendor_successful_vend(itemspec, user, get_turf(user))
+	vendor.vend_flags &= ~(VEND_TO_HAND|VEND_UNIFORM_AUTOEQUIP)
+	vendor.vendor_successful_vend(itemspec, user, drop_turf)
 	vendor.vend_flags = saved_flags
-	return TRUE
+	var/obj/item/bought
+	for(var/obj/item/extra in drop_turf.contents - before)
+		if(!bought && extra.type == item_type)
+			bought = extra
+		else if(clash_count_type(user, extra.type))
+			qdel(extra)
+		else
+			user.equip_to_appropriate_slot(extra)
+	return bought
+
+/proc/clash_place(obj/item/thing, atom/parent, slot, mob/living/carbon/human/user)
+	if(istype(parent, /obj/item/weapon/gun))
+		var/obj/item/weapon/gun/weapon = parent
+		if(istype(thing, /obj/item/attachable))
+			var/obj/item/attachable/attachment = thing
+			if(weapon.can_attach_to_gun(user, attachment))
+				attachment.Attach(weapon)
+				weapon.update_attachable(attachment.slot)
+				return
+		else if(istype(thing, /obj/item/ammo_magazine))
+			var/obj/item/ammo_magazine/magazine = thing
+			if(!weapon.current_mag && (istype(weapon, magazine.gun_type) || (magazine.type in weapon.accepted_ammo)))
+				weapon.replace_magazine(user, magazine)
+				return
+	else if(isstorage(parent))
+		var/obj/item/storage/holder = parent
+		if(holder.can_be_inserted(thing, user, TRUE) && holder.handle_item_insertion(thing, TRUE, user))
+			return
+	else if(istype(parent, /obj/item/clothing/shoes))
+		var/obj/item/clothing/shoes/boots = parent
+		if(boots.attempt_insert_item(user, thing))
+			return
+	else if(istype(parent, /obj/item/clothing) && istype(thing, /obj/item/clothing/accessory))
+		var/obj/item/clothing/worn = parent
+		if(worn.can_attach_accessory(thing))
+			worn.attach_accessory(user, thing)
+			return
+	if(slot && user.equip_to_slot_if_possible(thing, slot, TRUE, FALSE, TRUE))
+		return
+	if(!user.equip_to_appropriate_slot(thing))
+		user.put_in_any_hand_if_possible(thing)
 
 /datum/clash_loadout/proc/restore(mob/living/carbon/human/user)
 	var/list/vendors = get_clash_vendors(user)
@@ -150,15 +195,25 @@ GLOBAL_LIST_EMPTY(clash_loadouts)
 		to_chat(user, SPAN_WARNING("Loadout not restored. [shortfall]"))
 		return FALSE
 	var/list/missing = list()
-	var/list/needed = list()
-	for(var/list/entry in get_sorted_items())
+	var/list/placed = list()
+	var/list/claimed = list()
+	for(var/index in get_sorted_indexes())
+		var/list/entry = items[index]
 		var/item_type = entry["type"]
-		needed[item_type] = (needed[item_type] || 0) + 1
-		if(clash_count_type(user, item_type) >= needed[item_type])
+		var/atom/parent = entry["parent"] ? placed["[entry["parent"]]"] : null
+		var/obj/item/existing = clash_find_unclaimed(parent ? parent.contents : user.contents, item_type, claimed) || clash_find_unclaimed(user.get_contents(), item_type, claimed)
+		if(existing)
+			placed["[index]"] = existing
+			claimed += existing
 			continue
 		var/list/found = find_clash_product(vendors, user, item_type)
-		if(!found || !clash_vend(found[1], found[2], user))
+		var/obj/item/bought = found && clash_vend(found[1], found[2], user, item_type)
+		if(!bought)
 			missing += entry["name"]
+			continue
+		placed["[index]"] = bought
+		claimed += bought
+		clash_place(bought, parent, entry["slot"], user)
 	if(length(missing))
 		to_chat(user, SPAN_WARNING("Not available, and not restored: [english_list(missing)]."))
 	return TRUE
