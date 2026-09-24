@@ -272,7 +272,7 @@ GLOBAL_REAL(Master, /datum/controller/master) = new
 	if(tgs_prime)
 		world.TgsInitializationComplete()
 
-	if(sleep_offline_after_initializations)
+	if(sleep_offline_after_initializations && !CONFIG_GET(flag/resume_after_initializations))
 		world.sleep_offline = TRUE
 	sleep(1 TICKS)
 

@@ -559,18 +559,6 @@
 		list("Syringe", floor(scale * 21), /obj/item/reagent_container/syringe, VENDOR_ITEM_REGULAR)
 	)
 
-/obj/structure/machinery/cm_vending/sorted/medical/populate_product_list_and_boxes(scale)
-	. = ..()
-
-	// If this is groundside and isn't dynamically changing we will spawn with stock randomly removed from it
-	if(vend_flags & VEND_STOCK_DYNAMIC)
-		return
-	if(Check_WO())
-		return
-	var/turf/location = get_turf(src)
-	if(location && is_ground_level(location.z))
-		random_unstock()
-
 /obj/structure/machinery/cm_vending/sorted/medical/Initialize()
 	. = ..()
 

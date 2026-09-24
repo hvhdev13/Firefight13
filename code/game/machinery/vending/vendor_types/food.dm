@@ -107,18 +107,6 @@
 		list("Vacuum Flask", 5, /obj/item/reagent_container/food/drinks/flask/vacuumflask, VENDOR_ITEM_REGULAR)
 	)
 
-/obj/structure/machinery/cm_vending/sorted/boozeomat/populate_product_list_and_boxes(scale)
-	. = ..()
-
-	// If this is groundside and isn't dynamically changing we will spawn with stock randomly removed from it
-	if(vend_flags & VEND_STOCK_DYNAMIC)
-		return
-	if(Check_WO())
-		return
-	var/turf/location = get_turf(src)
-	if(location && is_ground_level(location.z))
-		random_unstock()
-
 /// Randomly removes amounts of listed_products and reagents
 /obj/structure/machinery/cm_vending/sorted/boozeomat/proc/random_unstock()
 	for(var/list/vendspec as anything in listed_products)
