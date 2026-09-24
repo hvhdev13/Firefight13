@@ -16,6 +16,9 @@
 
 /obj/structure/machinery/cm_vending/sorted/cargo_ammo/upp_squad/populate_product_list(scale)
 	listed_products = list(
+		list("EXPLOSIVES", -1, null, null),
+		list("M40 HEDP Grenade", floor(scale * 10), /obj/item/explosive/grenade/high_explosive, VENDOR_ITEM_REGULAR),
+
 		list("RESTRICTED FIREARM AMMUNITION", -1, null, null),
 		list("M240 Incinerator Tank", floor(scale * 8), /obj/item/ammo_magazine/flamer_tank, VENDOR_ITEM_REGULAR),
 		)

@@ -289,8 +289,6 @@ SUBSYSTEM_DEF(vote)
 				var/list/maps = list()
 				for(var/i in config.maplist[GROUND_MAP])
 					var/datum/map_config/VM = config.maplist[GROUND_MAP][i]
-					if(VM.map_file == SSmapping.configs[GROUND_MAP].map_file)
-						continue
 					if(!VM.voteweight)
 						continue
 					if(!(GLOB.master_mode in VM.gamemodes))
