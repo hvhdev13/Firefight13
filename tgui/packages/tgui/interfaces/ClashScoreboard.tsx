@@ -27,7 +27,11 @@ interface ScoreboardData {
   kill_limit?: number;
   seconds_left?: number;
   countdown?: number;
+  intermission?: number;
   finished?: BooleanLike;
+  match?: number;
+  matches?: number;
+  series?: [number, number];
 }
 
 const byScore = (a: Row, b: Row) =>
@@ -88,11 +92,22 @@ const TeamTable = (props: { readonly team: Team }) => {
 
 export const ClashScoreboard = () => {
   const { data } = useBackend<ScoreboardData>();
-  const { teams = [], kill_limit, seconds_left = 0, countdown = 0 } = data;
+  const {
+    teams = [],
+    kill_limit,
+    seconds_left = 0,
+    countdown = 0,
+    intermission = 0,
+    match = 1,
+    matches = 1,
+    series = [0, 0],
+  } = data;
 
   let status = '';
   if (data.finished) {
     status = 'Round over';
+  } else if (intermission) {
+    status = `Next match in ${intermission}`;
   } else if (countdown) {
     status = `Match starts in ${countdown}`;
   } else if (seconds_left) {
@@ -108,6 +123,9 @@ export const ClashScoreboard = () => {
           <>
             <Box mb={1} color="label">
               {data.mode}
+              {matches > 1
+                ? ` · Match ${match} of ${matches} · Series ${series[0]}-${series[1]}`
+                : ''}
               {kill_limit ? ` · First to ${kill_limit}` : ''}
               {status ? ` · ${status}` : ''}
             </Box>

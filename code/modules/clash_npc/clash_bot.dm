@@ -417,6 +417,31 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 	GLOB.clash_bot_cover_claims[spot] = src
 	claimed = spot
 
+/// Heals the bot and puts it back at its spawner with a clear head, for a fresh match
+/datum/clash_bot/proc/return_to_post()
+	if(!post || QDELETED(body) || body.stat == DEAD)
+		return
+	release_cover()
+	body.stop_pulling()
+	body.rejuvenate()
+	body.forceMove(get_turf(post))
+	target = null
+	threat = null
+	contact_turf = null
+	destination = null
+	path = null
+	stuck_for = 0
+	anchor = post.get_hold_turf()
+
+/// Takes the bot and its body off the field for good
+/datum/clash_bot/proc/retire()
+	var/mob/living/carbon/human/old_body = body
+	if(post?.bot == src)
+		post.bot = null
+	qdel(src)
+	if(!QDELETED(old_body))
+		qdel(old_body)
+
 /datum/clash_bot/proc/release_cover()
 	if(claimed && GLOB.clash_bot_cover_claims[claimed] == src)
 		GLOB.clash_bot_cover_claims -= claimed

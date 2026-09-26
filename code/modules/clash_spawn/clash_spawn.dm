@@ -27,6 +27,7 @@ SUBSYSTEM_DEF(clash_spawn)
 	UnregisterSignal(spawned, COMSIG_POST_SPAWN_UPDATE)
 	if(clash_fed_spawns())
 		spawned.nutrition = NUTRITION_NORMAL
+	spawned.clash_spawn_points = list(spawned.vendor_points, spawned.vendor_snowflake_points)
 	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
 	if(istype(clash_mode) && clash_mode.spawn_protection)
 		spawned.AddComponent(/datum/component/clash_spawn_guard, clash_mode.spawn_protection)
@@ -38,6 +39,26 @@ SUBSYSTEM_DEF(clash_spawn)
 	GLOB.clash_welcomed += ckey
 	if(!fexists(clash_welcome_path(ckey)))
 		INVOKE_ASYNC(src, PROC_REF(show_welcome), spawned)
+
+/// Vendor points a fighter spawned with, restored when a new match starts
+/mob/living/carbon/human/var/list/clash_spawn_points
+
+/// Where a fighter's job spawns them, the same lookup a fresh spawn uses
+/proc/get_clash_home_turf(mob/living/carbon/human/fighter)
+	var/datum/job/job = GLOB.RoleAuthority.roles_by_name[fighter.job]
+	var/squad = fighter.assigned_squad?.name
+	var/list/candidates
+	if(job && squad && GLOB.spawns_by_squad_and_job[squad])
+		candidates = GLOB.spawns_by_squad_and_job[squad][job.type]
+	if(!length(candidates) && job)
+		candidates = GLOB.spawns_by_job[job.type] || GLOB.spawns_by_job[job.title]
+	if(!length(candidates) && squad)
+		candidates = GLOB.latejoin_by_squad[squad]
+	if(!length(candidates) && job)
+		candidates = GLOB.latejoin_by_job[job.title]
+	if(!length(candidates))
+		candidates = GLOB.latejoin
+	return length(candidates) ? get_turf(pick(candidates)) : null
 
 /datum/controller/subsystem/clash_spawn/proc/show_welcome(mob/viewer)
 	var/list/page = list()

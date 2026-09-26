@@ -27,9 +27,10 @@
         "Team Deathmatch"
     ],
     "force_mode": "Team Deathmatch",
-    "tdm_round_minutes": 20,
+    "tdm_matches": 3,
+    "tdm_match_minutes": 8,
     "tdm_respawn_seconds": 15,
-    "tdm_kill_limit": 30,
+    "tdm_kill_limit": 15,
     "tdm_countdown_seconds": 20,
     "tdm_spawn_protection_seconds": 3
 }

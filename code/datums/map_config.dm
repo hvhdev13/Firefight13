@@ -69,8 +69,10 @@
 
 	var/force_mode
 
-	/// Team Deathmatch: round length in minutes, null uses the mode default
-	var/tdm_round_minutes
+	/// Team Deathmatch: length of one match in minutes, null uses the mode default
+	var/tdm_match_minutes
+	/// Team Deathmatch: matches per round, played as a best-of series, null uses the mode default
+	var/tdm_matches
 	/// Team Deathmatch: seconds between dying and being allowed to respawn, null uses the mode default
 	var/tdm_respawn_seconds
 	/// Team Deathmatch: kills that win the match early, 0 turns the limit off, null uses the mode default
@@ -423,11 +425,18 @@
 	if(json["force_mode"])
 		force_mode = json["force_mode"]
 
-	temp = json["tdm_round_minutes"]
+	temp = json["tdm_match_minutes"]
 	if(isnum(temp) && temp > 0)
-		tdm_round_minutes = temp
+		tdm_match_minutes = temp
 	else if(!isnull(temp))
-		log_world("map_config tdm_round_minutes is not a positive number!")
+		log_world("map_config tdm_match_minutes is not a positive number!")
+		return
+
+	temp = json["tdm_matches"]
+	if(isnum(temp) && temp >= 1)
+		tdm_matches = round(temp)
+	else if(!isnull(temp))
+		log_world("map_config tdm_matches is not a positive number!")
 		return
 
 	temp = json["tdm_respawn_seconds"]

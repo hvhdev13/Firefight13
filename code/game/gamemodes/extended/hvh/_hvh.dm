@@ -8,6 +8,8 @@
 #define CLASH_TEAM_GAP 5
 #define CLASH_USCM_SQUADS list(SQUAD_MARINE_1, SQUAD_MARINE_2)
 #define CLASH_MAP_VOTE_LEAD (5 MINUTES)
+/// Break between matches, with the last match's scoreboard up
+#define CLASH_INTERMISSION (30 SECONDS)
 /// How recently someone must have hurt a victim to earn an assist on its death
 #define CLASH_ASSIST_WINDOW (10 SECONDS)
 /// Played to a killer when their kill lands
@@ -42,8 +44,30 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 
 	taskbar_icon = 'icons/taskbar/gml_hvh.png'
 	skip_roundend_votes = TRUE
+	/// Length of one match
 	var/round_time_limit = 30 MINUTES
-	var/scoring_started = FALSE
+	/// Whether a match is in play, false in countdowns, intermissions and after the round
+	var/match_live = FALSE
+	/// Matches a round is played over, a team winning a majority ends the round early
+	var/matches_per_round = 1
+	var/match_number = 0
+	/// One list per finished match: winner faction or null, kills per faction, reason, mvp
+	var/list/match_results = list()
+	var/list/match_wins = list()
+	var/match_timer_id
+	var/vote_timer_id
+	var/intermission_end_time
+	/// Whether weapons are held by a countdown or intermission ceasefire of ours
+	var/holding_fire = FALSE
+	/// Totals of finished matches, swapped in for the round end reports
+	var/list/round_scores = list()
+	var/list/round_faction_kills = list()
+	var/list/round_faction_deaths = list()
+	var/list/round_environment_kills = list()
+	/// Idle time after which a living fighter is moved to observer to free their slot, 0 leaves it to the server AFK kick
+	var/idle_limit = 0
+	var/list/idle_warned = list()
+	var/idle_timer_id
 	var/list/faction_kills = list()
 	var/list/faction_deaths = list()
 	var/list/player_scores = list()
@@ -85,15 +109,22 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 /// Rule lines for the welcome page, in the order they are shown
 /datum/game_mode/extended/faction_clash/hvh/proc/get_welcome_rules()
 	. = list()
+	var/unit = matches_per_round > 1 ? "Matches" : "Rounds"
 	if(kill_limit)
-		. += "Rounds last [round_time_limit / 600] minutes. The first team to [kill_limit] kills wins, otherwise the most kills when time runs out. The map vote opens with [CLASH_MAP_VOTE_LEAD / 600] minutes left, or as soon as a team wins."
+		. += "[unit] last [round_time_limit / 600] minutes. The first team to [kill_limit] kills wins, otherwise the most kills when time runs out."
 	else
-		. += "Rounds last [round_time_limit / 600] minutes. The team with the most kills wins. The map vote opens with [CLASH_MAP_VOTE_LEAD / 600] minutes left."
+		. += "[unit] last [round_time_limit / 600] minutes. The team with the most kills wins."
+	if(matches_per_round > 1)
+		. += "A round is the best of [matches_per_round] matches, with a [CLASH_INTERMISSION / 10] second break and a fresh start between them. The map vote opens during the deciding match."
+	else
+		. += "The map vote opens with [CLASH_MAP_VOTE_LEAD / 600] minutes left, or as soon as a team wins."
 	if(countdown_time)
-		. += "The match starts [countdown_time / 10] seconds after the round begins. Until then you are held in your base."
+		. += "Each match starts after a [countdown_time / 10] second countdown. Until then you are held in your base."
 	. += "You can respawn [respawn_cooldown / 10] seconds after dying, using the Respawn button in the centre of the screen."
 	if(spawn_protection)
 		. += "After spawning you cannot be hurt inside your base, and for [spawn_protection / 10] seconds after leaving it. Firing, melee attacks or using an item end it early."
+	if(idle_limit)
+		. += "Fighters idle for [idle_limit / 600] minutes are moved to observer so the slot frees up."
 
 /datum/game_mode/extended/faction_clash/hvh/pre_setup()
 	. = ..()
@@ -134,14 +165,40 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	disabled_squads.Cut()
 
 /datum/game_mode/extended/faction_clash/hvh/proc/start_round_timer()
-	if(scoring_started)
-		return
-	scoring_started = TRUE
 	round_end_time = world.time + round_time_limit
-	addtimer(CALLBACK(src, PROC_REF(round_time_expired)), round_time_limit)
-	addtimer(CALLBACK(src, PROC_REF(start_map_vote)), max(1, round_time_limit - CLASH_MAP_VOTE_LEAD))
-	start_clash_radar()
-	log_debug("HVH: round timer armed for [round_time_limit / 600] minutes")
+	var/match = match_number
+	match_timer_id = addtimer(CALLBACK(src, PROC_REF(round_time_expired), match), round_time_limit, TIMER_STOPPABLE)
+	if(could_be_final_match())
+		vote_timer_id = addtimer(CALLBACK(src, PROC_REF(start_map_vote)), max(1, round_time_limit - CLASH_MAP_VOTE_LEAD), TIMER_STOPPABLE)
+	if(!radar_timer_id)
+		start_clash_radar()
+	log_debug("HVH: match [match_number] timer armed for [round_time_limit / 600] minutes")
+
+/// Match to show: the one being played or just finished, else the one coming up
+/datum/game_mode/extended/faction_clash/hvh/proc/get_display_match()
+	if(match_live || intermission_end_time || round_finished)
+		return max(1, match_number)
+	return min(match_number + 1, matches_per_round)
+
+/// Matches a team must win to take the round
+/datum/game_mode/extended/faction_clash/hvh/proc/wins_needed()
+	return floor(matches_per_round / 2) + 1
+
+/// Whether the match now starting can end the round, so the map vote belongs in it
+/datum/game_mode/extended/faction_clash/hvh/proc/could_be_final_match()
+	if(match_number >= matches_per_round)
+		return TRUE
+	for(var/faction in match_wins)
+		if(match_wins[faction] + 1 >= wins_needed())
+			return TRUE
+	return FALSE
+
+/// Holds everyone's weapons with the ceasefire, releasing only a hold this mode placed
+/datum/game_mode/extended/faction_clash/hvh/proc/hold_fire(hold)
+	if(holding_fire == hold)
+		return
+	holding_fire = hold
+	set_gamemode_modifier(/datum/gamemode_modifier/ceasefire, enabled = hold)
 
 /// Holds both teams in their bases with weapons down, then starts the match
 /datum/game_mode/extended/faction_clash/hvh/proc/begin_countdown()
@@ -150,21 +207,25 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		return
 	countdown_end_time = world.time + countdown_time
 	bases_sealed = TRUE
-	set_gamemode_modifier(/datum/gamemode_modifier/ceasefire, enabled = TRUE)
+	hold_fire(TRUE)
+	var/label = matches_per_round > 1 ? "Match [match_number + 1] of [matches_per_round]" : "Match"
 	for(var/faction in list(FACTION_MARINE, FACTION_UPP))
-		announce_to_faction(faction, "Match starts in [countdown_time / 10] seconds. Gear up, you are held in your base until then.")
+		announce_to_faction(faction, "[label] starts in [countdown_time / 10] seconds. Gear up, you are held in your base until then.")
 	addtimer(CALLBACK(src, PROC_REF(start_match)), countdown_time)
 	log_debug("HVH: countdown armed for [countdown_time / 10]s")
 
 /datum/game_mode/extended/faction_clash/hvh/proc/start_match()
-	if(scoring_started || round_finished)
+	if(match_live || round_finished)
 		return
-	if(bases_sealed)
-		bases_sealed = FALSE
-		set_gamemode_modifier(/datum/gamemode_modifier/ceasefire, enabled = FALSE)
+	match_number++
+	match_live = TRUE
+	countdown_end_time = null
+	intermission_end_time = null
+	bases_sealed = FALSE
+	if(holding_fire)
+		hold_fire(FALSE)
 		for(var/faction in list(FACTION_MARINE, FACTION_UPP))
 			announce_to_faction(faction, "Fight!")
-	countdown_end_time = null
 	start_round_timer()
 	update_score_huds()
 
@@ -206,6 +267,8 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	lines += "<span class='maptext center'><span style='color: #5a8fe6'>Players: [count_side(FACTION_MARINE)]</span> | <span style='color: #e61919'>Players: [count_side(FACTION_UPP)]</span></span>"
 	if(kill_limit)
 		lines += "<span class='maptext center'>First to [kill_limit]</span>"
+	if(matches_per_round > 1)
+		lines += "<span class='maptext center'>Match [get_display_match()] of [matches_per_round] | Series <span style='color: #5a8fe6'>[match_wins[FACTION_MARINE] || 0]</span>-<span style='color: #e61919'>[match_wins[FACTION_UPP] || 0]</span></span>"
 	var/clock = get_round_clock()
 	if(clock)
 		lines += ""
@@ -215,9 +278,14 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 /datum/game_mode/extended/faction_clash/hvh/proc/get_round_clock()
 	if(round_finished)
 		return null
+	if(intermission_end_time)
+		var/pause = CEILING(max(0, intermission_end_time - world.time) / 10, 1)
+		return "<span class='maptext center'>Next match in [pause]</span>"
 	if(countdown_end_time)
 		var/hold = CEILING(max(0, countdown_end_time - world.time) / 10, 1)
 		return "<span class='maptext center'>Match starts in [hold]</span>"
+	if(!match_live)
+		return null
 	if(!round_end_time)
 		return null
 	var/remaining = max(0, round_end_time - world.time)
@@ -249,8 +317,12 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 			"kills" = faction_kills[faction] || 0,
 			"players" = players,
 		))
-	var/remaining = round_end_time && !round_finished ? max(0, round_end_time - world.time) : 0
+	var/remaining = match_live ? max(0, round_end_time - world.time) : 0
 	return list(
+		"match" = get_display_match(),
+		"matches" = matches_per_round,
+		"series" = list(match_wins[FACTION_MARINE] || 0, match_wins[FACTION_UPP] || 0),
+		"intermission" = intermission_end_time ? CEILING(max(0, intermission_end_time - world.time) / 10, 1) : 0,
 		"active" = TRUE,
 		"mode" = name,
 		"teams" = teams,
@@ -345,6 +417,9 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 			display.maptext = text
 
 /datum/game_mode/extended/faction_clash/hvh/proc/score_kill(faction, mob_name, owner_ckey)
+	// Nothing scores between matches
+	if(!match_live)
+		return
 	if(faction)
 		faction_kills[faction] = (faction_kills[faction] || 0) + 1
 	if(mob_name)
@@ -356,7 +431,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		check_kill_limit(faction)
 
 /datum/game_mode/extended/faction_clash/hvh/proc/check_kill_limit(faction)
-	if(!kill_limit || !scoring_started || round_finished)
+	if(!kill_limit || !match_live || round_finished)
 		return
 	var/remaining = kill_limit - (faction_kills[faction] || 0)
 	if(remaining <= 0)
@@ -380,6 +455,8 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		announce_to_faction(enemy, "The enemy is [remaining] kills from winning.")
 
 /datum/game_mode/extended/faction_clash/hvh/proc/score_death(faction, mob_name, cause, owner_ckey)
+	if(!match_live)
+		return
 	if(faction)
 		faction_deaths[faction] = (faction_deaths[faction] || 0) + 1
 	if(mob_name)
@@ -411,7 +488,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 
 /// Notes that attacker hurt victim, for assists. Bots neither earn assists nor are scored as victims.
 /datum/game_mode/extended/faction_clash/hvh/proc/record_damage(mob/living/victim, mob/attacker)
-	if(!scoring_started || round_finished || victim.statistic_exempt || attacker.statistic_exempt || attacker.faction == victim.faction)
+	if(!match_live || round_finished || victim.statistic_exempt || attacker.statistic_exempt || attacker.faction == victim.faction)
 		return
 	var/list/attackers = recent_damage[victim.real_name]
 	if(!attackers)
@@ -485,7 +562,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 			to_chat(player, SPAN_BOLDNOTICE(message))
 
 /datum/game_mode/extended/faction_clash/hvh/proc/track_streak(killer, killer_faction, victim, victim_faction, killer_ckey)
-	if(!killer)
+	if(!killer || !match_live)
 		return
 	var/streak = (kill_streaks[killer] || 0) + 1
 	kill_streaks[killer] = streak
@@ -500,28 +577,213 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		announce_to_faction(killer_faction, "[killer] is on a [streak] kill streak.")
 		announce_to_faction(victim_faction, "[killer] is on a [streak] kill streak. Put them down.")
 
-/datum/game_mode/extended/faction_clash/hvh/proc/round_time_expired()
-	finish_match("Time")
+/datum/game_mode/extended/faction_clash/hvh/proc/round_time_expired(match)
+	if(match == match_number)
+		finish_match("Time")
 
-/// Scores the match on kills and ends it, whether time or the kill limit ran out
+/// Scores the match on kills and ends it, whether time or the kill limit ran out. Ends the round too once the series is decided.
 /datum/game_mode/extended/faction_clash/hvh/proc/finish_match(reason)
-	if(round_finished)
+	if(round_finished || !match_live)
+		return
+	match_live = FALSE
+	deltimer(match_timer_id)
+	deltimer(vote_timer_id)
+	match_timer_id = null
+	vote_timer_id = null
+	finish_reason = reason
+	var/uscm = faction_kills[FACTION_MARINE] || 0
+	var/upp = faction_kills[FACTION_UPP] || 0
+	var/winner = uscm > upp ? FACTION_MARINE : (upp > uscm ? FACTION_UPP : null)
+	if(winner)
+		match_wins[winner] = (match_wins[winner] || 0) + 1
+	var/mvp = pick_mvp(player_scores)
+	match_results += list(list("winner" = winner, "uscm" = uscm, "upp" = upp, "reason" = reason, "mvp" = mvp))
+	log_debug("HVH: match [match_number] ended, [reason], uscm=[uscm] upp=[upp] winner=[winner || "draw"]")
+	if(match_number < matches_per_round && (match_wins[FACTION_MARINE] || 0) < wins_needed() && (match_wins[FACTION_UPP] || 0) < wins_needed())
+		begin_intermission()
 		return
 	// The round ends as soon as a result is set, so an early finish opens the vote here or never gets one
 	if(!map_vote_started)
 		start_map_vote()
-	finish_reason = reason
-	var/uscm = faction_kills[FACTION_MARINE] || 0
-	var/upp = faction_kills[FACTION_UPP] || 0
-	if(uscm > upp)
-		round_finished = MODE_INFESTATION_M_MAJOR
-	else if(upp > uscm)
-		round_finished = MODE_FACTION_CLASH_UPP_MAJOR
-	else
-		round_finished = MODE_FACTION_CLASH_DRAW
-	log_debug("HVH: [reason], uscm=[uscm] upp=[upp] result=[round_finished]")
+	archive_match()
+	// The round end reports read the live tallies, so they get the whole round's
+	player_scores = round_scores
+	faction_kills = round_faction_kills
+	faction_deaths = round_faction_deaths
+	environment_kills = round_environment_kills
+	round_finished = get_round_result()
+	log_debug("HVH: round result [round_finished]")
 	roundend_ceasefire()
 
+/datum/game_mode/extended/faction_clash/hvh/proc/get_round_result()
+	var/uscm = matches_per_round > 1 ? (match_wins[FACTION_MARINE] || 0) : 0
+	var/upp = matches_per_round > 1 ? (match_wins[FACTION_UPP] || 0) : 0
+	if(uscm == upp)
+		uscm = faction_kills[FACTION_MARINE] || 0
+		upp = faction_kills[FACTION_UPP] || 0
+	if(uscm > upp)
+		return MODE_INFESTATION_M_MAJOR
+	if(upp > uscm)
+		return MODE_FACTION_CLASH_UPP_MAJOR
+	return MODE_FACTION_CLASH_DRAW
+
+/// Highest scorer in a score table, kills first, then assists, then fewest deaths
+/datum/game_mode/extended/faction_clash/hvh/proc/pick_mvp(list/scores)
+	var/best
+	var/list/best_entry
+	for(var/name in scores)
+		var/list/entry = scores[name]
+		if(!entry["ckey"] || (!entry["kills"] && !entry["assists"]))
+			continue
+		if(best_entry)
+			var/score = entry["kills"] + entry["assists"] * 0.5
+			var/best_score = best_entry["kills"] + best_entry["assists"] * 0.5
+			if(score < best_score || (score == best_score && entry["deaths"] >= best_entry["deaths"]))
+				continue
+		best = name
+		best_entry = entry
+	return best
+
+/// Folds the finished match into the round totals and clears it for the next one
+/datum/game_mode/extended/faction_clash/hvh/proc/archive_match()
+	for(var/name in player_scores)
+		var/list/entry = player_scores[name]
+		var/list/total = round_scores[name]
+		if(!total)
+			round_scores[name] = entry.Copy()
+			continue
+		for(var/stat in list("kills", "assists", "deaths", "shots", "hits"))
+			total[stat] += entry[stat]
+		total["best_streak"] = max(total["best_streak"], entry["best_streak"])
+		if(!total["ckey"])
+			total["ckey"] = entry["ckey"]
+	for(var/faction in faction_kills)
+		round_faction_kills[faction] = (round_faction_kills[faction] || 0) + faction_kills[faction]
+	for(var/faction in faction_deaths)
+		round_faction_deaths[faction] = (round_faction_deaths[faction] || 0) + faction_deaths[faction]
+	for(var/cause in environment_kills)
+		round_environment_kills[cause] = (round_environment_kills[cause] || 0) + environment_kills[cause]
+	player_scores = list()
+	faction_kills = list()
+	faction_deaths = list()
+	environment_kills = list()
+	kill_streaks = list()
+	last_killed_by = list()
+	recent_damage = list()
+	limit_callouts_made = list()
+
+/// Break between matches: weapons down, last match's scoreboard up, then a fresh start
+/datum/game_mode/extended/faction_clash/hvh/proc/begin_intermission()
+	hold_fire(TRUE)
+	intermission_end_time = world.time + CLASH_INTERMISSION
+	var/list/result = match_results[length(match_results)]
+	var/line = get_match_result_line(result)
+	for(var/faction in list(FACTION_MARINE, FACTION_UPP))
+		announce_to_faction(faction, "[result["reason"]]. [line][result["mvp"] ? " MVP: [result["mvp"]]." : ""] Next match in [CLASH_INTERMISSION / 10] seconds.")
+	for(var/mob/player as anything in GLOB.player_list)
+		GLOB.clash_scoreboard.tgui_interact(player)
+	update_score_huds()
+	addtimer(CALLBACK(src, PROC_REF(end_intermission)), CLASH_INTERMISSION)
+
+/datum/game_mode/extended/faction_clash/hvh/proc/end_intermission()
+	if(round_finished)
+		return
+	intermission_end_time = null
+	archive_match()
+	reset_arena()
+	killfeed.Cut()
+	render_killfeed()
+	begin_countdown()
+
+/// Fresh start between matches: survivors healed and sent home, corpses cleared, the dead free to respawn, bots back at their posts
+/datum/game_mode/extended/faction_clash/hvh/proc/reset_arena()
+	for(var/mob/living/carbon/human/fighter as anything in GLOB.human_mob_list.Copy())
+		if(QDELETED(fighter) || !is_ground_level(fighter.z) || !(fighter.faction in list(FACTION_MARINE, FACTION_UPP)))
+			continue
+		if(fighter.stat == DEAD)
+			// Nobody gets to be revived into the next match, so free anyone still in their body and clear it
+			if(fighter.client)
+				fighter.ghostize(FALSE)
+			qdel(fighter)
+			continue
+		if(fighter.statistic_exempt || !fighter.mind)
+			continue
+		fighter.stop_pulling()
+		fighter.buckled?.unbuckle()
+		fighter.rejuvenate()
+		var/turf/home = get_clash_home_turf(fighter)
+		if(home)
+			fighter.forceMove(home)
+		if(length(fighter.clash_spawn_points))
+			fighter.vendor_points = fighter.clash_spawn_points[1]
+			fighter.vendor_snowflake_points = fighter.clash_spawn_points[2]
+		if(spawn_protection)
+			fighter.AddComponent(/datum/component/clash_spawn_guard, spawn_protection)
+	for(var/datum/clash_bot/bot as anything in GLOB.clash_bots.Copy())
+		// Fill bots whose seat a player has since taken sit the next match out
+		if(bot.post?.team_fill && !bot.post.active)
+			bot.retire()
+		else
+			bot.return_to_post()
+	for(var/mob/player as anything in GLOB.player_list)
+		if((isobserver(player) || player.stat == DEAD) && player.timeofdeath)
+			player.timeofdeath = min(player.timeofdeath, world.time - respawn_cooldown)
+	log_debug("HVH: arena reset for match [match_number + 1]")
+
+/// Moves fighters idle past the limit to observer, so they stop holding a team slot and skewing balance and bot fill
+/datum/game_mode/extended/faction_clash/hvh/proc/check_idle()
+	if(round_finished)
+		deltimer(idle_timer_id)
+		idle_timer_id = null
+		return
+	if(!match_live)
+		return
+	for(var/mob/living/carbon/human/fighter as anything in GLOB.alive_human_list.Copy())
+		var/client/player = fighter.client
+		if(!player || !(fighter.faction in list(FACTION_MARINE, FACTION_UPP)) || CLIENT_IS_AFK_SAFE(player))
+			continue
+		if(player.inactivity >= idle_limit)
+			idle_warned -= player.ckey
+			log_access("HVH idle: [key_name(fighter)] moved to observer after [round(player.inactivity / 600, 0.1)] minutes idle")
+			to_chat(fighter, SPAN_WARNING("You were idle for [idle_limit / 600] minutes and have been moved to observer. Respawn when you are back."))
+			fighter.ghostize(FALSE)
+			qdel(fighter)
+		else if(player.inactivity >= idle_limit - 1 MINUTES)
+			if(!(player.ckey in idle_warned))
+				idle_warned += player.ckey
+				to_chat(fighter, SPAN_WARNING("You have been idle a while. In about a minute you will be moved to observer to free your slot."))
+		else
+			idle_warned -= player.ckey
+
+/datum/game_mode/extended/faction_clash/hvh/proc/get_match_result_line(list/result)
+	var/uscm = result["uscm"]
+	var/upp = result["upp"]
+	switch(result["winner"])
+		if(FACTION_MARINE)
+			return "USCM takes match [length(match_results)], [uscm] to [upp]."
+		if(FACTION_UPP)
+			return "UPP takes match [length(match_results)], [upp] to [uscm]."
+	return "Match [length(match_results)] drawn at [uscm] each."
+
+/// Result sentence for the round, by series when there is one, else by kills
+/datum/game_mode/extended/faction_clash/hvh/proc/get_round_result_line()
+	var/uscm = faction_kills[FACTION_MARINE] || 0
+	var/upp = faction_kills[FACTION_UPP] || 0
+	if(matches_per_round > 1)
+		var/uscm_wins = match_wins[FACTION_MARINE] || 0
+		var/upp_wins = match_wins[FACTION_UPP] || 0
+		switch(round_finished)
+			if(MODE_INFESTATION_M_MAJOR)
+				return "USCM wins the series [uscm_wins] to [upp_wins]."
+			if(MODE_FACTION_CLASH_UPP_MAJOR)
+				return "UPP wins the series [upp_wins] to [uscm_wins]."
+		return "Series drawn, [uscm_wins] to [upp_wins]."
+	switch(round_finished)
+		if(MODE_INFESTATION_M_MAJOR)
+			return "USCM wins [uscm] to [upp]."
+		if(MODE_FACTION_CLASH_UPP_MAJOR)
+			return "UPP wins [upp] to [uscm]."
+	return "Draw at [uscm] each."
 
 /datum/game_mode/extended/faction_clash/hvh/proc/start_map_vote()
 	if(round_finished || map_vote_started)
@@ -539,6 +801,8 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		var/datum/hive_status/hive = GLOB.hive_datum[hivenumber]
 		hive.UnregisterSignal(SSdcs, COMSIG_GLOB_POST_SETUP)
 	respawn_timer_id = addtimer(CALLBACK(src, PROC_REF(update_respawn_huds)), 1 SECONDS, TIMER_LOOP|TIMER_STOPPABLE)
+	if(idle_limit)
+		idle_timer_id = addtimer(CALLBACK(src, PROC_REF(check_idle)), 30 SECONDS, TIMER_LOOP|TIMER_STOPPABLE)
 	begin_countdown()
 	for(var/obj/structure/machinery/cm_vending/vendor in GLOB.machines)
 		vendor.vend_delay = 0
@@ -626,33 +890,15 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 
 /// Faction announcements when the scoring stops and the ceasefire begins
 /datum/game_mode/extended/faction_clash/hvh/proc/announce_ceasefire()
-	var/uscm = faction_kills[FACTION_MARINE] || 0
-	var/upp = faction_kills[FACTION_UPP] || 0
-	var/result
-	switch(round_finished)
-		if(MODE_INFESTATION_M_MAJOR)
-			result = "USCM wins [uscm] to [upp]."
-		if(MODE_FACTION_CLASH_UPP_MAJOR)
-			result = "UPP wins [upp] to [uscm]."
-		else
-			result = "Draw at [uscm] each."
+	var/result = get_round_result_line()
 	marine_announcement("[finish_reason]. [result]\n\nCeasefire is in effect. Final scores in two minutes.", "ARES 3.2", 'sound/AI/commandreport.ogg', FACTION_MARINE)
 	marine_announcement("[finish_reason]. [result]\n\nCeasefire is in effect. Final scores in two minutes.", "1VAN/3", 'sound/AI/commandreport.ogg', FACTION_UPP)
 
 /// Faction announcements delivered with the final result
 /datum/game_mode/extended/faction_clash/hvh/proc/announce_final_result()
-	var/uscm = faction_kills[FACTION_MARINE] || 0
-	var/upp = faction_kills[FACTION_UPP] || 0
-	switch(round_finished)
-		if(MODE_INFESTATION_M_MAJOR)
-			marine_announcement("Match over. USCM victory, [uscm] to [upp].", "ARES 3.2", 'sound/AI/commandreport.ogg', FACTION_MARINE)
-			marine_announcement("Match over. USCM victory, [uscm] to [upp].", "1VAN/3", 'sound/AI/commandreport.ogg', FACTION_UPP)
-		if(MODE_FACTION_CLASH_UPP_MAJOR)
-			marine_announcement("Match over. UPP victory, [upp] to [uscm].", "ARES 3.2", 'sound/AI/commandreport.ogg', FACTION_MARINE)
-			marine_announcement("Match over. UPP victory, [upp] to [uscm].", "1VAN/3", 'sound/AI/commandreport.ogg', FACTION_UPP)
-		else
-			marine_announcement("Match over. Draw, [uscm] each.", "ARES 3.2", 'sound/AI/commandreport.ogg', FACTION_MARINE)
-			marine_announcement("Match over. Draw, [uscm] each.", "1VAN/3", 'sound/AI/commandreport.ogg', FACTION_UPP)
+	var/result = get_round_result_line()
+	marine_announcement("Round over. [result]", "ARES 3.2", 'sound/AI/commandreport.ogg', FACTION_MARINE)
+	marine_announcement("Round over. [result]", "1VAN/3", 'sound/AI/commandreport.ogg', FACTION_UPP)
 
 /datum/game_mode/extended/faction_clash/hvh/proc/announce_scoreboard()
 	var/uscm = faction_kills[FACTION_MARINE] || 0
@@ -660,12 +906,27 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	var/list/output = list("<br><h2>Final Score</h2>")
 	output += "USCM [uscm] kills, [faction_deaths[FACTION_MARINE] || 0] losses<br>"
 	output += "UPP [upp] kills, [faction_deaths[FACTION_UPP] || 0] losses<br>"
+	if(matches_per_round > 1)
+		output += "<br><b>Matches</b><br>"
+		for(var/i in 1 to length(match_results))
+			var/list/result = match_results[i]
+			output += "[i]. [get_match_result_line(result)] ([result["reason"]])[result["mvp"] ? " MVP [result["mvp"]]" : ""]<br>"
+
+	var/mvp = pick_mvp(player_scores)
+	if(mvp)
+		var/list/mvp_entry = player_scores[mvp]
+		output += "<br><b>MVP: [mvp]</b> ([mvp_entry["faction"]]) - [mvp_entry["kills"]] kills, [mvp_entry["assists"]] assists, [mvp_entry["deaths"]] deaths<br>"
+	var/list/awards = get_awards()
+	if(length(awards))
+		output += "<br><b>Awards</b><br>"
+		for(var/award in awards)
+			output += "[award]<br>"
 
 	var/list/ranked = list()
 	for(var/name in player_scores)
 		var/list/entry = player_scores[name]
 		if(entry["kills"] > 0 || entry["deaths"] > 0)
-			ranked += list(list("name" = name, "kills" = entry["kills"], "deaths" = entry["deaths"], "faction" = entry["faction"]))
+			ranked += list(list("name" = name, "kills" = entry["kills"], "assists" = entry["assists"], "deaths" = entry["deaths"], "faction" = entry["faction"]))
 	for(var/i = 1 to length(ranked))
 		for(var/j = i + 1 to length(ranked))
 			var/list/x = ranked[i]
@@ -678,7 +939,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		output += "<br><b>Top performers</b><br>"
 		for(var/i = 1 to min(10, length(ranked)))
 			var/list/entry = ranked[i]
-			output += "[i]. [entry["name"]] ([entry["faction"]]) - [entry["kills"]] kills, [entry["deaths"]] deaths<br>"
+			output += "[i]. [entry["name"]] ([entry["faction"]]) - [entry["kills"]] kills, [entry["assists"]] assists, [entry["deaths"]] deaths<br>"
 
 	var/top_env
 	var/top_env_count = 0
@@ -693,6 +954,46 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		output += "Total revives: [GLOB.round_statistics.total_revives]<br>"
 		output += "Friendly fire incidents: [GLOB.round_statistics.total_friendly_fire_instances]<br>"
 	to_world(output.Join())
+
+/// Round awards as display lines, each for the best player at one thing, with a floor so small samples do not win
+/datum/game_mode/extended/faction_clash/hvh/proc/get_awards()
+	. = list()
+	var/best_kd_name
+	var/best_kd = 0
+	var/best_streak_name
+	var/best_streak = 1
+	var/best_accuracy_name
+	var/best_accuracy = 0
+	var/best_assists_name
+	var/best_assists = 0
+	for(var/name in player_scores)
+		var/list/entry = player_scores[name]
+		if(!entry["ckey"])
+			continue
+		if(entry["kills"] >= 5)
+			var/kd = entry["kills"] / max(1, entry["deaths"])
+			if(kd > best_kd)
+				best_kd = kd
+				best_kd_name = name
+		if(entry["best_streak"] > best_streak)
+			best_streak = entry["best_streak"]
+			best_streak_name = name
+		if(entry["shots"] >= 30)
+			var/accuracy = entry["hits"] / entry["shots"]
+			if(accuracy > best_accuracy)
+				best_accuracy = accuracy
+				best_accuracy_name = name
+		if(entry["assists"] > best_assists)
+			best_assists = entry["assists"]
+			best_assists_name = name
+	if(best_kd_name)
+		. += "Deadliest: [best_kd_name], [round(best_kd, 0.01)] K/D"
+	if(best_streak_name)
+		. += "Unstoppable: [best_streak_name], [best_streak] kill streak"
+	if(best_accuracy_name)
+		. += "Sharpshooter: [best_accuracy_name], [round(best_accuracy * 100, 0.1)]% of shots on target"
+	if(best_assists_name)
+		. += "Team player: [best_assists_name], [best_assists] assists"
 
 /datum/game_mode/extended/faction_clash/hvh/proc/announce_personal_stats()
 	for(var/mob/player as anything in GLOB.player_list)
@@ -760,6 +1061,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		"weapons" = weapons,
 		"players" = players,
 	)
+	payload["matches"] = match_results
 	var/path = "data/hvh_stats/round_[GLOB.round_id || world.time].json"
 	WRITE_FILE(file(path), json_encode(payload))
 	log_debug("HVH: stats exported to [path], [length(players)] players, [length(weapons)] weapons")
