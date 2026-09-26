@@ -501,6 +501,8 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	. = list()
 	var/list/attackers = recent_damage[victim_name]
 	recent_damage -= victim_name
+	if(!match_live)
+		return
 	for(var/name in attackers)
 		var/list/hit = attackers[name]
 		if(name == killer_name || world.time - hit["time"] > CLASH_ASSIST_WINDOW)

@@ -7,7 +7,8 @@
  * Firing a gun, a melee attack or using a held item (priming a grenade) ends it at once.
  */
 /datum/component/clash_spawn_guard
-	dupe_mode = COMPONENT_DUPE_HIGHLANDER
+	// A second grant restarts this guard. Replacing it would let the old one's cleanup strip the new one's protection.
+	dupe_mode = COMPONENT_DUPE_UNIQUE_PASSARGS
 	/// How long protection lasts after leaving base
 	var/grace
 	var/grace_timer
@@ -20,19 +21,37 @@
 
 /datum/component/clash_spawn_guard/RegisterWithParent()
 	var/mob/living/guarded = parent
-	guarded.grant_spawn_protection(CLASH_SPAWN_GUARD_CAP)
+	// The same flags grant_spawn_protection() sets: bullets pass through RECENTSPAWN, damage procs no-op on GODMODE.
+	// Set here rather than through it, since its own end timer cannot be cancelled and would cut a restarted guard short.
+	guarded.status_flags |= RECENTSPAWN|GODMODE
 	guarded.add_filter("clash_spawn_guard", 2, outline_filter(1, "#ffffffb0"))
 	RegisterSignal(guarded, list(COMSIG_MOB_FIRED_GUN, COMSIG_MOB_ITEM_ATTACK_SELF, COMSIG_MOB_MELEE_ATTACK, COMSIG_MOB_DEATH), PROC_REF(on_break))
 	RegisterSignal(guarded, COMSIG_MOVABLE_MOVED, PROC_REF(on_moved))
+	RegisterSignal(guarded, list(COMSIG_LIVING_FLAMER_CROSSED, COMSIG_LIVING_FLAMER_FLAMED), PROC_REF(on_flamed))
+	restart()
+
+/datum/component/clash_spawn_guard/UnregisterFromParent()
+	var/mob/living/guarded = parent
+	UnregisterSignal(guarded, list(COMSIG_MOB_FIRED_GUN, COMSIG_MOB_ITEM_ATTACK_SELF, COMSIG_MOB_MELEE_ATTACK, COMSIG_MOB_DEATH, COMSIG_MOVABLE_MOVED, COMSIG_LIVING_FLAMER_CROSSED, COMSIG_LIVING_FLAMER_FLAMED))
+	guarded.status_flags &= ~(RECENTSPAWN|GODMODE)
+	guarded.remove_filter("clash_spawn_guard")
+
+/datum/component/clash_spawn_guard/InheritComponent(datum/component/new_guard, i_am_original, grace)
+	src.grace = grace
+	restart()
+
+/// Starts the protection window over, as for a fresh spawn
+/datum/component/clash_spawn_guard/proc/restart()
+	deltimer(grace_timer)
+	grace_timer = null
+	deltimer(cap_timer)
 	cap_timer = addtimer(CALLBACK(src, PROC_REF(expire)), CLASH_SPAWN_GUARD_CAP, TIMER_STOPPABLE)
 	if(!in_own_base())
 		start_grace()
 
-/datum/component/clash_spawn_guard/UnregisterFromParent()
-	var/mob/living/guarded = parent
-	UnregisterSignal(guarded, list(COMSIG_MOB_FIRED_GUN, COMSIG_MOB_ITEM_ATTACK_SELF, COMSIG_MOB_MELEE_ATTACK, COMSIG_MOB_DEATH, COMSIG_MOVABLE_MOVED))
-	guarded.end_spawn_protection()
-	guarded.remove_filter("clash_spawn_guard")
+/datum/component/clash_spawn_guard/proc/on_flamed(datum/source)
+	SIGNAL_HANDLER
+	return COMPONENT_NO_IGNITE
 
 /datum/component/clash_spawn_guard/Destroy(force)
 	deltimer(grace_timer)
