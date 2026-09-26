@@ -112,6 +112,7 @@ GLOBAL_VAR(clash_bot_litter_timer)
 	if(clash_fed_spawns())
 		npc.nutrition = NUTRITION_NORMAL
 	npc.AddElement(/datum/element/clash_hit_flinch)
+	npc.AddElement(/datum/element/clash_combat_log)
 	npc.setDir(dir)
 	npc.real_name = "[npc.real_name] \[BOT\]"
 	npc.name = npc.real_name

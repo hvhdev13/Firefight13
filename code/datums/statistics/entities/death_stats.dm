@@ -142,13 +142,17 @@
 	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
 	if(istype(clash_mode))
 		clash_mode.score_death(new_death.faction_name, new_death.mob_name, new_death.cause_name, mind?.ckey || ckey)
-		if(cause_mob && ismob(cause_mob) && cause_mob != src && new_death.cause_faction_name)
-			var/mob/killer = cause_mob
+		var/mob/killer = ismob(cause_mob) && cause_mob != src ? cause_mob : null
+		var/list/assisters = statistic_exempt ? list() : clash_mode.credit_assists(new_death.mob_name, killer?.real_name)
+		for(var/mob/assister in GLOB.player_list)
+			if(assister.real_name in assisters)
+				to_chat(assister, SPAN_NOTICE("Assist on [new_death.mob_name]."))
+		if(killer && new_death.cause_faction_name)
 			var/killer_ckey = killer.mind?.ckey || killer.ckey
 			if(!killer.statistic_exempt)
 				clash_mode.score_kill(new_death.cause_faction_name, killer.real_name, killer_ckey)
 				clash_mode.track_streak(killer.real_name, new_death.cause_faction_name, new_death.mob_name, new_death.faction_name, killer_ckey)
-			clash_mode.add_killfeed(killer.real_name, new_death.cause_faction_name, new_death.mob_name, new_death.faction_name, new_death.cause_name)
+			clash_mode.add_killfeed(killer.real_name, new_death.cause_faction_name, new_death.mob_name, new_death.faction_name, new_death.cause_name, length(assisters))
 			clash_mode.report_kill(src, killer, new_death.cause_name)
 		else
 			clash_mode.report_environment_death(src, new_death.cause_name)

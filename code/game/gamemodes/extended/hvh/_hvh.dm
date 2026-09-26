@@ -8,6 +8,10 @@
 #define CLASH_TEAM_GAP 5
 #define CLASH_USCM_SQUADS list(SQUAD_MARINE_1, SQUAD_MARINE_2)
 #define CLASH_MAP_VOTE_LEAD (5 MINUTES)
+/// How recently someone must have hurt a victim to earn an assist on its death
+#define CLASH_ASSIST_WINDOW (10 SECONDS)
+/// Played to a killer when their kill lands
+#define CLASH_KILL_SOUND 'sound/weapons/gun_xm88_directhit_high.ogg'
 /// Kill counts that trigger a streak announcement
 GLOBAL_LIST_INIT(clash_streak_steps, list(3, 5, 7, 10, 15, 20))
 /// Kills remaining that trigger a kill limit callout
@@ -69,6 +73,8 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	var/map_vote_started = FALSE
 	/// Why the match ended, shown in the ceasefire announcement
 	var/finish_reason = "Time"
+	/// Victim name to attacker name to list(time, faction, ckey), for assists
+	var/list/recent_damage = list()
 	map_vote_mode = GAMEMODE_FACTION_CLASH_UPP_CM
 
 /// Respawn wait for the current round, the default outside a clash mode
@@ -87,7 +93,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		. += "The match starts [countdown_time / 10] seconds after the round begins. Until then you are held in your base."
 	. += "You can respawn [respawn_cooldown / 10] seconds after dying, using the Respawn button in the centre of the screen."
 	if(spawn_protection)
-		. += "After spawning you cannot be hurt inside your base, and for [spawn_protection / 10] seconds after leaving it. Firing or using an item ends it early."
+		. += "After spawning you cannot be hurt inside your base, and for [spawn_protection / 10] seconds after leaving it. Firing, melee attacks or using an item end it early."
 
 /datum/game_mode/extended/faction_clash/hvh/pre_setup()
 	. = ..()
@@ -187,7 +193,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 /datum/game_mode/extended/faction_clash/hvh/proc/get_score_entry(mob_name, faction, owner_ckey)
 	var/list/entry = player_scores[mob_name]
 	if(!entry)
-		entry = list("kills" = 0, "deaths" = 0, "shots" = 0, "hits" = 0, "best_streak" = 0, "faction" = faction, "ckey" = owner_ckey)
+		entry = list("kills" = 0, "assists" = 0, "deaths" = 0, "shots" = 0, "hits" = 0, "best_streak" = 0, "faction" = faction, "ckey" = owner_ckey)
 		player_scores[mob_name] = entry
 	if(owner_ckey && !entry["ckey"])
 		entry["ckey"] = owner_ckey
@@ -220,8 +226,53 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	seconds = seconds % 60
 	return "<span class='maptext center'>[minutes]:[seconds < 10 ? "0[seconds]" : "[seconds]"] left</span>"
 
+/// Everything the live scoreboard shows, from viewer's point of view
+/datum/game_mode/extended/faction_clash/hvh/proc/get_scoreboard_data(mob/viewer)
+	var/list/teams = list()
+	for(var/faction in list(FACTION_MARINE, FACTION_UPP))
+		var/list/players = list()
+		var/list/listed = list()
+		for(var/name in player_scores)
+			var/list/entry = player_scores[name]
+			if(entry["faction"] != faction || !entry["ckey"])
+				continue
+			players += list(scoreboard_row(name, entry, viewer))
+			listed[name] = TRUE
+		// Everyone on the team shows up, scored or not
+		for(var/mob/living/carbon/human/player as anything in GLOB.alive_human_list)
+			if(!player.client || player.faction != faction || listed[player.real_name])
+				continue
+			players += list(scoreboard_row(player.real_name, null, viewer))
+		teams += list(list(
+			"name" = faction == FACTION_MARINE ? "USCM" : "UPP",
+			"color" = faction_color(faction),
+			"kills" = faction_kills[faction] || 0,
+			"players" = players,
+		))
+	var/remaining = round_end_time && !round_finished ? max(0, round_end_time - world.time) : 0
+	return list(
+		"active" = TRUE,
+		"mode" = name,
+		"teams" = teams,
+		"kill_limit" = kill_limit,
+		"seconds_left" = CEILING(remaining / 10, 1),
+		"countdown" = countdown_end_time ? CEILING(max(0, countdown_end_time - world.time) / 10, 1) : 0,
+		"finished" = !!round_finished,
+	)
+
+/datum/game_mode/extended/faction_clash/hvh/proc/scoreboard_row(name, list/entry, mob/viewer)
+	return list(
+		"name" = name,
+		"kills" = entry?["kills"] || 0,
+		"assists" = entry?["assists"] || 0,
+		"deaths" = entry?["deaths"] || 0,
+		"best_streak" = entry?["best_streak"] || 0,
+		"streak" = kill_streaks[name] || 0,
+		"is_viewer" = name == viewer.real_name,
+	)
+
 /datum/game_mode/extended/faction_clash/hvh/proc/get_killfeed_line(list/entry)
-	return "<span class='maptext' style='text-align: right; font-size: 6px'><span style='color: [entry["killer_color"]]'>[entry["killer"]]</span> killed <span style='color: [entry["victim_color"]]'>[entry["victim"]]</span>[entry["cause"] ? " ([entry["cause"]])" : ""]</span>"
+	return "<span class='maptext' style='text-align: right; font-size: 6px'><span style='color: [entry["killer_color"]]'>[entry["killer"]][entry["assists"] ? " +[entry["assists"]]" : ""]</span> killed <span style='color: [entry["victim_color"]]'>[entry["victim"]]</span>[entry["cause"] ? " ([entry["cause"]])" : ""]</span>"
 
 /datum/game_mode/extended/faction_clash/hvh/proc/render_killfeed_for(mob/player)
 	var/list/lines = player.hud_used?.faction_killfeed
@@ -355,15 +406,41 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		health_left = max(0, round(living_killer.health / living_killer.maxHealth * 100))
 	to_chat(victim, SPAN_WARNING("Killed by [killer.real_name][cause ? " ([cause])" : ""] at [get_dist(victim, killer)] tiles. They had [health_left]% health left."))
 	to_chat(killer, SPAN_NOTICE("You killed [victim.real_name]."))
+	if(killer.client)
+		playsound_client(killer.client, CLASH_KILL_SOUND, null, 50)
+
+/// Notes that attacker hurt victim, for assists. Bots neither earn assists nor are scored as victims.
+/datum/game_mode/extended/faction_clash/hvh/proc/record_damage(mob/living/victim, mob/attacker)
+	if(!scoring_started || round_finished || victim.statistic_exempt || attacker.statistic_exempt || attacker.faction == victim.faction)
+		return
+	var/list/attackers = recent_damage[victim.real_name]
+	if(!attackers)
+		attackers = list()
+		recent_damage[victim.real_name] = attackers
+	attackers[attacker.real_name] = list("time" = world.time, "faction" = attacker.faction, "ckey" = attacker.mind?.ckey || attacker.ckey)
+
+/// Credits an assist to everyone but the killer who recently hurt the victim, returns their names
+/datum/game_mode/extended/faction_clash/hvh/proc/credit_assists(victim_name, killer_name)
+	. = list()
+	var/list/attackers = recent_damage[victim_name]
+	recent_damage -= victim_name
+	for(var/name in attackers)
+		var/list/hit = attackers[name]
+		if(name == killer_name || world.time - hit["time"] > CLASH_ASSIST_WINDOW)
+			continue
+		var/list/entry = get_score_entry(name, hit["faction"], hit["ckey"])
+		entry["assists"] += 1
+		. += name
 
 /datum/game_mode/extended/faction_clash/hvh/proc/report_environment_death(mob/victim, cause)
 	if(!cause)
 		return
 	to_chat(victim, SPAN_WARNING("Killed by [cause]."))
 
-/datum/game_mode/extended/faction_clash/hvh/proc/add_killfeed(killer, killer_faction, victim, victim_faction, cause)
+/datum/game_mode/extended/faction_clash/hvh/proc/add_killfeed(killer, killer_faction, victim, victim_faction, cause, assists = 0)
 	killfeed += list(list(
 		"killer" = killer,
+		"assists" = assists,
 		"victim" = victim,
 		"cause" = cause,
 		"killer_color" = faction_color(killer_faction),

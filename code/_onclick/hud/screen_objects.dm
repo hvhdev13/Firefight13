@@ -19,9 +19,11 @@
 
 //Faction Clash score display
 /atom/movable/screen/faction_score
+	name = "Scoreboard"
 	icon = null
 	icon_state = null
-	mouse_opacity = MOUSE_OPACITY_TRANSPARENT
+	// Clickable, opens the live scoreboard
+	mouse_opacity = MOUSE_OPACITY_OPAQUE
 	screen_loc = "LEFT,TOP"
 	maptext_height = 80
 	maptext_width = 480

@@ -4,7 +4,7 @@
 /**
  * Spawn protection for HvH respawns.
  * Invulnerable while inside their own base, and for a short grace after first stepping out of it.
- * Firing a gun or using a held item (priming a grenade) ends it at once.
+ * Firing a gun, a melee attack or using a held item (priming a grenade) ends it at once.
  */
 /datum/component/clash_spawn_guard
 	dupe_mode = COMPONENT_DUPE_HIGHLANDER
@@ -22,7 +22,7 @@
 	var/mob/living/guarded = parent
 	guarded.grant_spawn_protection(CLASH_SPAWN_GUARD_CAP)
 	guarded.add_filter("clash_spawn_guard", 2, outline_filter(1, "#ffffffb0"))
-	RegisterSignal(guarded, list(COMSIG_MOB_FIRED_GUN, COMSIG_MOB_ITEM_ATTACK_SELF, COMSIG_MOB_DEATH), PROC_REF(on_break))
+	RegisterSignal(guarded, list(COMSIG_MOB_FIRED_GUN, COMSIG_MOB_ITEM_ATTACK_SELF, COMSIG_MOB_MELEE_ATTACK, COMSIG_MOB_DEATH), PROC_REF(on_break))
 	RegisterSignal(guarded, COMSIG_MOVABLE_MOVED, PROC_REF(on_moved))
 	cap_timer = addtimer(CALLBACK(src, PROC_REF(expire)), CLASH_SPAWN_GUARD_CAP, TIMER_STOPPABLE)
 	if(!in_own_base())
@@ -30,7 +30,7 @@
 
 /datum/component/clash_spawn_guard/UnregisterFromParent()
 	var/mob/living/guarded = parent
-	UnregisterSignal(guarded, list(COMSIG_MOB_FIRED_GUN, COMSIG_MOB_ITEM_ATTACK_SELF, COMSIG_MOB_DEATH, COMSIG_MOVABLE_MOVED))
+	UnregisterSignal(guarded, list(COMSIG_MOB_FIRED_GUN, COMSIG_MOB_ITEM_ATTACK_SELF, COMSIG_MOB_MELEE_ATTACK, COMSIG_MOB_DEATH, COMSIG_MOVABLE_MOVED))
 	guarded.end_spawn_protection()
 	guarded.remove_filter("clash_spawn_guard")
 

@@ -58,6 +58,7 @@
 
 	if(SEND_SIGNAL(src, COMSIG_ITEM_ATTACK, user, M) & COMPONENT_CANCEL_ATTACK) //Sent by source item.
 		return FALSE
+	SEND_SIGNAL(user, COMSIG_MOB_MELEE_ATTACK, M, src)
 
 	if(ishuman(user))
 		var/mob/living/carbon/human/H = user
