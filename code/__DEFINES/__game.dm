@@ -56,6 +56,7 @@
 #define GAMEMODE_HIVE_WARS "Hive Wars"
 #define GAMEMODE_FACTION_CLASH "Faction Clash"
 #define GAMEMODE_FACTION_CLASH_UPP_CM "Faction Clash UPP CM"
+#define GAMEMODE_TDM "Team Deathmatch"
 #define GAMEMODE_HUNTER_GAMES "Hunter Games"
 #define GAMEMODE_INFECTION "Infection"
 #define GAMEMODE_EXTENDED "Extended"

@@ -136,8 +136,9 @@
 	var/mob/dead/observer/abandoning_ghost
 	if(MODE_HAS_FLAG(MODE_FACTION_CLASH) && !is_admin)
 		var/deathtime = world.time - src.timeofdeath
-		if(deathtime < RESPAWN_COOLDOWN)
-			to_chat(usr, SPAN_WARNING("You must wait at least [DisplayTimeText(RESPAWN_COOLDOWN)] before respawning."))
+		var/cooldown = clash_respawn_cooldown()
+		if(deathtime < cooldown)
+			to_chat(usr, SPAN_WARNING("You must wait at least [DisplayTimeText(cooldown)] before respawning."))
 			log_debug("HVH: respawn blocked for [key_name(usr)], dead [deathtime / 10]s")
 			return
 		var/mob/dead/observer/ghost = src

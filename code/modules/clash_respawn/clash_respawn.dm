@@ -68,7 +68,7 @@ GLOBAL_LIST_EMPTY(clash_respawn_button_icons)
 		return
 	alpha = 255
 	mouse_opacity = MOUSE_OPACITY_OPAQUE
-	var/remaining = viewer.timeofdeath + RESPAWN_COOLDOWN - world.time
+	var/remaining = viewer.timeofdeath + clash_respawn_cooldown() - world.time
 	if(remaining > 0)
 		var/seconds = CEILING(remaining / 10, 1)
 		if(state != RESPAWN_STATE_COOLDOWN || seconds != shown_seconds)

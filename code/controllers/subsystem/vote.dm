@@ -287,11 +287,12 @@ SUBSYSTEM_DEF(vote)
 				vote_sound_vol = 15
 				randomize_entries = TRUE
 				var/list/maps = list()
+				var/vote_mode = SSticker.mode?.map_vote_mode || GLOB.master_mode
 				for(var/i in config.maplist[GROUND_MAP])
 					var/datum/map_config/VM = config.maplist[GROUND_MAP][i]
 					if(!VM.voteweight)
 						continue
-					if(!(GLOB.master_mode in VM.gamemodes))
+					if(!(vote_mode in VM.gamemodes))
 						continue
 					if(text2num(SSperf_logging?.round?.id) % VM.vote_cycle != 0)
 						continue

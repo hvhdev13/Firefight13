@@ -23,6 +23,10 @@
         }
     ],
     "gamemodes": [
-        "Faction Clash UPP CM"
-    ]
+        "Faction Clash UPP CM",
+        "Team Deathmatch"
+    ],
+    "force_mode": "Team Deathmatch",
+    "tdm_round_minutes": 30,
+    "tdm_respawn_seconds": 30
 }

@@ -1,9 +1,10 @@
-GLOBAL_LIST_INIT(clash_fed_spawn_maps, list(MAP_TDM_JUNGLE))
 GLOBAL_LIST_EMPTY(clash_welcomed)
 GLOBAL_VAR_INIT(clash_feedback_contact, "")
 
+/// Whether fresh spawns and bots start with a full stomach this round
 /proc/clash_fed_spawns()
-	return (SSmapping.configs[GROUND_MAP]?.map_name in GLOB.clash_fed_spawn_maps)
+	var/datum/game_mode/extended/faction_clash/cm_vs_upp/clash_mode = SSticker.mode
+	return istype(clash_mode) && clash_mode.fed_spawns
 
 /proc/clash_welcome_path(ckey)
 	return "data/player_saves/[copytext(ckey, 1, 2)]/[ckey]/clash_welcome.sav"
@@ -39,12 +40,13 @@ SUBSYSTEM_DEF(clash_spawn)
 	page += "<p>The server is currently being playtested and updated continuously.</p>"
 	page += "<p><b>Recommended maps:</b></p>"
 	page += "<ul><li>TDM_Jungle</li><li>TDM_Deathmatch2000</li></ul>"
-	page += "<p>Eventually players will be able to select either Faction Clash (FC_) or Team Deathmatch (TDM_) maps.</p>"
-	page += "<ul><li>FC maps will have the traditional CM-SS13 UPP vs USCM gamemode.</li><li>TDM maps will have the small arena TDM maps.</li></ul>"
+	page += "<p>The map vote decides the mode. Faction Clash (FC_) maps run the traditional CM-SS13 UPP vs USCM gamemode, Team Deathmatch (TDM_) maps run the small arena mode.</p>"
 	page += "<p><b>How it works:</b></p>"
 	page += "<ul>"
-	page += "<li>Rounds last 30 minutes. The team with the most kills wins. The map vote opens with 5 minutes left.</li>"
-	page += "<li>You can respawn 40 seconds after dying, using the Respawn button in the centre of the screen.</li>"
+	var/datum/game_mode/extended/faction_clash/cm_vs_upp/clash_mode = SSticker.mode
+	if(istype(clash_mode))
+		for(var/line in clash_mode.get_welcome_rules())
+			page += "<li>[line]</li>"
 	page += "<li>You can save your loadouts. At a vendor, use Save current in the Saved Loadouts section. Each role has 3 slots.</li>"
 	page += "<li>The enemy base is locked. Enemies cannot walk or throw grenades into it.</li>"
 	page += "<li>Players named \[BOT\] are bots. Kills on bots and by bots never count toward the score.</li>"

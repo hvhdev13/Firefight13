@@ -69,6 +69,11 @@
 
 	var/force_mode
 
+	/// Team Deathmatch: round length in minutes, null uses the mode default
+	var/tdm_round_minutes
+	/// Team Deathmatch: seconds between dying and being allowed to respawn, null uses the mode default
+	var/tdm_respawn_seconds
+
 	var/perf_mode
 
 	var/disable_ship_map = FALSE
@@ -411,6 +416,20 @@
 
 	if(json["force_mode"])
 		force_mode = json["force_mode"]
+
+	temp = json["tdm_round_minutes"]
+	if(isnum(temp) && temp > 0)
+		tdm_round_minutes = temp
+	else if(!isnull(temp))
+		log_world("map_config tdm_round_minutes is not a positive number!")
+		return
+
+	temp = json["tdm_respawn_seconds"]
+	if(isnum(temp) && temp >= 0)
+		tdm_respawn_seconds = temp
+	else if(!isnull(temp))
+		log_world("map_config tdm_respawn_seconds is not a number!")
+		return
 
 	if(json["disable_ship_map"])
 		disable_ship_map = json["disable_ship_map"]

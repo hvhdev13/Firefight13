@@ -48,6 +48,25 @@ GLOBAL_LIST_INIT(clash_streak_steps, list(3, 5, 7, 10, 15, 20))
 	var/round_end_time
 	var/list/disabled_squads = list()
 	var/list/clamped_jobs = list()
+	/// How long the dead wait before they may respawn
+	var/respawn_cooldown = RESPAWN_COOLDOWN
+	/// Whether fresh spawns and bots start with a full stomach
+	var/fed_spawns = FALSE
+	/// Whether the first dropship landing opens a five minute ceasefire
+	var/landing_ceasefire = TRUE
+	map_vote_mode = GAMEMODE_FACTION_CLASH_UPP_CM
+
+/// Respawn wait for the current round, the default outside a clash mode
+/proc/clash_respawn_cooldown()
+	var/datum/game_mode/extended/faction_clash/cm_vs_upp/clash_mode = SSticker.mode
+	return istype(clash_mode) ? clash_mode.respawn_cooldown : RESPAWN_COOLDOWN
+
+/// Rule lines for the welcome page, in the order they are shown
+/datum/game_mode/extended/faction_clash/cm_vs_upp/proc/get_welcome_rules()
+	return list(
+		"Rounds last [round_time_limit / 600] minutes. The team with the most kills wins. The map vote opens with [CLASH_MAP_VOTE_LEAD / 600] minutes left.",
+		"You can respawn [respawn_cooldown / 10] seconds after dying, using the Respawn button in the centre of the screen.",
+	)
 
 /datum/game_mode/extended/faction_clash/cm_vs_upp/pre_setup()
 	. = ..()
@@ -188,7 +207,7 @@ GLOBAL_LIST_INIT(clash_streak_steps, list(3, 5, 7, 10, 15, 20))
 		return null
 	if(!player.timeofdeath)
 		return null
-	var/remaining = player.timeofdeath + RESPAWN_COOLDOWN - world.time
+	var/remaining = player.timeofdeath + respawn_cooldown - world.time
 	if(remaining <= 0)
 		return "<span class='maptext center'>Respawn available</span>"
 	var/seconds = CEILING(remaining / 10, 1)
@@ -385,6 +404,10 @@ GLOBAL_LIST_INIT(clash_streak_steps, list(3, 5, 7, 10, 15, 20))
 
 /datum/game_mode/extended/faction_clash/cm_vs_upp/proc/roundend_ceasefire()
 	set_gamemode_modifier(/datum/gamemode_modifier/ceasefire, enabled = TRUE)
+	announce_ceasefire()
+
+/// Faction announcements when the scoring stops and the ceasefire begins
+/datum/game_mode/extended/faction_clash/cm_vs_upp/proc/announce_ceasefire()
 	switch(round_finished)
 		if(MODE_FACTION_CLASH_UPP_MAJOR)
 			marine_announcement("ALERT: USCM ground force overrun scenario in progress. Automated command directive issued, all USCM personnel are ordered to evacuate combat zone.\n\nOpposing Force have issued a ceasefire, risk of capture of USCM personnel by opposing force is high, avoid contact and evade capture.\n\nFinal report being prepared in two minutes.", "ARES 3.2", 'sound/AI/commandreport.ogg', FACTION_MARINE)
@@ -398,7 +421,7 @@ GLOBAL_LIST_INIT(clash_streak_steps, list(3, 5, 7, 10, 15, 20))
 		if(MODE_INFESTATION_M_MINOR)
 			marine_announcement("ALERT: Opposing force are conducting emergency evacuation of the operations zone. Confidence is high that opposing forces are retreating from the planet.\n\nCeasefire is in effect to minimise non-combatant casualties, ground forces are directed to intercept and detain retreating opposing forces.\n\nFinal report being prepared in two minutes.", "ARES 3.2", 'sound/AI/commandreport.ogg', FACTION_MARINE)
 			marine_announcement("ALERT: Unsustainable combat losses noted. Automated strategic reposition order is now in effect. All Union combat personnel are to return to dropships and re-deploy to the SSV Rostock.\n\nEnemy force have instituted a ceasefire, exploit this to assist in evading capture.\n\nFinal report being prepared in two minutes.", "1VAN/3", 'sound/AI/commandreport.ogg', FACTION_UPP)
-		if(MODE_BATTLEFIELD_DRAW_STALEMATE)
+		if(MODE_FACTION_CLASH_DRAW, MODE_BATTLEFIELD_DRAW_STALEMATE)
 			marine_announcement("ALERT: A ceasefire is now in effect. Further details pending. All combat operations are to cease. Further information pending in two minutes.", "ARES 3.2", 'sound/AI/commandreport.ogg', FACTION_MARINE)
 			marine_announcement("ALERT: A ceasefire is now in effect. Further details pending. All combat operations are to cease. Additional facts pending in two minutes.", "1VAN/3", 'sound/AI/commandreport.ogg', FACTION_UPP)
 
@@ -407,32 +430,23 @@ GLOBAL_LIST_INIT(clash_streak_steps, list(3, 5, 7, 10, 15, 20))
 	restore_uscm_squads()
 	restore_upp_job_slots()
 	announce_ending()
+	announce_final_result()
 	var/musical_track
 	var/end_icon = "draw"
 	switch(round_finished)
 		if(MODE_FACTION_CLASH_UPP_MAJOR)
-			marine_announcement("ALERT: All ground forces killed in action or non-responsive. Landing zone overrun. Impossible to sustain combat operations.\n\nMission Abort Authorized! Commencing automatic vessel deorbit procedure from operations zone.\n\nSaving operational report to archive, commencing final systems scan.", "ARES 3.2", 'sound/AI/commandreport.ogg', FACTION_MARINE)
-			marine_announcement("ALERT: Enemy landing zone status. Under Union Military Control. Enemy ground forces. Deceased and/or in Union Military custody.\n\nMission Accomplished! Dispatching subspace signal to Sector Command.\n\nConcluding operational report for dispatch, commencing final data entry and systems scan.", "1VAN/3", 'sound/AI/commandreport.ogg', FACTION_UPP)
 			musical_track = pick('sound/theme/lastmanstanding_upp.ogg')
 			end_icon = "upp_major"
 		if(MODE_FACTION_CLASH_UPP_MINOR)
-			marine_announcement("ALERT: All ground forces killed in action or non-responsive. Landing zone overrun. Impossible to sustain combat operations.\n\nMission Abort Authorized! Commencing automatic vessel deorbit procedure from operations zone.\n\nSaving operational report to archive, commencing final systems scan.", "ARES 3.2", 'sound/AI/commandreport.ogg', FACTION_MARINE)
-			marine_announcement("ALERT: Enemy landing zone status. Under Union Military Control. Enemy ground forces. Deceased and/or in Union Military custody.\n\nMission Accomplished! Dispatching subspace signal to Sector Command.\n\nConcluding operational report for dispatch, commencing final data entry and systems scan.", "1VAN/3", 'sound/AI/commandreport.ogg', FACTION_UPP)
 			musical_track = pick('sound/theme/lastmanstanding_upp.ogg')
 			end_icon = "upp_minor"
 		if(MODE_INFESTATION_M_MAJOR)
-			marine_announcement("ALERT: Opposing Force landing zone under USCM force control. Orbital scans concludes all opposing force combat personnel are combat inoperative.\n\nMission Accomplished!\n\nSaving operational report to archive, commencing final systems.", "ARES 3.2", 'sound/AI/commandreport.ogg', FACTION_MARINE)
-			marine_announcement("ALERT: Union landing zone compromised. Union ground forces are non-responsive. Further combat operations impossible.\n\nMission Abort Authorized\n\nConcluding operational report for dispatch, commencing final data entry and systems scan.", "1VAN/3", 'sound/AI/commandreport.ogg', FACTION_UPP)
 			musical_track = pick('sound/theme/winning_triumph1.ogg','sound/theme/winning_triumph2.ogg','sound/theme/winning_triumph3.ogg')
 			end_icon = "marine_major"
 		if(MODE_INFESTATION_M_MINOR)
-			marine_announcement("ALERT: Opposing Force landing zone under USCM force control. Orbital scans concludes all opposing force combat personnel are combat inoperative.\n\nMission Accomplished!\n\nSaving operational report to archive, commencing final systems scan.", "ARES 3.2", 'sound/AI/commandreport.ogg', FACTION_MARINE)
-			marine_announcement("ALERT: Union landing zone compromised. Union ground forces are non-responsive. Further combat operations impossible.\n\nMission Abort Authorized\n\nConcluding operational report for dispatch, commencing final data entry and systems scan.", "1VAN/3", 'sound/AI/commandreport.ogg', FACTION_UPP)
 			musical_track = pick('sound/theme/neutral_hopeful1.ogg','sound/theme/neutral_hopeful2.ogg')
 			end_icon = "marine_minor"
 		if(MODE_BATTLEFIELD_DRAW_STALEMATE)
-			marine_announcement("ALERT: Inconclusive combat outcome. Unable to assess tactical or strategic situation.\n\nDispatching automated request to High Command for further directives.\n\nSaving operational report to archive, commencing final systems scan.", "ARES 3.2", 'sound/AI/commandreport.ogg', FACTION_MARINE)
-			marine_announcement("ALERT: Battle situation has developed not necessarily to the Unions advantage\n\nDispatching request for new directives to Sector Command.\n\nConcluding operational report for dispatch, commencing final data entry and systems scan.", "1VAN/3", 'sound/AI/commandreport.ogg', FACTION_UPP)
 			end_icon = "draw"
 			musical_track = 'sound/theme/neutral_hopeful2.ogg'
 		else
@@ -455,10 +469,31 @@ GLOBAL_LIST_INIT(clash_streak_steps, list(3, 5, 7, 10, 15, 20))
 
 	return TRUE
 
+/// Faction announcements delivered with the final result
+/datum/game_mode/extended/faction_clash/cm_vs_upp/proc/announce_final_result()
+	switch(round_finished)
+		if(MODE_FACTION_CLASH_UPP_MAJOR)
+			marine_announcement("ALERT: All ground forces killed in action or non-responsive. Landing zone overrun. Impossible to sustain combat operations.\n\nMission Abort Authorized! Commencing automatic vessel deorbit procedure from operations zone.\n\nSaving operational report to archive, commencing final systems scan.", "ARES 3.2", 'sound/AI/commandreport.ogg', FACTION_MARINE)
+			marine_announcement("ALERT: Enemy landing zone status. Under Union Military Control. Enemy ground forces. Deceased and/or in Union Military custody.\n\nMission Accomplished! Dispatching subspace signal to Sector Command.\n\nConcluding operational report for dispatch, commencing final data entry and systems scan.", "1VAN/3", 'sound/AI/commandreport.ogg', FACTION_UPP)
+		if(MODE_FACTION_CLASH_UPP_MINOR)
+			marine_announcement("ALERT: All ground forces killed in action or non-responsive. Landing zone overrun. Impossible to sustain combat operations.\n\nMission Abort Authorized! Commencing automatic vessel deorbit procedure from operations zone.\n\nSaving operational report to archive, commencing final systems scan.", "ARES 3.2", 'sound/AI/commandreport.ogg', FACTION_MARINE)
+			marine_announcement("ALERT: Enemy landing zone status. Under Union Military Control. Enemy ground forces. Deceased and/or in Union Military custody.\n\nMission Accomplished! Dispatching subspace signal to Sector Command.\n\nConcluding operational report for dispatch, commencing final data entry and systems scan.", "1VAN/3", 'sound/AI/commandreport.ogg', FACTION_UPP)
+		if(MODE_INFESTATION_M_MAJOR)
+			marine_announcement("ALERT: Opposing Force landing zone under USCM force control. Orbital scans concludes all opposing force combat personnel are combat inoperative.\n\nMission Accomplished!\n\nSaving operational report to archive, commencing final systems.", "ARES 3.2", 'sound/AI/commandreport.ogg', FACTION_MARINE)
+			marine_announcement("ALERT: Union landing zone compromised. Union ground forces are non-responsive. Further combat operations impossible.\n\nMission Abort Authorized\n\nConcluding operational report for dispatch, commencing final data entry and systems scan.", "1VAN/3", 'sound/AI/commandreport.ogg', FACTION_UPP)
+		if(MODE_INFESTATION_M_MINOR)
+			marine_announcement("ALERT: Opposing Force landing zone under USCM force control. Orbital scans concludes all opposing force combat personnel are combat inoperative.\n\nMission Accomplished!\n\nSaving operational report to archive, commencing final systems scan.", "ARES 3.2", 'sound/AI/commandreport.ogg', FACTION_MARINE)
+			marine_announcement("ALERT: Union landing zone compromised. Union ground forces are non-responsive. Further combat operations impossible.\n\nMission Abort Authorized\n\nConcluding operational report for dispatch, commencing final data entry and systems scan.", "1VAN/3", 'sound/AI/commandreport.ogg', FACTION_UPP)
+		if(MODE_FACTION_CLASH_DRAW, MODE_BATTLEFIELD_DRAW_STALEMATE)
+			marine_announcement("ALERT: Inconclusive combat outcome. Unable to assess tactical or strategic situation.\n\nDispatching automated request to High Command for further directives.\n\nSaving operational report to archive, commencing final systems scan.", "ARES 3.2", 'sound/AI/commandreport.ogg', FACTION_MARINE)
+			marine_announcement("ALERT: Battle situation has developed not necessarily to the Unions advantage\n\nDispatching request for new directives to Sector Command.\n\nConcluding operational report for dispatch, commencing final data entry and systems scan.", "1VAN/3", 'sound/AI/commandreport.ogg', FACTION_UPP)
+
 /datum/game_mode/extended/faction_clash/cm_vs_upp/ds_first_landed(obj/docking_port/stationary/marine_dropship)
 	if(round_started > 0) //we enter here on shipspawn but do not want this
 		return
 	.=..()
+	if(!landing_ceasefire)
+		return
 	marine_announcement("First troops have landed on the colony! Five minute long ceasefire is in effect to allow evacuation of civilians.", "ARES 3.2", 'sound/AI/commandreport.ogg', FACTION_MARINE)
 	marine_announcement("First troops have landed on the colony! Five minute long ceasefire is in effect to allow evacuation of civilians.", "1VAN/3", 'sound/AI/commandreport.ogg', FACTION_UPP)
 	set_gamemode_modifier(/datum/gamemode_modifier/ceasefire, enabled = TRUE)
