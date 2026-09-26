@@ -73,6 +73,12 @@
 	var/tdm_round_minutes
 	/// Team Deathmatch: seconds between dying and being allowed to respawn, null uses the mode default
 	var/tdm_respawn_seconds
+	/// Team Deathmatch: kills that win the match early, 0 turns the limit off, null uses the mode default
+	var/tdm_kill_limit
+	/// Team Deathmatch: seconds both teams are held in base before the match starts, null uses the mode default
+	var/tdm_countdown_seconds
+	/// Team Deathmatch: seconds of protection after a fresh spawn leaves base, null uses the mode default
+	var/tdm_spawn_protection_seconds
 
 	var/perf_mode
 
@@ -429,6 +435,27 @@
 		tdm_respawn_seconds = temp
 	else if(!isnull(temp))
 		log_world("map_config tdm_respawn_seconds is not a number!")
+		return
+
+	temp = json["tdm_kill_limit"]
+	if(isnum(temp) && temp >= 0)
+		tdm_kill_limit = temp
+	else if(!isnull(temp))
+		log_world("map_config tdm_kill_limit is not a number!")
+		return
+
+	temp = json["tdm_countdown_seconds"]
+	if(isnum(temp) && temp >= 0)
+		tdm_countdown_seconds = temp
+	else if(!isnull(temp))
+		log_world("map_config tdm_countdown_seconds is not a number!")
+		return
+
+	temp = json["tdm_spawn_protection_seconds"]
+	if(isnum(temp) && temp >= 0)
+		tdm_spawn_protection_seconds = temp
+	else if(!isnull(temp))
+		log_world("map_config tdm_spawn_protection_seconds is not a number!")
 		return
 
 	if(json["disable_ship_map"])

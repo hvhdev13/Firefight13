@@ -10,6 +10,8 @@
 #define CLASH_MAP_VOTE_LEAD (5 MINUTES)
 /// Kill counts that trigger a streak announcement
 GLOBAL_LIST_INIT(clash_streak_steps, list(3, 5, 7, 10, 15, 20))
+/// Kills remaining that trigger a kill limit callout
+GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 
 /// Shared engine for the human vs human modes: two teams, respawns, kill scoring. Never picked directly, the presets beside this file set the rules.
 /datum/game_mode/extended/faction_clash/hvh
@@ -53,6 +55,20 @@ GLOBAL_LIST_INIT(clash_streak_steps, list(3, 5, 7, 10, 15, 20))
 	var/respawn_cooldown = RESPAWN_COOLDOWN
 	/// Whether fresh spawns and bots start with a full stomach
 	var/fed_spawns = FALSE
+	/// Kills that end the match early, 0 leaves only the timer
+	var/kill_limit = 0
+	/// Faction to kill limit callouts already made, so each fires once
+	var/list/limit_callouts_made = list()
+	/// Pre-match hold with bases sealed and weapons down, 0 starts the match at once
+	var/countdown_time = 0
+	var/countdown_end_time
+	/// Whether players are held inside their own base
+	var/bases_sealed = FALSE
+	/// Invulnerability window after a fresh spawn leaves their base, 0 disables it
+	var/spawn_protection = 0
+	var/map_vote_started = FALSE
+	/// Why the match ended, shown in the ceasefire announcement
+	var/finish_reason = "Time"
 	map_vote_mode = GAMEMODE_FACTION_CLASH_UPP_CM
 
 /// Respawn wait for the current round, the default outside a clash mode
@@ -62,10 +78,16 @@ GLOBAL_LIST_INIT(clash_streak_steps, list(3, 5, 7, 10, 15, 20))
 
 /// Rule lines for the welcome page, in the order they are shown
 /datum/game_mode/extended/faction_clash/hvh/proc/get_welcome_rules()
-	return list(
-		"Rounds last [round_time_limit / 600] minutes. The team with the most kills wins. The map vote opens with [CLASH_MAP_VOTE_LEAD / 600] minutes left.",
-		"You can respawn [respawn_cooldown / 10] seconds after dying, using the Respawn button in the centre of the screen.",
-	)
+	. = list()
+	if(kill_limit)
+		. += "Rounds last [round_time_limit / 600] minutes. The first team to [kill_limit] kills wins, otherwise the most kills when time runs out. The map vote opens with [CLASH_MAP_VOTE_LEAD / 600] minutes left, or as soon as a team wins."
+	else
+		. += "Rounds last [round_time_limit / 600] minutes. The team with the most kills wins. The map vote opens with [CLASH_MAP_VOTE_LEAD / 600] minutes left."
+	if(countdown_time)
+		. += "The match starts [countdown_time / 10] seconds after the round begins. Until then you are held in your base."
+	. += "You can respawn [respawn_cooldown / 10] seconds after dying, using the Respawn button in the centre of the screen."
+	if(spawn_protection)
+		. += "After spawning you cannot be hurt inside your base, and for [spawn_protection / 10] seconds after leaving it. Firing or using an item ends it early."
 
 /datum/game_mode/extended/faction_clash/hvh/pre_setup()
 	. = ..()
@@ -112,9 +134,33 @@ GLOBAL_LIST_INIT(clash_streak_steps, list(3, 5, 7, 10, 15, 20))
 	round_end_time = world.time + round_time_limit
 	addtimer(CALLBACK(src, PROC_REF(round_time_expired)), round_time_limit)
 	addtimer(CALLBACK(src, PROC_REF(start_map_vote)), max(1, round_time_limit - CLASH_MAP_VOTE_LEAD))
-	respawn_timer_id = addtimer(CALLBACK(src, PROC_REF(update_respawn_huds)), 1 SECONDS, TIMER_LOOP|TIMER_STOPPABLE)
 	start_clash_radar()
 	log_debug("HVH: round timer armed for [round_time_limit / 600] minutes")
+
+/// Holds both teams in their bases with weapons down, then starts the match
+/datum/game_mode/extended/faction_clash/hvh/proc/begin_countdown()
+	if(!countdown_time)
+		start_match()
+		return
+	countdown_end_time = world.time + countdown_time
+	bases_sealed = TRUE
+	set_gamemode_modifier(/datum/gamemode_modifier/ceasefire, enabled = TRUE)
+	for(var/faction in list(FACTION_MARINE, FACTION_UPP))
+		announce_to_faction(faction, "Match starts in [countdown_time / 10] seconds. Gear up, you are held in your base until then.")
+	addtimer(CALLBACK(src, PROC_REF(start_match)), countdown_time)
+	log_debug("HVH: countdown armed for [countdown_time / 10]s")
+
+/datum/game_mode/extended/faction_clash/hvh/proc/start_match()
+	if(scoring_started || round_finished)
+		return
+	if(bases_sealed)
+		bases_sealed = FALSE
+		set_gamemode_modifier(/datum/gamemode_modifier/ceasefire, enabled = FALSE)
+		for(var/faction in list(FACTION_MARINE, FACTION_UPP))
+			announce_to_faction(faction, "Fight!")
+	countdown_end_time = null
+	start_round_timer()
+	update_score_huds()
 
 /datum/game_mode/extended/faction_clash/hvh/proc/count_side(faction)
 	var/count = 0
@@ -152,6 +198,8 @@ GLOBAL_LIST_INIT(clash_streak_steps, list(3, 5, 7, 10, 15, 20))
 	var/upp = faction_kills[FACTION_UPP] || 0
 	var/list/lines = list("<span class='maptext center' style='font-size: 10px'><span style='color: #5a8fe6'>USCM [uscm]</span> | <span style='color: #e61919'>[upp] UPP</span></span>")
 	lines += "<span class='maptext center'><span style='color: #5a8fe6'>Players: [count_side(FACTION_MARINE)]</span> | <span style='color: #e61919'>Players: [count_side(FACTION_UPP)]</span></span>"
+	if(kill_limit)
+		lines += "<span class='maptext center'>First to [kill_limit]</span>"
 	var/clock = get_round_clock()
 	if(clock)
 		lines += ""
@@ -159,7 +207,12 @@ GLOBAL_LIST_INIT(clash_streak_steps, list(3, 5, 7, 10, 15, 20))
 	return lines.Join("<br>")
 
 /datum/game_mode/extended/faction_clash/hvh/proc/get_round_clock()
-	if(!round_end_time || round_finished)
+	if(round_finished)
+		return null
+	if(countdown_end_time)
+		var/hold = CEILING(max(0, countdown_end_time - world.time) / 10, 1)
+		return "<span class='maptext center'>Match starts in [hold]</span>"
+	if(!round_end_time)
 		return null
 	var/remaining = max(0, round_end_time - world.time)
 	var/seconds = CEILING(remaining / 10, 1)
@@ -248,6 +301,32 @@ GLOBAL_LIST_INIT(clash_streak_steps, list(3, 5, 7, 10, 15, 20))
 		entry["kills"] += 1
 	update_score_huds()
 	log_debug("HVH: kill faction=[faction || "none"] killer=[mob_name || "none"]")
+	if(faction)
+		check_kill_limit(faction)
+
+/datum/game_mode/extended/faction_clash/hvh/proc/check_kill_limit(faction)
+	if(!kill_limit || !scoring_started || round_finished)
+		return
+	var/remaining = kill_limit - (faction_kills[faction] || 0)
+	if(remaining <= 0)
+		finish_match("Kill limit reached")
+		return
+	if(!(remaining in GLOB.clash_limit_callouts))
+		return
+	var/list/made = limit_callouts_made[faction]
+	if(!made)
+		made = list()
+		limit_callouts_made[faction] = made
+	if(remaining in made)
+		return
+	made += remaining
+	var/enemy = faction == FACTION_MARINE ? FACTION_UPP : FACTION_MARINE
+	if(remaining == 1)
+		announce_to_faction(faction, "Next kill wins the match.")
+		announce_to_faction(enemy, "The enemy is one kill from winning.")
+	else
+		announce_to_faction(faction, "[remaining] kills to win.")
+		announce_to_faction(enemy, "The enemy is [remaining] kills from winning.")
 
 /datum/game_mode/extended/faction_clash/hvh/proc/score_death(faction, mob_name, cause, owner_ckey)
 	if(faction)
@@ -345,8 +424,16 @@ GLOBAL_LIST_INIT(clash_streak_steps, list(3, 5, 7, 10, 15, 20))
 		announce_to_faction(victim_faction, "[killer] is on a [streak] kill streak. Put them down.")
 
 /datum/game_mode/extended/faction_clash/hvh/proc/round_time_expired()
+	finish_match("Time")
+
+/// Scores the match on kills and ends it, whether time or the kill limit ran out
+/datum/game_mode/extended/faction_clash/hvh/proc/finish_match(reason)
 	if(round_finished)
 		return
+	// The round ends as soon as a result is set, so an early finish opens the vote here or never gets one
+	if(!map_vote_started)
+		start_map_vote()
+	finish_reason = reason
 	var/uscm = faction_kills[FACTION_MARINE] || 0
 	var/upp = faction_kills[FACTION_UPP] || 0
 	if(uscm > upp)
@@ -355,13 +442,14 @@ GLOBAL_LIST_INIT(clash_streak_steps, list(3, 5, 7, 10, 15, 20))
 		round_finished = MODE_FACTION_CLASH_UPP_MAJOR
 	else
 		round_finished = MODE_FACTION_CLASH_DRAW
-	log_debug("HVH: time limit reached, uscm=[uscm] upp=[upp] result=[round_finished]")
+	log_debug("HVH: [reason], uscm=[uscm] upp=[upp] result=[round_finished]")
 	roundend_ceasefire()
 
 
 /datum/game_mode/extended/faction_clash/hvh/proc/start_map_vote()
-	if(round_finished)
+	if(round_finished || map_vote_started)
 		return
+	map_vote_started = TRUE
 	log_debug("HVH: map vote opening, [CLASH_MAP_VOTE_LEAD / 600] minutes left")
 	SSvote.initiate_vote("groundmap", "SERVER", null, TRUE)
 
@@ -373,7 +461,8 @@ GLOBAL_LIST_INIT(clash_streak_steps, list(3, 5, 7, 10, 15, 20))
 	for(var/hivenumber in GLOB.hive_datum)
 		var/datum/hive_status/hive = GLOB.hive_datum[hivenumber]
 		hive.UnregisterSignal(SSdcs, COMSIG_GLOB_POST_SETUP)
-	start_round_timer()
+	respawn_timer_id = addtimer(CALLBACK(src, PROC_REF(update_respawn_huds)), 1 SECONDS, TIMER_LOOP|TIMER_STOPPABLE)
+	begin_countdown()
 	for(var/obj/structure/machinery/cm_vending/vendor in GLOB.machines)
 		vendor.vend_delay = 0
 	SSweather.force_weather_holder(/datum/weather_ss_map_holder/faction_clash)
@@ -470,8 +559,8 @@ GLOBAL_LIST_INIT(clash_streak_steps, list(3, 5, 7, 10, 15, 20))
 			result = "UPP wins [upp] to [uscm]."
 		else
 			result = "Draw at [uscm] each."
-	marine_announcement("Time. [result]\n\nCeasefire is in effect. Final scores in two minutes.", "ARES 3.2", 'sound/AI/commandreport.ogg', FACTION_MARINE)
-	marine_announcement("Time. [result]\n\nCeasefire is in effect. Final scores in two minutes.", "1VAN/3", 'sound/AI/commandreport.ogg', FACTION_UPP)
+	marine_announcement("[finish_reason]. [result]\n\nCeasefire is in effect. Final scores in two minutes.", "ARES 3.2", 'sound/AI/commandreport.ogg', FACTION_MARINE)
+	marine_announcement("[finish_reason]. [result]\n\nCeasefire is in effect. Final scores in two minutes.", "1VAN/3", 'sound/AI/commandreport.ogg', FACTION_UPP)
 
 /// Faction announcements delivered with the final result
 /datum/game_mode/extended/faction_clash/hvh/proc/announce_final_result()

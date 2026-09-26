@@ -1,5 +1,7 @@
 /// Saved Faction Clash loadouts, ckey to list of slot name to /datum/clash_loadout
 GLOBAL_LIST_EMPTY(clash_loadouts)
+/// Loadouts equipped on spawn, ckey to list of job to slot name
+GLOBAL_LIST_EMPTY(clash_auto_loadouts)
 /// How many slots a player may keep per job
 #define CLASH_LOADOUT_SLOTS 3
 
@@ -19,8 +21,31 @@ GLOBAL_LIST_EMPTY(clash_loadouts)
 		return null
 	if(!GLOB.clash_loadouts[key])
 		GLOB.clash_loadouts[key] = list()
+		GLOB.clash_auto_loadouts[key] = list()
 		load_clash_loadouts(key)
 	return GLOB.clash_loadouts[key]
+
+/// Name of the slot this key equips on spawn as job, if any
+/proc/get_clash_auto_slot(key, job)
+	if(!get_clash_loadouts(key))
+		return null
+	var/list/auto = GLOB.clash_auto_loadouts[key]
+	return auto[job]
+
+/// Buys and equips a fresh spawn's chosen loadout for their role
+/proc/clash_equip_spawn_loadout(mob/living/carbon/human/spawned)
+	if(QDELETED(spawned) || spawned.stat == DEAD || !SSticker.mode || !MODE_HAS_FLAG(MODE_FACTION_CLASH))
+		return
+	var/key = clash_loadout_key(spawned)
+	var/slot_name = get_clash_auto_slot(key, spawned.job)
+	if(!slot_name)
+		return
+	var/list/slots = get_clash_loadouts_for_job(key, spawned.job)
+	var/datum/clash_loadout/loadout = slots[slot_name]
+	if(!loadout)
+		return
+	to_chat(spawned, SPAN_NOTICE("Equipping your saved loadout [slot_name]."))
+	loadout.restore(spawned)
 
 /proc/get_clash_loadouts_for_job(key, job)
 	var/list/all_slots = get_clash_loadouts(key)
@@ -231,9 +256,10 @@ GLOBAL_LIST_EMPTY(clash_loadouts)
 	var/mob/living/carbon/human/human_user = user
 	data["clash_enabled"] = TRUE
 	var/list/slots = get_clash_loadouts_for_job(clash_loadout_key(human_user), human_user.job)
+	var/auto_slot = get_clash_auto_slot(clash_loadout_key(human_user), human_user.job)
 	for(var/slot_name in slots)
 		var/datum/clash_loadout/loadout = slots[slot_name]
-		data["clash_loadouts"] += list(list("name" = slot_name, "count" = length(loadout.items), "role" = loadout.job, "faction" = (loadout.job in UPP_JOB_LIST) ? "UPP" : "USCM"))
+		data["clash_loadouts"] += list(list("name" = slot_name, "count" = length(loadout.items), "role" = loadout.job, "faction" = (loadout.job in UPP_JOB_LIST) ? "UPP" : "USCM", "auto" = auto_slot == slot_name))
 
 /obj/structure/machinery/cm_vending/proc/clash_save_loadout(mob/living/carbon/human/user, overwrite_slot)
 	var/key = clash_loadout_key(user)
@@ -271,9 +297,26 @@ GLOBAL_LIST_EMPTY(clash_loadouts)
 	if(!loadout || loadout.job != user.job)
 		return
 	all_slots -= slot_name
+	var/list/auto = GLOB.clash_auto_loadouts[clash_loadout_key(user)]
+	if(auto?[user.job] == slot_name)
+		auto -= user.job
 	qdel(loadout)
 	save_clash_loadouts(clash_loadout_key(user))
 	to_chat(user, SPAN_NOTICE("Loadout [slot_name] deleted."))
+
+/obj/structure/machinery/cm_vending/proc/clash_toggle_auto_loadout(mob/living/carbon/human/user, slot_name)
+	var/key = clash_loadout_key(user)
+	var/list/slots = get_clash_loadouts_for_job(key, user.job)
+	if(!slots[slot_name])
+		return
+	var/list/auto = GLOB.clash_auto_loadouts[key]
+	if(auto[user.job] == slot_name)
+		auto -= user.job
+		to_chat(user, SPAN_NOTICE("[slot_name] will no longer be equipped when you spawn."))
+	else
+		auto[user.job] = slot_name
+		to_chat(user, SPAN_NOTICE("[slot_name] will be equipped whenever you spawn as [user.job]."))
+	save_clash_loadouts(key)
 
 /proc/clash_loadout_path(key)
 	return "data/player_saves/[copytext(key, 1, 2)]/[key]/clash_loadouts.sav"
@@ -289,6 +332,7 @@ GLOBAL_LIST_EMPTY(clash_loadouts)
 	var/savefile/save = new(clash_loadout_path(key))
 	save.cd = "/"
 	save["loadouts"] << payload
+	save["auto"] << GLOB.clash_auto_loadouts[key]
 
 /proc/load_clash_loadouts(key)
 	if(!key || IsGuestKey(key))
@@ -298,6 +342,10 @@ GLOBAL_LIST_EMPTY(clash_loadouts)
 		return
 	var/savefile/save = new(path)
 	save.cd = "/"
+	var/list/stored_auto
+	save["auto"] >> stored_auto
+	if(islist(stored_auto))
+		GLOB.clash_auto_loadouts[key] = stored_auto
 	var/list/payload
 	save["loadouts"] >> payload
 	if(!islist(payload))

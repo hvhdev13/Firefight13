@@ -27,6 +27,11 @@ SUBSYSTEM_DEF(clash_spawn)
 	UnregisterSignal(spawned, COMSIG_POST_SPAWN_UPDATE)
 	if(clash_fed_spawns())
 		spawned.nutrition = NUTRITION_NORMAL
+	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
+	if(istype(clash_mode) && clash_mode.spawn_protection)
+		spawned.AddComponent(/datum/component/clash_spawn_guard, clash_mode.spawn_protection)
+	// Let the spawn finish settling in before buying gear onto it
+	addtimer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(clash_equip_spawn_loadout), spawned), 1 SECONDS)
 	var/ckey = spawned.ckey
 	if(!ckey || (ckey in GLOB.clash_welcomed))
 		return
