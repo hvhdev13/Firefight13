@@ -17,7 +17,14 @@ interface Team {
   name: string;
   color: string;
   kills: number;
+  score?: number;
   players: Row[];
+}
+
+interface Objective {
+  label: string;
+  state: string;
+  color: string;
 }
 
 interface ScoreboardData {
@@ -25,6 +32,9 @@ interface ScoreboardData {
   mode?: string;
   teams?: Team[];
   kill_limit?: number;
+  score_label?: string;
+  limit_text?: string;
+  objectives?: Objective[];
   seconds_left?: number;
   countdown?: number;
   intermission?: number;
@@ -47,7 +57,7 @@ const TeamTable = (props: { readonly team: Team }) => {
     <Section
       title={
         <Box as="span" color={team.color}>
-          {team.name} &middot; {team.kills}
+          {team.name} &middot; {team.score ?? team.kills}
         </Box>
       }
     >
@@ -94,7 +104,8 @@ export const ClashScoreboard = () => {
   const { data } = useBackend<ScoreboardData>();
   const {
     teams = [],
-    kill_limit,
+    limit_text,
+    objectives = [],
     seconds_left = 0,
     countdown = 0,
     intermission = 0,
@@ -126,9 +137,23 @@ export const ClashScoreboard = () => {
               {matches > 1
                 ? ` · Match ${match} of ${matches} · Series ${series[0]}-${series[1]}`
                 : ''}
-              {kill_limit ? ` · First to ${kill_limit}` : ''}
+              {limit_text ? ` · ${limit_text}` : ''}
               {status ? ` · ${status}` : ''}
             </Box>
+            {objectives.length > 0 && (
+              <Box mb={1}>
+                {objectives.map((objective) => (
+                  <Box
+                    as="span"
+                    key={objective.label}
+                    mr={2}
+                    color={objective.color}
+                  >
+                    {objective.label}: {objective.state}
+                  </Box>
+                ))}
+              </Box>
+            )}
             <Stack>
               {teams.map((team) => (
                 <Stack.Item grow basis={0} key={team.name}>

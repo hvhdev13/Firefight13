@@ -102,3 +102,18 @@ endmap
 
 map tdm_jungle
 endmap
+
+map tdm_kutjevo_supermini_koth
+endmap
+
+map tdm_deathmatch2000_koth
+endmap
+
+map tdm_deathmatch2000_domination
+endmap
+
+map tdm_jungle_koth
+endmap
+
+map tdm_jungle_domination
+endmap

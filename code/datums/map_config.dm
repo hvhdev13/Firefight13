@@ -77,6 +77,8 @@
 	var/tdm_respawn_seconds
 	/// Team Deathmatch: kills that win the match early, 0 turns the limit off, null uses the mode default
 	var/tdm_kill_limit
+	/// Objective arena modes: points that win the match early, null uses the mode default
+	var/tdm_point_limit
 	/// Team Deathmatch: seconds both teams are held in base before the match starts, null uses the mode default
 	var/tdm_countdown_seconds
 	/// Team Deathmatch: seconds of protection after a fresh spawn leaves base, null uses the mode default
@@ -451,6 +453,13 @@
 		tdm_kill_limit = temp
 	else if(!isnull(temp))
 		log_world("map_config tdm_kill_limit is not a number!")
+		return
+
+	temp = json["tdm_point_limit"]
+	if(isnum(temp) && temp > 0)
+		tdm_point_limit = temp
+	else if(!isnull(temp))
+		log_world("map_config tdm_point_limit is not a positive number!")
 		return
 
 	temp = json["tdm_countdown_seconds"]

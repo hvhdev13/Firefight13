@@ -97,6 +97,8 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	var/map_vote_started = FALSE
 	/// Why the match ended, shown in the ceasefire announcement
 	var/finish_reason = "Time"
+	/// What the match score counts, for the scoreboard
+	var/score_label = "kills"
 	/// Victim name to attacker name to list(time, faction, ckey), for assists
 	var/list/recent_damage = list()
 	map_vote_mode = GAMEMODE_FACTION_CLASH_UPP_CM
@@ -227,7 +229,36 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		for(var/faction in list(FACTION_MARINE, FACTION_UPP))
 			announce_to_faction(faction, "Fight!")
 	start_round_timer()
+	on_match_start()
 	update_score_huds()
+
+/// What a match is won on for faction, kills unless a mode scores something else
+/datum/game_mode/extended/faction_clash/hvh/proc/get_match_score(faction)
+	return faction_kills[faction] || 0
+
+/// What decides a round tied on matches, read after the round totals are swapped in
+/datum/game_mode/extended/faction_clash/hvh/proc/get_round_tiebreak(faction)
+	return faction_kills[faction] || 0
+
+/// Short line naming what ends a match early, or null
+/datum/game_mode/extended/faction_clash/hvh/proc/get_limit_text()
+	return kill_limit ? "First to [kill_limit]" : null
+
+/// Extra HUD lines for modes with objectives
+/datum/game_mode/extended/faction_clash/hvh/proc/get_objective_maptext()
+	return list()
+
+/// Objective states for the scoreboard, empty without objectives
+/datum/game_mode/extended/faction_clash/hvh/proc/get_objective_data()
+	return list()
+
+/// Called once a match is live
+/datum/game_mode/extended/faction_clash/hvh/proc/on_match_start()
+	return
+
+/// Called as a match stops, before it is scored
+/datum/game_mode/extended/faction_clash/hvh/proc/on_match_end()
+	return
 
 /datum/game_mode/extended/faction_clash/hvh/proc/count_side(faction)
 	var/count = 0
@@ -261,12 +292,14 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	return entry
 
 /datum/game_mode/extended/faction_clash/hvh/proc/get_score_maptext()
-	var/uscm = faction_kills[FACTION_MARINE] || 0
-	var/upp = faction_kills[FACTION_UPP] || 0
+	var/uscm = get_match_score(FACTION_MARINE)
+	var/upp = get_match_score(FACTION_UPP)
 	var/list/lines = list("<span class='maptext center' style='font-size: 10px'><span style='color: #5a8fe6'>USCM [uscm]</span> | <span style='color: #e61919'>[upp] UPP</span></span>")
 	lines += "<span class='maptext center'><span style='color: #5a8fe6'>Players: [count_side(FACTION_MARINE)]</span> | <span style='color: #e61919'>Players: [count_side(FACTION_UPP)]</span></span>"
-	if(kill_limit)
-		lines += "<span class='maptext center'>First to [kill_limit]</span>"
+	var/limit_text = get_limit_text()
+	if(limit_text)
+		lines += "<span class='maptext center'>[limit_text]</span>"
+	lines += get_objective_maptext()
 	if(matches_per_round > 1)
 		lines += "<span class='maptext center'>Match [get_display_match()] of [matches_per_round] | Series <span style='color: #5a8fe6'>[match_wins[FACTION_MARINE] || 0]</span>-<span style='color: #e61919'>[match_wins[FACTION_UPP] || 0]</span></span>"
 	var/clock = get_round_clock()
@@ -315,6 +348,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 			"name" = faction == FACTION_MARINE ? "USCM" : "UPP",
 			"color" = faction_color(faction),
 			"kills" = faction_kills[faction] || 0,
+			"score" = get_match_score(faction),
 			"players" = players,
 		))
 	var/remaining = match_live ? max(0, round_end_time - world.time) : 0
@@ -327,6 +361,9 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		"mode" = name,
 		"teams" = teams,
 		"kill_limit" = kill_limit,
+		"score_label" = score_label,
+		"limit_text" = get_limit_text(),
+		"objectives" = get_objective_data(),
 		"seconds_left" = CEILING(remaining / 10, 1),
 		"countdown" = countdown_end_time ? CEILING(max(0, countdown_end_time - world.time) / 10, 1) : 0,
 		"finished" = !!round_finished,
@@ -593,8 +630,9 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	match_timer_id = null
 	vote_timer_id = null
 	finish_reason = reason
-	var/uscm = faction_kills[FACTION_MARINE] || 0
-	var/upp = faction_kills[FACTION_UPP] || 0
+	on_match_end()
+	var/uscm = get_match_score(FACTION_MARINE)
+	var/upp = get_match_score(FACTION_UPP)
 	var/winner = uscm > upp ? FACTION_MARINE : (upp > uscm ? FACTION_UPP : null)
 	if(winner)
 		match_wins[winner] = (match_wins[winner] || 0) + 1
@@ -621,8 +659,8 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	var/uscm = matches_per_round > 1 ? (match_wins[FACTION_MARINE] || 0) : 0
 	var/upp = matches_per_round > 1 ? (match_wins[FACTION_UPP] || 0) : 0
 	if(uscm == upp)
-		uscm = faction_kills[FACTION_MARINE] || 0
-		upp = faction_kills[FACTION_UPP] || 0
+		uscm = get_round_tiebreak(FACTION_MARINE)
+		upp = get_round_tiebreak(FACTION_UPP)
 	if(uscm > upp)
 		return MODE_INFESTATION_M_MAJOR
 	if(upp > uscm)
@@ -769,8 +807,8 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 
 /// Result sentence for the round, by series when there is one, else by kills
 /datum/game_mode/extended/faction_clash/hvh/proc/get_round_result_line()
-	var/uscm = faction_kills[FACTION_MARINE] || 0
-	var/upp = faction_kills[FACTION_UPP] || 0
+	var/uscm = get_round_tiebreak(FACTION_MARINE)
+	var/upp = get_round_tiebreak(FACTION_UPP)
 	if(matches_per_round > 1)
 		var/uscm_wins = match_wins[FACTION_MARINE] || 0
 		var/upp_wins = match_wins[FACTION_UPP] || 0

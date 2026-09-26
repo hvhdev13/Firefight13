@@ -85,6 +85,22 @@ GLOBAL_VAR(clash_bot_litter_timer)
 		INVOKE_ASYNC(src, PROC_REF(spawn_npc))
 
 /obj/effect/landmark/clash_npc/proc/get_hold_turf()
+	// Objective modes send bots to fight over the zones, spread across them
+	if(!rally_id && length(GLOB.clash_objective_turfs))
+		var/turf/best_objective
+		var/fewest
+		for(var/turf/objective as anything in GLOB.clash_objective_turfs)
+			if(objective.z != z)
+				continue
+			var/held = rand(0, 1)
+			for(var/datum/clash_bot/other as anything in GLOB.clash_bots)
+				if(other.anchor == objective)
+					held += 2
+			if(isnull(fewest) || held < fewest)
+				best_objective = objective
+				fewest = held
+		if(best_objective)
+			return best_objective
 	var/turf/best = get_turf(src)
 	var/best_count
 	for(var/obj/effect/landmark/clash_bot_rally/rally as anything in GLOB.clash_bot_rallies)

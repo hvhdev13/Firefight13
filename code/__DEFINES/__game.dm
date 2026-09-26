@@ -40,6 +40,11 @@
 #define MAP_TDM_KUTJEVO_SUPERMINI "TDM Kutjevo Super Mini"
 #define MAP_TDM_DEATHMATCH2000 "TDM Deathmatch 2000"
 #define MAP_TDM_JUNGLE "TDM Jungle"
+#define MAP_TDM_JUNGLE_KOTH "TDM Jungle KOTH"
+#define MAP_TDM_JUNGLE_DOMINATION "TDM Jungle Domination"
+#define MAP_TDM_DEATHMATCH2000_KOTH "TDM Deathmatch 2000 KOTH"
+#define MAP_TDM_DEATHMATCH2000_DOMINATION "TDM Deathmatch 2000 Domination"
+#define MAP_TDM_KUTJEVO_SUPERMINI_KOTH "TDM Kutjevo Super Mini KOTH"
 #define MAP_ICE_COLONY_V3 "Shivas Snowball" //Ice Rework, low pop enabled.
 #define MAP_RUNTIME "USS Runtime"
 #define MAP_LV522_CHANCES_CLAIM "LV-522 Chance's Claim"
@@ -57,6 +62,10 @@
 #define GAMEMODE_FACTION_CLASH "Faction Clash"
 #define GAMEMODE_FACTION_CLASH_UPP_CM "Faction Clash UPP CM"
 #define GAMEMODE_TDM "Team Deathmatch"
+#define GAMEMODE_KOTH "King of the Hill"
+#define GAMEMODE_DOMINATION "Domination"
+/// Every mode the HvH engine runs, by config tag
+#define HVH_MODE_TAGS list(GAMEMODE_FACTION_CLASH_UPP_CM, GAMEMODE_TDM, GAMEMODE_KOTH, GAMEMODE_DOMINATION)
 #define GAMEMODE_HUNTER_GAMES "Hunter Games"
 #define GAMEMODE_INFECTION "Infection"
 #define GAMEMODE_EXTENDED "Extended"
