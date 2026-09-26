@@ -139,7 +139,7 @@
 	if(GLOB.round_statistics)
 		GLOB.round_statistics.track_death(new_death)
 
-	var/datum/game_mode/extended/faction_clash/cm_vs_upp/clash_mode = SSticker.mode
+	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
 	if(istype(clash_mode))
 		clash_mode.score_death(new_death.faction_name, new_death.mob_name, new_death.cause_name, mind?.ckey || ckey)
 		if(cause_mob && ismob(cause_mob) && cause_mob != src && new_death.cause_faction_name)

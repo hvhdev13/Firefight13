@@ -116,7 +116,7 @@
 		line.maptext_y = -8 - (i * 16)
 		faction_killfeed += line
 		static_inventory += line
-	var/datum/game_mode/extended/faction_clash/cm_vs_upp/clash_mode = SSticker.mode
+	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
 	if(istype(clash_mode))
 		faction_score.maptext = clash_mode.get_score_maptext()
 		clash_mode.render_killfeed_for(mymob)

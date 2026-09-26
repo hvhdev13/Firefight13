@@ -3,7 +3,7 @@ GLOBAL_VAR_INIT(clash_feedback_contact, "")
 
 /// Whether fresh spawns and bots start with a full stomach this round
 /proc/clash_fed_spawns()
-	var/datum/game_mode/extended/faction_clash/cm_vs_upp/clash_mode = SSticker.mode
+	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
 	return istype(clash_mode) && clash_mode.fed_spawns
 
 /proc/clash_welcome_path(ckey)
@@ -43,7 +43,7 @@ SUBSYSTEM_DEF(clash_spawn)
 	page += "<p>The map vote decides the mode. Faction Clash (FC_) maps run the traditional CM-SS13 UPP vs USCM gamemode, Team Deathmatch (TDM_) maps run the small arena mode.</p>"
 	page += "<p><b>How it works:</b></p>"
 	page += "<ul>"
-	var/datum/game_mode/extended/faction_clash/cm_vs_upp/clash_mode = SSticker.mode
+	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
 	if(istype(clash_mode))
 		for(var/line in clash_mode.get_welcome_rules())
 			page += "<li>[line]</li>"

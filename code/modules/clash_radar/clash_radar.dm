@@ -265,12 +265,12 @@ GLOBAL_LIST_EMPTY(clash_radar_marks)
 	self_mark.transform = turn(matrix(), get_clash_turn_sign() * dir2angle(viewer.dir))
 	overlays = list(self_mark)
 
-/datum/game_mode/extended/faction_clash/cm_vs_upp/var/radar_timer_id
+/datum/game_mode/extended/faction_clash/hvh/var/radar_timer_id
 
-/datum/game_mode/extended/faction_clash/cm_vs_upp/proc/start_clash_radar()
+/datum/game_mode/extended/faction_clash/hvh/proc/start_clash_radar()
 	radar_timer_id = addtimer(CALLBACK(src, PROC_REF(update_clash_radars)), RADAR_REFRESH, TIMER_LOOP|TIMER_STOPPABLE)
 
-/datum/game_mode/extended/faction_clash/cm_vs_upp/proc/update_clash_radars()
+/datum/game_mode/extended/faction_clash/hvh/proc/update_clash_radars()
 	for(var/mob/player as anything in GLOB.player_list)
 		var/atom/movable/screen/clash_radar/radar = player.hud_used?.clash_radar
 		if(!radar)
