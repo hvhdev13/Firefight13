@@ -819,15 +819,18 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		else
 			idle_warned -= player.ckey
 
-/datum/game_mode/extended/faction_clash/hvh/proc/get_match_result_line(list/result)
+/// Result sentence for one finished match, the latest unless a number is given
+/datum/game_mode/extended/faction_clash/hvh/proc/get_match_result_line(list/result, number)
+	if(isnull(number))
+		number = length(match_results)
 	var/uscm = result["uscm"]
 	var/upp = result["upp"]
 	switch(result["winner"])
 		if(FACTION_MARINE)
-			return "USCM takes match [length(match_results)], [uscm] to [upp]."
+			return "USCM takes match [number], [uscm] to [upp]."
 		if(FACTION_UPP)
-			return "UPP takes match [length(match_results)], [upp] to [uscm]."
-	return "Match [length(match_results)] drawn at [uscm] each."
+			return "UPP takes match [number], [upp] to [uscm]."
+	return "Match [number] drawn at [uscm] each."
 
 /// Result sentence for the round, by series when there is one, else by kills
 /datum/game_mode/extended/faction_clash/hvh/proc/get_round_result_line()
@@ -948,9 +951,15 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 
 /// Start of round briefing
 /datum/game_mode/extended/faction_clash/hvh/proc/deleyed_announce()
-	var/minutes = round_time_limit / 600
-	marine_announcement("[name] is live. Most kills after [minutes] minutes wins.\n\nRespawns are open. The enemy staging area is shielded, do not waste time on it.", "ARES 3.2", 'sound/AI/commandreport.ogg', FACTION_MARINE)
-	marine_announcement("[name] is live. Most kills after [minutes] minutes wins.\n\nRespawns are open. The enemy staging area is shielded, do not waste time on it.", "1VAN/3", 'sound/AI/commandreport.ogg', FACTION_UPP)
+	var/briefing = "[name] is live. [get_win_condition()]\n\nRespawns are open. The enemy staging area is shielded, do not waste time on it."
+	marine_announcement(briefing, "ARES 3.2", 'sound/AI/commandreport.ogg', FACTION_MARINE)
+	marine_announcement(briefing, "1VAN/3", 'sound/AI/commandreport.ogg', FACTION_UPP)
+
+/// One sentence on how a match is won, for the opening briefing
+/datum/game_mode/extended/faction_clash/hvh/proc/get_win_condition()
+	var/unit = matches_per_round > 1 ? "Each match" : "The round"
+	var/limit = kill_limit ? "First to [kill_limit] kills, or the" : "The"
+	return "[unit] lasts [round_time_limit / 600] minutes. [limit] most kills when time runs out wins."
 
 /// Faction announcements when the scoring stops and the ceasefire begins
 /datum/game_mode/extended/faction_clash/hvh/proc/announce_ceasefire()
@@ -974,7 +983,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		output += "<br><b>Matches</b><br>"
 		for(var/i in 1 to length(match_results))
 			var/list/result = match_results[i]
-			output += "[i]. [get_match_result_line(result)] ([result["reason"]])[result["mvp"] ? " MVP [result["mvp"]]" : ""]<br>"
+			output += "[i]. [get_match_result_line(result, i)] ([result["reason"]])[result["mvp"] ? " MVP [result["mvp"]]" : ""]<br>"
 
 	var/mvp = pick_mvp(player_scores)
 	if(mvp)

@@ -92,6 +92,10 @@
 	var/unit = matches_per_round > 1 ? "Matches" : "Rounds"
 	.[1] = "[unit] last [round_time_limit / 600] minutes. Each flag stands just outside its base. Carry the enemy flag to your own flag's stand while yours is home to score. Touch your own flag where it lies to send it home, and a dropped flag goes home by itself after [flag_return_time / 10] seconds. First to [capture_limit] captures wins, otherwise the most captures when time runs out. Flag carriers cannot enter their own base."
 
+/datum/game_mode/extended/faction_clash/hvh/tdm/ctf/get_win_condition()
+	var/unit = matches_per_round > 1 ? "Each match" : "The round"
+	return "[unit] lasts [round_time_limit / 600] minutes. Bring the enemy flag to your own stand to score. First to [capture_limit] captures, or the most captures when time runs out, wins."
+
 /datum/game_mode/extended/faction_clash/hvh/tdm/ctf/get_match_score(faction)
 	return captures[faction] || 0
 
