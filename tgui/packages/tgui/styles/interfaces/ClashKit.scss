@@ -1,0 +1,179 @@
+@use '../base.scss';
+
+.ClashKit {
+  &__slotGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 64px);
+    gap: 6px;
+    justify-content: center;
+  }
+
+  &__attachHeader {
+    margin: 10px 0 4px;
+    text-align: center;
+    font-size: 0.85em;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    opacity: 0.7;
+  }
+
+  &__attachGrid {
+    display: grid;
+    grid-template-columns: repeat(4, 48px);
+    gap: 6px;
+    justify-content: center;
+  }
+
+  &__slot {
+    position: relative;
+    width: 64px;
+    height: 64px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 3px;
+    background: rgba(0, 0, 0, 0.35);
+    cursor: pointer;
+    transition:
+      border-color 0.1s,
+      background 0.1s;
+
+    &:hover {
+      border-color: rgba(255, 255, 255, 0.5);
+    }
+
+    &--small {
+      width: 48px;
+      height: 48px;
+    }
+
+    &--set {
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    &--selected {
+      border-color: #fff;
+      box-shadow: 0 0 6px rgba(255, 255, 255, 0.35);
+    }
+
+    &--dimmed {
+      opacity: 0.35;
+    }
+  }
+
+  &__slotArt {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 32px;
+    height: 32px;
+    transform: translate(-50%, -60%) scale(1.3);
+    opacity: 0.25;
+    image-rendering: pixelated;
+    pointer-events: none;
+  }
+
+  &__slotIcon {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 32px;
+    height: 32px;
+    transform: translate(-50%, -60%) scale(1.4);
+    image-rendering: pixelated;
+    pointer-events: none;
+  }
+
+  &__slotEmpty {
+    position: absolute;
+    left: 50%;
+    top: 42%;
+    transform: translate(-50%, -50%);
+    opacity: 0.35;
+  }
+
+  &__slotLabel {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 2px;
+    font-size: 0.7em;
+    text-align: center;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    opacity: 0.75;
+    pointer-events: none;
+  }
+
+  &__dollSection .Section__content {
+    display: flex;
+  }
+
+  &__doll {
+    width: 192px;
+    height: 192px;
+    image-rendering: pixelated;
+    filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.6));
+  }
+
+  &__dollName {
+    margin-top: 6px;
+    font-size: 1.1em;
+  }
+
+  &__dollMeta {
+    margin-top: 4px;
+    text-align: center;
+    font-size: 0.85em;
+    opacity: 0.7;
+  }
+
+  &__tabCount {
+    opacity: 0.5;
+    font-size: 0.85em;
+  }
+
+  &__option {
+    padding: 5px 6px;
+    margin-bottom: 3px;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    cursor: pointer;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    &--picked {
+      border-color: rgba(255, 255, 255, 0.5);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    &--disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+
+      &:hover {
+        background: none;
+      }
+    }
+  }
+
+  &__optionIcon {
+    width: 40px;
+    text-align: center;
+    image-rendering: pixelated;
+  }
+
+  &__optionName {
+    font-weight: bold;
+  }
+
+  &__optionBlurb {
+    font-size: 0.85em;
+    opacity: 0.7;
+  }
+
+  &__deploy {
+    font-size: 1.1em;
+    padding: 4px 14px;
+  }
+}

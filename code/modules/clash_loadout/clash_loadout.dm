@@ -34,7 +34,7 @@ GLOBAL_LIST_EMPTY(clash_auto_loadouts)
 
 /// Buys and equips a fresh spawn's chosen loadout for their role
 /proc/clash_equip_spawn_loadout(mob/living/carbon/human/spawned)
-	if(QDELETED(spawned) || spawned.stat == DEAD || !SSticker.mode || !MODE_HAS_FLAG(MODE_FACTION_CLASH))
+	if(QDELETED(spawned) || spawned.stat == DEAD || !SSticker.mode || !MODE_HAS_FLAG(MODE_FACTION_CLASH) || clash_uses_kits())
 		return
 	var/key = clash_loadout_key(spawned)
 	var/slot_name = get_clash_auto_slot(key, spawned.job)
@@ -251,7 +251,8 @@ GLOBAL_LIST_EMPTY(clash_auto_loadouts)
 /obj/structure/machinery/cm_vending/proc/add_clash_vendor_data(mob/user, list/data)
 	data["clash_loadouts"] = list()
 	data["clash_enabled"] = FALSE
-	if(!SSticker.mode || !MODE_HAS_FLAG(MODE_FACTION_CLASH) || !ishuman(user))
+	// Arena maps use kits instead, see clash_kit
+	if(!SSticker.mode || !MODE_HAS_FLAG(MODE_FACTION_CLASH) || clash_uses_kits() || !ishuman(user))
 		return
 	var/mob/living/carbon/human/human_user = user
 	data["clash_enabled"] = TRUE
@@ -319,7 +320,7 @@ GLOBAL_LIST_EMPTY(clash_auto_loadouts)
 	save_clash_loadouts(key)
 
 /proc/clash_loadout_path(key)
-	return "data/player_saves/[copytext(key, 1, 2)]/[key]/clash_loadouts.sav"
+	return clash_player_save_path(key, "clash_loadouts.sav")
 
 /proc/save_clash_loadouts(key)
 	if(!key || IsGuestKey(key))

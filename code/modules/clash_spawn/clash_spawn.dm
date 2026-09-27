@@ -7,7 +7,7 @@ GLOBAL_VAR_INIT(clash_feedback_contact, "")
 	return istype(clash_mode) && clash_mode.fed_spawns
 
 /proc/clash_welcome_path(ckey)
-	return "data/player_saves/[copytext(ckey, 1, 2)]/[ckey]/clash_welcome.sav"
+	return clash_player_save_path(ckey, "clash_welcome.sav")
 
 SUBSYSTEM_DEF(clash_spawn)
 	name = "Clash Spawn"
@@ -31,8 +31,14 @@ SUBSYSTEM_DEF(clash_spawn)
 	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
 	if(istype(clash_mode) && clash_mode.spawn_protection)
 		spawned.AddComponent(/datum/component/clash_spawn_guard, clash_mode.spawn_protection)
-	// Let the spawn finish settling in before buying gear onto it
-	addtimer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(clash_equip_spawn_loadout), spawned), 1 SECONDS)
+	if(clash_uses_kits())
+		var/datum/clash_kit/kit = get_clash_active_kit(spawned.ckey, spawned.job)
+		if(kit && length(kit.choices))
+			apply_clash_kit(spawned, kit)
+			to_chat(spawned, SPAN_NOTICE("Kitted out as [kit.name]. Use the Loadout verb to change it."))
+	else
+		// Let the spawn finish settling in before buying gear onto it
+		addtimer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(clash_equip_spawn_loadout), spawned), 1 SECONDS)
 	var/ckey = spawned.ckey
 	if(!ckey || (ckey in GLOB.clash_welcomed))
 		return
@@ -73,7 +79,10 @@ SUBSYSTEM_DEF(clash_spawn)
 	if(istype(clash_mode))
 		for(var/line in clash_mode.get_welcome_rules())
 			page += "<li>[line]</li>"
-	page += "<li>You can save your loadouts. At a vendor, use Save current in the Saved Loadouts section. Each role has 3 slots.</li>"
+	if(clash_uses_kits())
+		page += "<li>Build your kit with the Loadout verb (OOC tab) or from the Respawn button. Pick armor, weapons, attachments and rigs per role; the active kit is on you every time you spawn. Up to [CLASH_KIT_COUNT] kits per role.</li>"
+	else
+		page += "<li>You can save your loadouts. At a vendor, use Save current in the Saved Loadouts section. Each role has 3 slots.</li>"
 	page += "<li>The enemy base is locked. Enemies cannot walk or throw grenades into it.</li>"
 	page += "<li>Players named \[BOT\] are bots. Kills on bots and by bots never count toward the score.</li>"
 	page += "<li>Explosions can take off limbs.</li>"

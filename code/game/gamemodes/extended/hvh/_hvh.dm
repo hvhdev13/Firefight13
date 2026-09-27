@@ -85,6 +85,8 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	var/respawn_cooldown = RESPAWN_COOLDOWN
 	/// Whether fresh spawns and bots start with a full stomach
 	var/fed_spawns = FALSE
+	/// Whether players build kits (see clash_kit) instead of saving vendor loadouts
+	var/use_kits = FALSE
 	/// Kills that end the match early, 0 leaves only the timer
 	var/kill_limit = 0
 	/// Faction to kill limit callouts already made, so each fires once

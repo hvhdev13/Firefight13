@@ -4,6 +4,7 @@
 	config_tag = GAMEMODE_TDM
 	// Only reached through a map's force_mode, never by the gamemode vote
 	fed_spawns = TRUE
+	use_kits = TRUE
 	round_time_limit = 10 MINUTES
 	matches_per_round = 3
 	kill_limit = 25

@@ -101,6 +101,9 @@ GLOBAL_LIST_EMPTY(clash_respawn_button_icons)
 /atom/movable/screen/clash_respawn/clicked(mob/user, list/mods)
 	if(state != RESPAWN_STATE_READY && state != RESPAWN_STATE_HOVER)
 		return TRUE
+	if(clash_uses_kits())
+		open_clash_kit_screen(user, TRUE)
+		return TRUE
 	user.abandon_mob()
 	return TRUE
 
