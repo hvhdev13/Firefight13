@@ -5,7 +5,7 @@
     "webmap_url": "Kutjevo",
     "disable_ship_map": true,
     "perf_mode": 31,
-    "camouflage": "desert",
+    "camouflage": "jungle",
     "map_item_type": "/obj/item/map/kutjevo_map",
     "traits": [
         {

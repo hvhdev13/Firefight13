@@ -4,6 +4,7 @@
     "map_file": "TDM_Deathmatch2000.dmm",
     "disable_ship_map": true,
     "perf_mode": 31,
+    "camouflage": "jungle",
     "traits": [
         {
             "Ground": true

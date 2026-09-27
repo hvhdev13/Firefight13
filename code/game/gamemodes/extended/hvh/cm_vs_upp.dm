@@ -4,6 +4,25 @@
 	config_tag = GAMEMODE_FACTION_CLASH_UPP_CM
 	votable = TRUE
 	var/upp_ship = "ssv_rostock.dmm"
+	/// The match clock starts when the landing ceasefire ends, or this long into the round if nobody lands
+	var/first_match_fallback = 20 MINUTES
+	var/first_match_timer_id
+
+/datum/game_mode/extended/faction_clash/hvh/cm_vs_upp/open_first_match()
+	first_match_timer_id = addtimer(CALLBACK(src, PROC_REF(start_first_match)), first_match_fallback, TIMER_STOPPABLE)
+	log_debug("HVH: waiting for the first landing, match starts by [first_match_fallback / 600] minutes at the latest")
+
+/// Starts the clock and scoring once, whichever of the ceasefire end or the fallback comes first
+/datum/game_mode/extended/faction_clash/hvh/cm_vs_upp/proc/start_first_match()
+	deltimer(first_match_timer_id)
+	first_match_timer_id = null
+	if(match_number || match_live || round_finished)
+		return
+	begin_countdown()
+
+/datum/game_mode/extended/faction_clash/hvh/cm_vs_upp/get_welcome_rules()
+	. = ..()
+	. += "The fight starts on the colony. Deploy by dropship from your ship. The first landing starts a five minute ceasefire, and the clock and scoring start when it ends."
 
 /datum/game_mode/extended/faction_clash/hvh/cm_vs_upp/announce_ceasefire()
 	switch(round_finished)
@@ -49,6 +68,9 @@
 	marine_announcement("First troops have landed on the colony! Five minute long ceasefire is in effect to allow evacuation of civilians.", "ARES 3.2", 'sound/AI/commandreport.ogg', FACTION_MARINE)
 	marine_announcement("First troops have landed on the colony! Five minute long ceasefire is in effect to allow evacuation of civilians.", "1VAN/3", 'sound/AI/commandreport.ogg', FACTION_UPP)
 	set_gamemode_modifier(/datum/gamemode_modifier/ceasefire, enabled = TRUE)
+	// The ceasefire's end starts the match now, so the fallback is not needed
+	deltimer(first_match_timer_id)
+	first_match_timer_id = null
 	addtimer(CALLBACK(src,PROC_REF(ceasefire_warning)), 4 MINUTES)
 	addtimer(CALLBACK(src,PROC_REF(ceasefire_end)), 5 MINUTES)
 	addtimer(VARSET_CALLBACK(GLOB, round_should_check_for_win, TRUE), 15 MINUTES)
@@ -62,6 +84,7 @@
 	marine_announcement("Ceasefire is over. Combat operations may commence.", "1VAN/3", 'sound/AI/commandreport.ogg', FACTION_UPP)
 	set_gamemode_modifier(/datum/gamemode_modifier/ceasefire, enabled = FALSE)
 	GLOB.round_should_check_for_win = TRUE
+	start_first_match()
 
 
 

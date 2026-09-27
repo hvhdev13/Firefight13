@@ -11,6 +11,7 @@
 	countdown_time = 20 SECONDS
 	spawn_protection = 3 SECONDS
 	idle_limit = 3 MINUTES
+	arena_rules = TRUE
 
 /datum/game_mode/extended/faction_clash/hvh/tdm/pre_setup()
 	var/datum/map_config/ground = SSmapping.configs[GROUND_MAP]

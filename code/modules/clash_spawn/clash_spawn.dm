@@ -74,7 +74,7 @@ SUBSYSTEM_DEF(clash_spawn)
 	page += "<p>The server is currently being playtested and updated continuously.</p>"
 	page += "<p><b>Recommended maps:</b></p>"
 	page += "<ul><li>TDM_Jungle</li><li>TDM_Deathmatch2000</li></ul>"
-	page += "<p>The map vote decides the mode. Faction Clash (FC_) maps run the traditional CM-SS13 UPP vs USCM gamemode, Team Deathmatch (TDM_) maps run the small arena mode.</p>"
+	page += "<p>The map vote decides the mode. Arena maps (TDM_) run Team Deathmatch, King of the Hill, Domination or Capture the Flag, named after the map. Colony maps run Faction Clash, the classic UPP vs USCM operation: deploy from your ship by dropship and fight over the colony.</p>"
 	page += "<p><b>How it works:</b></p>"
 	page += "<ul>"
 	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
@@ -85,8 +85,6 @@ SUBSYSTEM_DEF(clash_spawn)
 		page += "<li>Your loadout is picked per role, like a class: open it from the Loadout button in the lobby, the Deploy button when you are down, or the Loadout verb. The kit you select is on you every time you spawn as that role. Up to [CLASH_KIT_COUNT] kits per role, starting from ready-made classes.</li>"
 	else
 		page += "<li>You can save your loadouts. At a vendor, use Save current in the Saved Loadouts section. Each role has 3 slots.</li>"
-	page += "<li>The enemy base is locked. Enemies cannot walk or throw grenades into it.</li>"
-	page += "<li>Players named \[BOT\] are bots. Kills on bots and by bots never count toward the score.</li>"
 	page += "<li>Explosions can take off limbs.</li>"
 	page += "<li>Friendly fire is on.</li>"
 	page += "</ul>"

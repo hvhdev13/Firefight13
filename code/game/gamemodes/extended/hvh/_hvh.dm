@@ -105,6 +105,8 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	var/score_label = "kills"
 	/// Victim name to attacker name to list(time, faction, ckey), for assists
 	var/list/recent_damage = list()
+	/// Whether the map is an arena with sealed bases and bots, for the rules shown to players
+	var/arena_rules = FALSE
 	map_vote_mode = GAMEMODE_FACTION_CLASH_UPP_CM
 
 /// Respawn wait for the current round, the default outside a clash mode
@@ -131,6 +133,9 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		. += "After spawning you cannot be hurt inside your base, and for [spawn_protection / 10] seconds after leaving it. Firing, melee attacks or using an item end it early."
 	if(idle_limit)
 		. += "Fighters idle for [idle_limit / 600] minutes are moved to observer so the slot frees up."
+	if(arena_rules)
+		. += "The enemy base is locked. Enemies cannot walk or throw grenades into it."
+		. += "Players named \[BOT\] are bots. Kills on bots and by bots never count toward the score."
 
 /datum/game_mode/extended/faction_clash/hvh/pre_setup()
 	. = ..()
@@ -205,6 +210,10 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		return
 	holding_fire = hold
 	set_gamemode_modifier(/datum/gamemode_modifier/ceasefire, enabled = hold)
+
+/// Sets the first match going at round start, modes that deploy first can hold it back
+/datum/game_mode/extended/faction_clash/hvh/proc/open_first_match()
+	begin_countdown()
 
 /// Holds both teams in their bases with weapons down, then starts the match
 /datum/game_mode/extended/faction_clash/hvh/proc/begin_countdown()
@@ -909,7 +918,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	respawn_timer_id = addtimer(CALLBACK(src, PROC_REF(update_respawn_huds)), 1 SECONDS, TIMER_LOOP|TIMER_STOPPABLE)
 	if(idle_limit)
 		idle_timer_id = addtimer(CALLBACK(src, PROC_REF(check_idle)), 30 SECONDS, TIMER_LOOP|TIMER_STOPPABLE)
-	begin_countdown()
+	open_first_match()
 	for(var/obj/structure/machinery/cm_vending/vendor in GLOB.machines)
 		vendor.vend_delay = 0
 	SSweather.force_weather_holder(/datum/weather_ss_map_holder/faction_clash)
