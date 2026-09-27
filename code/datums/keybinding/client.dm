@@ -10,6 +10,20 @@
 	description = "Switch between the map pane and the command bar."
 	keybind_signal = COMSIG_KB_CLIENT_SWITCHINPUT_DOWN
 
+/datum/keybinding/client/scoreboard
+	hotkey_keys = list("Tab")
+	classic_keys = list("Tab")
+	name = "scoreboard"
+	full_name = "Scoreboard"
+	description = "Show or hide the match scoreboard in HvH rounds."
+	keybind_signal = COMSIG_KB_CLIENT_SCOREBOARD_DOWN
+
+/datum/keybinding/client/scoreboard/down(client/user)
+	. = ..()
+	if(.)
+		return
+	return toggle_clash_scoreboard(user.mob)
+
 /datum/keybinding/client/admin_help
 	hotkey_keys = list("Unbound")
 	classic_keys = list("F1")

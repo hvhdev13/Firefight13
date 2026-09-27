@@ -70,6 +70,9 @@
 	var/what = zone_count == 1 ? "Hold the hill to score" : "Take and hold the zones to score"
 	return "[unit] lasts [round_time_limit / 600] minutes. [what]. First to [point_limit] points, or the most points when time runs out, wins."
 
+/datum/game_mode/extended/faction_clash/hvh/tdm/objective/get_score_limit()
+	return point_limit
+
 /datum/game_mode/extended/faction_clash/hvh/tdm/objective/get_match_score(faction)
 	return objective_points[faction] || 0
 

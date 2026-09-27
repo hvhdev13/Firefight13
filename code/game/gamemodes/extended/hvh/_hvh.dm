@@ -353,55 +353,89 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 
 /// Everything the live scoreboard shows, from viewer's point of view
 /datum/game_mode/extended/faction_clash/hvh/proc/get_scoreboard_data(mob/viewer)
+	var/leader = match_live || intermission_end_time || round_finished ? pick_mvp(player_scores) : null
 	var/list/teams = list()
 	for(var/faction in list(FACTION_MARINE, FACTION_UPP))
 		var/list/players = list()
 		var/list/listed = list()
+		var/alive = 0
 		for(var/name in player_scores)
 			var/list/entry = player_scores[name]
 			if(entry["faction"] != faction || !entry["ckey"])
 				continue
-			players += list(scoreboard_row(name, entry, viewer))
+			var/client/player_client = GLOB.directory[entry["ckey"]]
+			var/list/row = scoreboard_row(name, entry, viewer, player_client?.mob, leader)
+			players += list(row)
 			listed[name] = TRUE
+			if(row["alive"])
+				alive++
 		// Everyone on the team shows up, scored or not
 		for(var/mob/living/carbon/human/player as anything in GLOB.alive_human_list)
 			if(!player.client || player.faction != faction || listed[player.real_name])
 				continue
-			players += list(scoreboard_row(player.real_name, null, viewer))
+			players += list(scoreboard_row(player.real_name, null, viewer, player, leader))
+			alive++
 		teams += list(list(
+			"id" = faction == FACTION_MARINE ? "uscm" : "upp",
 			"name" = faction == FACTION_MARINE ? "USCM" : "UPP",
 			"color" = faction_color(faction),
 			"kills" = faction_kills[faction] || 0,
+			"deaths" = faction_deaths[faction] || 0,
 			"score" = get_match_score(faction),
+			"wins" = match_wins[faction] || 0,
+			"alive" = alive,
+			"own" = viewer.faction == faction,
 			"players" = players,
+		))
+	var/list/results = list()
+	for(var/list/result as anything in match_results)
+		results += list(list(
+			"winner" = result["winner"] == FACTION_MARINE ? "uscm" : (result["winner"] == FACTION_UPP ? "upp" : null),
+			"uscm" = result["uscm"],
+			"upp" = result["upp"],
+			"mvp" = result["mvp"],
 		))
 	var/remaining = match_live ? max(0, round_end_time - world.time) : 0
 	return list(
 		"match" = get_display_match(),
 		"matches" = matches_per_round,
+		"wins_needed" = wins_needed(),
 		"series" = list(match_wins[FACTION_MARINE] || 0, match_wins[FACTION_UPP] || 0),
+		"results" = results,
 		"intermission" = intermission_end_time ? CEILING(max(0, intermission_end_time - world.time) / 10, 1) : 0,
 		"active" = TRUE,
 		"mode" = name,
 		"teams" = teams,
 		"kill_limit" = kill_limit,
+		"score_limit" = get_score_limit(),
 		"score_label" = score_label,
 		"limit_text" = get_limit_text(),
 		"objectives" = get_objective_data(),
 		"seconds_left" = CEILING(remaining / 10, 1),
 		"countdown" = countdown_end_time ? CEILING(max(0, countdown_end_time - world.time) / 10, 1) : 0,
 		"finished" = !!round_finished,
+		"awards" = intermission_end_time || round_finished ? get_awards() : list(),
+		"kits" = clash_uses_kits(),
 	)
 
-/datum/game_mode/extended/faction_clash/hvh/proc/scoreboard_row(name, list/entry, mob/viewer)
+/// Score that wins a match outright, 0 when only time ends it
+/datum/game_mode/extended/faction_clash/hvh/proc/get_score_limit()
+	return kill_limit
+
+/datum/game_mode/extended/faction_clash/hvh/proc/scoreboard_row(name, list/entry, mob/viewer, mob/player, leader)
+	var/mob/living/carbon/human/fighter = ishuman(player) && player.real_name == name ? player : null
 	return list(
 		"name" = name,
+		"role" = fighter?.job,
+		"alive" = fighter && fighter.stat != DEAD,
 		"kills" = entry?["kills"] || 0,
 		"assists" = entry?["assists"] || 0,
 		"deaths" = entry?["deaths"] || 0,
+		"captures" = entry?["captures"] || 0,
 		"best_streak" = entry?["best_streak"] || 0,
 		"streak" = kill_streaks[name] || 0,
-		"is_viewer" = name == viewer.real_name,
+		"is_viewer" = viewer.ckey && (entry ? entry["ckey"] == viewer.ckey : player?.ckey == viewer.ckey),
+		"mvp" = !!leader && name == leader,
 	)
 
 /datum/game_mode/extended/faction_clash/hvh/proc/get_killfeed_line(list/entry)
@@ -452,6 +486,9 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	return "<span class='maptext center'>Respawn in [minutes]:[seconds < 10 ? "0[seconds]" : "[seconds]"]</span>"
 
 /datum/game_mode/extended/faction_clash/hvh/proc/compose_hud_maptext(mob/player, base)
+	// The respawn button carries the countdown itself
+	if(player.hud_used?.clash_respawn)
+		return base
 	var/line = get_respawn_line(player)
 	return line ? "[base]<br>[line]" : base
 

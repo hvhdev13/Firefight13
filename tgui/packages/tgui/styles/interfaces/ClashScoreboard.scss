@@ -1,0 +1,353 @@
+@use '../base.scss';
+
+$line: rgba(255, 255, 255, 0.1);
+$line-strong: rgba(255, 255, 255, 0.35);
+$panel: rgba(0, 0, 0, 0.35);
+$dim: rgba(255, 255, 255, 0.45);
+$gold: #ffcf4d;
+$hot: #ff8a3d;
+
+.ClashScoreboard {
+  font-size: 12px;
+
+  // Header: score, clock, score
+  &__header {
+    display: flex;
+    align-items: stretch;
+    gap: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid $line;
+  }
+
+  &__teamScore {
+    flex: 1 1 0;
+    padding: 6px 10px;
+    border-left: 4px solid var(--team-color);
+    background: linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--team-color) 22%, transparent),
+      $panel
+    );
+
+    &--flip {
+      border-left: none;
+      border-right: 4px solid var(--team-color);
+      background: linear-gradient(
+        270deg,
+        color-mix(in srgb, var(--team-color) 22%, transparent),
+        $panel
+      );
+
+      .ClashScoreboard__teamLine,
+      .ClashScoreboard__teamMeta {
+        flex-direction: row-reverse;
+      }
+
+      .ClashScoreboard__bar {
+        transform: scaleX(-1);
+      }
+    }
+
+    &--leading .ClashScoreboard__score {
+      text-shadow: 0 0 10px var(--team-color);
+    }
+  }
+
+  &__teamLine {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+
+  &__teamName {
+    font-weight: bold;
+    font-size: 15px;
+    letter-spacing: 0.12em;
+    color: var(--team-color);
+  }
+
+  &__you {
+    margin: 0 6px;
+    padding: 0 4px;
+    border: 1px solid var(--team-color);
+    border-radius: 2px;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    vertical-align: middle;
+  }
+
+  &__score {
+    font-size: 30px;
+    font-weight: bold;
+    line-height: 1;
+    color: #fff;
+  }
+
+  &__bar {
+    height: 4px;
+    margin: 5px 0 4px;
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  &__barFill {
+    height: 100%;
+    background: var(--team-color);
+    transition: width 400ms ease-out;
+  }
+
+  &__teamMeta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: $dim;
+    font-size: 11px;
+  }
+
+  &__pips {
+    display: flex;
+    gap: 3px;
+  }
+
+  &__pip {
+    width: 10px;
+    height: 10px;
+    border: 1px solid var(--team-color);
+    transform: rotate(45deg);
+
+    &--won {
+      background: var(--team-color);
+    }
+  }
+
+  &__center {
+    flex: 0 0 150px;
+    text-align: center;
+    padding: 4px 0;
+  }
+
+  &__mode {
+    color: $dim;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  &__clock {
+    font-size: 26px;
+    font-weight: bold;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+
+    &--urgent {
+      color: #ff5a5a;
+    }
+  }
+
+  &__status,
+  &__match {
+    color: $dim;
+    font-size: 11px;
+  }
+
+  // Limit, objectives and past matches
+  &__sub {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 10px;
+    padding: 6px 0;
+    color: $dim;
+  }
+
+  &__strip {
+    display: flex;
+    gap: 6px;
+    margin-left: auto;
+  }
+
+  &__chip {
+    padding: 1px 7px;
+    border: 1px solid $line-strong;
+    border-radius: 2px;
+    background: $panel;
+    color: #ddd;
+    white-space: nowrap;
+  }
+
+  &__awards {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 12px;
+    margin-bottom: 6px;
+    padding: 5px 8px;
+    border: 1px solid rgba(255, 207, 77, 0.4);
+    background: rgba(255, 207, 77, 0.07);
+    color: $gold;
+  }
+
+  &__award {
+    color: #eee;
+  }
+
+  // Team tables
+  &__teams {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  &__team {
+    flex: 1 1 0;
+    min-width: 0;
+    border-top: 2px solid var(--team-color);
+    background: $panel;
+
+    &--own {
+      box-shadow: 0 0 0 1px
+        color-mix(in srgb, var(--team-color) 55%, transparent);
+    }
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+
+    th {
+      padding: 4px 4px;
+      color: $dim;
+      font-size: 10px;
+      font-weight: normal;
+      letter-spacing: 0.08em;
+      text-align: right;
+      border-bottom: 1px solid $line;
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 3px 4px;
+      text-align: right;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+
+    tbody tr:hover td {
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    th.ClashScoreboard__nameCol {
+      color: var(--team-color);
+      font-weight: bold;
+      font-size: 11px;
+    }
+  }
+
+  &__rank {
+    width: 18px;
+    color: $dim;
+    text-align: center !important;
+  }
+
+  &__nameCol {
+    text-align: left !important;
+    width: 100%;
+    max-width: 0;
+  }
+
+  &__player {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    overflow: hidden;
+  }
+
+  &__playerName {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__life {
+    flex-shrink: 0;
+    font-size: 7px;
+    color: #5fd35f;
+  }
+
+  &__role {
+    padding-left: 12px;
+    color: $dim;
+    font-size: 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__mvp {
+    flex-shrink: 0;
+    color: $gold;
+  }
+
+  &__kills {
+    font-weight: bold;
+    color: #fff;
+  }
+
+  &__hot {
+    color: $hot;
+    font-weight: bold;
+  }
+
+  &__dim {
+    color: $dim;
+  }
+
+  &__row--dead {
+    td {
+      opacity: 0.55;
+    }
+
+    .ClashScoreboard__life {
+      font-size: 10px;
+      color: #c55;
+    }
+  }
+
+  &__row--viewer td {
+    background: color-mix(in srgb, var(--team-color) 18%, transparent);
+    opacity: 1;
+  }
+
+  &__row--viewer .ClashScoreboard__playerName {
+    color: #fff;
+    font-weight: bold;
+  }
+
+  &__empty {
+    padding: 10px;
+    color: $dim;
+    text-align: center;
+  }
+
+  &__teamFoot {
+    padding: 4px 6px;
+    color: $dim;
+    font-size: 10px;
+    text-align: right;
+  }
+
+  &__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 8px;
+  }
+
+  &__key {
+    display: inline-block;
+    margin-right: 4px;
+    padding: 0 5px;
+    border: 1px solid $line-strong;
+    border-radius: 3px;
+    font-size: 10px;
+    color: #ddd;
+  }
+}

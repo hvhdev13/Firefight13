@@ -96,6 +96,9 @@
 	var/unit = matches_per_round > 1 ? "Each match" : "The round"
 	return "[unit] lasts [round_time_limit / 600] minutes. Bring the enemy flag to your own stand to score. First to [capture_limit] captures, or the most captures when time runs out, wins."
 
+/datum/game_mode/extended/faction_clash/hvh/tdm/ctf/get_score_limit()
+	return capture_limit
+
 /datum/game_mode/extended/faction_clash/hvh/tdm/ctf/get_match_score(faction)
 	return captures[faction] || 0
 
