@@ -106,6 +106,20 @@
 	set name = "Respawn"
 	set category = "OOC"
 
+	respawn_to_lobby()
+
+/// For a ghost that can still go back to a body someone could revive, that body
+/mob/proc/get_revivable_body()
+	var/mob/dead/observer/ghost = src
+	if(!istype(ghost) || !ghost.can_reenter_corpse || QDELETED(ghost.mind?.original))
+		return null
+	var/mob/living/carbon/human/body = ghost.mind.original
+	if(istype(body) && body.stat == DEAD && body.check_tod() && body.is_revivable())
+		return body
+	return null
+
+/// Sends a dead mob's player back to the lobby. confirmed skips the are-you-sure prompts, for callers that asked already.
+/mob/proc/respawn_to_lobby(confirmed = FALSE)
 	var/is_admin = 0
 	if(client.admin_holder && (client.admin_holder.rights & R_ADMIN))
 		is_admin = 1
@@ -141,15 +155,12 @@
 			to_chat(usr, SPAN_WARNING("You must wait at least [DisplayTimeText(cooldown)] before respawning."))
 			log_debug("HVH: respawn blocked for [key_name(usr)], dead [deathtime / 10]s")
 			return
-		var/mob/dead/observer/ghost = src
-		if(istype(ghost) && ghost.can_reenter_corpse && !QDELETED(ghost.mind?.original))
-			var/mob/living/carbon/human/body = ghost.mind.original
-			if(istype(body) && body.stat == DEAD && body.check_tod() && body.is_revivable())
-				if(alert(usr, "Your body can still be revived. Respawn anyway?", "Confirm Respawn", "Yes", "No") != "Yes")
-					return
-				abandoning_ghost = ghost
+		if(get_revivable_body())
+			if(!confirmed && alert(usr, "Your body can still be revived. Respawn anyway?", "Confirm Respawn", "Yes", "No") != "Yes")
+				return
+			abandoning_ghost = src
 
-	if(alert("Are you sure you want to respawn?",,"Yes","No") != "Yes")
+	if(!confirmed && alert("Are you sure you want to respawn?",,"Yes","No") != "Yes")
 		return
 
 	abandoning_ghost?.can_reenter_corpse = FALSE

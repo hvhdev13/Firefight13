@@ -4,6 +4,12 @@ GLOBAL_LIST_EMPTY(clash_kits)
 GLOBAL_LIST_EMPTY(clash_active_kits)
 /// Key of the pooled dummy every doll is drawn on
 #define CLASH_KIT_DUMMY "clash_kit"
+/// Key of the pooled dummy roles are dressed on to see what they are issued
+#define CLASH_KIT_ISSUE_DUMMY "clash_kit_issue"
+/// Job to slot to what that job hands out there, list(name, icon, icon_state)
+GLOBAL_LIST_EMPTY(clash_kit_issue_items)
+/// Jobs whose issue items are being worked out, to the screens waiting on them
+GLOBAL_LIST_EMPTY(clash_kit_issue_pending)
 
 /// One saved kit: slot to option id. A slot with no pick keeps the job's issue item.
 /datum/clash_kit
@@ -47,12 +53,24 @@ GLOBAL_LIST_EMPTY(clash_active_kits)
 		GLOB.clash_active_kits[ckey] = list()
 		load_clash_kits(ckey)
 	var/list/kits = by_job[job]
+	// A role never set up starts from the faction's starter classes
+	var/list/presets = kits ? list() : GLOB.clash_kit_presets[clash_kit_faction_for_job(job)]
 	if(!kits)
 		kits = list()
 		by_job[job] = kits
 	while(length(kits) < CLASH_KIT_COUNT)
 		var/datum/clash_kit/kit = new
-		kit.name = "Kit [length(kits) + 1]"
+		var/list/preset = length(presets) > length(kits) ? presets[length(kits) + 1] : null
+		if(preset)
+			var/list/preset_choices = preset[2]
+			kit.name = preset[1]
+			kit.choices = preset_choices.Copy()
+		else
+			var/customs = 1
+			for(var/datum/clash_kit/other as anything in kits)
+				if(findtext(other.name, "Custom") == 1)
+					customs++
+			kit.name = customs > 1 ? "Custom [customs]" : "Custom"
 		kits += kit
 	return kits
 
@@ -108,10 +126,13 @@ GLOBAL_LIST_EMPTY(clash_active_kits)
 				break
 			var/datum/clash_kit/kit = new
 			kit.name = stored["name"]
-			// Drop picks the catalogue no longer has
+			// Drop picks the catalogue no longer has. Early saves keyed options by item alone.
 			for(var/slot in stored["choices"])
-				if(get_clash_kit_option(stored["choices"][slot]))
-					kit.choices[slot] = stored["choices"][slot]
+				var/id = stored["choices"][slot]
+				if(!get_clash_kit_option(id) && ispath(text2path(id)))
+					id = clash_kit_option_id(clash_kit_faction_for_job(job), slot, text2path(id))
+				if(get_clash_kit_option(id))
+					kit.choices[slot] = id
 			kits += kit
 		by_job[job] = kits
 
@@ -194,7 +215,7 @@ GLOBAL_LIST_EMPTY(clash_active_kits)
 	if(issue_primary)
 		wearer.temp_drop_inv_item(issue_primary, TRUE)
 		issue_primary.forceMove(wearer)
-	for(var/slot in list(KIT_SLOT_HELMET, KIT_SLOT_ARMOR, KIT_SLOT_MASK, KIT_SLOT_BACK, KIT_SLOT_BELT, KIT_SLOT_POUCH_L, KIT_SLOT_POUCH_R))
+	for(var/slot in GLOB.clash_kit_worn_slots)
 		var/datum/clash_kit_option/option = kit.get_option(slot)
 		if(!option || option.faction != faction)
 			continue
@@ -243,25 +264,90 @@ GLOBAL_LIST_EMPTY(clash_active_kits)
 				qdel(grenade)
 	wearer.regenerate_icons()
 
+/proc/describe_clash_kit_item(obj/item/item)
+	return item ? list("name" = item.name, "icon" = "[item.icon]", "icon_state" = item.icon_state) : null
+
+/// What a role hands out in each kit slot, or null until it has been worked out
+/proc/get_clash_issue_items(job)
+	return GLOB.clash_kit_issue_items[job]
+
+/// Works out a role's issue items off the current tick, then refreshes the screen that asked
+/proc/queue_clash_issue_items(job, datum/requester)
+	if(!job || GLOB.clash_kit_issue_items[job])
+		return
+	var/list/waiting = GLOB.clash_kit_issue_pending[job]
+	if(waiting)
+		waiting |= requester
+		return
+	GLOB.clash_kit_issue_pending[job] = list(requester)
+	addtimer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(build_clash_issue_items), job), 1)
+
+/// Dresses a dummy as the role and reads off what lands in each kit slot
+/proc/build_clash_issue_items(job)
+	var/list/found = list()
+	var/failed = FALSE
+	var/datum/job/role = GLOB.RoleAuthority.roles_by_name[job]
+	if(role?.gear_preset)
+		var/mob/living/carbon/human/dummy/model = generate_or_wait_for_human_dummy(CLASH_KIT_ISSUE_DUMMY)
+		try
+			model.set_species()
+			model.faction = clash_kit_faction_for_job(job)
+			arm_equipment(model, role.gear_preset, FALSE, FALSE, null, TRUE)
+			for(var/slot in GLOB.clash_kit_worn_slots)
+				var/list/info = describe_clash_kit_item(model.get_item_by_slot(GLOB.clash_kit_slots[slot]["wear"]))
+				if(info)
+					found[slot] = info
+			for(var/obj/item/weapon/gun/gun in model.get_contents())
+				var/slot = clash_is_sidearm(gun) ? KIT_SLOT_SIDEARM : KIT_SLOT_PRIMARY
+				if(found[slot])
+					continue
+				found[slot] = describe_clash_kit_item(gun)
+				if(slot == KIT_SLOT_PRIMARY)
+					for(var/attachment_slot in GLOB.clash_kit_attachment_slots)
+						var/list/info = describe_clash_kit_item(gun.attachments[attachment_slot])
+						if(info)
+							found[attachment_slot] = info
+			var/obj/item/explosive/grenade/grenade = locate() in model.get_contents()
+			if(grenade)
+				found[KIT_SLOT_GRENADE] = describe_clash_kit_item(grenade)
+		catch(var/exception/error)
+			failed = TRUE
+			stack_trace("Clash kit could not read the issue gear of [job]: [error]")
+		// Always hand the dummy back, or every later doll and lookup waits on it forever
+		unset_busy_human_dummy(CLASH_KIT_ISSUE_DUMMY)
+	// A failed read is not kept, so the next screen to open tries again
+	if(!failed)
+		GLOB.clash_kit_issue_items[job] = found
+	var/list/waiting = GLOB.clash_kit_issue_pending[job]
+	GLOB.clash_kit_issue_pending -= job
+	for(var/datum/requester as anything in waiting)
+		if(!QDELETED(requester))
+			SStgui.update_uis(requester)
+
 /// A picture of a fighter of this role wearing this kit, as a base64 PNG for the kit screen
 /proc/render_clash_kit_doll(datum/clash_kit/kit, job, client/viewer)
 	var/datum/job/role = GLOB.RoleAuthority.roles_by_name[job]
 	if(!role?.gear_preset)
 		return null
 	var/mob/living/carbon/human/dummy/model = generate_or_wait_for_human_dummy(CLASH_KIT_DUMMY)
-	model.set_species()
-	if(viewer?.prefs)
-		viewer.prefs.copy_appearance_to(model)
-	model.faction = clash_kit_faction_for_job(job)
-	model.update_body()
-	model.update_hair()
-	arm_equipment(model, role.gear_preset, FALSE, FALSE, viewer, TRUE)
-	apply_clash_kit(model, kit)
-	for(var/obj/limb/limb in model.limbs)
-		limb.blocks_emissive = EMISSIVE_BLOCK_NONE
-	model.regenerate_icons()
-	var/icon/flat = getFlatIcon(model)
-	. = flat ? icon2base64(flat) : null
+	try
+		model.set_species()
+		if(viewer?.prefs)
+			viewer.prefs.copy_appearance_to(model)
+		model.faction = clash_kit_faction_for_job(job)
+		model.update_body()
+		model.update_hair()
+		arm_equipment(model, role.gear_preset, FALSE, FALSE, viewer, TRUE)
+		apply_clash_kit(model, kit)
+		for(var/obj/limb/limb in model.limbs)
+			limb.blocks_emissive = EMISSIVE_BLOCK_NONE
+		model.regenerate_icons()
+		var/icon/flat = getFlatIcon(model)
+		. = flat ? icon2base64(flat) : null
+	catch(var/exception/error)
+		stack_trace("Clash kit could not draw a [job] doll: [error]")
+	// Always hand the dummy back, or every later doll waits on it forever
 	unset_busy_human_dummy(CLASH_KIT_DUMMY)
 
 #undef CLASH_KIT_DUMMY
+#undef CLASH_KIT_ISSUE_DUMMY

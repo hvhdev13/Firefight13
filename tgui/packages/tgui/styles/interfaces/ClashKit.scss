@@ -254,6 +254,28 @@ $panel: rgba(0, 0, 0, 0.3);
     pointer-events: none;
   }
 
+  &__slotIcon--issue {
+    opacity: 0.45;
+    filter: grayscale(0.6);
+  }
+
+  &__slotIssue {
+    position: absolute;
+    top: 3px;
+    right: 4px;
+    font-size: 0.6em;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.45;
+  }
+
+  &__hint {
+    padding: 0 12px;
+    font-size: 0.85em;
+    opacity: 0.7;
+    text-align: right;
+  }
+
   &__slotEmpty {
     position: absolute;
     left: 50%;
@@ -411,6 +433,8 @@ $panel: rgba(0, 0, 0, 0.3);
   }
 
   &__deploy {
+    min-width: 200px;
+    text-align: center;
     font-size: 1.15em;
     padding: 5px 18px;
     border-color: var(--kit-accent) !important;
@@ -420,6 +444,17 @@ $panel: rgba(0, 0, 0, 0.3);
     &:hover {
       background: var(--kit-accent) !important;
       color: #000 !important;
+    }
+  }
+
+  &__deploy--waiting {
+    border-color: $line !important;
+    color: rgba(255, 255, 255, 0.6) !important;
+    background: $panel !important;
+
+    &:hover {
+      background: $panel !important;
+      color: rgba(255, 255, 255, 0.6) !important;
     }
   }
 }

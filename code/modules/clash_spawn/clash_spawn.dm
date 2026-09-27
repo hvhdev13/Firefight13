@@ -80,7 +80,7 @@ SUBSYSTEM_DEF(clash_spawn)
 		for(var/line in clash_mode.get_welcome_rules())
 			page += "<li>[line]</li>"
 	if(clash_uses_kits())
-		page += "<li>Build your kit with the Loadout verb (OOC tab) or from the Respawn button. Pick armor, weapons, attachments and rigs per role; the active kit is on you every time you spawn. Up to [CLASH_KIT_COUNT] kits per role.</li>"
+		page += "<li>Your loadout is picked per role, like a class: open it from the Loadout button in the lobby, the Deploy button when you are down, or the Loadout verb. The kit you select is on you every time you spawn as that role. Up to [CLASH_KIT_COUNT] kits per role, starting from ready-made classes.</li>"
 	else
 		page += "<li>You can save your loadouts. At a vendor, use Save current in the Saved Loadouts section. Each role has 3 slots.</li>"
 	page += "<li>The enemy base is locked. Enemies cannot walk or throw grenades into it.</li>"

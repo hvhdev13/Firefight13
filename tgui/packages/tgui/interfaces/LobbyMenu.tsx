@@ -38,6 +38,7 @@ type LobbyData = {
   confirmation_message?: string | string[];
 
   upp_enabled: BooleanLike;
+  kits_enabled: BooleanLike;
   xenomorph_enabled: BooleanLike;
   predator_enabled: BooleanLike;
   fax_responder_enabled: BooleanLike;
@@ -467,10 +468,24 @@ const LobbyButtons = (props: {
                 </LobbyButton>
               </Stack.Item>
             )}
-            {!!predator_enabled && (
+            {!!data.kits_enabled && (
               <Stack.Item>
                 <LobbyButton
                   index={7 + (upp_enabled ? 1 : 0)}
+                  onClick={() => act('clash_loadout')}
+                  icon="person-rifle"
+                  tooltip="Pick a role and loadout, then deploy straight in"
+                >
+                  Loadout
+                </LobbyButton>
+              </Stack.Item>
+            )}
+            {!!predator_enabled && (
+              <Stack.Item>
+                <LobbyButton
+                  index={
+                    7 + (upp_enabled ? 1 : 0) + (data.kits_enabled ? 1 : 0)
+                  }
                   onClick={() => {
                     setModal(
                       <ModalConfirm>

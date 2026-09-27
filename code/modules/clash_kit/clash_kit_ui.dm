@@ -11,15 +11,14 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 		GLOB.clash_kit_screens[ckey] = screen
 	return screen
 
-/// Opens the kit screen. deploy makes its main button respawn the viewer wearing the kit.
-/proc/open_clash_kit_screen(mob/user, deploy = FALSE)
+/// Opens the kit screen. From the lobby, a ghost or a body it doubles as the spawn menu.
+/proc/open_clash_kit_screen(mob/user)
 	if(!clash_uses_kits())
 		to_chat(user, SPAN_WARNING("Kits are only used on arena maps. Faction Clash keeps the vendor loadouts."))
 		return
 	var/datum/clash_kit_screen/screen = get_clash_kit_screen(user)
 	if(!screen)
 		return
-	screen.deploy_mode = deploy
 	screen.pick_job_for(user)
 	screen.tgui_interact(user)
 
@@ -32,7 +31,6 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 	var/ckey
 	var/job
 	var/kit_index = 1
-	var/deploy_mode = FALSE
 	/// Base64 PNG of the doll last shown
 	var/doll
 	/// Job and choices the shown doll was drawn for
@@ -70,6 +68,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 	ui = SStgui.try_update_ui(user, src, ui)
 	if(!ui)
 		ui = new(user, src, "ClashKit", "Loadout")
+		// Pushed on change only: the doll is heavy and the respawn countdown runs in the client
 		ui.set_autoupdate(FALSE)
 		ui.open()
 
@@ -136,23 +135,90 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 			for(var/datum/clash_kit_option/option as anything in GLOB.clash_kit_menu[primary.faction][slot])
 				if(clash_kit_attachment_fits(option.item_type, primary.item_type))
 					fits += option.id
-	var/mob/living/carbon/human/fighter = ishuman(user) ? user : null
+	var/mob/living/carbon/human/fighter = ishuman(user) && user.stat != DEAD ? user : null
 	var/area/clash_arena/here = fighter ? get_area(fighter) : null
-	var/can_equip_now = fighter && fighter.stat == CONSCIOUS && fighter.job == job && istype(here) && here.clash_faction == fighter.faction
+	var/in_base = istype(here) && here.clash_faction == fighter?.faction
+	var/can_equip_now = fighter && fighter.stat == CONSCIOUS && fighter.job == job && in_base
+	var/deploy_state = get_deploy_state(user)
+	var/respawn_in = deploy_state == "dead" ? get_respawn_wait(user) : 0
+	if(respawn_in)
+		// One push when the wait is over, so Deploy lights up without polling
+		addtimer(CALLBACK(SStgui, TYPE_PROC_REF(/datum/controller/subsystem/tgui, update_uis), src), respawn_in + 1, TIMER_UNIQUE|TIMER_OVERRIDE)
+	var/list/issue = get_clash_issue_items(job)
+	if(isnull(issue))
+		queue_clash_issue_items(job, src)
+	var/hint
+	if(fighter)
+		if(fighter.job != job)
+			hint = "Editing [job]. You are playing [fighter.job]."
+		else if(in_base)
+			hint = "Equip now to swap into this kit, or it goes on at your next spawn."
+		else
+			hint = "Goes on at your next spawn. Head back to base to swap now."
+	else if(deploy_state)
+		hint = "Choose a role and a kit, then deploy."
 	return list(
 		"job" = job,
 		"faction" = clash_kit_faction_for_job(job),
 		"kits" = kit_data,
 		"kit_index" = kit_index,
-		"active_index" = get_clash_active_kit_index(ckey, job),
 		"choices" = kit?.choices || list(),
+		"issue" = issue || list(),
 		"fits" = fits,
 		"doll" = doll,
 		"doll_pending" = doll_pending,
 		"can_equip_now" = can_equip_now,
-		"deploy_mode" = deploy_mode && (isobserver(user) || (fighter && fighter.stat == DEAD)),
-		"live" = !!fighter && fighter.stat != DEAD,
+		"live" = !!fighter,
+		"deploy_state" = deploy_state,
+		"respawn_in" = CEILING(respawn_in / 10, 1),
+		"deploy_block" = deploy_state ? get_deploy_block(user) : null,
+		"revivable" = deploy_state == "dead" && !!user.get_revivable_body(),
+		"hint" = hint,
 	)
+
+/// "lobby" or "dead" when the viewer can spawn from this screen, else null
+/datum/clash_kit_screen/proc/get_deploy_state(mob/user)
+	if(isnewplayer(user))
+		return "lobby"
+	if(isobserver(user) || (isliving(user) && user.stat == DEAD))
+		return "dead"
+	return null
+
+/// Deciseconds until a dead viewer may respawn
+/datum/clash_kit_screen/proc/get_respawn_wait(mob/user)
+	if(!user.timeofdeath || check_client_rights(user.client, R_ADMIN, FALSE))
+		return 0
+	return max(0, user.timeofdeath + clash_respawn_cooldown() - world.time)
+
+/// Why deploying as the shown role would fail right now, or null. Checked before anything is given up.
+/datum/clash_kit_screen/proc/get_deploy_block(mob/user)
+	if(!user.client)
+		return "Not connected"
+	if(SSticker.current_state != GAME_STATE_PLAYING)
+		return "The round has not started"
+	if(!GLOB.enter_allowed)
+		return "Joining is locked right now"
+	if(get_deploy_state(user) == "dead" && !CONFIG_GET(flag/respawn) && !check_client_rights(user.client, R_ADMIN, FALSE))
+		return "Respawning is off"
+	var/datum/job/role = GLOB.RoleAuthority.roles_for_mode[job]
+	if(!role)
+		return "That role is not in this round"
+	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
+	if(istype(clash_mode) && !clash_mode.can_join_side(job))
+		return "Your side is full. Even the teams by joining the other side"
+	// Respawning frees the seat the player held, and they already passed the role's checks to take it
+	if(get_held_job(user) == job)
+		return null
+	if(!GLOB.RoleAuthority.check_role_entry(user, role, TRUE))
+		return "That role is full or not open to you"
+	return null
+
+/// The role a dead viewer was playing, which respawning gives up
+/datum/clash_kit_screen/proc/get_held_job(mob/user)
+	if(isnewplayer(user))
+		return null
+	var/mob/body = isobserver(user) ? user.mind?.original : user
+	return body?.job
 
 /datum/clash_kit_screen/proc/get_doll_key(datum/clash_kit/kit)
 	return json_encode(list(job, kit?.choices))
@@ -188,7 +254,11 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 		if("kit")
 			var/index = text2num(params["index"])
 			if(index >= 1 && index <= CLASH_KIT_COUNT)
+				// The kit you pick is the kit you spawn with
 				kit_index = index
+				var/list/active = GLOB.clash_active_kits[ckey]
+				active[job] = kit_index
+				save_clash_kits(ckey)
 		if("pick")
 			var/datum/clash_kit_option/option = get_clash_kit_option(params["id"])
 			if(!kit || !option || option.faction != clash_kit_faction_for_job(job) || option.slot != params["slot"])
@@ -211,11 +281,6 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 				return TRUE
 			kit.name = new_name
 			save_clash_kits(ckey)
-		if("set_active")
-			var/list/active = GLOB.clash_active_kits[ckey]
-			active[job] = kit_index
-			save_clash_kits(ckey)
-			to_chat(user, SPAN_NOTICE("[kit.name] will be your kit whenever you spawn as [job]."))
 		if("equip_now")
 			var/mob/living/carbon/human/fighter = user
 			var/area/clash_arena/here = ishuman(fighter) ? get_area(fighter) : null
@@ -229,12 +294,31 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 			apply_clash_kit(fighter, kit)
 			to_chat(user, SPAN_NOTICE("Re-kitted as [kit.name]."))
 		if("deploy")
-			if(!(isobserver(user) || (isliving(user) && user.stat == DEAD)))
-				return TRUE
-			var/list/active = GLOB.clash_active_kits[ckey]
-			active[job] = kit_index
-			save_clash_kits(ckey)
-			SStgui.close_uis(src)
-			user.abandon_mob()
+			deploy(user)
 			return TRUE
 	return TRUE
+
+/// Spawns the viewer as the shown role wearing the shown kit: straight from the lobby, or through a respawn
+/datum/clash_kit_screen/proc/deploy(mob/user)
+	var/state = get_deploy_state(user)
+	if(!state)
+		return
+	var/block = get_deploy_block(user)
+	if(block)
+		to_chat(user, SPAN_WARNING("[block]."))
+		return
+	if(state == "dead" && get_respawn_wait(user))
+		return
+	var/client/player = user.client
+	var/role = job
+	if(state == "dead")
+		// Respawning lands the player in the lobby, from where they join as the chosen role.
+		// The screen already asked everything the respawn verb would.
+		user.respawn_to_lobby(TRUE)
+	var/mob/new_player/lobby = player?.mob
+	if(!istype(lobby))
+		return
+	SStgui.close_uis(src)
+	if(!lobby.late_spawn(role))
+		// Whatever stopped it has been told to them; put them back on the screen rather than leave them in the lobby
+		open_clash_kit_screen(lobby)

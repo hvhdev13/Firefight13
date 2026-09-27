@@ -83,10 +83,12 @@ GLOBAL_LIST_EMPTY(clash_respawn_button_icons)
 	if(state != new_state)
 		state = new_state
 		icon = get_clash_respawn_button_icon(state)
+	// In kit rounds the button is the way into the spawn menu, so it works through the cooldown too
+	var/kits = clash_uses_kits()
 	if(state == RESPAWN_STATE_COOLDOWN)
-		maptext = "<span style='font-family: \"Small Fonts\"; font-size: 7px; -dm-text-outline: 1px black; text-align: center; vertical-align: middle; color: #a4acb4'>RESPAWN [floor(shown_seconds / 60)]:[shown_seconds % 60 < 10 ? "0" : ""][shown_seconds % 60]</span>"
+		maptext = "<span style='font-family: \"Small Fonts\"; font-size: 7px; -dm-text-outline: 1px black; text-align: center; vertical-align: middle; color: #a4acb4'>[kits ? "LOADOUT" : "RESPAWN"] [floor(shown_seconds / 60)]:[shown_seconds % 60 < 10 ? "0" : ""][shown_seconds % 60]</span>"
 		return
-	maptext = "<span style='font-family: \"VCR OSD Mono\"; font-size: 12px; text-align: center; vertical-align: middle; color: [state == RESPAWN_STATE_HOVER ? "#ffffff" : "#e6f5e8"]'>RESPAWN</span>"
+	maptext = "<span style='font-family: \"VCR OSD Mono\"; font-size: 12px; text-align: center; vertical-align: middle; color: [state == RESPAWN_STATE_HOVER ? "#ffffff" : "#e6f5e8"]'>[kits ? "DEPLOY" : "RESPAWN"]</span>"
 
 /atom/movable/screen/clash_respawn/MouseEntered(location, control, params)
 	hovered = TRUE
@@ -99,10 +101,12 @@ GLOBAL_LIST_EMPTY(clash_respawn_button_icons)
 		show_state(RESPAWN_STATE_READY)
 
 /atom/movable/screen/clash_respawn/clicked(mob/user, list/mods)
-	if(state != RESPAWN_STATE_READY && state != RESPAWN_STATE_HOVER)
+	if(!state)
 		return TRUE
 	if(clash_uses_kits())
-		open_clash_kit_screen(user, TRUE)
+		open_clash_kit_screen(user)
+		return TRUE
+	if(state != RESPAWN_STATE_READY && state != RESPAWN_STATE_HOVER)
 		return TRUE
 	user.abandon_mob()
 	return TRUE

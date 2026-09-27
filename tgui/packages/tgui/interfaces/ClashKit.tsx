@@ -37,6 +37,12 @@ interface RoleGroup {
   jobs: string[];
 }
 
+interface IssueItem {
+  name: string;
+  icon: string;
+  icon_state: string;
+}
+
 interface KitSummary {
   name: string;
   set: number;
@@ -54,14 +60,18 @@ interface Data extends StaticData {
   faction: string;
   kits: KitSummary[];
   kit_index: number;
-  active_index: number;
   choices: Record<string, string>;
+  issue: Record<string, IssueItem>;
   fits: string[];
   doll: string | null;
   doll_pending: BooleanLike;
   can_equip_now: BooleanLike;
-  deploy_mode: BooleanLike;
   live: BooleanLike;
+  deploy_state: 'lobby' | 'dead' | null;
+  respawn_in: number;
+  deploy_block: string | null;
+  revivable: BooleanLike;
+  hint: string | null;
 }
 
 /** Worn gear down the left of the doll, carried gear down the right */
@@ -69,6 +79,9 @@ const LEFT_SLOTS = ['helmet', 'mask', 'armor', 'back'];
 const RIGHT_SLOTS = ['primary', 'sidearm', 'grenade', 'belt'];
 const POUCH_SLOTS = ['pouch_l', 'pouch_r'];
 const ATTACHMENT_SLOTS = ['rail', 'muzzle', 'under', 'stock'];
+
+const clock = (seconds: number) =>
+  `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
 
 const findOption = (
   menus: Record<string, Record<string, Option[]>>,
@@ -83,14 +96,21 @@ const findOption = (
 const SlotTile = (props: {
   readonly slot: Slot;
   readonly picked?: Option;
+  readonly issued?: IssueItem;
   readonly selected: boolean;
   readonly dimmed?: boolean;
   readonly small?: boolean;
   readonly onClick: () => void;
 }) => {
-  const { slot, picked, selected, dimmed, small, onClick } = props;
+  const { slot, picked, issued, selected, dimmed, small, onClick } = props;
+  const shown = picked ?? issued;
+  const tooltip = picked
+    ? picked.name
+    : issued
+      ? `${issued.name} (job issue)`
+      : `${slot.name}: nothing`;
   return (
-    <Tooltip content={picked ? picked.name : `${slot.name}: job issue`}>
+    <Tooltip content={tooltip}>
       <Box
         className={classes([
           'ClashKit__slot',
@@ -101,25 +121,32 @@ const SlotTile = (props: {
         ])}
         onClick={onClick}
       >
-        {slot.image && (
+        {!shown && slot.image && (
           <img
             className="ClashKit__slotArt"
             src={resolveAsset(slot.image)}
             alt=""
           />
         )}
-        {picked ? (
+        {shown ? (
           <DmIcon
-            className="ClashKit__slotIcon"
-            icon={picked.icon}
-            icon_state={picked.icon_state}
+            className={classes([
+              'ClashKit__slotIcon',
+              !picked && 'ClashKit__slotIcon--issue',
+            ])}
+            icon={shown.icon}
+            icon_state={shown.icon_state}
             fallback={<Icon name="spinner" spin />}
           />
         ) : (
           !slot.image && <Icon className="ClashKit__slotEmpty" name="plus" />
         )}
         <Box className="ClashKit__slotLabel">{slot.name}</Box>
-        {picked && <Box className="ClashKit__slotDot" />}
+        {picked ? (
+          <Box className="ClashKit__slotDot" />
+        ) : (
+          issued && <Box className="ClashKit__slotIssue">issue</Box>
+        )}
       </Box>
     </Tooltip>
   );
@@ -144,13 +171,15 @@ const StatChips = (props: { readonly stats: [string, number][] }) => {
 
 const OptionRow = (props: {
   readonly option?: Option;
+  readonly issued?: IssueItem;
   readonly label?: string;
   readonly blurb?: string;
   readonly picked: boolean;
   readonly disabled?: boolean;
   readonly onClick: () => void;
 }) => {
-  const { option, label, blurb, picked, disabled, onClick } = props;
+  const { option, issued, label, blurb, picked, disabled, onClick } = props;
+  const art = option ?? issued;
   return (
     <Box
       className={classes([
@@ -162,10 +191,10 @@ const OptionRow = (props: {
     >
       <Stack align="center">
         <Stack.Item className="ClashKit__optionIcon">
-          {option ? (
+          {art ? (
             <DmIcon
-              icon={option.icon}
-              icon_state={option.icon_state}
+              icon={art.icon}
+              icon_state={art.icon_state}
               fallback={<Icon name="spinner" spin />}
             />
           ) : (
@@ -202,17 +231,32 @@ export const ClashKit = () => {
     faction,
     kits,
     kit_index,
-    active_index,
     choices,
+    issue,
     fits,
     doll,
     doll_pending,
     can_equip_now,
-    deploy_mode,
     live,
+    deploy_state,
+    respawn_in,
+    deploy_block,
+    revivable,
+    hint,
   } = data;
 
   const [selectedSlot, setSelectedSlot] = useState('primary');
+  // The server sends the wait once; the client counts it down
+  const [waitLeft, setWaitLeft] = useState(respawn_in);
+  useEffect(() => {
+    setWaitLeft(respawn_in);
+    if (!respawn_in) return;
+    const timer = setInterval(
+      () => setWaitLeft((left) => Math.max(0, left - 1)),
+      1000,
+    );
+    return () => clearInterval(timer);
+  }, [respawn_in]);
   const [renaming, setRenaming] = useState(false);
 
   useEffect(() => {
@@ -224,7 +268,16 @@ export const ClashKit = () => {
   const primary = findOption(menus, faction, 'primary', choices.primary);
   const current = slotById[selectedSlot];
   const options = menus[faction]?.[selectedSlot] ?? [];
-  const isActive = active_index === kit_index;
+  // Issue attachments only come with the issued gun
+  const issueFor = (id: string) =>
+    ATTACHMENT_SLOTS.includes(id) && choices.primary ? undefined : issue?.[id];
+  const issued = issueFor(selectedSlot);
+  const waiting = deploy_state === 'dead' && waitLeft > 0;
+  const deployLabel = deploy_block
+    ? 'Cannot deploy'
+    : waiting
+      ? `Deploy in ${clock(waitLeft)}`
+      : `Deploy as ${job}`;
   const isUpp = faction === 'UPP';
   const factionName = roles.find((group) => group.faction === faction)?.name;
 
@@ -240,6 +293,7 @@ export const ClashKit = () => {
       key={id}
       slot={slotById[id]}
       picked={findOption(menus, faction, id, choices[id])}
+      issued={issueFor(id)}
       selected={selectedSlot === id}
       small={small}
       dimmed={dimmed}
@@ -279,8 +333,8 @@ export const ClashKit = () => {
                         ])}
                         onClick={() => act('kit', { index: number })}
                       >
-                        {number === active_index && (
-                          <Icon name="star" className="ClashKit__kitStar" />
+                        {number === kit_index && (
+                          <Icon name="check" className="ClashKit__kitStar" />
                         )}
                         {entry.name}
                         {entry.set > 0 && (
@@ -324,15 +378,7 @@ export const ClashKit = () => {
                       <Icon name="pen" className="ClashKit__kitNamePen" />
                     </Box>
                   )}
-                  <Box className="ClashKit__dollSub">
-                    {isActive ? (
-                      <>
-                        <Icon name="star" /> Spawn kit for {job}
-                      </>
-                    ) : (
-                      `Not your spawn kit for ${job}`
-                    )}
-                  </Box>
+                  <Box className="ClashKit__dollSub">Your {job} class</Box>
                 </Box>
 
                 <Box className="ClashKit__dollGrid">
@@ -401,11 +447,14 @@ export const ClashKit = () => {
                 </Box>
                 <Box className="ClashKit__optionsList">
                   <OptionRow
-                    label={current?.attachment ? 'None' : 'Job issue'}
+                    issued={issued}
+                    label={issued ? issued.name : 'Nothing'}
                     blurb={
-                      current?.attachment
-                        ? 'Nothing in this slot'
-                        : 'Whatever the role hands out'
+                      issued
+                        ? `What a ${job} is issued`
+                        : current?.attachment
+                          ? 'Leave this slot empty'
+                          : `A ${job} gets nothing here`
                     }
                     picked={!choices[selectedSlot]}
                     onClick={() => act('clear', { slot: selectedSlot })}
@@ -434,16 +483,6 @@ export const ClashKit = () => {
           {/* Footer */}
           <Stack.Item className="ClashKit__footer">
             <Stack align="center">
-              <Stack.Item>
-                <Button
-                  icon="star"
-                  selected={isActive}
-                  disabled={isActive}
-                  onClick={() => act('set_active')}
-                >
-                  {isActive ? 'Spawn kit' : 'Use on spawn'}
-                </Button>
-              </Stack.Item>
               {!!live && (
                 <Stack.Item>
                   <Button
@@ -451,7 +490,7 @@ export const ClashKit = () => {
                     disabled={!can_equip_now}
                     tooltip={
                       can_equip_now
-                        ? 'Swap your gear for this kit'
+                        ? 'Swap your gear for this kit now'
                         : 'Only inside your own base, as this role'
                     }
                     onClick={() => act('equip_now')}
@@ -460,26 +499,48 @@ export const ClashKit = () => {
                   </Button>
                 </Stack.Item>
               )}
-              <Stack.Item grow />
+              <Stack.Item grow className="ClashKit__hint">
+                {hint}
+              </Stack.Item>
               <Stack.Item>
                 <Button.Confirm
-                  icon="eraser"
+                  icon="rotate-left"
                   color="transparent"
-                  confirmContent="Clear kit?"
+                  confirmContent="Back to job issue?"
+                  tooltip="Clear every pick in this kit"
                   onClick={() => act('reset')}
                 >
                   Reset
                 </Button.Confirm>
               </Stack.Item>
-              {!!deploy_mode && (
+              {!!deploy_state && (
                 <Stack.Item>
-                  <Button
-                    className="ClashKit__deploy"
-                    icon="person-running"
-                    onClick={() => act('deploy')}
-                  >
-                    Deploy · {kit?.name}
-                  </Button>
+                  {revivable && !waiting && !deploy_block ? (
+                    <Button.Confirm
+                      className="ClashKit__deploy"
+                      icon="person-running"
+                      confirmIcon="triangle-exclamation"
+                      confirmColor="average"
+                      confirmContent="Body can be revived. Deploy anyway?"
+                      onClick={() => act('deploy')}
+                    >
+                      {deployLabel}
+                    </Button.Confirm>
+                  ) : (
+                    <Button
+                      className={classes([
+                        'ClashKit__deploy',
+                        (waiting || deploy_block) &&
+                          'ClashKit__deploy--waiting',
+                      ])}
+                      icon={waiting ? 'hourglass-half' : 'person-running'}
+                      disabled={waiting || !!deploy_block}
+                      tooltip={deploy_block || undefined}
+                      onClick={() => act('deploy')}
+                    >
+                      {deployLabel}
+                    </Button>
+                  )}
                 </Stack.Item>
               )}
             </Stack>

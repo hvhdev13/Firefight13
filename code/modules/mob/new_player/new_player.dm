@@ -115,27 +115,34 @@
 	qdel(src)
 
 /mob/new_player/proc/AttemptLateSpawn(rank)
-	var/datum/job/player_rank = GLOB.RoleAuthority.roles_for_mode[rank]
 	if (src != usr)
 		return
+	return late_spawn(rank)
+
+/// Joins the round as rank. Returns TRUE once the player is in; tells them why not otherwise.
+/mob/new_player/proc/late_spawn(rank)
+	var/datum/job/player_rank = GLOB.RoleAuthority.roles_for_mode[rank]
+	if(!player_rank)
+		to_chat(src, SPAN_WARNING("[rank] is not available. Please try another."))
+		return FALSE
 	if(SSticker.current_state != GAME_STATE_PLAYING)
-		to_chat(usr, SPAN_WARNING("The round is either not ready, or has already finished!"))
-		return
+		to_chat(src, SPAN_WARNING("The round is either not ready, or has already finished!"))
+		return FALSE
 	if(!GLOB.enter_allowed)
-		to_chat(usr, SPAN_WARNING("There is an administrative lock on entering the game! (The dropship likely crashed into the Almayer. This should take at most 20 minutes.)"))
-		return
+		to_chat(src, SPAN_WARNING("There is an administrative lock on entering the game! (The dropship likely crashed into the Almayer. This should take at most 20 minutes.)"))
+		return FALSE
 
 	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
 	if(istype(clash_mode) && !clash_mode.can_join_side(rank))
-		to_chat(usr, SPAN_WARNING("That side has too many players. Join the other side to keep the teams even."))
-		return
+		to_chat(src, SPAN_WARNING("That side has too many players. Join the other side to keep the teams even."))
+		return FALSE
 
 	if(!client?.prefs.update_slot(player_rank.title))
-		return
+		return FALSE
 
 	if(!GLOB.RoleAuthority.assign_role(src, player_rank, latejoin = TRUE))
 		to_chat(src, SPAN_WARNING("[rank] is not available. Please try another."))
-		return
+		return FALSE
 
 	spawning = TRUE
 	close_spawn_windows()
@@ -189,7 +196,7 @@
 
 	character.client.init_verbs()
 	qdel(src)
-
+	return TRUE
 
 /mob/new_player/proc/late_choices()
 	var/mills = world.time // 1/10 of a second, not real milliseconds but whatever
