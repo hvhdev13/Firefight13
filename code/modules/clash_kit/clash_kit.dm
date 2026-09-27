@@ -54,7 +54,7 @@ GLOBAL_LIST_EMPTY(clash_kit_issue_pending)
 		load_clash_kits(ckey)
 	var/list/kits = by_job[job]
 	// A role never set up starts from the faction's starter classes
-	var/list/presets = kits ? list() : GLOB.clash_kit_presets[clash_kit_faction_for_job(job)]
+	var/list/presets = kits ? list() : get_clash_kit_role_presets(job)
 	if(!kits)
 		kits = list()
 		by_job[job] = kits
@@ -135,6 +135,24 @@ GLOBAL_LIST_EMPTY(clash_kit_issue_pending)
 					kit.choices[slot] = id
 			kits += kit
 		by_job[job] = kits
+
+/**
+ * Hands a fighter their role's full kit, over the bare job preset they spawned from.
+ * The job's empty pack makes way for the kit's packed one; anything else already worn stays.
+ */
+/proc/issue_clash_role_kit(mob/living/carbon/human/fighter, job)
+	var/kit_path = GLOB.clash_kit_role_kits[job]
+	var/datum/equipment_preset/full_kit = kit_path && GLOB.equipment_presets.gear_path_presets_list[kit_path]
+	if(!full_kit)
+		return
+	var/obj/item/pack = fighter.back
+	if(pack && !length(pack.contents))
+		fighter.temp_drop_inv_item(pack, TRUE)
+		qdel(pack)
+	try
+		full_kit.load_gear(fighter, fighter.client)
+	catch(var/exception/error)
+		stack_trace("Clash kit could not issue [job] their full kit: [error]")
 
 /// Takes out whatever is worn in a slot and puts the kit's item there. What the old one held moves across where it fits.
 /proc/clash_kit_replace_worn(mob/living/carbon/human/wearer, wear_slot, item_type)
@@ -305,6 +323,7 @@ GLOBAL_LIST_EMPTY(clash_kit_issue_pending)
 			model.set_species()
 			model.faction = clash_kit_faction_for_job(job)
 			arm_equipment(model, role.gear_preset, FALSE, FALSE, null, TRUE)
+			issue_clash_role_kit(model, job)
 			for(var/slot in GLOB.clash_kit_worn_slots)
 				var/list/info = describe_clash_kit_item(model.get_item_by_slot(GLOB.clash_kit_slots[slot]["wear"]))
 				if(info)
@@ -350,6 +369,7 @@ GLOBAL_LIST_EMPTY(clash_kit_issue_pending)
 		model.update_body()
 		model.update_hair()
 		arm_equipment(model, role.gear_preset, FALSE, FALSE, viewer, TRUE)
+		issue_clash_role_kit(model, job)
 		apply_clash_kit(model, kit)
 		for(var/obj/limb/limb in model.limbs)
 			limb.blocks_emissive = EMISSIVE_BLOCK_NONE

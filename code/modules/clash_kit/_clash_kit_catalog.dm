@@ -46,6 +46,72 @@ GLOBAL_LIST_EMPTY(clash_kit_menu)
 GLOBAL_LIST_EMPTY(clash_kit_gun_attachables)
 /// Faction to starter classes, each list(name, slot to option id), handed to players with nothing saved for a role
 GLOBAL_LIST_EMPTY(clash_kit_presets)
+
+/**
+ * The full kit each role fights in. Jobs spawn from bare presets and gear up at the prep vendors; these are
+ * the game's own fully equipped versions of the same roles, handed out on spawn in kit rounds instead.
+ * Roles not listed (the ship roles) are dressed by their job already.
+ */
+GLOBAL_LIST_INIT(clash_kit_role_kits, list(
+	JOB_SQUAD_MARINE = /datum/equipment_preset/uscm/private_equipped,
+	JOB_SQUAD_ENGI = /datum/equipment_preset/uscm/engineer_equipped,
+	JOB_SQUAD_MEDIC = /datum/equipment_preset/uscm/medic_equipped,
+	JOB_SQUAD_SMARTGUN = /datum/equipment_preset/uscm/smartgunner_equipped,
+	JOB_SQUAD_SPECIALIST = /datum/equipment_preset/uscm/specialist_equipped,
+	JOB_SQUAD_TEAM_LEADER = /datum/equipment_preset/uscm/tl_equipped,
+	JOB_SQUAD_LEADER = /datum/equipment_preset/uscm/leader_equipped,
+	JOB_UPP = /datum/equipment_preset/upp/soldier/dressed/rifleman,
+	JOB_UPP_ENGI = /datum/equipment_preset/upp/sapper/dressed,
+	JOB_UPP_MEDIC = /datum/equipment_preset/upp/medic/dressed,
+	JOB_UPP_SPECIALIST = /datum/equipment_preset/upp/machinegunner/dressed,
+	JOB_UPP_LEADER = /datum/equipment_preset/upp/leader/dressed,
+	JOB_UPP_LT_DOKTOR = /datum/equipment_preset/upp/doctor/dressed,
+	JOB_UPP_SUPPLY = /datum/equipment_preset/upp/supply/dressed,
+))
+/// Roles whose starter classes may swap their whole kit
+GLOBAL_LIST_INIT(clash_kit_rifleman_roles, list(JOB_SQUAD_MARINE, JOB_UPP))
+/// Roles whose weapon is the role, so their only starter class is their issue
+GLOBAL_LIST_INIT(clash_kit_heavy_roles, list(JOB_SQUAD_SMARTGUN, JOB_SQUAD_SPECIALIST, JOB_UPP_SPECIALIST))
+/// Roles whose own kit carries no primary, so a starter class with one comes first and is what they spawn with
+GLOBAL_LIST_INIT(clash_kit_unarmed_roles, list(JOB_SQUAD_TEAM_LEADER, JOB_DOCTOR, JOB_NURSE, JOB_FIELD_DOCTOR, JOB_CHIEF_REQUISITION, JOB_CARGO_TECH, JOB_UPP_LT_DOKTOR, JOB_UPP_SUPPLY))
+/// Slots a support role's starter classes may change, leaving their rigs, pouches and pack alone
+GLOBAL_LIST_INIT(clash_kit_weapon_slots, list(KIT_SLOT_HELMET, KIT_SLOT_ARMOR, KIT_SLOT_PRIMARY, KIT_SLOT_SIDEARM, KIT_SLOT_RAIL, KIT_SLOT_MUZZLE, KIT_SLOT_UNDER, KIT_SLOT_STOCK, KIT_SLOT_GRENADE))
+/// Job to its starter classes, worked out on first use
+GLOBAL_LIST_EMPTY(clash_kit_role_presets)
+
+/// The UPP soldier's full kit always as a rifleman, where the dressed preset rolls rifleman, breacher or both
+/datum/equipment_preset/upp/soldier/dressed/rifleman
+	name = "UPP Soldier (Rifleman)"
+
+/datum/equipment_preset/upp/soldier/dressed/rifleman/load_upp_soldier(mob/living/carbon/human/new_human, obj/item/clothing/under/marine/veteran/UPP/UPP)
+	load_upp_rifleman(new_human)
+
+/**
+ * A role's starter classes. Every role starts with its standard issue. Riflemen add the side's whole-kit
+ * classes; support and lead roles get the same classes as weapon and armour swaps that keep their gear.
+ */
+/proc/get_clash_kit_role_presets(job)
+	if(GLOB.clash_kit_role_presets[job])
+		return GLOB.clash_kit_role_presets[job]
+	var/list/classes = list(list("Standard issue", list()))
+	GLOB.clash_kit_role_presets[job] = classes
+	if(job in GLOB.clash_kit_heavy_roles)
+		return classes
+	var/list/side_classes = GLOB.clash_kit_presets[clash_kit_faction_for_job(job)]
+	var/whole_kit = (job in GLOB.clash_kit_rifleman_roles)
+	// The first side class is the rifleman, which standard issue already is
+	for(var/index in 2 to length(side_classes))
+		var/list/side_class = side_classes[index]
+		var/list/choices = side_class[2]
+		var/list/kept = list()
+		for(var/slot in choices)
+			if(whole_kit || (slot in GLOB.clash_kit_weapon_slots))
+				kept[slot] = choices[slot]
+		classes += list(list(side_class[1], kept))
+	if(job in GLOB.clash_kit_unarmed_roles && length(classes) > 1)
+		// Nobody should spawn into an arena unarmed by default; standard issue stays one click away
+		classes.Swap(1, 2)
+	return classes
 /**
  * What every fighter of a side wears under their kit, by wear slot, in the order it is put on.
  * The rifleman presets issue next to nothing and leave the rest to the prep vendors, but belts and

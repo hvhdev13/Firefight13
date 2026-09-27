@@ -32,6 +32,7 @@ SUBSYSTEM_DEF(clash_spawn)
 	if(istype(clash_mode) && clash_mode.spawn_protection)
 		spawned.AddComponent(/datum/component/clash_spawn_guard, clash_mode.spawn_protection)
 	if(clash_uses_kits())
+		issue_clash_role_kit(spawned, spawned.job)
 		var/datum/clash_kit/kit = get_clash_active_kit(spawned.ckey, spawned.job)
 		if(kit)
 			// Even an empty kit dresses the base outfit, which the vendors used to hand out
