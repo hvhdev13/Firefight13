@@ -39,6 +39,24 @@
 	if(!length(zones))
 		message_admins("HVH: [name] could not place any objectives on this map. Matches will be decided on time as draws.")
 
+/datum/game_mode/extended/faction_clash/hvh/tdm/objective/can_rebuild_objectives()
+	return TRUE
+
+/datum/game_mode/extended/faction_clash/hvh/tdm/objective/rebuild_objectives()
+	build_zones()
+	for(var/datum/clash_bot/bot as anything in GLOB.clash_bots)
+		if(bot.post && !bot.post.rally_id)
+			bot.anchor = bot.post.get_hold_turf()
+
+/datum/game_mode/extended/faction_clash/hvh/tdm/objective/get_objective_turfs()
+	. = list()
+	for(var/datum/clash_zone/zone as anything in zones)
+		.[zone.label] = zone.center
+
+/datum/game_mode/extended/faction_clash/hvh/tdm/objective/admin_set_score(faction, score)
+	objective_points[faction] = score
+	update_score_huds()
+
 /datum/game_mode/extended/faction_clash/hvh/tdm/objective/get_welcome_rules()
 	. = ..()
 	.[1] = get_objective_rule()

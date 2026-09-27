@@ -56,6 +56,8 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	var/list/match_wins = list()
 	var/match_timer_id
 	var/vote_timer_id
+	var/countdown_timer_id
+	var/intermission_timer_id
 	var/intermission_end_time
 	/// Whether weapons are held by a countdown or intermission ceasefire of ours
 	var/holding_fire = FALSE
@@ -213,12 +215,14 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	var/label = matches_per_round > 1 ? "Match [match_number + 1] of [matches_per_round]" : "Match"
 	for(var/faction in list(FACTION_MARINE, FACTION_UPP))
 		announce_to_faction(faction, "[label] starts in [countdown_time / 10] seconds. Gear up, you are held in your base until then.")
-	addtimer(CALLBACK(src, PROC_REF(start_match)), countdown_time)
+	countdown_timer_id = addtimer(CALLBACK(src, PROC_REF(start_match)), countdown_time, TIMER_STOPPABLE)
 	log_debug("HVH: countdown armed for [countdown_time / 10]s")
 
 /datum/game_mode/extended/faction_clash/hvh/proc/start_match()
 	if(match_live || round_finished)
 		return
+	deltimer(countdown_timer_id)
+	countdown_timer_id = null
 	match_number++
 	match_live = TRUE
 	countdown_end_time = null
@@ -251,6 +255,24 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 /// Objective states for the scoreboard, empty without objectives
 /datum/game_mode/extended/faction_clash/hvh/proc/get_objective_data()
 	return list()
+
+/// Whether this mode has objectives an admin can move
+/datum/game_mode/extended/faction_clash/hvh/proc/can_rebuild_objectives()
+	return FALSE
+
+/// Places the objectives again from scratch
+/datum/game_mode/extended/faction_clash/hvh/proc/rebuild_objectives()
+	return
+
+/// Objective name to turf, for admin jumps
+/datum/game_mode/extended/faction_clash/hvh/proc/get_objective_turfs()
+	return list()
+
+/// Sets a side's match score outright, for testing limits and series
+/datum/game_mode/extended/faction_clash/hvh/proc/admin_set_score(faction, score)
+	faction_kills[faction] = score
+	update_score_huds()
+	check_kill_limit(faction)
 
 /// Called once a match is live
 /datum/game_mode/extended/faction_clash/hvh/proc/on_match_start()
@@ -723,11 +745,13 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	for(var/mob/player as anything in GLOB.player_list)
 		GLOB.clash_scoreboard.tgui_interact(player)
 	update_score_huds()
-	addtimer(CALLBACK(src, PROC_REF(end_intermission)), CLASH_INTERMISSION)
+	intermission_timer_id = addtimer(CALLBACK(src, PROC_REF(end_intermission)), CLASH_INTERMISSION, TIMER_STOPPABLE)
 
 /datum/game_mode/extended/faction_clash/hvh/proc/end_intermission()
-	if(round_finished)
+	if(round_finished || !intermission_end_time)
 		return
+	deltimer(intermission_timer_id)
+	intermission_timer_id = null
 	intermission_end_time = null
 	archive_match()
 	reset_arena()

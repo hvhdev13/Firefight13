@@ -13,6 +13,8 @@
 	/// Faction to the turf its flag stands on
 	var/list/stands = list()
 	var/list/captures = list()
+	/// Tinted tiles marking the stands
+	var/list/stand_tiles = list()
 	var/list/round_captures = list()
 	var/flag_timer_id
 
@@ -37,10 +39,44 @@
 		return
 	for(var/faction in stands)
 		var/turf/home = stands[faction]
-		place_clash_flag_stand(home, faction_color(faction))
+		stand_tiles += place_clash_flag_stand(home, faction_color(faction))
 		GLOB.clash_objective_turfs |= home
 		spawn_flag(faction)
 		log_debug("HVH: [faction] flag stand at [home.x],[home.y]")
+
+/datum/game_mode/extended/faction_clash/hvh/tdm/ctf/can_rebuild_objectives()
+	return TRUE
+
+/datum/game_mode/extended/faction_clash/hvh/tdm/ctf/rebuild_objectives()
+	for(var/faction in flags)
+		var/obj/item/clash_flag/flag = flags[faction]
+		if(QDELETED(flag))
+			continue
+		if(ismob(flag.loc))
+			var/mob/holder = flag.loc
+			holder.drop_inv_item_on_ground(flag, TRUE, TRUE)
+		if(flag.carrier)
+			release_carrier(flag)
+		qdel(flag)
+	flags = list()
+	for(var/faction in stands)
+		GLOB.clash_objective_turfs -= stands[faction]
+	QDEL_LIST(stand_tiles)
+	build_stands()
+	for(var/datum/clash_bot/bot as anything in GLOB.clash_bots)
+		if(bot.post && !bot.post.rally_id)
+			bot.anchor = bot.post.get_hold_turf()
+
+/datum/game_mode/extended/faction_clash/hvh/tdm/ctf/get_objective_turfs()
+	. = list()
+	for(var/faction in stands)
+		.["[faction == FACTION_MARINE ? "USCM" : "UPP"] flag stand"] = stands[faction]
+
+/datum/game_mode/extended/faction_clash/hvh/tdm/ctf/admin_set_score(faction, score)
+	captures[faction] = score
+	update_score_huds()
+	if(score >= capture_limit)
+		finish_match("Capture limit reached")
 
 /datum/game_mode/extended/faction_clash/hvh/tdm/ctf/proc/spawn_flag(faction)
 	var/turf/home = stands[faction]
