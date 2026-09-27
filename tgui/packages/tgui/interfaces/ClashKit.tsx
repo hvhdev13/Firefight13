@@ -9,9 +9,7 @@ import {
   Dropdown,
   Icon,
   Input,
-  Section,
   Stack,
-  Tabs,
   Tooltip,
 } from 'tgui/components';
 import { Window } from 'tgui/layouts';
@@ -30,6 +28,7 @@ interface Option {
   icon: string;
   icon_state: string;
   ammo: number;
+  stats: [string, number][];
 }
 
 interface RoleGroup {
@@ -59,23 +58,16 @@ interface Data extends StaticData {
   choices: Record<string, string>;
   fits: string[];
   doll: string | null;
+  doll_pending: BooleanLike;
   can_equip_now: BooleanLike;
   deploy_mode: BooleanLike;
   live: BooleanLike;
 }
 
-/** Slots laid out around the doll, in pairs. Attachments sit under the primary. */
-const GEAR_SLOTS = [
-  'helmet',
-  'armor',
-  'mask',
-  'back',
-  'belt',
-  'primary',
-  'pouch_l',
-  'pouch_r',
-  'sidearm',
-];
+/** Worn gear down the left of the doll, carried gear down the right */
+const LEFT_SLOTS = ['helmet', 'mask', 'armor', 'back'];
+const RIGHT_SLOTS = ['primary', 'sidearm', 'grenade', 'belt'];
+const POUCH_SLOTS = ['pouch_l', 'pouch_r'];
 const ATTACHMENT_SLOTS = ['rail', 'muzzle', 'under', 'stock'];
 
 const findOption = (
@@ -127,8 +119,26 @@ const SlotTile = (props: {
           !slot.image && <Icon className="ClashKit__slotEmpty" name="plus" />
         )}
         <Box className="ClashKit__slotLabel">{slot.name}</Box>
+        {picked && <Box className="ClashKit__slotDot" />}
       </Box>
     </Tooltip>
+  );
+};
+
+const StatChips = (props: { readonly stats: [string, number][] }) => {
+  const { stats } = props;
+  if (!stats?.length) return null;
+  return (
+    <Box className="ClashKit__stats">
+      {stats.map(([label, value]) => (
+        <Box as="span" key={label} className="ClashKit__stat">
+          <Box as="span" className="ClashKit__statLabel">
+            {label}
+          </Box>
+          {value}
+        </Box>
+      ))}
+    </Box>
   );
 };
 
@@ -159,21 +169,24 @@ const OptionRow = (props: {
               fallback={<Icon name="spinner" spin />}
             />
           ) : (
-            <Icon name="user" size={1.5} />
+            <Icon name="box-open" size={1.4} />
           )}
         </Stack.Item>
         <Stack.Item grow>
-          <Box className="ClashKit__optionName">{option?.name ?? label}</Box>
-          <Box className="ClashKit__optionBlurb">
-            {option?.blurb ?? blurb}
-            {option && option.ammo > 0 ? ` · ${option.ammo} magazines` : ''}
+          <Box className="ClashKit__optionName">
+            {option?.name ?? label}
+            {option && option.ammo > 0 && (
+              <Box as="span" className="ClashKit__optionAmmo">
+                ×{option.ammo}
+              </Box>
+            )}
           </Box>
+          <Box className="ClashKit__optionBlurb">{option?.blurb ?? blurb}</Box>
+          {option && <StatChips stats={option.stats} />}
         </Stack.Item>
-        {picked && (
-          <Stack.Item>
-            <Icon name="check" />
-          </Stack.Item>
-        )}
+        <Stack.Item className="ClashKit__optionCheck">
+          {picked ? <Icon name="check" /> : disabled && <Icon name="ban" />}
+        </Stack.Item>
       </Stack>
     </Box>
   );
@@ -185,7 +198,6 @@ export const ClashKit = () => {
     slots,
     menus,
     roles,
-    kit_count,
     job,
     faction,
     kits,
@@ -194,6 +206,7 @@ export const ClashKit = () => {
     choices,
     fits,
     doll,
+    doll_pending,
     can_equip_now,
     deploy_mode,
     live,
@@ -212,6 +225,7 @@ export const ClashKit = () => {
   const current = slotById[selectedSlot];
   const options = menus[faction]?.[selectedSlot] ?? [];
   const isActive = active_index === kit_index;
+  const isUpp = faction === 'UPP';
   const factionName = roles.find((group) => group.faction === faction)?.name;
 
   const roleOptions = roles.flatMap((group) =>
@@ -221,83 +235,117 @@ export const ClashKit = () => {
     })),
   );
 
+  const tile = (id: string, small?: boolean, dimmed?: boolean) => (
+    <SlotTile
+      key={id}
+      slot={slotById[id]}
+      picked={findOption(menus, faction, id, choices[id])}
+      selected={selectedSlot === id}
+      small={small}
+      dimmed={dimmed}
+      onClick={() => setSelectedSlot(id)}
+    />
+  );
+
   return (
-    <Window
-      width={1000}
-      height={680}
-      theme={faction === 'UPP' ? 'crtupp' : 'crtblue'}
-    >
-      <Window.Content className="ClashKit">
+    <Window width={1080} height={700} theme={isUpp ? 'crtupp' : 'crtblue'}>
+      <Window.Content
+        className={classes(['ClashKit', isUpp && 'ClashKit--upp'])}
+      >
         <Stack fill vertical>
-          <Stack.Item>
+          {/* Header */}
+          <Stack.Item className="ClashKit__header">
             <Stack align="center">
+              <Stack.Item className="ClashKit__badge">{factionName}</Stack.Item>
               <Stack.Item>
                 <Dropdown
-                  width="260px"
+                  width="250px"
                   options={roleOptions}
                   selected={job}
-                  displayText={`${factionName} · ${job}`}
+                  displayText={job}
                   onSelected={(value) => act('role', { job: value })}
                 />
               </Stack.Item>
               <Stack.Item grow>
-                <Tabs>
-                  {kits.map((entry, index) => (
-                    <Tabs.Tab
-                      key={index}
-                      selected={index + 1 === kit_index}
-                      icon={index + 1 === active_index ? 'star' : undefined}
-                      onClick={() => act('kit', { index: index + 1 })}
-                    >
-                      {entry.name}
-                      <Box as="span" className="ClashKit__tabCount">
-                        {entry.set ? ` ${entry.set}` : ''}
+                <Box className="ClashKit__kitTabs">
+                  {kits.map((entry, index) => {
+                    const number = index + 1;
+                    return (
+                      <Box
+                        key={number}
+                        className={classes([
+                          'ClashKit__kitTab',
+                          number === kit_index && 'ClashKit__kitTab--selected',
+                        ])}
+                        onClick={() => act('kit', { index: number })}
+                      >
+                        {number === active_index && (
+                          <Icon name="star" className="ClashKit__kitStar" />
+                        )}
+                        {entry.name}
+                        {entry.set > 0 && (
+                          <Box as="span" className="ClashKit__kitCount">
+                            {entry.set}
+                          </Box>
+                        )}
                       </Box>
-                    </Tabs.Tab>
-                  ))}
-                </Tabs>
+                    );
+                  })}
+                </Box>
               </Stack.Item>
             </Stack>
           </Stack.Item>
 
+          {/* Body */}
           <Stack.Item grow>
             <Stack fill>
-              <Stack.Item width="236px">
-                <Section fill title="Gear">
-                  <Box className="ClashKit__slotGrid">
-                    {GEAR_SLOTS.map((id) => (
-                      <SlotTile
-                        key={id}
-                        slot={slotById[id]}
-                        picked={findOption(menus, faction, id, choices[id])}
-                        selected={selectedSlot === id}
-                        onClick={() => setSelectedSlot(id)}
-                      />
-                    ))}
+              {/* Doll with gear around it */}
+              <Stack.Item className="ClashKit__dollPanel">
+                <Box className="ClashKit__dollTitle">
+                  {renaming ? (
+                    <Input
+                      autoFocus
+                      width="180px"
+                      value={kit?.name}
+                      maxLength={24}
+                      onEnter={(_, value) => {
+                        act('rename', { name: value });
+                        setRenaming(false);
+                      }}
+                      onEscape={() => setRenaming(false)}
+                    />
+                  ) : (
+                    <Box
+                      as="span"
+                      className="ClashKit__kitName"
+                      onClick={() => setRenaming(true)}
+                    >
+                      {kit?.name}
+                      <Icon name="pen" className="ClashKit__kitNamePen" />
+                    </Box>
+                  )}
+                  <Box className="ClashKit__dollSub">
+                    {isActive ? (
+                      <>
+                        <Icon name="star" /> Spawn kit for {job}
+                      </>
+                    ) : (
+                      `Not your spawn kit for ${job}`
+                    )}
                   </Box>
-                  <Box className="ClashKit__attachHeader">
-                    {primary ? `${primary.name} attachments` : 'Attachments'}
-                  </Box>
-                  <Box className="ClashKit__attachGrid">
-                    {ATTACHMENT_SLOTS.map((id) => (
-                      <SlotTile
-                        key={id}
-                        small
-                        slot={slotById[id]}
-                        picked={findOption(menus, faction, id, choices[id])}
-                        selected={selectedSlot === id}
-                        dimmed={!primary}
-                        onClick={() => setSelectedSlot(id)}
-                      />
-                    ))}
-                  </Box>
-                </Section>
-              </Stack.Item>
+                </Box>
 
-              <Stack.Item width="220px">
-                <Section fill className="ClashKit__dollSection">
-                  <Stack fill vertical align="center" justify="center">
-                    <Stack.Item>
+                <Box className="ClashKit__dollGrid">
+                  <Box className="ClashKit__slotColumn">
+                    {LEFT_SLOTS.map((id) => tile(id))}
+                  </Box>
+                  <Box className="ClashKit__dollStage">
+                    <Box
+                      className={classes([
+                        'ClashKit__dollFrame',
+                        doll_pending && 'ClashKit__dollFrame--pending',
+                      ])}
+                    >
                       {doll ? (
                         <img
                           className="ClashKit__doll"
@@ -305,55 +353,55 @@ export const ClashKit = () => {
                           alt=""
                         />
                       ) : (
-                        <Icon name="user" size={6} color="label" />
-                      )}
-                    </Stack.Item>
-                    <Stack.Item className="ClashKit__dollName">
-                      {renaming ? (
-                        <Input
-                          autoFocus
-                          width="160px"
-                          value={kit?.name}
-                          maxLength={24}
-                          onEnter={(_, value) => {
-                            act('rename', { name: value });
-                            setRenaming(false);
-                          }}
-                          onEscape={() => setRenaming(false)}
+                        <Icon
+                          name="user"
+                          size={5}
+                          className="ClashKit__dollGhost"
                         />
-                      ) : (
-                        <Button
-                          color="transparent"
-                          icon="pen"
-                          tooltip="Rename"
-                          onClick={() => setRenaming(true)}
-                        >
-                          {kit?.name}
-                        </Button>
                       )}
-                    </Stack.Item>
-                    <Stack.Item className="ClashKit__dollMeta">
-                      {factionName} · {job}
-                      <br />
-                      {isActive ? 'Spawns with this kit' : 'Not the spawn kit'}
-                    </Stack.Item>
-                  </Stack>
-                </Section>
+                      {!!doll_pending && (
+                        <Icon
+                          name="circle-notch"
+                          spin
+                          className="ClashKit__dollSpinner"
+                        />
+                      )}
+                    </Box>
+                    <Box className="ClashKit__pouchRow">
+                      {POUCH_SLOTS.map((id) => tile(id, true))}
+                    </Box>
+                  </Box>
+                  <Box className="ClashKit__slotColumn">
+                    {RIGHT_SLOTS.map((id) => tile(id))}
+                  </Box>
+                </Box>
+
+                <Box className="ClashKit__attachHeader">
+                  {primary ? primary.name : 'Attachments'}
+                  {!primary && (
+                    <Box as="span" className="ClashKit__attachHint">
+                      pick a primary first
+                    </Box>
+                  )}
+                </Box>
+                <Box className="ClashKit__attachRow">
+                  {ATTACHMENT_SLOTS.map((id) => tile(id, true, !primary))}
+                </Box>
               </Stack.Item>
 
-              <Stack.Item grow>
-                <Section
-                  fill
-                  scrollable
-                  title={current?.name}
-                  buttons={
-                    current?.attachment && !primary ? (
-                      <Box color="label">Pick a primary first</Box>
-                    ) : undefined
-                  }
-                >
+              {/* Options */}
+              <Stack.Item grow className="ClashKit__optionsPanel">
+                <Box className="ClashKit__optionsHeader">
+                  <Box as="span" className="ClashKit__optionsTitle">
+                    {current?.name}
+                  </Box>
+                  <Box as="span" className="ClashKit__optionsCount">
+                    {options.length} options
+                  </Box>
+                </Box>
+                <Box className="ClashKit__optionsList">
                   <OptionRow
-                    label="Job issue"
+                    label={current?.attachment ? 'None' : 'Job issue'}
                     blurb={
                       current?.attachment
                         ? 'Nothing in this slot'
@@ -378,12 +426,13 @@ export const ClashKit = () => {
                       />
                     );
                   })}
-                </Section>
+                </Box>
               </Stack.Item>
             </Stack>
           </Stack.Item>
 
-          <Stack.Item>
+          {/* Footer */}
+          <Stack.Item className="ClashKit__footer">
             <Stack align="center">
               <Stack.Item>
                 <Button
@@ -427,10 +476,9 @@ export const ClashKit = () => {
                   <Button
                     className="ClashKit__deploy"
                     icon="person-running"
-                    color="good"
                     onClick={() => act('deploy')}
                   >
-                    Deploy with {kit?.name}
+                    Deploy · {kit?.name}
                   </Button>
                 </Stack.Item>
               )}

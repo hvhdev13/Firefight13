@@ -33,9 +33,13 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 	var/job
 	var/kit_index = 1
 	var/deploy_mode = FALSE
-	/// Base64 PNG of the doll, redrawn when a pick changes
+	/// Base64 PNG of the doll last shown
 	var/doll
-	var/doll_dirty = TRUE
+	/// Job and choices the shown doll was drawn for
+	var/doll_key
+	/// Drawn dolls by key, so flipping between kits is instant
+	var/list/doll_cache = list()
+	var/render_queued = FALSE
 	/// Re-kitting in place mints fresh gear, so it is rate limited
 	COOLDOWN_DECLARE(equip_cooldown)
 
@@ -57,7 +61,6 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 		return
 	job = new_job
 	kit_index = get_clash_active_kit_index(ckey, job)
-	doll_dirty = TRUE
 
 /datum/clash_kit_screen/proc/get_kit()
 	var/list/kits = get_clash_kits(ckey, job)
@@ -95,6 +98,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 					"icon" = "[initial(item.icon)]",
 					"icon_state" = initial(item.icon_state),
 					"ammo" = option.ammo_count,
+					"stats" = option.stats,
 				))
 			by_slot[slot] = options
 		menus[faction] = by_slot
@@ -109,9 +113,15 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 /datum/clash_kit_screen/ui_data(mob/user)
 	var/list/kits = get_clash_kits(ckey, job)
 	var/datum/clash_kit/kit = get_kit()
-	if(doll_dirty)
-		doll = render_clash_kit_doll(kit, job, user.client)
-		doll_dirty = FALSE
+	// The doll is drawn off the tick so a pick answers at once, then pushed when ready
+	var/wanted = get_doll_key(kit)
+	var/doll_pending = FALSE
+	if(doll_cache[wanted])
+		doll = doll_cache[wanted]
+		doll_key = wanted
+	else if(doll_key != wanted)
+		doll_pending = TRUE
+		queue_doll(user.client)
 	var/list/kit_data = list()
 	for(var/datum/clash_kit/each as anything in kits)
 		var/set_count = 0
@@ -138,10 +148,32 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 		"choices" = kit?.choices || list(),
 		"fits" = fits,
 		"doll" = doll,
+		"doll_pending" = doll_pending,
 		"can_equip_now" = can_equip_now,
 		"deploy_mode" = deploy_mode && (isobserver(user) || (fighter && fighter.stat == DEAD)),
 		"live" = !!fighter && fighter.stat != DEAD,
 	)
+
+/datum/clash_kit_screen/proc/get_doll_key(datum/clash_kit/kit)
+	return json_encode(list(job, kit?.choices))
+
+/datum/clash_kit_screen/proc/queue_doll(client/viewer)
+	if(render_queued)
+		return
+	render_queued = TRUE
+	addtimer(CALLBACK(src, PROC_REF(render_doll), viewer), 1)
+
+/datum/clash_kit_screen/proc/render_doll(client/viewer)
+	render_queued = FALSE
+	var/datum/clash_kit/kit = get_kit()
+	var/key = get_doll_key(kit)
+	if(!doll_cache[key])
+		doll_cache[key] = render_clash_kit_doll(kit, job, viewer)
+		if(length(doll_cache) > 24)
+			doll_cache.Cut(1, 2)
+	doll = doll_cache[key]
+	doll_key = key
+	SStgui.update_uis(src)
 
 /datum/clash_kit_screen/ui_act(action, list/params, datum/tgui/ui, datum/ui_state/state)
 	. = ..()
@@ -157,25 +189,21 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 			var/index = text2num(params["index"])
 			if(index >= 1 && index <= CLASH_KIT_COUNT)
 				kit_index = index
-				doll_dirty = TRUE
 		if("pick")
 			var/datum/clash_kit_option/option = get_clash_kit_option(params["id"])
 			if(!kit || !option || option.faction != clash_kit_faction_for_job(job) || option.slot != params["slot"])
 				return TRUE
 			kit.choices[option.slot] = option.id
-			doll_dirty = TRUE
 			save_clash_kits(ckey)
 		if("clear")
 			if(!kit || !(params["slot"] in GLOB.clash_kit_slots))
 				return TRUE
 			kit.choices -= params["slot"]
-			doll_dirty = TRUE
 			save_clash_kits(ckey)
 		if("reset")
 			if(!kit)
 				return TRUE
 			kit.choices = list()
-			doll_dirty = TRUE
 			save_clash_kits(ckey)
 		if("rename")
 			var/new_name = sanitize(copytext(trim("[params["name"]]"), 1, 25))

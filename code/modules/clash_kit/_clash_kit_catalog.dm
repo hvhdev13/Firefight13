@@ -8,6 +8,7 @@
 #define KIT_SLOT_POUCH_R "pouch_r"
 #define KIT_SLOT_PRIMARY "primary"
 #define KIT_SLOT_SIDEARM "sidearm"
+#define KIT_SLOT_GRENADE "grenade"
 #define KIT_SLOT_RAIL "rail"
 #define KIT_SLOT_MUZZLE "muzzle"
 #define KIT_SLOT_UNDER "under"
@@ -28,6 +29,7 @@ GLOBAL_LIST_INIT(clash_kit_slots, list(
 	KIT_SLOT_POUCH_R = list("name" = "Right pouch", "image" = "inventory-pocket.png", "wear" = WEAR_R_STORE),
 	KIT_SLOT_PRIMARY = list("name" = "Primary", "image" = "inventory-suit_storage.png", "wear" = WEAR_J_STORE),
 	KIT_SLOT_SIDEARM = list("name" = "Sidearm", "image" = "inventory-hand_r.png", "wear" = null),
+	KIT_SLOT_GRENADE = list("name" = "Grenades", "image" = "inventory-pocket.png", "wear" = null),
 	KIT_SLOT_RAIL = list("name" = "Rail", "image" = null, "wear" = null),
 	KIT_SLOT_MUZZLE = list("name" = "Muzzle", "image" = null, "wear" = null),
 	KIT_SLOT_UNDER = list("name" = "Underbarrel", "image" = null, "wear" = null),
@@ -50,9 +52,11 @@ GLOBAL_LIST_EMPTY(clash_kit_gun_attachables)
 	var/item_type
 	var/faction
 	var/slot
-	/// Guns: magazine type and how many come with it
+	/// Guns: magazine type and how many come with it. Grenades: how many
 	var/ammo_type
 	var/ammo_count = 0
+	/// Numbers shown under the name, list of list(label, value), read off an instance once
+	var/list/stats = list()
 
 /proc/add_clash_kit_option(faction, slot, name, item_type, blurb, ammo_type, ammo_count = 0)
 	var/datum/clash_kit_option/option = new
@@ -74,7 +78,37 @@ GLOBAL_LIST_EMPTY(clash_kit_gun_attachables)
 		options = list()
 		slots[slot] = options
 	options += option
+	option.stats = read_clash_kit_stats(option)
 	return option
+
+/// The numbers worth comparing for an option, from one throwaway instance
+/proc/read_clash_kit_stats(datum/clash_kit_option/option)
+	. = list()
+	var/obj/item/sample = new option.item_type
+	if(istype(sample, /obj/item/clothing))
+		var/obj/item/clothing/worn = sample
+		if(worn.armor_bullet || worn.armor_melee || worn.armor_bomb)
+			. += list(list("Bullet", worn.armor_bullet), list("Melee", worn.armor_melee), list("Blast", worn.armor_bomb))
+		if(worn.slowdown)
+			. += list(list("Slowdown", worn.slowdown))
+	else if(istype(sample, /obj/item/weapon/gun))
+		var/obj/item/weapon/gun/gun = sample
+		if(option.ammo_type)
+			var/obj/item/ammo_magazine/magazine = option.ammo_type
+			var/datum/ammo/round = GLOB.ammo_list[initial(magazine.default_ammo)]
+			if(round)
+				. += list(list("Damage", round.damage))
+				if(round.penetration)
+					. += list(list("AP", round.penetration))
+			. += list(list("Rounds", initial(magazine.max_rounds)))
+		var/delay = gun.get_fire_delay()
+		if(delay > 0)
+			. += list(list("RPM", round(600 / delay)))
+	else if(isstorage(sample))
+		var/obj/item/storage/holder = sample
+		if(holder.storage_slots)
+			. += list(list("Slots", holder.storage_slots))
+	qdel(sample)
 
 /proc/get_clash_kit_option(id)
 	return id ? GLOB.clash_kit_options[id] : null
@@ -114,7 +148,7 @@ GLOBAL_LIST_EMPTY(clash_kit_gun_attachables)
 		add_clash_kit_option(faction, slot, "First aid pouch", /obj/item/storage/pouch/firstaid/full, "Autoinjectors, refillable")
 		add_clash_kit_option(faction, slot, "Flare pouch", /obj/item/storage/pouch/flare/full, "Light up a lane")
 		add_clash_kit_option(faction, slot, "Medium general pouch", /obj/item/storage/pouch/general/medium, "Grenades, tools, whatever fits")
-		add_clash_kit_option(faction, slot, "Bayonet sheath", /obj/item/storage/pouch/bayonet, "Spare blade on the hip")
+		add_clash_kit_option(faction, slot, "Bayonet sheath", faction == FACTION_UPP ? /obj/item/storage/pouch/bayonet/upp : /obj/item/storage/pouch/bayonet, "Spare blade on the hip")
 	add_clash_kit_option(faction, KIT_SLOT_RAIL, "Red dot sight", /obj/item/attachable/reddot, "Accuracy up")
 	add_clash_kit_option(faction, KIT_SLOT_RAIL, "Reflex sight", /obj/item/attachable/reflex, "Accuracy up, less than the red dot, no scatter penalty")
 	add_clash_kit_option(faction, KIT_SLOT_RAIL, "Rail flashlight", /obj/item/attachable/flashlight, "Light")
@@ -154,7 +188,12 @@ GLOBAL_LIST_EMPTY(clash_kit_gun_attachables)
 	add_clash_kit_option(faction, KIT_SLOT_BELT, "M276 M44 holster rig", /obj/item/storage/belt/gun/m44, "Holsters the revolver with speedloaders")
 	add_clash_kit_option(faction, KIT_SLOT_BELT, "M276 M10 holster rig", /obj/item/storage/belt/gun/m10, "Holsters the M10 with spare magazines")
 	add_clash_kit_option(faction, KIT_SLOT_BELT, "M276 shotgun shell rig", /obj/item/storage/belt/shotgun, "Shells and slugs")
+	add_clash_kit_option(faction, KIT_SLOT_BELT, "M276 M40 grenade rig", /obj/item/storage/belt/grenade, "Grenades on the hip")
 	add_clash_kit_option(faction, KIT_SLOT_BELT, "G8-A general utility pouch", /obj/item/storage/backpack/general_belt, "Anything that fits")
+	add_clash_kit_option(faction, KIT_SLOT_GRENADE, "M40 HEDP", /obj/item/explosive/grenade/high_explosive, "High explosive, dual purpose", null, 2)
+	add_clash_kit_option(faction, KIT_SLOT_GRENADE, "M15 fragmentation", /obj/item/explosive/grenade/high_explosive/m15, "Old pattern, bigger bang, longer fuse", null, 2)
+	add_clash_kit_option(faction, KIT_SLOT_GRENADE, "M40 HIDP incendiary", /obj/item/explosive/grenade/incendiary, "Sets the ground alight", null, 2)
+	add_clash_kit_option(faction, KIT_SLOT_GRENADE, "M40 HSDP smoke", /obj/item/explosive/grenade/smokebomb, "Cover to cross", null, 2)
 	add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "M41A pulse rifle", /obj/item/weapon/gun/rifle/m41a, "All rounder. Burst and full auto", /obj/item/ammo_magazine/rifle, 4)
 	add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "M4RA battle rifle", /obj/item/weapon/gun/rifle/m4ra, "Hits hard at range. Semi auto", /obj/item/ammo_magazine/rifle/m4ra, 4)
 	add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "M37A2 pump shotgun", /obj/item/weapon/gun/shotgun/pump/m37a, "Wins the doorway. Buckshot", /obj/item/ammo_magazine/shotgun/buckshot, 4)
@@ -169,6 +208,8 @@ GLOBAL_LIST_EMPTY(clash_kit_gun_attachables)
 	add_clash_kit_option(faction, KIT_SLOT_HELMET, "UM4 helmet", /obj/item/clothing/head/helmet/marine/veteran/UPP, "Standard issue, heavy on the neck")
 	add_clash_kit_option(faction, KIT_SLOT_HELMET, "UM4 heavy helmet", /obj/item/clothing/head/helmet/marine/veteran/UPP/heavy, "More plate, more weight")
 	add_clash_kit_option(faction, KIT_SLOT_HELMET, "UM4 helmet, army", /obj/item/clothing/head/helmet/marine/veteran/UPP/army, "Same helmet, army pattern")
+	add_clash_kit_option(faction, KIT_SLOT_HELMET, "UL3 armored beret", /obj/item/clothing/head/uppcap/beret, "Light. Some plate under the cloth")
+	add_clash_kit_option(faction, KIT_SLOT_HELMET, "UL8 armored ushanka", /obj/item/clothing/head/uppcap/ushanka, "Light. Warm, some plate")
 	add_clash_kit_option(faction, KIT_SLOT_ARMOR, "UL6 light armor", /obj/item/clothing/suit/storage/marine/faction/UPP/support, "Fast. No neck guard")
 	add_clash_kit_option(faction, KIT_SLOT_ARMOR, "UM5 medium armor", /obj/item/clothing/suit/storage/marine/faction/UPP, "The balance. Standard issue")
 	add_clash_kit_option(faction, KIT_SLOT_ARMOR, "UH7 heavy armor", /obj/item/clothing/suit/storage/marine/faction/UPP/heavy, "Slow. Shrugs off bullets and blasts")
@@ -182,8 +223,12 @@ GLOBAL_LIST_EMPTY(clash_kit_gun_attachables)
 	add_clash_kit_option(faction, KIT_SLOT_BACK, "Shotgun scabbard", /obj/item/storage/large_holster/m37, "Carries a shotgun on the back")
 	add_clash_kit_option(faction, KIT_SLOT_BELT, "Type 41 ammo load rig", /obj/item/storage/belt/marine/upp, "Rifle magazines")
 	add_clash_kit_option(faction, KIT_SLOT_BELT, "NPZ92 holster rig", /obj/item/storage/belt/gun/type47, "Holsters a pistol with spare magazines")
-	add_clash_kit_option(faction, KIT_SLOT_BELT, "Shotgun shell rig", /obj/item/storage/belt/shotgun, "Shells and slugs")
+	add_clash_kit_option(faction, KIT_SLOT_BELT, "Type 42 shotgun shell rig", /obj/item/storage/belt/shotgun/upp, "Shells and slugs")
+	add_clash_kit_option(faction, KIT_SLOT_BELT, "Type 46 grenade rig", /obj/item/storage/belt/grenade/upp, "Grenades on the hip")
 	add_clash_kit_option(faction, KIT_SLOT_BELT, "G8-A general utility pouch", /obj/item/storage/backpack/general_belt, "Anything that fits")
+	add_clash_kit_option(faction, KIT_SLOT_GRENADE, "Type 6 shrapnel", /obj/item/explosive/grenade/high_explosive/upp, "Union pattern, fragments wide", null, 2)
+	add_clash_kit_option(faction, KIT_SLOT_GRENADE, "Type 8 WP", /obj/item/explosive/grenade/phosphorus/upp, "White phosphorus. Burns and blinds", null, 2)
+	add_clash_kit_option(faction, KIT_SLOT_GRENADE, "Smoke grenade", /obj/item/explosive/grenade/smokebomb, "Cover to cross", null, 2)
 	add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "Type 71 pulse rifle", /obj/item/weapon/gun/rifle/type71, "All rounder. Burst and full auto", /obj/item/ammo_magazine/rifle/type71, 4)
 	add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "Type 71 carbine", /obj/item/weapon/gun/rifle/type71/carbine, "Lighter and quicker, less reach", /obj/item/ammo_magazine/rifle/type71/carbine, 4)
 	add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "AK-4047", /obj/item/weapon/gun/rifle/ak4047, "Big magazine, big kick", /obj/item/ammo_magazine/rifle/ak4047, 4)

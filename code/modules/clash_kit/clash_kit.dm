@@ -230,6 +230,17 @@ GLOBAL_LIST_EMPTY(clash_active_kits)
 			clash_kit_give_magazines(wearer, primary)
 		if(sidearm)
 			clash_kit_give_magazines(wearer, sidearm)
+	var/datum/clash_kit_option/grenades = kit.get_option(KIT_SLOT_GRENADE)
+	if(grenades && grenades.faction == faction)
+		// Picked grenades replace the issue ones
+		for(var/obj/item/explosive/grenade/issued in wearer.get_contents())
+			if(issued.loc == wearer)
+				wearer.temp_drop_inv_item(issued, TRUE)
+			qdel(issued)
+		for(var/count in 1 to grenades.ammo_count)
+			var/obj/item/grenade = new grenades.item_type(wearer)
+			if(!wearer.equip_to_appropriate_slot(grenade))
+				qdel(grenade)
 	wearer.regenerate_icons()
 
 /// A picture of a fighter of this role wearing this kit, as a base64 PNG for the kit screen
