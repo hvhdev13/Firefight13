@@ -210,6 +210,18 @@ GLOBAL_LIST_EMPTY(clash_kit_issue_pending)
 	if(sidearm?.faction != faction)
 		sidearm = null
 
+	// Uniform and the rest under the kit, only where the role left the slot empty
+	var/list/base_outfit = GLOB.clash_kit_base_outfits[faction]
+	for(var/wear_slot in base_outfit)
+		if(wearer.get_item_by_slot(wear_slot))
+			continue
+		var/base_type = base_outfit[wear_slot]
+		var/obj/item/base_item = new base_type(wearer)
+		if(!wearer.equip_to_slot_if_possible(base_item, wear_slot, TRUE, FALSE, TRUE))
+			qdel(base_item)
+	if(faction == FACTION_UPP && istype(wearer.w_uniform, /obj/item/clothing/under/marine/veteran/UPP) && !(locate(/obj/item/clothing/accessory/patch/upp) in wearer.w_uniform.accessories))
+		wearer.equip_to_slot_if_possible(new /obj/item/clothing/accessory/patch/upp(wearer), WEAR_ACCESSORY, TRUE, TRUE, TRUE)
+
 	// Armor first, holding the issue gun out of the way, since a new suit would drop it
 	var/obj/item/issue_primary = wearer.s_store
 	if(issue_primary)

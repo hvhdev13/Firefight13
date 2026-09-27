@@ -46,6 +46,25 @@ GLOBAL_LIST_EMPTY(clash_kit_menu)
 GLOBAL_LIST_EMPTY(clash_kit_gun_attachables)
 /// Faction to starter classes, each list(name, slot to option id), handed to players with nothing saved for a role
 GLOBAL_LIST_EMPTY(clash_kit_presets)
+/**
+ * What every fighter of a side wears under their kit, by wear slot, in the order it is put on.
+ * The rifleman presets issue next to nothing and leave the rest to the prep vendors, but belts and
+ * pouches cannot be worn without a uniform, so a kit fills these in wherever the role left a slot empty.
+ */
+GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
+	FACTION_MARINE = list(
+		WEAR_BODY = /obj/item/clothing/under/marine,
+		WEAR_FEET = /obj/item/clothing/shoes/marine/knife,
+		WEAR_HANDS = /obj/item/clothing/gloves/marine,
+		WEAR_L_EAR = /obj/item/device/radio/headset/almayer/marine,
+	),
+	FACTION_UPP = list(
+		WEAR_BODY = /obj/item/clothing/under/marine/veteran/UPP,
+		WEAR_FEET = /obj/item/clothing/shoes/marine/upp/knife,
+		WEAR_HANDS = /obj/item/clothing/gloves/marine/veteran/upp,
+		WEAR_L_EAR = /obj/item/device/radio/headset/distress/UPP,
+	),
+))
 
 /// One thing a player can put in a kit slot
 /datum/clash_kit_option
@@ -166,48 +185,56 @@ GLOBAL_LIST_EMPTY(clash_kit_presets)
 
 /proc/build_clash_kit_presets()
 	add_clash_kit_preset(FACTION_MARINE, "Rifleman", list(
+		KIT_SLOT_HELMET = /obj/item/clothing/head/helmet/marine,
 		KIT_SLOT_PRIMARY = /obj/item/weapon/gun/rifle/m41a, KIT_SLOT_RAIL = /obj/item/attachable/reddot,
 		KIT_SLOT_ARMOR = /obj/item/clothing/suit/storage/marine/medium, KIT_SLOT_BELT = /obj/item/storage/belt/marine,
-		KIT_SLOT_POUCH_L = /obj/item/storage/pouch/firstaid/full, KIT_SLOT_POUCH_R = /obj/item/storage/pouch/magazine,
+		KIT_SLOT_POUCH_L = /obj/item/storage/pouch/firstaid/full, KIT_SLOT_POUCH_R = /obj/item/storage/pouch/explosive,
 		KIT_SLOT_GRENADE = /obj/item/explosive/grenade/high_explosive,
 	))
 	add_clash_kit_preset(FACTION_MARINE, "Assault", list(
+		KIT_SLOT_HELMET = /obj/item/clothing/head/helmet/marine,
 		KIT_SLOT_PRIMARY = /obj/item/weapon/gun/smg/m39, KIT_SLOT_RAIL = /obj/item/attachable/reflex, KIT_SLOT_UNDER = /obj/item/attachable/verticalgrip,
 		KIT_SLOT_ARMOR = /obj/item/clothing/suit/storage/marine/light, KIT_SLOT_BELT = /obj/item/storage/belt/gun/m4a3,
 		KIT_SLOT_SIDEARM = /obj/item/weapon/gun/pistol/m4a3, KIT_SLOT_POUCH_L = /obj/item/storage/pouch/firstaid/full,
 		KIT_SLOT_POUCH_R = /obj/item/storage/pouch/magazine, KIT_SLOT_GRENADE = /obj/item/explosive/grenade/smokebomb,
 	))
 	add_clash_kit_preset(FACTION_MARINE, "Breacher", list(
+		KIT_SLOT_HELMET = /obj/item/clothing/head/helmet/marine,
 		KIT_SLOT_PRIMARY = /obj/item/weapon/gun/shotgun/pump/m37a, KIT_SLOT_RAIL = /obj/item/attachable/flashlight,
 		KIT_SLOT_ARMOR = /obj/item/clothing/suit/storage/marine/heavy, KIT_SLOT_BELT = /obj/item/storage/belt/shotgun,
 		KIT_SLOT_SIDEARM = /obj/item/weapon/gun/pistol/mod88, KIT_SLOT_POUCH_L = /obj/item/storage/pouch/firstaid/full,
 		KIT_SLOT_POUCH_R = /obj/item/storage/pouch/shotgun, KIT_SLOT_GRENADE = /obj/item/explosive/grenade/high_explosive,
 	))
 	add_clash_kit_preset(FACTION_MARINE, "Marksman", list(
+		KIT_SLOT_HELMET = /obj/item/clothing/head/helmet/marine,
 		KIT_SLOT_PRIMARY = /obj/item/weapon/gun/rifle/m4ra, KIT_SLOT_RAIL = /obj/item/attachable/scope/mini, KIT_SLOT_MUZZLE = /obj/item/attachable/extended_barrel,
 		KIT_SLOT_ARMOR = /obj/item/clothing/suit/storage/marine/medium, KIT_SLOT_BELT = /obj/item/storage/belt/gun/m44,
 		KIT_SLOT_SIDEARM = /obj/item/weapon/gun/revolver/m44, KIT_SLOT_POUCH_L = /obj/item/storage/pouch/firstaid/full,
 		KIT_SLOT_POUCH_R = /obj/item/storage/pouch/magazine,
 	))
 	add_clash_kit_preset(FACTION_UPP, "Rifleman", list(
+		KIT_SLOT_HELMET = /obj/item/clothing/head/helmet/marine/veteran/UPP,
 		KIT_SLOT_PRIMARY = /obj/item/weapon/gun/rifle/type71, KIT_SLOT_RAIL = /obj/item/attachable/reddot,
 		KIT_SLOT_ARMOR = /obj/item/clothing/suit/storage/marine/faction/UPP, KIT_SLOT_BELT = /obj/item/storage/belt/marine/upp,
-		KIT_SLOT_POUCH_L = /obj/item/storage/pouch/firstaid/full, KIT_SLOT_POUCH_R = /obj/item/storage/pouch/magazine,
+		KIT_SLOT_POUCH_L = /obj/item/storage/pouch/firstaid/full, KIT_SLOT_POUCH_R = /obj/item/storage/pouch/explosive,
 		KIT_SLOT_GRENADE = /obj/item/explosive/grenade/high_explosive/upp,
 	))
 	add_clash_kit_preset(FACTION_UPP, "Carbineer", list(
+		KIT_SLOT_HELMET = /obj/item/clothing/head/helmet/marine/veteran/UPP,
 		KIT_SLOT_PRIMARY = /obj/item/weapon/gun/rifle/type71/carbine, KIT_SLOT_RAIL = /obj/item/attachable/reflex, KIT_SLOT_UNDER = /obj/item/attachable/verticalgrip,
 		KIT_SLOT_ARMOR = /obj/item/clothing/suit/storage/marine/faction/UPP/support, KIT_SLOT_BELT = /obj/item/storage/belt/gun/type47,
 		KIT_SLOT_SIDEARM = /obj/item/weapon/gun/pistol/t73, KIT_SLOT_POUCH_L = /obj/item/storage/pouch/firstaid/full,
 		KIT_SLOT_POUCH_R = /obj/item/storage/pouch/magazine, KIT_SLOT_GRENADE = /obj/item/explosive/grenade/smokebomb,
 	))
 	add_clash_kit_preset(FACTION_UPP, "Breacher", list(
+		KIT_SLOT_HELMET = /obj/item/clothing/head/helmet/marine/veteran/UPP/heavy,
 		KIT_SLOT_PRIMARY = /obj/item/weapon/gun/shotgun/type23,
 		KIT_SLOT_ARMOR = /obj/item/clothing/suit/storage/marine/faction/UPP/heavy, KIT_SLOT_BELT = /obj/item/storage/belt/shotgun/upp,
 		KIT_SLOT_SIDEARM = /obj/item/weapon/gun/pistol/np92, KIT_SLOT_POUCH_L = /obj/item/storage/pouch/firstaid/full,
 		KIT_SLOT_POUCH_R = /obj/item/storage/pouch/shotgun, KIT_SLOT_GRENADE = /obj/item/explosive/grenade/phosphorus/upp,
 	))
 	add_clash_kit_preset(FACTION_UPP, "Gunner", list(
+		KIT_SLOT_HELMET = /obj/item/clothing/head/helmet/marine/veteran/UPP,
 		KIT_SLOT_PRIMARY = /obj/item/weapon/gun/rifle/ak4047, KIT_SLOT_RAIL = /obj/item/attachable/reddot, KIT_SLOT_MUZZLE = /obj/item/attachable/compensator,
 		KIT_SLOT_ARMOR = /obj/item/clothing/suit/storage/marine/faction/UPP, KIT_SLOT_BELT = /obj/item/storage/belt/marine/upp,
 		KIT_SLOT_POUCH_L = /obj/item/storage/pouch/firstaid/full, KIT_SLOT_POUCH_R = /obj/item/storage/pouch/magazine/large,
@@ -224,7 +251,8 @@ GLOBAL_LIST_EMPTY(clash_kit_presets)
 		add_clash_kit_option(faction, slot, "Shotgun shell pouch", /obj/item/storage/pouch/shotgun, "Shells and slugs")
 		add_clash_kit_option(faction, slot, "First aid pouch", /obj/item/storage/pouch/firstaid/full, "Autoinjectors, refillable")
 		add_clash_kit_option(faction, slot, "Flare pouch", /obj/item/storage/pouch/flare/full, "Light up a lane")
-		add_clash_kit_option(faction, slot, "Medium general pouch", /obj/item/storage/pouch/general/medium, "Grenades, tools, whatever fits")
+		add_clash_kit_option(faction, slot, "Explosive pouch", /obj/item/storage/pouch/explosive, "Carries your grenades")
+		add_clash_kit_option(faction, slot, "Medium general pouch", /obj/item/storage/pouch/general/medium, "Tools, flares, whatever fits")
 		add_clash_kit_option(faction, slot, "Bayonet sheath", faction == FACTION_UPP ? /obj/item/storage/pouch/bayonet/upp : /obj/item/storage/pouch/bayonet, "Spare blade on the hip")
 	add_clash_kit_option(faction, KIT_SLOT_RAIL, "Red dot sight", /obj/item/attachable/reddot, "Accuracy up")
 	add_clash_kit_option(faction, KIT_SLOT_RAIL, "Reflex sight", /obj/item/attachable/reflex, "Accuracy up, less than the red dot, no scatter penalty")

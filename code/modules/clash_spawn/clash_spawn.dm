@@ -33,7 +33,8 @@ SUBSYSTEM_DEF(clash_spawn)
 		spawned.AddComponent(/datum/component/clash_spawn_guard, clash_mode.spawn_protection)
 	if(clash_uses_kits())
 		var/datum/clash_kit/kit = get_clash_active_kit(spawned.ckey, spawned.job)
-		if(kit && length(kit.choices))
+		if(kit)
+			// Even an empty kit dresses the base outfit, which the vendors used to hand out
 			apply_clash_kit(spawned, kit)
 			to_chat(spawned, SPAN_NOTICE("Kitted out as [kit.name]. Use the Loadout verb to change it."))
 	else
