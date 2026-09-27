@@ -667,17 +667,17 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		return MODE_FACTION_CLASH_UPP_MAJOR
 	return MODE_FACTION_CLASH_DRAW
 
-/// Highest scorer in a score table, kills first, then assists, then fewest deaths
+/// Highest scorer in a score table: kills, half an assist, three per flag capture, then fewest deaths
 /datum/game_mode/extended/faction_clash/hvh/proc/pick_mvp(list/scores)
 	var/best
 	var/list/best_entry
 	for(var/name in scores)
 		var/list/entry = scores[name]
-		if(!entry["ckey"] || (!entry["kills"] && !entry["assists"]))
+		if(!entry["ckey"] || (!entry["kills"] && !entry["assists"] && !entry["captures"]))
 			continue
 		if(best_entry)
-			var/score = entry["kills"] + entry["assists"] * 0.5
-			var/best_score = best_entry["kills"] + best_entry["assists"] * 0.5
+			var/score = entry["kills"] + entry["assists"] * 0.5 + (entry["captures"] || 0) * 3
+			var/best_score = best_entry["kills"] + best_entry["assists"] * 0.5 + (best_entry["captures"] || 0) * 3
 			if(score < best_score || (score == best_score && entry["deaths"] >= best_entry["deaths"]))
 				continue
 		best = name
@@ -692,8 +692,8 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		if(!total)
 			round_scores[name] = entry.Copy()
 			continue
-		for(var/stat in list("kills", "assists", "deaths", "shots", "hits"))
-			total[stat] += entry[stat]
+		for(var/stat in list("kills", "assists", "deaths", "shots", "hits", "captures"))
+			total[stat] = (total[stat] || 0) + (entry[stat] || 0)
 		total["best_streak"] = max(total["best_streak"], entry["best_streak"])
 		if(!total["ckey"])
 			total["ckey"] = entry["ckey"]
@@ -1006,6 +1006,8 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	var/best_accuracy = 0
 	var/best_assists_name
 	var/best_assists = 0
+	var/best_captures_name
+	var/best_captures = 0
 	for(var/name in player_scores)
 		var/list/entry = player_scores[name]
 		if(!entry["ckey"])
@@ -1026,6 +1028,9 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		if(entry["assists"] > best_assists)
 			best_assists = entry["assists"]
 			best_assists_name = name
+		if((entry["captures"] || 0) > best_captures)
+			best_captures = entry["captures"]
+			best_captures_name = name
 	if(best_kd_name)
 		. += "Deadliest: [best_kd_name], [round(best_kd, 0.01)] K/D"
 	if(best_streak_name)
@@ -1034,6 +1039,8 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		. += "Sharpshooter: [best_accuracy_name], [round(best_accuracy * 100, 0.1)]% of shots on target"
 	if(best_assists_name)
 		. += "Team player: [best_assists_name], [best_assists] assists"
+	if(best_captures_name)
+		. += "Flag runner: [best_captures_name], [best_captures] captures"
 
 /datum/game_mode/extended/faction_clash/hvh/proc/announce_personal_stats()
 	for(var/mob/player as anything in GLOB.player_list)

@@ -79,6 +79,8 @@
 	var/tdm_kill_limit
 	/// Objective arena modes: points that win the match early, null uses the mode default
 	var/tdm_point_limit
+	/// Capture the Flag: captures that win the match early, null uses the mode default
+	var/tdm_capture_limit
 	/// Team Deathmatch: seconds both teams are held in base before the match starts, null uses the mode default
 	var/tdm_countdown_seconds
 	/// Team Deathmatch: seconds of protection after a fresh spawn leaves base, null uses the mode default
@@ -460,6 +462,13 @@
 		tdm_point_limit = temp
 	else if(!isnull(temp))
 		log_world("map_config tdm_point_limit is not a positive number!")
+		return
+
+	temp = json["tdm_capture_limit"]
+	if(isnum(temp) && temp > 0)
+		tdm_capture_limit = temp
+	else if(!isnull(temp))
+		log_world("map_config tdm_capture_limit is not a positive number!")
 		return
 
 	temp = json["tdm_countdown_seconds"]

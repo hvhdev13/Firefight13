@@ -22,6 +22,9 @@
 		if(isliving(mover))
 			mover.balloon_alert(mover, "enemy base")
 		return FALSE
+	if(clash_faction && clash_carries_enemy_flag(mover))
+		mover.balloon_alert(mover, "take the flag to your stand")
+		return FALSE
 	return ..()
 
 /area/clash_arena/Exit(atom/movable/mover, atom/newloc)

@@ -173,7 +173,7 @@ GLOBAL_DATUM(clash_zone_tile_icon, /icon)
 		.[faction] = list(sum[1] / sum[3], sum[2] / sum[3])
 
 /// Walkable turfs outside the bases reachable from start, for placing objectives where players can get to them
-/proc/get_clash_reachable_turfs(turf/start)
+/proc/get_clash_reachable_turfs(turf/start, max_steps = CLASH_ZONE_SEARCH_STEPS)
 	. = list()
 	if(!clash_turf_passable(start))
 		return
@@ -187,7 +187,7 @@ GLOBAL_DATUM(clash_zone_tile_icon, /icon)
 		var/taken = steps[current]
 		if(!clash_in_base(current))
 			. += current
-		if(taken >= CLASH_ZONE_SEARCH_STEPS)
+		if(taken >= max_steps)
 			continue
 		for(var/direction in GLOB.cardinals)
 			var/turf/next = get_step(current, direction)

@@ -117,3 +117,9 @@ endmap
 
 map tdm_jungle_domination
 endmap
+
+map tdm_deathmatch2000_ctf
+endmap
+
+map tdm_jungle_ctf
+endmap
