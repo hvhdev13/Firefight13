@@ -328,7 +328,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	if(length(parts))
 		lines += "<span class='maptext center' style='color: #c3c9ce'>[parts.Join("  ·  ")]</span>"
 	lines += get_objective_maptext()
-	return lines.Join("<br>")
+	return "<span style='vertical-align: top'>[lines.Join("<br>")]</span>"
 
 /datum/game_mode/extended/faction_clash/hvh/proc/get_scoreboard_data(mob/viewer)
 	var/leader = match_live || intermission_end_time || round_finished ? pick_mvp(player_scores) : null

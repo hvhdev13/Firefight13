@@ -23,9 +23,9 @@
 	icon = null
 	icon_state = null
 	mouse_opacity = MOUSE_OPACITY_TRANSPARENT
-	screen_loc = "CENTER-4,TOP:-10"
+	screen_loc = "CENTER-3,TOP:-18"
 	maptext_height = 40
-	maptext_width = 288
+	maptext_width = 224
 	maptext_y = -42
 	maptext = ""
 	var/shown_panel
