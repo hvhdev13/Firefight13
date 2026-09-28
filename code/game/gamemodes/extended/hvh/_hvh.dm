@@ -872,8 +872,6 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 			continue
 		if(fighter.stat == DEAD)
 			// Nobody gets to be revived into the next match, so free anyone still in their body and clear it
-			if(fighter.client)
-				// They left no body behind, so they may deploy again as soon as they are back
 			fighter.timeofdeath = max(1, world.time - respawn_cooldown)
 			fighter.ghostize(FALSE)
 			qdel(fighter)
