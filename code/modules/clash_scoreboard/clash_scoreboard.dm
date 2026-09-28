@@ -37,7 +37,12 @@ GLOBAL_DATUM_INIT(clash_scoreboard, /datum/clash_scoreboard, new)
 	if(!istype(SSticker.mode, /datum/game_mode/extended/faction_clash/hvh))
 		to_chat(user, SPAN_WARNING("There is no scoreboard this round."))
 		return
+	close_clash_kit_screen(user)
 	GLOB.clash_scoreboard.tgui_interact(user)
+
+/proc/close_clash_scoreboard(mob/user)
+	var/datum/tgui/open_ui = SStgui.get_open_ui(user, GLOB.clash_scoreboard)
+	open_ui?.close()
 
 /proc/toggle_clash_scoreboard(mob/user)
 	if(!user || !istype(SSticker.mode, /datum/game_mode/extended/faction_clash/hvh))
@@ -46,6 +51,7 @@ GLOBAL_DATUM_INIT(clash_scoreboard, /datum/clash_scoreboard, new)
 	if(open_ui)
 		open_ui.close()
 		return TRUE
+	close_clash_kit_screen(user)
 	GLOB.clash_scoreboard.tgui_interact(user)
 	return TRUE
 

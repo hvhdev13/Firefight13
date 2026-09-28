@@ -17,8 +17,17 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 	var/datum/clash_kit_screen/screen = get_clash_kit_screen(user)
 	if(!screen)
 		return
+	close_clash_scoreboard(user)
 	screen.pick_job_for(user)
 	screen.tgui_interact(user)
+
+/proc/get_open_clash_kit_screen(mob/user)
+	var/datum/clash_kit_screen/screen = user.ckey && GLOB.clash_kit_screens[user.ckey]
+	return screen && SStgui.get_open_ui(user, screen)
+
+/proc/close_clash_kit_screen(mob/user)
+	var/datum/tgui/open_ui = get_open_clash_kit_screen(user)
+	open_ui?.close()
 
 /mob/verb/clash_loadout()
 	set name = "Loadout"

@@ -292,7 +292,10 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 	if(!firing)
 		return
 	firing = FALSE
-	gun?.stop_fire()
+	if(gun?.gun_user)
+		gun.stop_fire()
+	else
+		gun?.reset_fire()
 	next_fire = world.time + rand(5, 10)
 
 /datum/clash_bot/proc/reload()
