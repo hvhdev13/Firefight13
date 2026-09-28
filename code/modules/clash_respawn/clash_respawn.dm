@@ -266,7 +266,10 @@ GLOBAL_LIST_EMPTY(clash_death_card_icons)
 	var/outline = "-dm-text-outline: 1px black"
 	var/list/lines = list()
 	lines += "<span style='font-family: \"Small Fonts\"; font-size: 6px; color: #aab2b9'>[headline]</span>"
-	lines += "<span style='font-family: \"VCR OSD Mono\"; font-size: 14px; color: [color]'>[killer_name ? html_encode(killer_name) : "YOU DIED"]</span>"
+	var/shown_name = killer_name ? replacetext(killer_name, " \[BOT\]", "") : "YOU DIED"
+	var/name_size = length(shown_name) > 22 ? 10 : (length(shown_name) > 17 ? 12 : 14)
+	var/bot_tag = killer_name && shown_name != killer_name ? " <span style='font-family: \"Small Fonts\"; font-size: 6px; color: #8a939c'>BOT</span>" : ""
+	lines += "<span style='font-family: \"VCR OSD Mono\"; font-size: [name_size]px; color: [color]'>[html_encode(shown_name)]</span>[bot_tag]"
 	lines += "<span style='font-family: \"Small Fonts\"; font-size: 6px; color: #e2e6ea'>[detail]</span>"
 	for(var/note in notes)
 		lines += "<span style='font-family: \"Small Fonts\"; font-size: 6px; color: #d9bf7e'>[note]</span>"
@@ -287,6 +290,15 @@ GLOBAL_LIST_EMPTY(clash_death_card_icons)
 		band.maptext_height = DEATH_CARD_BAND - 2
 		band.appearance_flags = RESET_COLOR|RESET_ALPHA|KEEP_APART
 		overlays += band
+	if(has_killer && isnum(health))
+		var/mutable_appearance/health_label = mutable_appearance()
+		health_label.maptext = "<span style='[outline]; font-family: \"Small Fonts\"; font-size: 6px; text-align: center; color: #8a939c'>THEIR HP [health]%</span>"
+		health_label.maptext_x = 8
+		health_label.maptext_y = DEATH_CARD_BAND + 2
+		health_label.maptext_width = DEATH_CARD_ICON_BOX
+		health_label.maptext_height = 10
+		health_label.appearance_flags = RESET_COLOR|RESET_ALPHA|KEEP_APART
+		overlays += health_label
 	if(has_killer && weapon)
 		var/mutable_appearance/gun = new(weapon)
 		gun.plane = FLOAT_PLANE

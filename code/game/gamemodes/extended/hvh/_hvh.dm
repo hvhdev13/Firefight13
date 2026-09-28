@@ -541,14 +541,14 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	else
 		entry["shots"] += amount
 
-/datum/game_mode/extended/faction_clash/hvh/proc/report_kill(mob/victim, mob/killer, cause, list/assisters)
+/datum/game_mode/extended/faction_clash/hvh/proc/report_kill(mob/victim, mob/killer, cause, list/assisters, cause_object)
 	var/health_left = 0
 	if(isliving(killer))
 		var/mob/living/living_killer = killer
 		health_left = max(0, round(living_killer.health / living_killer.maxHealth * 100))
 	var/distance = get_dist(victim, killer)
 	to_chat(victim, SPAN_WARNING("Killed by [killer.real_name][cause ? " ([cause])" : ""] at [distance] tiles. They had [health_left]% health left."))
-	show_death_card(victim, killer, cause, distance, health_left, assisters)
+	show_death_card(victim, killer, cause, distance, health_left, assisters, cause_object)
 	to_chat(killer, SPAN_NOTICE("You killed [victim.real_name]."))
 	if(killer.client)
 		playsound_client(killer.client, CLASH_KILL_SOUND, null, 50)
@@ -582,7 +582,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		return
 	to_chat(victim, SPAN_WARNING("Killed by [cause]."))
 
-/datum/game_mode/extended/faction_clash/hvh/proc/show_death_card(mob/victim, mob/killer, cause, distance, health_left, list/assisters)
+/datum/game_mode/extended/faction_clash/hvh/proc/show_death_card(mob/victim, mob/killer, cause, distance, health_left, list/assisters, cause_object)
 	var/victim_name = victim.real_name
 	var/killer_name = killer.real_name
 	var/list/details = list()
@@ -609,9 +609,12 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		notes += "Assisted by [html_encode(english_list(assisters))]"
 	if(length(notes) > 3)
 		notes.Cut(4)
-	var/obj/item/weapon = killer.get_active_hand()
-	if(!istype(weapon) || (cause && weapon.name != cause))
-		weapon = null
+	var/obj/item/weapon = isitem(cause_object) ? cause_object : null
+	if(!weapon && cause)
+		for(var/obj/item/held in list(killer.get_active_hand(), killer.get_inactive_hand()))
+			if(held.name == cause || initial(held.name) == cause)
+				weapon = held
+				break
 	set_clash_death_card(victim, "KILLED BY", killer_name, faction_color(killer.faction), details.Join("  ·  "), notes, weapon, health_left, get_life_line(victim))
 
 /datum/game_mode/extended/faction_clash/hvh/proc/get_life_line(mob/victim)
@@ -622,7 +625,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	if(alive > 0)
 		parts += "[floor(alive / 60)]:[alive % 60 < 10 ? "0" : ""][alive % 60] alive"
 	var/list/entry = player_scores[victim.real_name]
-	if(entry)
+	if(entry && match_live)
 		parts += "match [entry["kills"]]/[entry["deaths"]] K/D"
 	return "YOUR LIFE  ·  [parts.Join("  ·  ")]"
 

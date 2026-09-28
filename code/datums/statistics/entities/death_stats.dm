@@ -153,7 +153,7 @@
 				clash_mode.score_kill(new_death.cause_faction_name, killer.real_name, killer_ckey)
 				clash_mode.track_streak(killer.real_name, new_death.cause_faction_name, new_death.mob_name, new_death.faction_name, killer_ckey)
 			clash_mode.add_killfeed(killer.real_name, new_death.cause_faction_name, new_death.mob_name, new_death.faction_name, new_death.cause_name, length(assisters))
-			clash_mode.report_kill(src, killer, new_death.cause_name, assisters)
+			clash_mode.report_kill(src, killer, new_death.cause_name, assisters, cause_data?.resolve_cause())
 		else
 			clash_mode.report_environment_death(src, new_death.cause_name)
 
