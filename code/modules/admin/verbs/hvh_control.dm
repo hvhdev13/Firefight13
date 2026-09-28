@@ -104,8 +104,6 @@
 		return
 	fdel(CLASH_MODE_OVERRIDE_FILE)
 	WRITE_FILE(file(CLASH_MODE_OVERRIDE_FILE), new_mode)
-	if(new_mode == GAMEMODE_FACTION_CLASH_UPP_CM)
-		SSticker.save_mode(new_mode)
 	message_admins("[key_name_admin(usr)] set the mode for the next round to [new_mode].[note]")
 	log_admin("[key_name(usr)] set the mode for the next round to [new_mode].")
 	if(when == "Restart now")
@@ -130,7 +128,7 @@
 	if(!(new_mode in HVH_MODE_TAGS))
 		log_game("HvH mode override '[new_mode]' is not an HvH mode, ignored.")
 		return null
-	if(new_mode == GAMEMODE_FACTION_CLASH_UPP_CM && get_clash_fc_block(SSmapping.configs[GROUND_MAP], FALSE))
+	if(!clash_map_fits_mode(SSmapping.configs[GROUND_MAP], new_mode))
 		log_game("HvH mode override to [new_mode] ignored, [SSmapping.configs[GROUND_MAP].map_name] cannot run it.")
 		message_admins("The one round mode override to [new_mode] was dropped because [SSmapping.configs[GROUND_MAP].map_name] cannot run it.")
 		return null

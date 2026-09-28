@@ -14,12 +14,6 @@
 	var/list/point_callouts_made = list()
 	var/objective_timer_id
 
-/datum/game_mode/extended/faction_clash/hvh/tdm/objective/pre_setup()
-	var/datum/map_config/ground = SSmapping.configs[GROUND_MAP]
-	if(ground?.tdm_point_limit)
-		point_limit = ground.tdm_point_limit
-	return ..()
-
 /datum/game_mode/extended/faction_clash/hvh/tdm/objective/post_setup()
 	build_zones()
 	return ..()
@@ -178,6 +172,12 @@
 	zone_count = 1
 	zone_radius = 3
 
+/datum/game_mode/extended/faction_clash/hvh/tdm/objective/koth/pre_setup()
+	var/datum/map_config/ground = SSmapping.configs[GROUND_MAP]
+	if(ground?.tdm_koth_point_limit)
+		point_limit = ground.tdm_koth_point_limit
+	return ..()
+
 /datum/game_mode/extended/faction_clash/hvh/tdm/objective/koth/get_objective_rule()
 	var/unit = matches_per_round > 1 ? "Matches" : "Rounds"
 	return "[unit] last [round_time_limit / 600] minutes. Stand on the hill with no enemies on it to score a point every second. First to [point_limit] points wins, otherwise the most points when time runs out. Bots fight over the hill but cannot hold or contest it."
@@ -190,6 +190,12 @@
 	zone_radius = 2
 	capture_time = 8 SECONDS
 	persistent = TRUE
+
+/datum/game_mode/extended/faction_clash/hvh/tdm/objective/domination/pre_setup()
+	var/datum/map_config/ground = SSmapping.configs[GROUND_MAP]
+	if(ground?.tdm_domination_point_limit)
+		point_limit = ground.tdm_domination_point_limit
+	return ..()
 
 /datum/game_mode/extended/faction_clash/hvh/tdm/objective/domination/get_objective_rule()
 	var/unit = matches_per_round > 1 ? "Matches" : "Rounds"

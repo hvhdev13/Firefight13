@@ -272,7 +272,9 @@ SUBSYSTEM_DEF(vote)
 			if("gamemode")
 				question = "Gamemode vote"
 				randomize_entries = TRUE
-				for(var/mode_type in config.gamemode_cache)
+				var/list/clash_modes = get_clash_vote_modes()
+				choices.Add(clash_modes || list())
+				for(var/mode_type in (clash_modes ? list() : config.gamemode_cache))
 					var/datum/game_mode/cur_mode = mode_type
 					if(initial(cur_mode.config_tag))
 						cur_mode = new mode_type
@@ -286,13 +288,15 @@ SUBSYSTEM_DEF(vote)
 				vote_sound = 'sound/voice/start_your_voting.ogg'
 				vote_sound_vol = 15
 				randomize_entries = TRUE
-				var/list/maps = list()
-				var/vote_mode = SSticker.mode?.map_vote_mode || GLOB.master_mode
-				for(var/i in config.maplist[GROUND_MAP])
+				var/list/clash_maps = get_clash_vote_maps(GLOB.master_mode)
+				var/list/maps = clash_maps || list()
+				for(var/i in (clash_maps ? list() : config.maplist[GROUND_MAP]))
 					var/datum/map_config/VM = config.maplist[GROUND_MAP][i]
+					if(VM.map_file == SSmapping.configs[GROUND_MAP].map_file)
+						continue
 					if(!VM.voteweight)
 						continue
-					if(!(vote_mode in VM.gamemodes))
+					if(!(GLOB.master_mode in VM.gamemodes))
 						continue
 					if(text2num(SSperf_logging?.round?.id) % VM.vote_cycle != 0)
 						continue

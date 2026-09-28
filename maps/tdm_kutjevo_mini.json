@@ -23,7 +23,10 @@
         }
     ],
     "gamemodes": [
-        "Team Deathmatch"
+        "Team Deathmatch",
+        "King of the Hill",
+        "Domination",
+        "Capture the Flag"
     ],
     "force_mode": "Team Deathmatch",
     "tdm_matches": 3,

@@ -114,7 +114,7 @@ SUBSYSTEM_DEF(ticker)
 				REDIS_PUBLISH("byond.round", "type" = "round-complete", "round_name" = GLOB.round_statistics.round_name, "round_finished" = mode.round_finished)
 				flash_clients()
 				if(mode.skip_roundend_votes)
-					addtimer(CALLBACK(src, PROC_REF(Reboot)), 3 SECONDS)
+					addtimer(CALLBACK(mode, TYPE_PROC_REF(/datum/game_mode, roundend_reboot)), 3 SECONDS)
 				else
 					addtimer(CALLBACK(
 						SSvote,
@@ -359,17 +359,7 @@ SUBSYSTEM_DEF(ticker)
 
 
 /datum/controller/subsystem/ticker/proc/load_mode()
-	var/mode = trim(file2text("data/mode.txt"))
-	var/forced = SSmapping.configs[GROUND_MAP].force_mode
-	var/override = consume_clash_mode_override()
-	if(override)
-		GLOB.master_mode = override
-	else if(forced)
-		GLOB.master_mode = forced
-	else if(mode)
-		GLOB.master_mode = mode
-	else
-		GLOB.master_mode = GAMEMODE_EXTENDED
+	GLOB.master_mode = resolve_clash_start_mode()
 	log_game("Saved mode is '[GLOB.master_mode]'")
 
 

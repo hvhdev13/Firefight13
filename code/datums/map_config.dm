@@ -73,7 +73,8 @@
 	var/tdm_matches
 	var/tdm_respawn_seconds
 	var/tdm_kill_limit
-	var/tdm_point_limit
+	var/tdm_koth_point_limit
+	var/tdm_domination_point_limit
 	var/tdm_capture_limit
 	var/tdm_countdown_seconds
 	var/tdm_spawn_protection_seconds
@@ -451,11 +452,18 @@
 		log_world("map_config tdm_kill_limit is not a number!")
 		return
 
-	temp = json["tdm_point_limit"]
+	temp = json["tdm_koth_point_limit"]
 	if(isnum(temp) && temp > 0)
-		tdm_point_limit = temp
+		tdm_koth_point_limit = temp
 	else if(!isnull(temp))
-		log_world("map_config tdm_point_limit is not a positive number!")
+		log_world("map_config tdm_koth_point_limit is not a positive number!")
+		return
+
+	temp = json["tdm_domination_point_limit"]
+	if(isnum(temp) && temp > 0)
+		tdm_domination_point_limit = temp
+	else if(!isnull(temp))
+		log_world("map_config tdm_domination_point_limit is not a positive number!")
 		return
 
 	temp = json["tdm_capture_limit"]

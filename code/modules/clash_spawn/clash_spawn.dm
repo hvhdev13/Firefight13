@@ -100,7 +100,7 @@ SUBSYSTEM_DEF(clash_spawn)
 	page += "</table>"
 	page += "<h2>Good to know</h2><ul>"
 	page += "<li>Friendly fire is on, and explosions can take off limbs.</li>"
-	page += "<li>The map vote picks the next arena and its mode.</li>"
+	page += "<li>Near the end of each round you vote for the next mode, then for a map that can run it.</li>"
 	page += "<li>Only rounds that finish on their own count toward career stats.</li>"
 	page += "</ul>"
 	if(GLOB.clash_feedback_contact)

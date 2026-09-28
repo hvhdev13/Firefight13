@@ -11,13 +11,19 @@
         }
     ],
     "gamemodes": [
-        "Team Deathmatch"
+        "Team Deathmatch",
+        "King of the Hill",
+        "Domination",
+        "Capture the Flag"
     ],
     "force_mode": "Team Deathmatch",
     "tdm_matches": 3,
     "tdm_match_minutes": 12,
     "tdm_respawn_seconds": 30,
     "tdm_kill_limit": 40,
+    "tdm_koth_point_limit": 150,
+    "tdm_domination_point_limit": 360,
+    "tdm_capture_limit": 3,
     "tdm_countdown_seconds": 20,
     "tdm_spawn_protection_seconds": 3
 }

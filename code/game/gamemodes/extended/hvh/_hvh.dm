@@ -3,7 +3,16 @@
 #define KILLFEED_LIFETIME (8 SECONDS)
 #define CLASH_TEAM_GAP 5
 #define CLASH_USCM_SQUADS list(SQUAD_MARINE_1, SQUAD_MARINE_2)
-#define CLASH_MAP_VOTE_LEAD (5 MINUTES)
+#define CLASH_VOTE_LEAD (5 MINUTES)
+#define CLASH_VOTE_GAP (3 SECONDS)
+#define CLASH_VOTE_RETRY (10 SECONDS)
+#define CLASH_REBOOT_AFTER_VOTES (30 SECONDS)
+#define CLASH_REBOOT_HOLD_LIMIT (5 MINUTES)
+#define CLASH_FC_MIN_PLAYERS 30
+#define CLASH_VOTES_NONE 0
+#define CLASH_VOTES_MODE 1
+#define CLASH_VOTES_MAP 2
+#define CLASH_VOTES_DONE 3
 #define CLASH_INTERMISSION (30 SECONDS)
 #define CLASH_ASSIST_WINDOW (10 SECONDS)
 #define CLASH_KILL_SOUND 'sound/weapons/gun_xm88_directhit_high.ogg'
@@ -73,7 +82,8 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	var/countdown_end_time
 	var/bases_sealed = FALSE
 	var/spawn_protection = 0
-	var/map_vote_started = FALSE
+	var/round_vote_stage = CLASH_VOTES_NONE
+	var/reboot_held = FALSE
 	var/finish_reason = "Time"
 	var/score_label = "kills"
 	var/list/recent_damage = list()
@@ -81,7 +91,6 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	var/list/life_kills = list()
 	var/admin_tampered = FALSE
 	var/arena_rules = FALSE
-	map_vote_mode = GAMEMODE_TDM
 
 /proc/clash_respawn_cooldown()
 	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
@@ -133,9 +142,9 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	else
 		. += "[unit] last [round_time_limit / 600] minutes. The team with the most kills wins."
 	if(matches_per_round > 1)
-		. += "A round is the best of [matches_per_round] matches, with a [CLASH_INTERMISSION / 10] second break and a fresh start between them. The map vote opens during the deciding match."
+		. += "A round is the best of [matches_per_round] matches, with a [CLASH_INTERMISSION / 10] second break and a fresh start between them. The votes for the next mode and map open during the deciding match."
 	else
-		. += "The map vote opens with [CLASH_MAP_VOTE_LEAD / 600] minutes left, or as soon as a team wins."
+		. += "The votes for the next mode and map open with [CLASH_VOTE_LEAD / 600] minutes left, or as soon as a team wins."
 	if(countdown_time)
 		. += "Each match starts after a [countdown_time / 10] second countdown. Until then you are held in your base."
 	. += "You can respawn [respawn_cooldown / 10] seconds after dying, using the Respawn button in the centre of the screen."
@@ -190,7 +199,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	var/match = match_number
 	match_timer_id = addtimer(CALLBACK(src, PROC_REF(round_time_expired), match), round_time_limit, TIMER_STOPPABLE)
 	if(could_be_final_match())
-		vote_timer_id = addtimer(CALLBACK(src, PROC_REF(start_map_vote)), max(1, round_time_limit - CLASH_MAP_VOTE_LEAD), TIMER_STOPPABLE)
+		vote_timer_id = addtimer(CALLBACK(src, PROC_REF(start_round_votes)), max(1, round_time_limit - CLASH_VOTE_LEAD), TIMER_STOPPABLE)
 	if(!radar_timer_id)
 		start_clash_radar()
 	log_debug("HVH: match [match_number] timer armed for [round_time_limit / 600] minutes")
@@ -717,8 +726,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	if(match_number < matches_per_round && (match_wins[FACTION_MARINE] || 0) < wins_needed() && (match_wins[FACTION_UPP] || 0) < wins_needed())
 		begin_intermission()
 		return
-	if(!map_vote_started)
-		start_map_vote()
+	start_round_votes()
 	archive_match()
 	player_scores = round_scores
 	faction_kills = round_faction_kills
@@ -921,12 +929,120 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 			return "UPP wins [upp] to [uscm]."
 	return "Draw at [uscm] each."
 
-/datum/game_mode/extended/faction_clash/hvh/proc/start_map_vote()
-	if(round_finished || map_vote_started)
+/datum/game_mode/extended/faction_clash/hvh/proc/start_round_votes()
+	if(round_vote_stage != CLASH_VOTES_NONE)
 		return
-	map_vote_started = TRUE
-	log_debug("HVH: map vote opening, [CLASH_MAP_VOTE_LEAD / 600] minutes left")
-	SSvote.initiate_vote("groundmap", "SERVER", null, TRUE)
+	round_vote_stage = CLASH_VOTES_MODE
+	log_debug("HVH: next round votes opening")
+	open_mode_vote()
+
+/datum/game_mode/extended/faction_clash/hvh/proc/open_mode_vote()
+	if(SSvote.mode)
+		addtimer(CALLBACK(src, PROC_REF(open_mode_vote)), CLASH_VOTE_RETRY)
+		return
+	if(length(get_clash_vote_modes()) < 2 || !SSvote.initiate_vote("gamemode", "SERVER", CALLBACK(src, PROC_REF(queue_map_vote)), TRUE))
+		queue_map_vote()
+
+/datum/game_mode/extended/faction_clash/hvh/proc/queue_map_vote()
+	round_vote_stage = CLASH_VOTES_MAP
+	addtimer(CALLBACK(src, PROC_REF(open_map_vote)), CLASH_VOTE_GAP)
+
+/datum/game_mode/extended/faction_clash/hvh/proc/open_map_vote()
+	if(SSvote.mode)
+		addtimer(CALLBACK(src, PROC_REF(open_map_vote)), CLASH_VOTE_RETRY)
+		return
+	if(!length(get_clash_vote_maps(GLOB.master_mode)))
+		to_chat(world, SPAN_BOLDNOTICE("No map can run [GLOB.master_mode] right now, so the next round stays [name]."))
+		GLOB.master_mode = name
+		SSticker.save_mode(name)
+	if(!SSvote.initiate_vote("groundmap", "SERVER", CALLBACK(src, PROC_REF(finish_round_votes)), TRUE))
+		finish_round_votes()
+
+/datum/game_mode/extended/faction_clash/hvh/proc/finish_round_votes()
+	round_vote_stage = CLASH_VOTES_DONE
+	var/datum/map_config/next_ground = LAZYACCESS(SSmapping.next_map_configs, GROUND_MAP) || SSmapping.configs[GROUND_MAP]
+	if(!clash_map_fits_mode(next_ground, GLOB.master_mode))
+		var/list/fitting = get_clash_vote_maps(GLOB.master_mode)
+		if(length(fitting))
+			var/picked = pick(fitting)
+			SSmapping.changemap(config.maplist[GROUND_MAP][picked], GROUND_MAP)
+			to_chat(world, SPAN_BOLDNOTICE("No map was chosen for [GLOB.master_mode], so the next map is [picked]."))
+	log_debug("HVH: next round votes done, [GLOB.master_mode] next")
+	if(reboot_held)
+		release_held_reboot()
+
+/datum/game_mode/extended/faction_clash/hvh/proc/release_held_reboot()
+	if(!reboot_held)
+		return
+	reboot_held = FALSE
+	SSticker.Reboot(null, CLASH_REBOOT_AFTER_VOTES)
+
+/datum/game_mode/proc/roundend_reboot()
+	SSticker.Reboot()
+
+/datum/game_mode/extended/faction_clash/hvh/roundend_reboot()
+	if(round_vote_stage == CLASH_VOTES_DONE)
+		return ..()
+	reboot_held = TRUE
+	start_round_votes()
+	to_chat(world, SPAN_BOLDNOTICE("The server restarts once the votes for the next round are done."))
+	addtimer(CALLBACK(src, PROC_REF(release_held_reboot)), CLASH_REBOOT_HOLD_LIMIT)
+
+/proc/clash_vote_context()
+	return istype(SSticker.mode, /datum/game_mode/extended/faction_clash/hvh) || (GLOB.master_mode in HVH_MODE_TAGS)
+
+/proc/clash_map_fits_mode(datum/map_config/ground, mode_tag)
+	if(!ground || !(mode_tag in ground.gamemodes))
+		return FALSE
+	return mode_tag != GAMEMODE_FACTION_CLASH_UPP_CM || !ground.disable_ship_map
+
+/proc/get_clash_vote_maps(mode_tag)
+	if(!clash_vote_context())
+		return null
+	. = list()
+	var/players = length(GLOB.clients)
+	for(var/map_name in config.maplist[GROUND_MAP])
+		var/datum/map_config/ground = config.maplist[GROUND_MAP][map_name]
+		if(!ground.voteweight || !clash_map_fits_mode(ground, mode_tag))
+			continue
+		if(text2num(SSperf_logging?.round?.id) % ground.vote_cycle != 0)
+			continue
+		if(ground.config_max_users && players > ground.config_max_users)
+			continue
+		if(ground.config_min_users && players < ground.config_min_users)
+			continue
+		. += map_name
+
+/proc/get_clash_vote_modes()
+	if(!clash_vote_context())
+		return null
+	. = list()
+	for(var/mode_tag in HVH_MODE_TAGS)
+		if(mode_tag == GAMEMODE_FACTION_CLASH_UPP_CM && length(GLOB.clients) < CLASH_FC_MIN_PLAYERS)
+			continue
+		if(length(get_clash_vote_maps(mode_tag)))
+			. += mode_tag
+
+GLOBAL_VAR(clash_start_mode)
+
+/proc/resolve_clash_start_mode()
+	if(GLOB.clash_start_mode)
+		return GLOB.clash_start_mode
+	var/datum/map_config/ground = SSmapping.configs[GROUND_MAP]
+	var/saved = trim(file2text("data/mode.txt"))
+	var/override = consume_clash_mode_override()
+	if(override)
+		GLOB.clash_start_mode = override
+	else if(saved && clash_map_fits_mode(ground, saved))
+		GLOB.clash_start_mode = saved
+	else if(!ground.force_mode && (saved in HVH_MODE_TAGS))
+		for(var/mode_tag in HVH_MODE_TAGS)
+			if(clash_map_fits_mode(ground, mode_tag))
+				GLOB.clash_start_mode = mode_tag
+				break
+	if(!GLOB.clash_start_mode)
+		GLOB.clash_start_mode = ground.force_mode || saved || GAMEMODE_EXTENDED
+	return GLOB.clash_start_mode
 
 /datum/game_mode/extended/faction_clash/hvh/get_roles_list()
 	return GLOB.ROLES_CM_VS_UPP
@@ -970,6 +1086,13 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 /datum/game_mode/extended/faction_clash/hvh/proc/roundend_ceasefire()
 	set_gamemode_modifier(/datum/gamemode_modifier/ceasefire, enabled = TRUE)
 	announce_ceasefire()
+
+/datum/game_mode/extended/faction_clash/hvh/announce_ending()
+	if(GLOB.round_statistics)
+		GLOB.round_statistics.track_round_end()
+	log_game("Round end result: [round_finished]")
+	to_chat_spaced(world, margin_top = 2, type = MESSAGE_TYPE_SYSTEM, html = SPAN_ROUNDHEADER("|Round Complete:[round_finished]|"))
+	to_chat_spaced(world, type = MESSAGE_TYPE_SYSTEM, html = SPAN_ROUNDBODY("Thus ends the fight between the USCM and the UPP on [SSmapping.configs[GROUND_MAP].map_name].\nThe game-mode was: [name]!\n[CONFIG_GET(string/endofroundblurb)]"))
 
 /datum/game_mode/extended/faction_clash/hvh/declare_completion()
 	restore_uscm_squads()

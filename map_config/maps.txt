@@ -51,7 +51,6 @@ map shivas_snowball
 endmap
 
 map kutjevo
-	disabled
 endmap
 
 map sorokyne_strata
@@ -69,7 +68,6 @@ map lv759_hybrisa_prospera
 endmap
 
 map new_varadero
-	disabled
 endmap
 
 map tyrargo_rift
@@ -101,25 +99,4 @@ map tdm_deathmatch2000
 endmap
 
 map tdm_jungle
-endmap
-
-map tdm_kutjevo_supermini_koth
-endmap
-
-map tdm_deathmatch2000_koth
-endmap
-
-map tdm_deathmatch2000_domination
-endmap
-
-map tdm_jungle_koth
-endmap
-
-map tdm_jungle_domination
-endmap
-
-map tdm_deathmatch2000_ctf
-endmap
-
-map tdm_jungle_ctf
 endmap

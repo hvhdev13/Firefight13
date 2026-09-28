@@ -2,7 +2,6 @@
 	name = GAMEMODE_FACTION_CLASH_UPP_CM
 	config_tag = GAMEMODE_FACTION_CLASH_UPP_CM
 	votable = FALSE
-	map_vote_mode = GAMEMODE_FACTION_CLASH_UPP_CM
 	score_label = "tickets"
 	round_time_limit = 30 MINUTES
 	var/upp_ship = "ssv_rostock.dmm"

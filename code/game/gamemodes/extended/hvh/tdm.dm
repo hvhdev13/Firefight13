@@ -19,7 +19,7 @@
 		matches_per_round = ground.tdm_matches
 	if(!isnull(ground?.tdm_respawn_seconds))
 		respawn_cooldown = ground.tdm_respawn_seconds SECONDS
-	if(!isnull(ground?.tdm_kill_limit))
+	if(kill_limit && !isnull(ground?.tdm_kill_limit))
 		kill_limit = ground.tdm_kill_limit
 	if(!isnull(ground?.tdm_countdown_seconds))
 		countdown_time = ground.tdm_countdown_seconds SECONDS
