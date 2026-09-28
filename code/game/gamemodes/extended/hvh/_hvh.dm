@@ -109,6 +109,8 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	var/list/rivalries = list()
 	/// Name to kills in the life that just ended, for the death card
 	var/list/life_kills = list()
+	/// Whether an admin ended a match or set a score this round, which keeps it out of career stats
+	var/admin_tampered = FALSE
 	/// Whether the map is an arena with sealed bases and bots, for the rules shown to players
 	var/arena_rules = FALSE
 	// The arena map pool, Faction Clash keeps its own
@@ -776,6 +778,10 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 
 /// Writes the round into everyone's career stats, run once the round totals are swapped in
 /datum/game_mode/extended/faction_clash/hvh/proc/record_career()
+	if(admin_tampered)
+		log_game("Clash career: round not recorded, an admin ended a match or set a score")
+		message_admins("HvH: this round was not saved to career stats because an admin ended a match or set a score.")
+		return
 	var/winner
 	switch(round_finished)
 		if(MODE_INFESTATION_M_MAJOR, MODE_INFESTATION_M_MINOR)

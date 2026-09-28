@@ -21,6 +21,7 @@
 			if(!clash_mode.match_live)
 				to_chat(usr, SPAN_WARNING("No match is being played right now."))
 				return
+			clash_mode.admin_tampered = TRUE
 			clash_mode.finish_match("Ended by an admin")
 		if("Skip countdown or break")
 			if(clash_mode.intermission_end_time)
@@ -38,6 +39,7 @@
 			var/score = tgui_input_number(usr, "New [clash_mode.score_label] for [team] this match.", "HvH Control", clash_mode.get_match_score(faction), 10000, 0)
 			if(isnull(score) || !clash_mode.match_live)
 				return
+			clash_mode.admin_tampered = TRUE
 			clash_mode.admin_set_score(faction, score)
 			choice = "Set [team] [clash_mode.score_label] to [score]"
 		if("Re-place objectives")
