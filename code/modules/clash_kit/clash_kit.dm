@@ -12,9 +12,19 @@ GLOBAL_LIST_EMPTY(clash_kit_issue_pending)
 /datum/clash_kit/proc/get_option(slot)
 	return get_clash_kit_option(choices[slot])
 
+GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
+
+/proc/build_clash_kit_mode_tags()
+	. = list()
+	for(var/datum/game_mode/extended/faction_clash/hvh/mode_type as anything in typesof(/datum/game_mode/extended/faction_clash/hvh))
+		if(initial(mode_type.use_kits) && initial(mode_type.config_tag))
+			. += initial(mode_type.config_tag)
+
 /proc/clash_uses_kits()
 	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
-	return istype(clash_mode) && clash_mode.use_kits
+	if(istype(clash_mode))
+		return clash_mode.use_kits
+	return !SSticker.mode && (GLOB.master_mode in GLOB.clash_kit_mode_tags)
 
 /proc/clash_player_save_path(ckey, filename)
 	return "data/player_saves/[copytext(ckey, 1, 2)]/[ckey]/[filename]"

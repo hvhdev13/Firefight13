@@ -361,7 +361,10 @@ SUBSYSTEM_DEF(ticker)
 /datum/controller/subsystem/ticker/proc/load_mode()
 	var/mode = trim(file2text("data/mode.txt"))
 	var/forced = SSmapping.configs[GROUND_MAP].force_mode
-	if(forced)
+	var/override = consume_clash_mode_override()
+	if(override)
+		GLOB.master_mode = override
+	else if(forced)
 		GLOB.master_mode = forced
 	else if(mode)
 		GLOB.master_mode = mode
