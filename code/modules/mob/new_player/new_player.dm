@@ -414,7 +414,7 @@
 /mob/new_player/get_status_tab_items()
 	. = ..()
 	. += ""
-	. += "Game Mode: [GLOB.master_mode]"
+	. += get_clash_status_lines(src) || "Game Mode: [GLOB.master_mode]"
 
 	if(SSticker.HasRoundStarted())
 		return

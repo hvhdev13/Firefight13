@@ -92,6 +92,39 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		return 0
 	return max(0, user.timeofdeath + clash_respawn_cooldown() - world.time)
 
+/proc/get_clash_status_lines(mob/viewer)
+	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
+	if(istype(clash_mode))
+		return clash_mode.get_status_lines(viewer)
+	if(!SSticker.HasRoundStarted() && (GLOB.master_mode in HVH_MODE_TAGS))
+		return list("Game Mode: [GLOB.master_mode]", "Map: [SSmapping.configs[GROUND_MAP]?.map_name]")
+	return null
+
+/datum/game_mode/extended/faction_clash/hvh/proc/get_status_lines(mob/viewer)
+	. = list("Game Mode: [name]", "Map: [SSmapping.configs[GROUND_MAP]?.map_name]")
+	var/limit = get_limit_text()
+	if(limit)
+		. += "Win: [limit]"
+	if(matches_per_round > 1)
+		. += "Match [get_display_match()] of [matches_per_round]"
+		. += "Series: USCM [match_wins[FACTION_MARINE] || 0] - [match_wins[FACTION_UPP] || 0] UPP"
+	. += "Score: USCM [get_match_score(FACTION_MARINE)] - [get_match_score(FACTION_UPP)] UPP"
+	var/list/clock = get_clock_parts()
+	switch(clock[2])
+		if("ROUND OVER")
+			. += "Round Over"
+		if("WAITING")
+			. += "Waiting"
+		if("NEXT MATCH")
+			. += "Next Match In: [clock[1]]"
+		if("GET READY")
+			. += "Match Starts In: [clock[1]]"
+		else
+			. += "Time Left: [clock[1]]"
+	if(viewer.timeofdeath && (isobserver(viewer) || viewer.stat == DEAD))
+		var/wait = CEILING(clash_respawn_wait(viewer) / 10, 1)
+		. += wait ? "Respawn In: [floor(wait / 60)]:[wait % 60 < 10 ? "0" : ""][wait % 60]" : "Respawn: ready"
+
 /datum/game_mode/extended/faction_clash/hvh/proc/get_welcome_rules()
 	. = list()
 	var/unit = matches_per_round > 1 ? "Matches" : "Rounds"
