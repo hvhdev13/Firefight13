@@ -79,8 +79,17 @@ GLOBAL_LIST_EMPTY(clash_respawn_button_icons)
 	/// Whether this viewer watched the wait run down, so the ready chime is not played on login
 	var/counted_down = FALSE
 
+/// Whether viewer is out of the fight and may come back in: dead, or a ghost with no living body to return to
+/proc/clash_can_redeploy(mob/viewer)
+	if(isobserver(viewer))
+		var/mob/dead/observer/ghost = viewer
+		var/mob/body = ghost.mind?.current
+		// An admin ghosting out of a living body has somewhere to go back to
+		return !(ghost.can_reenter_corpse && body && body != ghost && body.stat != DEAD)
+	return isliving(viewer) && viewer.stat == DEAD && viewer.timeofdeath
+
 /atom/movable/screen/clash_respawn/proc/update(mob/viewer)
-	if((viewer.stat != DEAD && !isobserver(viewer)) || !viewer.timeofdeath)
+	if(!clash_can_redeploy(viewer))
 		if(!alpha)
 			return
 		animate(src)
@@ -96,7 +105,8 @@ GLOBAL_LIST_EMPTY(clash_respawn_button_icons)
 		animate(src, alpha = 255, pixel_y = 0, time = 3, easing = CUBIC_EASING|EASE_OUT)
 	mouse_opacity = MOUSE_OPACITY_OPAQUE
 	var/cooldown = clash_respawn_cooldown()
-	var/remaining = viewer.timeofdeath + cooldown - world.time
+	// The same wait the kit screen and respawn verb use, so admins see it ready at once
+	var/remaining = clash_respawn_wait(viewer)
 	if(remaining > 0)
 		counted_down = TRUE
 		var/seconds = CEILING(remaining / 10, 1)

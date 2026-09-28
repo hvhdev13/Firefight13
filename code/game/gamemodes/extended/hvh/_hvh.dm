@@ -121,6 +121,12 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
 	return istype(clash_mode) ? clash_mode.respawn_cooldown : RESPAWN_COOLDOWN
 
+/// Deciseconds until a dead user may respawn. Admins skip the wait, as the respawn verb lets them.
+/proc/clash_respawn_wait(mob/user)
+	if(!user?.timeofdeath || check_client_rights(user.client, R_ADMIN, FALSE))
+		return 0
+	return max(0, user.timeofdeath + clash_respawn_cooldown() - world.time)
+
 /// Rule lines for the welcome page, in the order they are shown
 /datum/game_mode/extended/faction_clash/hvh/proc/get_welcome_rules()
 	. = list()
@@ -470,38 +476,17 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 			continue
 		animate(line, alpha = 0, time = duration)
 
-/datum/game_mode/extended/faction_clash/hvh/proc/get_respawn_line(mob/player)
-	if(player.stat != DEAD && !isobserver(player))
-		return null
-	if(!player.timeofdeath)
-		return null
-	var/remaining = player.timeofdeath + respawn_cooldown - world.time
-	if(remaining <= 0)
-		return "<span class='maptext center'>Respawn available</span>"
-	var/seconds = CEILING(remaining / 10, 1)
-	var/minutes = floor(seconds / 60)
-	seconds = seconds % 60
-	return "<span class='maptext center'>Respawn in [minutes]:[seconds < 10 ? "0[seconds]" : "[seconds]"]</span>"
-
-/datum/game_mode/extended/faction_clash/hvh/proc/compose_hud_maptext(mob/player, base)
-	// The respawn button carries the countdown itself
-	if(player.hud_used?.clash_respawn)
-		return base
-	var/line = get_respawn_line(player)
-	return line ? "[base]<br>[line]" : base
-
 /datum/game_mode/extended/faction_clash/hvh/proc/update_score_huds()
 	var/base = get_score_maptext()
 	var/list/panel = build_score_panel()
 	for(var/mob/player as anything in GLOB.player_list)
 		var/atom/movable/screen/faction_score/display = player.hud_used?.faction_score
 		if(display)
-			display.maptext = compose_hud_maptext(player, base)
+			display.maptext = base
 			display.show_panel(panel, player)
 
 /// Fills in a freshly made HUD's score bar
 /datum/game_mode/extended/faction_clash/hvh/proc/init_score_hud(atom/movable/screen/faction_score/display, mob/viewer)
-	// The HUD is not attached to viewer yet, so the respawn line is left to the next tick
 	display.maptext = get_score_maptext()
 	display.show_panel(build_score_panel(), viewer)
 
@@ -519,9 +504,8 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		if(!display)
 			continue
 		display.show_panel(panel, player)
-		var/text = compose_hud_maptext(player, base)
-		if(display.maptext != text)
-			display.maptext = text
+		if(display.maptext != base)
+			display.maptext = base
 
 /datum/game_mode/extended/faction_clash/hvh/proc/score_kill(faction, mob_name, owner_ckey)
 	// Nothing scores between matches
@@ -889,7 +873,9 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		if(fighter.stat == DEAD)
 			// Nobody gets to be revived into the next match, so free anyone still in their body and clear it
 			if(fighter.client)
-				fighter.ghostize(FALSE)
+				// They left no body behind, so they may deploy again as soon as they are back
+			fighter.timeofdeath = max(1, world.time - respawn_cooldown)
+			fighter.ghostize(FALSE)
 			qdel(fighter)
 			continue
 		if(fighter.statistic_exempt || !fighter.mind)

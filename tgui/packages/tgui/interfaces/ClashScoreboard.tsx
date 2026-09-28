@@ -1,5 +1,6 @@
 import { KEY_TAB } from 'common/keycodes';
 import { type BooleanLike, classes } from 'common/react';
+import { useState } from 'react';
 import { useBackend } from 'tgui/backend';
 import { Box, Button, Icon, KeyListener, NoticeBox } from 'tgui/components';
 import { Window } from 'tgui/layouts';
@@ -306,6 +307,7 @@ export const ClashScoreboard = () => {
     awards = [],
   } = data;
   const status = getStatus(data);
+  const [openedAt] = useState(() => Date.now());
   const [left, right] = teams;
   const showCaptures = teams.some((team) =>
     team.players.some((row) => row.captures > 0),
@@ -315,10 +317,15 @@ export const ClashScoreboard = () => {
     <Window width={760} height={560}>
       <KeyListener
         onKeyDown={(key) => {
-          if (key.code === KEY_TAB) {
-            key.event.preventDefault();
-            act('close');
+          if (key.code !== KEY_TAB) {
+            return;
           }
+          key.event.preventDefault();
+          // A held Tab repeats into the window it just opened, so only a fresh press closes it
+          if (key.event.repeat || Date.now() - openedAt < 400) {
+            return;
+          }
+          act('close');
         }}
       />
       <Window.Content scrollable className="ClashScoreboard">

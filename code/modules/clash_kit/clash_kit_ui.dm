@@ -140,7 +140,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 	var/in_base = istype(here) && here.clash_faction == fighter?.faction
 	var/can_equip_now = fighter && fighter.stat == CONSCIOUS && fighter.job == job && in_base
 	var/deploy_state = get_deploy_state(user)
-	var/respawn_in = deploy_state == "dead" ? get_respawn_wait(user) : 0
+	var/respawn_in = deploy_state == "dead" ? clash_respawn_wait(user) : 0
 	if(respawn_in)
 		// One push when the wait is over, so Deploy lights up without polling
 		addtimer(CALLBACK(SStgui, TYPE_PROC_REF(/datum/controller/subsystem/tgui, update_uis), src), respawn_in + 1, TIMER_UNIQUE|TIMER_OVERRIDE)
@@ -183,12 +183,6 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 	if(isobserver(user) || (isliving(user) && user.stat == DEAD))
 		return "dead"
 	return null
-
-/// Deciseconds until a dead viewer may respawn
-/datum/clash_kit_screen/proc/get_respawn_wait(mob/user)
-	if(!user.timeofdeath || check_client_rights(user.client, R_ADMIN, FALSE))
-		return 0
-	return max(0, user.timeofdeath + clash_respawn_cooldown() - world.time)
 
 /// Why deploying as the shown role would fail right now, or null. Checked before anything is given up.
 /datum/clash_kit_screen/proc/get_deploy_block(mob/user)
@@ -307,7 +301,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 	if(block)
 		to_chat(user, SPAN_WARNING("[block]."))
 		return
-	if(state == "dead" && get_respawn_wait(user))
+	if(state == "dead" && clash_respawn_wait(user))
 		return
 	var/client/player = user.client
 	var/role = job

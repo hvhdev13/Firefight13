@@ -105,6 +105,8 @@ GLOBAL_DATUM_INIT(clash_career, /datum/clash_career, new)
 		career["last_played"] = time2text(world.realtime, "YYYY-MM-DD")
 		count++
 	save()
+	// Anyone with the window open sees the round land
+	update_static_data_for_all_viewers()
 	log_game("Clash career: recorded [count] players for [mode_name]")
 
 /// One stat row for the UI, K/D and accuracy worked out here so every view agrees
