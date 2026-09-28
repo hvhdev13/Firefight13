@@ -48,7 +48,8 @@
 	update_score_huds()
 	var/left = tickets_left(faction)
 	if(left <= 0)
-		finish_match("[faction == FACTION_MARINE ? "USCM" : "UPP"] ran out of tickets")
+		// Finish just after this death is done being scored, so the killing blow still counts for its killer
+		addtimer(CALLBACK(src, PROC_REF(finish_match), "[faction == FACTION_MARINE ? "USCM" : "UPP"] ran out of tickets"), 1)
 		return
 	for(var/step in list(100, 50, 25, 10))
 		if(left != step)
@@ -64,6 +65,13 @@
 		announce_to_faction(faction, "[step] tickets left. Every death counts.")
 		announce_to_faction(enemy, "The enemy is down to [step] tickets.")
 		return
+
+/datum/game_mode/extended/faction_clash/hvh/cm_vs_upp/admin_set_score(faction, score)
+	// Tickets are what is left after deaths, so setting them moves the death count
+	faction_deaths[faction] = max(0, tickets - score)
+	update_score_huds()
+	if(tickets_left(faction) <= 0)
+		finish_match("[faction == FACTION_MARINE ? "USCM" : "UPP"] ran out of tickets")
 
 /datum/game_mode/extended/faction_clash/hvh/cm_vs_upp/open_first_match()
 	first_match_timer_id = addtimer(CALLBACK(src, PROC_REF(start_first_match)), first_match_fallback, TIMER_STOPPABLE)

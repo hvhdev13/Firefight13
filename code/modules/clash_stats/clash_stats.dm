@@ -64,27 +64,43 @@ GLOBAL_DATUM_INIT(clash_career, /datum/clash_career, new)
 		return
 	recorded_round = TRUE
 	load()
-	var/count = 0
+	// One player can show up under several names in a round, so fold their entries together first
+	var/list/by_ckey = list()
 	for(var/name in scores)
 		var/list/round_entry = scores[name]
 		var/ckey = round_entry["ckey"]
 		if(!ckey)
 			continue
+		var/list/total = by_ckey[ckey]
+		if(!total)
+			total = list("name" = name, "faction" = round_entry["faction"], "mvps" = 0, "best_streak" = 0)
+			by_ckey[ckey] = total
+		for(var/stat in list("kills", "assists", "deaths", "captures", "shots", "hits"))
+			total[stat] = (total[stat] || 0) + (round_entry[stat] || 0)
+		total["best_streak"] = max(total["best_streak"], round_entry["best_streak"] || 0)
+		for(var/mvp in mvp_names)
+			if(mvp == name)
+				total["mvps"] += 1
+		// The name they did the most with is the one shown
+		if((round_entry["kills"] || 0) > (total["name_kills"] || -1))
+			total["name"] = name
+			total["name_kills"] = round_entry["kills"] || 0
+			total["faction"] = round_entry["faction"]
+	var/count = 0
+	for(var/ckey in by_ckey)
+		var/list/total = by_ckey[ckey]
 		var/list/career = players[ckey]
 		if(!islist(career))
 			career = list()
 			players[ckey] = career
-		for(var/stat in list("kills", "assists", "deaths", "captures", "shots", "hits"))
-			career[stat] = (career[stat] || 0) + (round_entry[stat] || 0)
+		for(var/stat in list("kills", "assists", "deaths", "captures", "shots", "hits", "mvps"))
+			career[stat] = (career[stat] || 0) + (total[stat] || 0)
 		career["rounds"] = (career["rounds"] || 0) + 1
-		if(winner && round_entry["faction"] == winner)
+		if(winner && total["faction"] == winner)
 			career["wins"] = (career["wins"] || 0) + 1
-		for(var/mvp in mvp_names)
-			if(mvp == name)
-				career["mvps"] = (career["mvps"] || 0) + 1
-		career["best_streak"] = max(career["best_streak"] || 0, round_entry["best_streak"] || 0)
-		career["best_round_kills"] = max(career["best_round_kills"] || 0, round_entry["kills"] || 0)
-		career["name"] = name
+		career["best_streak"] = max(career["best_streak"] || 0, total["best_streak"])
+		career["best_round_kills"] = max(career["best_round_kills"] || 0, total["kills"] || 0)
+		career["name"] = total["name"]
 		career["last_mode"] = mode_name
 		career["last_played"] = time2text(world.realtime, "YYYY-MM-DD")
 		count++

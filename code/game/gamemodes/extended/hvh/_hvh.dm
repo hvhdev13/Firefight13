@@ -501,7 +501,8 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 
 /// Fills in a freshly made HUD's score bar
 /datum/game_mode/extended/faction_clash/hvh/proc/init_score_hud(atom/movable/screen/faction_score/display, mob/viewer)
-	display.maptext = compose_hud_maptext(viewer, get_score_maptext())
+	// The HUD is not attached to viewer yet, so the respawn line is left to the next tick
+	display.maptext = get_score_maptext()
 	display.show_panel(build_score_panel(), viewer)
 
 /datum/game_mode/extended/faction_clash/hvh/proc/update_respawn_huds()
@@ -913,6 +914,9 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	for(var/mob/player as anything in GLOB.player_list)
 		if((isobserver(player) || player.stat == DEAD) && player.timeofdeath)
 			player.timeofdeath = min(player.timeofdeath, world.time - respawn_cooldown)
+		// Last match's death card is stale now
+		player.client?.clash_death_card = null
+		player.hud_used?.clash_death_card?.update(player)
 	log_debug("HVH: arena reset for match [match_number + 1]")
 
 /// Moves fighters idle past the limit to observer, so they stop holding a team slot and skewing balance and bot fill
