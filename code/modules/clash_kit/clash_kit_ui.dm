@@ -223,9 +223,11 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 	var/datum/clash_kit/kit = get_kit()
 	var/key = get_doll_key(kit)
 	if(!doll_cache[key])
-		doll_cache[key] = render_clash_kit_doll(kit, job, viewer)
-		if(length(doll_cache) > 24)
-			doll_cache.Cut(1, 2)
+		var/rendered = render_clash_kit_doll(kit, job, viewer)
+		if(rendered)
+			doll_cache[key] = rendered
+			if(length(doll_cache) > 24)
+				doll_cache.Cut(1, 2)
 	doll = doll_cache[key]
 	doll_key = key
 	SStgui.update_uis(src)
@@ -300,6 +302,11 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 	var/role = job
 	if(state == "dead")
 		user.respawn_to_lobby(TRUE)
+		addtimer(CALLBACK(src, PROC_REF(spawn_from_lobby), player, role), 2)
+		return
+	spawn_from_lobby(player, role)
+
+/datum/clash_kit_screen/proc/spawn_from_lobby(client/player, role)
 	var/mob/new_player/lobby = player?.mob
 	if(!istype(lobby))
 		return

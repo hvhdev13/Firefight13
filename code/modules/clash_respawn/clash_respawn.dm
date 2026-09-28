@@ -187,14 +187,14 @@ GLOBAL_LIST_EMPTY(clash_death_card_icons)
 	card.Scale(DEATH_CARD_WIDTH, DEATH_CARD_HEIGHT)
 	card.DrawBox(rgb(8, 10, 13, 220), 2, 1, DEATH_CARD_WIDTH - 1, DEATH_CARD_HEIGHT)
 	card.DrawBox(rgb(8, 10, 13, 220), 1, 2, DEATH_CARD_WIDTH, DEATH_CARD_HEIGHT - 1)
-	card.DrawBox(clash_tint(accent, 38), 2, DEATH_CARD_HEIGHT - 30, DEATH_CARD_WIDTH - 1, DEATH_CARD_HEIGHT - 1)
+	card.DrawBox(clash_tint(accent, 38), 2, DEATH_CARD_HEIGHT - 38, DEATH_CARD_WIDTH - 1, DEATH_CARD_HEIGHT - 1)
 	card.DrawBox(accent, 2, DEATH_CARD_HEIGHT - 3, DEATH_CARD_WIDTH - 1, DEATH_CARD_HEIGHT - 1)
 	card.DrawBox(rgb(255, 255, 255, 14), 2, 2, DEATH_CARD_WIDTH - 1, DEATH_CARD_BAND)
 	card.DrawBox(rgb(255, 255, 255, 36), 2, DEATH_CARD_BAND + 1, DEATH_CARD_WIDTH - 1, DEATH_CARD_BAND + 1)
 	if(has_killer)
 		var/box_top = DEATH_CARD_HEIGHT - 8
 		var/box_bottom = box_top - DEATH_CARD_ICON_BOX + 1
-		card.DrawBox(rgb(0, 0, 0, 120), 8, box_bottom, 8 + DEATH_CARD_ICON_BOX - 1, box_top)
+		card.DrawBox(rgb(14, 17, 21, 250), 8, box_bottom, 8 + DEATH_CARD_ICON_BOX - 1, box_top)
 		card.DrawBox(clash_tint(accent, 120), 8, box_bottom, 8 + DEATH_CARD_ICON_BOX - 1, box_bottom)
 		if(health_step >= 0)
 			var/bar_y = box_bottom - 5
@@ -257,7 +257,22 @@ GLOBAL_LIST_EMPTY(clash_death_card_icons)
  * killer_name is null for a death to the environment. weapon is the item that did it, drawn large beside the text.
  * health is the killer's health left in percent, or null. life_line sums up the life that just ended.
  */
-/proc/set_clash_death_card(mob/victim, headline, killer_name, color, detail, list/notes, obj/item/weapon, health, life_line)
+/proc/clash_death_card_picture(appearance_source, width, height, center_x, center_y, max_scale, room)
+	var/scale = min(max_scale, room / max(width, height))
+	if(scale >= 1)
+		scale = floor(scale)
+	var/mutable_appearance/picture = new(appearance_source)
+	picture.plane = FLOAT_PLANE
+	picture.layer = FLOAT_LAYER
+	picture.dir = SOUTH
+	picture.maptext = null
+	picture.pixel_x = 0
+	picture.pixel_y = 0
+	picture.transform = matrix(scale, 0, center_x - width / 2, 0, scale, center_y - height / 2)
+	picture.appearance_flags = RESET_ALPHA|KEEP_APART|PIXEL_SCALE
+	return picture
+
+/proc/set_clash_death_card(mob/victim, headline, killer_name, color, detail, list/notes, obj/item/weapon, health, life_line, icon/portrait)
 	if(!victim?.client)
 		return
 	var/has_killer = !!killer_name
@@ -299,17 +314,16 @@ GLOBAL_LIST_EMPTY(clash_death_card_icons)
 		health_label.maptext_height = 10
 		health_label.appearance_flags = RESET_COLOR|RESET_ALPHA|KEEP_APART
 		overlays += health_label
+	var/box_center_x = 8 + DEATH_CARD_ICON_BOX / 2
+	var/box_bottom = DEATH_CARD_HEIGHT - 8 - DEATH_CARD_ICON_BOX
+	if(has_killer && portrait)
+		overlays += clash_death_card_picture(portrait, portrait.Width(), portrait.Height(), box_center_x, box_bottom + DEATH_CARD_ICON_BOX / 2, 2, DEATH_CARD_ICON_BOX)
 	if(has_killer && weapon)
-		var/mutable_appearance/gun = new(weapon)
-		gun.plane = FLOAT_PLANE
-		gun.layer = FLOAT_LAYER
-		gun.dir = SOUTH
-		gun.maptext = null
-		gun.pixel_x = 0
-		gun.pixel_y = 0
-		gun.transform = matrix(2, 0, 8 + DEATH_CARD_ICON_BOX / 2 - 16, 0, 2, DEATH_CARD_HEIGHT - 8 - DEATH_CARD_ICON_BOX / 2 - 16)
-		gun.appearance_flags = RESET_ALPHA|KEEP_APART|PIXEL_SCALE
-		overlays += gun
+		var/icon/weapon_icon = icon(weapon.icon, weapon.icon_state)
+		var/weapon_width = weapon_icon.Width()
+		var/weapon_height = weapon_icon.Height()
+		var/weapon_scale = min(1, (DEATH_CARD_ICON_BOX - 4) / max(weapon_width, weapon_height))
+		overlays += clash_death_card_picture(weapon, weapon_width, weapon_height, box_center_x, box_bottom + 2 + weapon_height * weapon_scale / 2, 1, DEATH_CARD_ICON_BOX - 4)
 	victim.client.clash_death_card = list(
 		"color" = color,
 		"has_killer" = has_killer,

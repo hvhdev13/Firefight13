@@ -169,6 +169,7 @@
 	grenade.activate(body)
 	body.drop_inv_item_to_loc(grenade, get_turf(body), force = TRUE)
 	grenade.throw_atom(landing, CLASH_BOT_GRENADE_MAX, SPEED_FAST, body, TRUE)
+	homes -= grenade
 	grenade = null
 	return TRUE
 

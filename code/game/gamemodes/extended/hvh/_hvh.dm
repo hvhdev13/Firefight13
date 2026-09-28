@@ -624,7 +624,8 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 			if(held.name == cause || initial(held.name) == cause)
 				weapon = held
 				break
-	set_clash_death_card(victim, "KILLED BY", killer_name, faction_color(killer.faction), details.Join("  ·  "), notes, weapon, health_left, get_life_line(victim))
+	var/icon/portrait = victim.client ? getFlatIcon(killer, SOUTH, no_anim = TRUE) : null
+	set_clash_death_card(victim, "KILLED BY", killer_name, faction_color(killer.faction), details.Join("  ·  "), notes, weapon, health_left, get_life_line(victim), portrait)
 
 /datum/game_mode/extended/faction_clash/hvh/proc/get_life_line(mob/victim)
 	var/list/parts = list()

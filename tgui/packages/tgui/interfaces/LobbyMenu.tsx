@@ -421,19 +421,33 @@ const LobbyButtons = (props: {
         </LobbyButton>
 
         {round_start ? (
-          <Stack.Item>
-            <LobbyButton
-              index={5}
-              selected={!!readied}
-              onClick={() => act(readied ? 'unready' : 'ready')}
-              icon={readied ? 'check' : 'xmark'}
-              tooltip={
-                xenomorph_enabled ? 'Ready with Xenomorph enabled' : undefined
-              }
-            >
-              {readied ? 'Unready' : 'Ready'}
-            </LobbyButton>
-          </Stack.Item>
+          <>
+            <Stack.Item>
+              <LobbyButton
+                index={5}
+                selected={!!readied}
+                onClick={() => act(readied ? 'unready' : 'ready')}
+                icon={readied ? 'check' : 'xmark'}
+                tooltip={
+                  xenomorph_enabled ? 'Ready with Xenomorph enabled' : undefined
+                }
+              >
+                {readied ? 'Unready' : 'Ready'}
+              </LobbyButton>
+            </Stack.Item>
+            {!!data.kits_enabled && (
+              <Stack.Item>
+                <LobbyButton
+                  index={6}
+                  onClick={() => act('clash_loadout')}
+                  icon="person-rifle"
+                  tooltip="Build your kits before the round starts"
+                >
+                  Loadout
+                </LobbyButton>
+              </Stack.Item>
+            )}
+          </>
         ) : (
           <>
             <Stack.Item>

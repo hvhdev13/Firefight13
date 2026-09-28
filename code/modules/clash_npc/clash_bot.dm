@@ -26,6 +26,7 @@
 #define CLASH_BOT_HEAL_DELAY 100
 /// Tiles a bot will go to fetch a magazine from the ground or a body
 #define CLASH_BOT_SCAVENGE_RANGE 8
+#define CLASH_BOT_CLOSE_RANGE 4
 
 GLOBAL_LIST_EMPTY(clash_bots)
 GLOBAL_LIST_EMPTY(clash_bot_cover_claims)
@@ -203,11 +204,14 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 		threat = null
 	if(!can_engage(target))
 		target = null
-	if(threat && threat != target && world.time - threat_at < CLASH_BOT_MEMORY && can_engage(threat))
-		target = threat
-	if(!target && world.time >= next_search)
+	if(world.time >= next_search)
 		next_search = world.time + CLASH_BOT_SEARCH_DELAY + rand(0, 3)
-		target = find_target()
+		var/mob/living/carbon/human/closest = find_target()
+		if(closest && (!target || (get_dist(body, closest) <= CLASH_BOT_CLOSE_RANGE && get_dist(body, closest) < get_dist(body, target))))
+			target = closest
+	var/close_target = target && get_dist(body, target) <= CLASH_BOT_CLOSE_RANGE
+	if(threat && threat != target && !close_target && world.time - threat_at < CLASH_BOT_MEMORY && can_engage(threat))
+		target = threat
 	if(!target)
 		return
 	contact_turf = get_turf(target)
@@ -292,7 +296,7 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 	if(!firing)
 		return
 	firing = FALSE
-	if(gun?.gun_user)
+	if(gun && body?.get_active_hand() == gun)
 		gun.stop_fire()
 	else
 		gun?.reset_fire()
@@ -646,3 +650,4 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 #undef CLASH_BOT_SEARCH_DELAY
 #undef CLASH_BOT_HEAL_DELAY
 #undef CLASH_BOT_SCAVENGE_RANGE
+#undef CLASH_BOT_CLOSE_RANGE

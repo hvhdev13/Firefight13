@@ -1,7 +1,5 @@
 GLOBAL_LIST_EMPTY(clash_kits)
 GLOBAL_LIST_EMPTY(clash_active_kits)
-#define CLASH_KIT_DUMMY "clash_kit"
-#define CLASH_KIT_ISSUE_DUMMY "clash_kit_issue"
 GLOBAL_LIST_EMPTY(clash_kit_issue_items)
 GLOBAL_LIST_EMPTY(clash_kit_issue_pending)
 
@@ -314,7 +312,7 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 	var/failed = FALSE
 	var/datum/job/role = GLOB.RoleAuthority.roles_by_name[job]
 	if(role?.gear_preset)
-		var/mob/living/carbon/human/dummy/model = generate_or_wait_for_human_dummy(CLASH_KIT_ISSUE_DUMMY)
+		var/mob/living/carbon/human/dummy/model = new /mob/living/carbon/human/dummy
 		try
 			model.set_species()
 			model.faction = clash_kit_faction_for_job(job)
@@ -340,7 +338,7 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 		catch(var/exception/error)
 			failed = TRUE
 			stack_trace("Clash kit could not read the issue gear of [job]: [error]")
-		unset_busy_human_dummy(CLASH_KIT_ISSUE_DUMMY)
+		qdel(model)
 	if(!failed)
 		GLOB.clash_kit_issue_items[job] = found
 	var/list/waiting = GLOB.clash_kit_issue_pending[job]
@@ -353,7 +351,7 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 	var/datum/job/role = GLOB.RoleAuthority.roles_by_name[job]
 	if(!role?.gear_preset)
 		return null
-	var/mob/living/carbon/human/dummy/model = generate_or_wait_for_human_dummy(CLASH_KIT_DUMMY)
+	var/mob/living/carbon/human/dummy/model = new /mob/living/carbon/human/dummy
 	try
 		model.set_species()
 		if(viewer?.prefs)
@@ -371,7 +369,5 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 		. = flat ? icon2base64(flat) : null
 	catch(var/exception/error)
 		stack_trace("Clash kit could not draw a [job] doll: [error]")
-	unset_busy_human_dummy(CLASH_KIT_DUMMY)
+	qdel(model)
 
-#undef CLASH_KIT_DUMMY
-#undef CLASH_KIT_ISSUE_DUMMY
