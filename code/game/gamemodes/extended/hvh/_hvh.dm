@@ -105,6 +105,10 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	var/score_label = "kills"
 	/// Victim name to attacker name to list(time, faction, ckey), for assists
 	var/list/recent_damage = list()
+	/// Victim name to killer name to kills this match, for the death card
+	var/list/rivalries = list()
+	/// Name to kills in the life that just ended, for the death card
+	var/list/life_kills = list()
 	/// Whether the map is an arena with sealed bases and bots, for the rules shown to players
 	var/arena_rules = FALSE
 	// The arena map pool, Faction Clash keeps its own
@@ -517,6 +521,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	var/base = get_score_maptext()
 	for(var/mob/player as anything in GLOB.player_list)
 		player.hud_used?.clash_respawn?.update(player)
+		player.hud_used?.clash_death_card?.update(player)
 		var/atom/movable/screen/faction_score/display = player.hud_used?.faction_score
 		if(!display)
 			continue
@@ -570,6 +575,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	if(mob_name)
 		var/list/entry = get_score_entry(mob_name, faction, owner_ckey)
 		entry["deaths"] += 1
+		life_kills[mob_name] = kill_streaks[mob_name] || 0
 		kill_streaks[mob_name] = 0
 	if(cause)
 		environment_kills[cause] = (environment_kills[cause] || 0) + 1
@@ -584,12 +590,14 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	else
 		entry["shots"] += amount
 
-/datum/game_mode/extended/faction_clash/hvh/proc/report_kill(mob/victim, mob/killer, cause)
+/datum/game_mode/extended/faction_clash/hvh/proc/report_kill(mob/victim, mob/killer, cause, list/assisters)
 	var/health_left = 0
 	if(isliving(killer))
 		var/mob/living/living_killer = killer
 		health_left = max(0, round(living_killer.health / living_killer.maxHealth * 100))
-	to_chat(victim, SPAN_WARNING("Killed by [killer.real_name][cause ? " ([cause])" : ""] at [get_dist(victim, killer)] tiles. They had [health_left]% health left."))
+	var/distance = get_dist(victim, killer)
+	to_chat(victim, SPAN_WARNING("Killed by [killer.real_name][cause ? " ([cause])" : ""] at [distance] tiles. They had [health_left]% health left."))
+	show_death_card(victim, killer, cause, distance, health_left, assisters)
 	to_chat(killer, SPAN_NOTICE("You killed [victim.real_name]."))
 	if(killer.client)
 		playsound_client(killer.client, CLASH_KILL_SOUND, null, 50)
@@ -620,9 +628,48 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		. += name
 
 /datum/game_mode/extended/faction_clash/hvh/proc/report_environment_death(mob/victim, cause)
+	var/list/notes = list()
+	var/kills = life_kills[victim.real_name]
+	if(kills)
+		notes += "You got [kills] kill\s that life."
+	set_clash_death_card(victim, "ELIMINATED", null, "#8a939c", cause ? "Killed by [html_encode(cause)]" : "Cause unknown", notes)
 	if(!cause)
 		return
 	to_chat(victim, SPAN_WARNING("Killed by [cause]."))
+
+/// Builds the on-screen recap of who killed victim and how
+/datum/game_mode/extended/faction_clash/hvh/proc/show_death_card(mob/victim, mob/killer, cause, distance, health_left, list/assisters)
+	var/list/details = list()
+	if(cause)
+		details += html_encode(cause)
+	details += "[distance] tile\s"
+	details += "[health_left]% health left"
+	var/list/notes = list()
+	var/victim_name = victim.real_name
+	var/killer_name = killer.real_name
+	if(match_live && victim.faction != killer.faction)
+		var/list/by_killer = rivalries[victim_name]
+		if(!by_killer)
+			by_killer = list()
+			rivalries[victim_name] = by_killer
+		by_killer[killer_name] = (by_killer[killer_name] || 0) + 1
+		var/times = by_killer[killer_name]
+		if(times >= 2)
+			notes += "They have killed you [times] times this match."
+	var/streak = kill_streaks[killer_name]
+	if(streak >= 3)
+		notes += "They are on a [streak] kill streak."
+	if(length(assisters))
+		notes += "Assisted by [html_encode(english_list(assisters))]."
+	var/kills = life_kills[victim_name]
+	if(kills)
+		notes += "You got [kills] kill\s that life."
+	if(victim.faction == killer.faction)
+		notes.Insert(1, "Friendly fire.")
+	// Four notes fit under the headline
+	if(length(notes) > 4)
+		notes.Cut(5)
+	set_clash_death_card(victim, "KILLED BY", killer_name, faction_color(killer.faction), details.Join("  ·  "), notes)
 
 /datum/game_mode/extended/faction_clash/hvh/proc/add_killfeed(killer, killer_faction, victim, victim_faction, cause, assists = 0)
 	killfeed += list(list(
@@ -723,8 +770,23 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	faction_deaths = round_faction_deaths
 	environment_kills = round_environment_kills
 	round_finished = get_round_result()
+	record_career()
 	log_debug("HVH: round result [round_finished]")
 	roundend_ceasefire()
+
+/// Writes the round into everyone's career stats, run once the round totals are swapped in
+/datum/game_mode/extended/faction_clash/hvh/proc/record_career()
+	var/winner
+	switch(round_finished)
+		if(MODE_INFESTATION_M_MAJOR, MODE_INFESTATION_M_MINOR)
+			winner = FACTION_MARINE
+		if(MODE_FACTION_CLASH_UPP_MAJOR, MODE_FACTION_CLASH_UPP_MINOR)
+			winner = FACTION_UPP
+	var/list/mvps = list()
+	for(var/list/result as anything in match_results)
+		if(result["mvp"])
+			mvps += result["mvp"]
+	GLOB.clash_career.record_round(player_scores, winner, mvps, name)
 
 /datum/game_mode/extended/faction_clash/hvh/proc/get_round_result()
 	var/uscm = matches_per_round > 1 ? (match_wins[FACTION_MARINE] || 0) : 0
@@ -781,6 +843,8 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	kill_streaks = list()
 	last_killed_by = list()
 	recent_damage = list()
+	rivalries = list()
+	life_kills = list()
 	limit_callouts_made = list()
 
 /// Break between matches: weapons down, last match's scoreboard up, then a fresh start

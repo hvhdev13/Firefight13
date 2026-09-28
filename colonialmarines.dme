@@ -1744,6 +1744,7 @@
 #include "code\modules\clash_scoreboard\clash_scoreboard.dm"
 #include "code\modules\clash_spawn\clash_spawn.dm"
 #include "code\modules\clash_spawn\clash_spawn_guard.dm"
+#include "code\modules\clash_stats\clash_stats.dm"
 #include "code\modules\client\body_picker.dm"
 #include "code\modules\client\client_defines.dm"
 #include "code\modules\client\client_procs.dm"

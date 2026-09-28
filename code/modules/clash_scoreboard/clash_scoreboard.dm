@@ -27,6 +27,9 @@ GLOBAL_DATUM_INIT(clash_scoreboard, /datum/clash_scoreboard, new)
 		if("close")
 			ui.close()
 			return TRUE
+		if("stats")
+			GLOB.clash_career.tgui_interact(ui.user)
+			return TRUE
 		if("loadout")
 			if(clash_uses_kits())
 				open_clash_kit_screen(ui.user)

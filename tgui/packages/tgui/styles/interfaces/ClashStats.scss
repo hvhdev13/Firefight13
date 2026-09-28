@@ -1,0 +1,131 @@
+@use '../base.scss';
+
+$line: rgba(255, 255, 255, 0.1);
+$dim: rgba(255, 255, 255, 0.45);
+$panel: rgba(0, 0, 0, 0.35);
+$gold: #ffcf4d;
+
+.ClashStats {
+  &__name {
+    margin: 4px 0 8px;
+    font-size: 16px;
+    font-weight: bold;
+    letter-spacing: 0.05em;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+  }
+
+  &__tile {
+    padding: 6px 8px;
+    border-left: 3px solid $line;
+    background: $panel;
+
+    &--big {
+      border-left-color: #5a8fe6;
+
+      .ClashStats__tileValue {
+        font-size: 22px;
+      }
+    }
+  }
+
+  &__tileValue {
+    font-size: 15px;
+    font-weight: bold;
+    color: #fff;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__tileLabel {
+    color: $dim;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  &__tileSub {
+    color: $dim;
+    font-size: 10px;
+  }
+
+  &__sorts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin: 4px 0 8px;
+  }
+
+  &__sort {
+    padding: 2px 9px;
+    border: 1px solid $line;
+    border-radius: 2px;
+    background: $panel;
+    cursor: pointer;
+    user-select: none;
+
+    &:hover {
+      border-color: rgba(255, 255, 255, 0.35);
+    }
+
+    &--active {
+      border-color: $gold;
+      color: #fff;
+    }
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+
+    th {
+      padding: 4px;
+      color: $dim;
+      font-size: 10px;
+      font-weight: normal;
+      letter-spacing: 0.08em;
+      text-align: right;
+      border-bottom: 1px solid $line;
+    }
+
+    td {
+      padding: 3px 4px;
+      text-align: right;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      font-variant-numeric: tabular-nums;
+    }
+  }
+
+  &__nameCol {
+    text-align: left !important;
+    width: 100%;
+  }
+
+  &__main {
+    font-weight: bold;
+    color: #fff;
+  }
+
+  &__rank {
+    font-weight: bold;
+
+    &--1 {
+      color: $gold;
+    }
+
+    &--2 {
+      color: #c9d1d9;
+    }
+
+    &--3 {
+      color: #d08a4a;
+    }
+  }
+
+  &__row--viewer td {
+    background: rgba(90, 143, 230, 0.18);
+  }
+}

@@ -392,11 +392,16 @@ export const ClashScoreboard = () => {
               <Box color="label">
                 <span className="ClashScoreboard__key">Tab</span> close
               </Box>
-              {!!data.kits && (
-                <Button icon="person-rifle" onClick={() => act('loadout')}>
-                  Loadout
+              <Box>
+                <Button icon="chart-line" onClick={() => act('stats')}>
+                  Career stats
                 </Button>
-              )}
+                {!!data.kits && (
+                  <Button icon="person-rifle" onClick={() => act('loadout')}>
+                    Loadout
+                  </Button>
+                )}
+              </Box>
             </div>
           </>
         )}

@@ -174,3 +174,95 @@ GLOBAL_LIST_EMPTY(clash_respawn_button_icons)
 #undef RESPAWN_STATE_COOLDOWN
 #undef RESPAWN_STATE_READY
 #undef RESPAWN_STATE_HOVER
+
+#define DEATH_CARD_WIDTH 224
+#define DEATH_CARD_HEIGHT 76
+
+/// What the death card shows, kept on the client so it survives ghosting into a new HUD
+/client/var/list/clash_death_card
+
+GLOBAL_LIST_EMPTY(clash_death_card_icons)
+
+/proc/get_clash_death_card_icon(accent)
+	if(GLOB.clash_death_card_icons[accent])
+		return GLOB.clash_death_card_icons[accent]
+	var/icon/card = icon('icons/effects/effects.dmi', "nothing")
+	card.Scale(DEATH_CARD_WIDTH, DEATH_CARD_HEIGHT)
+	card.DrawBox(rgb(10, 12, 15, 215), 2, 1, DEATH_CARD_WIDTH - 1, DEATH_CARD_HEIGHT)
+	card.DrawBox(rgb(10, 12, 15, 215), 1, 2, DEATH_CARD_WIDTH, DEATH_CARD_HEIGHT - 1)
+	// Killer's colour along the top, a thin rule under the headline
+	card.DrawBox(accent, 2, DEATH_CARD_HEIGHT - 2, DEATH_CARD_WIDTH - 1, DEATH_CARD_HEIGHT - 1)
+	card.DrawBox(rgb(255, 255, 255, 30), 24, DEATH_CARD_HEIGHT - 36, DEATH_CARD_WIDTH - 23, DEATH_CARD_HEIGHT - 36)
+	GLOB.clash_death_card_icons[accent] = card
+	return card
+
+/// Who killed you and how, shown while you are down, above the respawn button
+/atom/movable/screen/clash_death_card
+	name = "Death recap"
+	desc = "Click to hide."
+	icon = null
+	screen_loc = "CENTER-3,CENTER-2:6"
+	maptext_width = DEATH_CARD_WIDTH - 8
+	maptext_height = DEATH_CARD_HEIGHT
+	maptext_x = 4
+	maptext_y = -5
+	alpha = 0
+	mouse_opacity = MOUSE_OPACITY_TRANSPARENT
+	/// The card data this is showing, so it redraws only on a new death
+	var/list/shown
+
+/atom/movable/screen/clash_death_card/proc/update(mob/viewer)
+	var/client/viewer_client = viewer.client
+	if(viewer.stat != DEAD && !isobserver(viewer))
+		// Alive again, the card is spent
+		if(viewer_client && ishuman(viewer))
+			viewer_client.clash_death_card = null
+		hide()
+		return
+	var/list/card = viewer_client?.clash_death_card
+	if(!card || card["dismissed"])
+		hide()
+		return
+	if(shown == card)
+		return
+	shown = card
+	icon = get_clash_death_card_icon(card["color"])
+	maptext = card["text"]
+	mouse_opacity = MOUSE_OPACITY_OPAQUE
+	pixel_y = 8
+	alpha = 0
+	animate(src, alpha = 255, pixel_y = 0, time = 3, easing = CUBIC_EASING|EASE_OUT)
+
+/atom/movable/screen/clash_death_card/proc/hide()
+	if(!alpha && !shown)
+		return
+	shown = null
+	animate(src)
+	alpha = 0
+	mouse_opacity = MOUSE_OPACITY_TRANSPARENT
+
+/atom/movable/screen/clash_death_card/clicked(mob/user, list/mods)
+	if(user.client?.clash_death_card)
+		user.client.clash_death_card["dismissed"] = TRUE
+	hide()
+	return TRUE
+
+/// Fills in victim's death card and shows it at once, killer_name null for a death to the environment
+/proc/set_clash_death_card(mob/victim, headline, killer_name, color, detail, list/notes)
+	if(!victim?.client)
+		return
+	var/list/lines = list()
+	lines += "<span style='font-family: \"Small Fonts\"; font-size: 6px; color: #8a939c; letter-spacing: 1px'>[headline]</span>"
+	lines += "<span style='font-family: \"VCR OSD Mono\"; font-size: 12px; color: [color]'>[killer_name ? html_encode(killer_name) : "YOU DIED"]</span>"
+	lines += "<span style='font-family: \"Small Fonts\"; font-size: 6px; color: #d0d6dc'>[detail]</span>"
+	for(var/note in notes)
+		lines += "<span style='font-family: \"Small Fonts\"; font-size: 6px; color: #c9b27a'>[note]</span>"
+	victim.client.clash_death_card = list(
+		"color" = color,
+		"text" = "<span style='text-align: center; vertical-align: top; -dm-text-outline: 1px black'>[lines.Join("<br>")]</span>",
+	)
+	if(victim.stat == DEAD)
+		victim.hud_used?.clash_death_card?.update(victim)
+
+#undef DEATH_CARD_WIDTH
+#undef DEATH_CARD_HEIGHT

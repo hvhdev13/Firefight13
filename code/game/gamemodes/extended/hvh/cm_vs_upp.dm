@@ -6,9 +6,10 @@
 	votable = FALSE
 	map_vote_mode = GAMEMODE_FACTION_CLASH_UPP_CM
 	score_label = "tickets"
+	round_time_limit = 30 MINUTES
 	var/upp_ship = "ssv_rostock.dmm"
 	/// Tickets each team starts with, every death on the team costs one
-	var/tickets = 500
+	var/tickets = 200
 	/// Faction to ticket callouts already made
 	var/list/ticket_callouts_made = list()
 	/// The match clock starts when the landing ceasefire ends, or this long into the round if nobody lands
