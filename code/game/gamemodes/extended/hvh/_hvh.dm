@@ -891,6 +891,11 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 			fighter.vendor_snowflake_points = fighter.clash_spawn_points[2]
 		if(spawn_protection)
 			fighter.AddComponent(/datum/component/clash_spawn_guard, spawn_protection)
+		// A fresh match is a fresh loadout, so survivors do not start it on the last one's ammo
+		if(clash_uses_kits() && fighter.ckey)
+			var/datum/clash_kit/kit = get_clash_active_kit(fighter.ckey, fighter.job)
+			if(kit)
+				INVOKE_ASYNC(GLOBAL_PROC, GLOBAL_PROC_REF(apply_clash_kit), fighter, kit)
 	for(var/datum/clash_bot/bot as anything in GLOB.clash_bots.Copy())
 		// Fill bots whose seat a player has since taken sit the next match out
 		if(bot.post?.team_fill && !bot.post.active)
