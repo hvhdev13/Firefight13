@@ -22,8 +22,8 @@
 	name = "Scoreboard"
 	icon = null
 	icon_state = null
-	// Clickable, opens the live scoreboard
-	mouse_opacity = MOUSE_OPACITY_OPAQUE
+	// Clicks pass through to the map, the bar sits over play and must never eat a shot. Tab opens the scoreboard.
+	mouse_opacity = MOUSE_OPACITY_TRANSPARENT
 	// A score bar across the top middle, the limit and objectives in small text under it
 	screen_loc = "CENTER-4,TOP:-10"
 	maptext_height = 40

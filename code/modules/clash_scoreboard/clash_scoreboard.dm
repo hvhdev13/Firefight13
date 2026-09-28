@@ -57,7 +57,3 @@ GLOBAL_DATUM_INIT(clash_scoreboard, /datum/clash_scoreboard, new)
 	set name = "Scoreboard"
 	set category = "OOC"
 	open_clash_scoreboard(src)
-
-/atom/movable/screen/faction_score/clicked(mob/user, list/mods)
-	open_clash_scoreboard(user)
-	return TRUE
