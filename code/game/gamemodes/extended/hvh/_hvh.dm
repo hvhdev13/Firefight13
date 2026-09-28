@@ -107,7 +107,8 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	var/list/recent_damage = list()
 	/// Whether the map is an arena with sealed bases and bots, for the rules shown to players
 	var/arena_rules = FALSE
-	map_vote_mode = GAMEMODE_FACTION_CLASH_UPP_CM
+	// The arena map pool, Faction Clash keeps its own
+	map_vote_mode = GAMEMODE_TDM
 
 /// Respawn wait for the current round, the default outside a clash mode
 /proc/clash_respawn_cooldown()

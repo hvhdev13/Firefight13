@@ -132,8 +132,9 @@ const TeamScore = (props: {
   readonly needed: number;
   readonly leading: boolean;
   readonly flip?: boolean;
+  readonly label?: string;
 }) => {
-  const { team, limit, needed, leading, flip } = props;
+  const { team, limit, needed, leading, flip, label } = props;
   const fill = limit ? Math.min(100, (team.score / limit) * 100) : 0;
   return (
     <div
@@ -149,7 +150,10 @@ const TeamScore = (props: {
           {team.name}
           {!!team.own && <span className="ClashScoreboard__you">YOU</span>}
         </span>
-        <span className="ClashScoreboard__score">{team.score}</span>
+        <span className="ClashScoreboard__score">
+          {team.score}
+          {label && <span className="ClashScoreboard__unit">{label}</span>}
+        </span>
       </div>
       {limit > 0 && (
         <div className="ClashScoreboard__bar">
@@ -324,6 +328,7 @@ export const ClashScoreboard = () => {
           <>
             <div className="ClashScoreboard__header">
               <TeamScore
+                label={data.score_label}
                 team={left}
                 limit={score_limit}
                 needed={matches > 1 ? wins_needed : 0}
@@ -347,6 +352,7 @@ export const ClashScoreboard = () => {
                 )}
               </div>
               <TeamScore
+                label={data.score_label}
                 team={right}
                 limit={score_limit}
                 needed={matches > 1 ? wins_needed : 0}

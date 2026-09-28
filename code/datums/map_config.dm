@@ -85,6 +85,10 @@
 	var/tdm_countdown_seconds
 	/// Team Deathmatch: seconds of protection after a fresh spawn leaves base, null uses the mode default
 	var/tdm_spawn_protection_seconds
+	/// Faction Clash: tickets each team starts with
+	var/fc_tickets
+	/// Faction Clash: minutes before the team with more tickets left wins
+	var/fc_match_minutes
 
 	var/perf_mode
 
@@ -483,6 +487,20 @@
 		tdm_spawn_protection_seconds = temp
 	else if(!isnull(temp))
 		log_world("map_config tdm_spawn_protection_seconds is not a number!")
+		return
+
+	temp = json["fc_tickets"]
+	if(isnum(temp) && temp > 0)
+		fc_tickets = round(temp)
+	else if(!isnull(temp))
+		log_world("map_config fc_tickets is not a positive number!")
+		return
+
+	temp = json["fc_match_minutes"]
+	if(isnum(temp) && temp > 0)
+		fc_match_minutes = temp
+	else if(!isnull(temp))
+		log_world("map_config fc_match_minutes is not a positive number!")
 		return
 
 	if(json["disable_ship_map"])

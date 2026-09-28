@@ -2,11 +2,67 @@
 /datum/game_mode/extended/faction_clash/hvh/cm_vs_upp
 	name = GAMEMODE_FACTION_CLASH_UPP_CM
 	config_tag = GAMEMODE_FACTION_CLASH_UPP_CM
-	votable = TRUE
+	// Off until colony maps are back in rotation
+	votable = FALSE
+	map_vote_mode = GAMEMODE_FACTION_CLASH_UPP_CM
+	score_label = "tickets"
 	var/upp_ship = "ssv_rostock.dmm"
+	/// Tickets each team starts with, every death on the team costs one
+	var/tickets = 500
+	/// Faction to ticket callouts already made
+	var/list/ticket_callouts_made = list()
 	/// The match clock starts when the landing ceasefire ends, or this long into the round if nobody lands
 	var/first_match_fallback = 20 MINUTES
 	var/first_match_timer_id
+
+/datum/game_mode/extended/faction_clash/hvh/cm_vs_upp/pre_setup()
+	var/datum/map_config/ground = SSmapping.configs[GROUND_MAP]
+	if(ground?.fc_tickets)
+		tickets = ground.fc_tickets
+	if(ground?.fc_match_minutes)
+		round_time_limit = ground.fc_match_minutes MINUTES
+	log_debug("FC: [ground?.map_name || "unknown map"], [tickets] tickets a team, [round_time_limit / 600] minute cap")
+	return ..()
+
+/// Tickets faction has left
+/datum/game_mode/extended/faction_clash/hvh/cm_vs_upp/proc/tickets_left(faction)
+	return max(0, tickets - (faction_deaths[faction] || 0))
+
+/datum/game_mode/extended/faction_clash/hvh/cm_vs_upp/get_match_score(faction)
+	return tickets_left(faction)
+
+/datum/game_mode/extended/faction_clash/hvh/cm_vs_upp/get_round_tiebreak(faction)
+	return tickets_left(faction)
+
+/datum/game_mode/extended/faction_clash/hvh/cm_vs_upp/get_score_limit()
+	return tickets
+
+/datum/game_mode/extended/faction_clash/hvh/cm_vs_upp/get_limit_text()
+	return "[tickets] tickets a team"
+
+/datum/game_mode/extended/faction_clash/hvh/cm_vs_upp/score_death(faction, mob_name, cause, owner_ckey)
+	. = ..()
+	if(!match_live || round_finished || !(faction in list(FACTION_MARINE, FACTION_UPP)))
+		return
+	update_score_huds()
+	var/left = tickets_left(faction)
+	if(left <= 0)
+		finish_match("[faction == FACTION_MARINE ? "USCM" : "UPP"] ran out of tickets")
+		return
+	for(var/step in list(100, 50, 25, 10))
+		if(left != step)
+			continue
+		var/list/made = ticket_callouts_made[faction]
+		if(!made)
+			made = list()
+			ticket_callouts_made[faction] = made
+		if(step in made)
+			return
+		made += step
+		var/enemy = faction == FACTION_MARINE ? FACTION_UPP : FACTION_MARINE
+		announce_to_faction(faction, "[step] tickets left. Every death counts.")
+		announce_to_faction(enemy, "The enemy is down to [step] tickets.")
+		return
 
 /datum/game_mode/extended/faction_clash/hvh/cm_vs_upp/open_first_match()
 	first_match_timer_id = addtimer(CALLBACK(src, PROC_REF(start_first_match)), first_match_fallback, TIMER_STOPPABLE)
@@ -22,6 +78,7 @@
 
 /datum/game_mode/extended/faction_clash/hvh/cm_vs_upp/get_welcome_rules()
 	. = ..()
+	.[1] = "Each team has [tickets] tickets and every death costs one. A team out of tickets loses. Otherwise, after [round_time_limit / 600] minutes, the team with more tickets left wins."
 	. += "The fight starts on the colony. Deploy by dropship from your ship. The first landing starts a five minute ceasefire, and the clock and scoring start when it ends."
 
 /datum/game_mode/extended/faction_clash/hvh/cm_vs_upp/announce_ceasefire()

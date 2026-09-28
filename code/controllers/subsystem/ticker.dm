@@ -360,8 +360,11 @@ SUBSYSTEM_DEF(ticker)
 
 /datum/controller/subsystem/ticker/proc/load_mode()
 	var/mode = trim(file2text("data/mode.txt"))
-	if(mode)
-		GLOB.master_mode = SSmapping.configs[GROUND_MAP].force_mode ? SSmapping.configs[GROUND_MAP].force_mode : mode
+	var/forced = SSmapping.configs[GROUND_MAP].force_mode
+	if(forced)
+		GLOB.master_mode = forced
+	else if(mode)
+		GLOB.master_mode = mode
 	else
 		GLOB.master_mode = GAMEMODE_EXTENDED
 	log_game("Saved mode is '[GLOB.master_mode]'")

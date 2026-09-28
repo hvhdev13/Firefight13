@@ -11,7 +11,7 @@
         }
     ],
     "gamemodes": [
-        "Faction Clash UPP CM",
+        "Team Deathmatch",
         "Capture the Flag"
     ],
     "force_mode": "Capture the Flag",

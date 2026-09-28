@@ -83,6 +83,14 @@ $hot: #ff8a3d;
     color: #fff;
   }
 
+  &__unit {
+    margin: 0 4px;
+    color: $dim;
+    font-size: 10px;
+    font-weight: normal;
+    letter-spacing: 0.08em;
+  }
+
   &__bar {
     height: 4px;
     margin: 5px 0 4px;

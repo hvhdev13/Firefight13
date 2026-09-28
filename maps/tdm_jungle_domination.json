@@ -11,7 +11,7 @@
         }
     ],
     "gamemodes": [
-        "Faction Clash UPP CM",
+        "Team Deathmatch",
         "Domination"
     ],
     "force_mode": "Domination",
