@@ -175,25 +175,48 @@ GLOBAL_LIST_EMPTY(clash_respawn_button_icons)
 #undef RESPAWN_STATE_READY
 #undef RESPAWN_STATE_HOVER
 
-#define DEATH_CARD_WIDTH 224
-#define DEATH_CARD_HEIGHT 76
+#define DEATH_CARD_WIDTH 272
+#define DEATH_CARD_HEIGHT 104
+/// Bottom band holding your own life summary
+#define DEATH_CARD_BAND 16
+/// Square on the left holding the weapon that killed you
+#define DEATH_CARD_ICON_BOX 64
 
 /// What the death card shows, kept on the client so it survives ghosting into a new HUD
 /client/var/list/clash_death_card
 
 GLOBAL_LIST_EMPTY(clash_death_card_icons)
 
-/proc/get_clash_death_card_icon(accent)
-	if(GLOB.clash_death_card_icons[accent])
-		return GLOB.clash_death_card_icons[accent]
+/// Card backing in the killer's colour, with a weapon box and a health bar for them when there is a killer
+/proc/get_clash_death_card_icon(accent, has_killer, health)
+	var/health_step = isnum(health) ? clamp(round(health / 5), 0, 20) : -1
+	var/key = "[accent]|[has_killer]|[health_step]"
+	if(GLOB.clash_death_card_icons[key])
+		return GLOB.clash_death_card_icons[key]
 	var/icon/card = icon('icons/effects/effects.dmi', "nothing")
 	card.Scale(DEATH_CARD_WIDTH, DEATH_CARD_HEIGHT)
-	card.DrawBox(rgb(10, 12, 15, 215), 2, 1, DEATH_CARD_WIDTH - 1, DEATH_CARD_HEIGHT)
-	card.DrawBox(rgb(10, 12, 15, 215), 1, 2, DEATH_CARD_WIDTH, DEATH_CARD_HEIGHT - 1)
-	// Killer's colour along the top, a thin rule under the headline
-	card.DrawBox(accent, 2, DEATH_CARD_HEIGHT - 2, DEATH_CARD_WIDTH - 1, DEATH_CARD_HEIGHT - 1)
-	card.DrawBox(rgb(255, 255, 255, 30), 24, DEATH_CARD_HEIGHT - 36, DEATH_CARD_WIDTH - 23, DEATH_CARD_HEIGHT - 36)
-	GLOB.clash_death_card_icons[accent] = card
+	card.DrawBox(rgb(8, 10, 13, 220), 2, 1, DEATH_CARD_WIDTH - 1, DEATH_CARD_HEIGHT)
+	card.DrawBox(rgb(8, 10, 13, 220), 1, 2, DEATH_CARD_WIDTH, DEATH_CARD_HEIGHT - 1)
+	// A wash of the killer's colour behind the header, and a solid stripe on top
+	card.DrawBox(clash_tint(accent, 38), 2, DEATH_CARD_HEIGHT - 30, DEATH_CARD_WIDTH - 1, DEATH_CARD_HEIGHT - 1)
+	card.DrawBox(accent, 2, DEATH_CARD_HEIGHT - 3, DEATH_CARD_WIDTH - 1, DEATH_CARD_HEIGHT - 1)
+	// Your own life along the bottom
+	card.DrawBox(rgb(255, 255, 255, 14), 2, 2, DEATH_CARD_WIDTH - 1, DEATH_CARD_BAND)
+	card.DrawBox(rgb(255, 255, 255, 36), 2, DEATH_CARD_BAND + 1, DEATH_CARD_WIDTH - 1, DEATH_CARD_BAND + 1)
+	if(has_killer)
+		var/box_top = DEATH_CARD_HEIGHT - 8
+		var/box_bottom = box_top - DEATH_CARD_ICON_BOX + 1
+		card.DrawBox(rgb(0, 0, 0, 120), 8, box_bottom, 8 + DEATH_CARD_ICON_BOX - 1, box_top)
+		card.DrawBox(clash_tint(accent, 120), 8, box_bottom, 8 + DEATH_CARD_ICON_BOX - 1, box_bottom)
+		// The killer's health when they got you, green to red
+		if(health_step >= 0)
+			var/bar_y = box_bottom - 5
+			card.DrawBox(rgb(255, 255, 255, 30), 8, bar_y, 8 + DEATH_CARD_ICON_BOX - 1, bar_y + 1)
+			var/filled = round(DEATH_CARD_ICON_BOX * health_step / 20)
+			if(filled > 0)
+				var/bar_color = health_step > 12 ? rgb(95, 211, 95) : (health_step > 6 ? rgb(230, 190, 70) : rgb(230, 80, 70))
+				card.DrawBox(bar_color, 8, bar_y, 8 + filled - 1, bar_y + 1)
+	GLOB.clash_death_card_icons[key] = card
 	return card
 
 /// Who killed you and how, shown while you are down, above the respawn button
@@ -201,11 +224,7 @@ GLOBAL_LIST_EMPTY(clash_death_card_icons)
 	name = "Death recap"
 	desc = "Click to hide."
 	icon = null
-	screen_loc = "CENTER-3,CENTER-2:6"
-	maptext_width = DEATH_CARD_WIDTH - 8
-	maptext_height = DEATH_CARD_HEIGHT
-	maptext_x = 4
-	maptext_y = -5
+	screen_loc = "CENTER-4:8,CENTER-2:6"
 	alpha = 0
 	mouse_opacity = MOUSE_OPACITY_TRANSPARENT
 	/// The card data this is showing, so it redraws only on a new death
@@ -226,8 +245,8 @@ GLOBAL_LIST_EMPTY(clash_death_card_icons)
 	if(shown == card)
 		return
 	shown = card
-	icon = get_clash_death_card_icon(card["color"])
-	maptext = card["text"]
+	icon = get_clash_death_card_icon(card["color"], card["has_killer"], card["health"])
+	overlays = card["overlays"]
 	mouse_opacity = MOUSE_OPACITY_OPAQUE
 	pixel_y = 8
 	alpha = 0
@@ -239,6 +258,7 @@ GLOBAL_LIST_EMPTY(clash_death_card_icons)
 	shown = null
 	animate(src)
 	alpha = 0
+	overlays.Cut()
 	mouse_opacity = MOUSE_OPACITY_TRANSPARENT
 
 /atom/movable/screen/clash_death_card/clicked(mob/user, list/mods)
@@ -247,22 +267,64 @@ GLOBAL_LIST_EMPTY(clash_death_card_icons)
 	hide()
 	return TRUE
 
-/// Fills in victim's death card and shows it at once, killer_name null for a death to the environment
-/proc/set_clash_death_card(mob/victim, headline, killer_name, color, detail, list/notes)
+/**
+ * Fills in victim's death card and shows it at once
+ *
+ * killer_name is null for a death to the environment. weapon is the item that did it, drawn large beside the text.
+ * health is the killer's health left in percent, or null. life_line sums up the life that just ended.
+ */
+/proc/set_clash_death_card(mob/victim, headline, killer_name, color, detail, list/notes, obj/item/weapon, health, life_line)
 	if(!victim?.client)
 		return
+	var/has_killer = !!killer_name
+	var/text_x = has_killer ? 8 + DEATH_CARD_ICON_BOX + 8 : 10
+	var/text_width = DEATH_CARD_WIDTH - text_x - 8
+	var/outline = "-dm-text-outline: 1px black"
 	var/list/lines = list()
-	lines += "<span style='font-family: \"Small Fonts\"; font-size: 6px; color: #8a939c; letter-spacing: 1px'>[headline]</span>"
-	lines += "<span style='font-family: \"VCR OSD Mono\"; font-size: 12px; color: [color]'>[killer_name ? html_encode(killer_name) : "YOU DIED"]</span>"
-	lines += "<span style='font-family: \"Small Fonts\"; font-size: 6px; color: #d0d6dc'>[detail]</span>"
+	lines += "<span style='font-family: \"Small Fonts\"; font-size: 6px; color: #aab2b9'>[headline]</span>"
+	lines += "<span style='font-family: \"VCR OSD Mono\"; font-size: 14px; color: [color]'>[killer_name ? html_encode(killer_name) : "YOU DIED"]</span>"
+	lines += "<span style='font-family: \"Small Fonts\"; font-size: 6px; color: #e2e6ea'>[detail]</span>"
 	for(var/note in notes)
-		lines += "<span style='font-family: \"Small Fonts\"; font-size: 6px; color: #c9b27a'>[note]</span>"
+		lines += "<span style='font-family: \"Small Fonts\"; font-size: 6px; color: #d9bf7e'>[note]</span>"
+	var/list/overlays = list()
+	var/mutable_appearance/body = mutable_appearance()
+	body.maptext = "<span style='[outline]; text-align: left; vertical-align: top'>[lines.Join("<br>")]</span>"
+	body.maptext_x = text_x
+	body.maptext_y = DEATH_CARD_BAND + 4
+	body.maptext_width = text_width
+	body.maptext_height = DEATH_CARD_HEIGHT - DEATH_CARD_BAND - 10
+	body.appearance_flags = RESET_COLOR|RESET_ALPHA|KEEP_APART
+	overlays += body
+	if(life_line)
+		var/mutable_appearance/band = mutable_appearance()
+		band.maptext = "<span style='[outline]; font-family: \"Small Fonts\"; font-size: 6px; text-align: center; color: #aab2b9'>[life_line]</span>"
+		band.maptext_y = 2
+		band.maptext_width = DEATH_CARD_WIDTH
+		band.maptext_height = DEATH_CARD_BAND - 2
+		band.appearance_flags = RESET_COLOR|RESET_ALPHA|KEEP_APART
+		overlays += band
+	if(has_killer && weapon)
+		// The weapon at double size, centred in its box
+		var/mutable_appearance/gun = new(weapon)
+		gun.plane = FLOAT_PLANE
+		gun.layer = FLOAT_LAYER
+		gun.dir = SOUTH
+		gun.maptext = null
+		gun.pixel_x = 0
+		gun.pixel_y = 0
+		gun.transform = matrix(2, 0, 8 + DEATH_CARD_ICON_BOX / 2 - 16, 0, 2, DEATH_CARD_HEIGHT - 8 - DEATH_CARD_ICON_BOX / 2 - 16)
+		gun.appearance_flags = RESET_ALPHA|KEEP_APART|PIXEL_SCALE
+		overlays += gun
 	victim.client.clash_death_card = list(
 		"color" = color,
-		"text" = "<span style='text-align: center; vertical-align: top; -dm-text-outline: 1px black'>[lines.Join("<br>")]</span>",
+		"has_killer" = has_killer,
+		"health" = health,
+		"overlays" = overlays,
 	)
 	if(victim.stat == DEAD)
 		victim.hud_used?.clash_death_card?.update(victim)
 
 #undef DEATH_CARD_WIDTH
 #undef DEATH_CARD_HEIGHT
+#undef DEATH_CARD_BAND
+#undef DEATH_CARD_ICON_BOX

@@ -16,7 +16,7 @@
     "tdm_matches": 3,
     "tdm_match_minutes": 10,
     "tdm_respawn_seconds": 25,
-    "tdm_kill_limit": 25,
+    "tdm_kill_limit": 40,
     "tdm_countdown_seconds": 20,
     "tdm_spawn_protection_seconds": 3
 }

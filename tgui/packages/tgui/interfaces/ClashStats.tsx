@@ -60,8 +60,27 @@ const Tile = (props: {
   );
 };
 
-const Career = (props: { readonly own: CareerRow | null }) => {
-  const { own } = props;
+const rankOf = (
+  board: CareerRow[],
+  ckey: string,
+  key: SortKey,
+  floor: number,
+) => {
+  const pool =
+    key === 'kd' || key === 'accuracy'
+      ? board.filter((row) => row.kills >= floor)
+      : board;
+  const sorted = [...pool].sort((a, b) => b[key] - a[key] || b.kills - a.kills);
+  const index = sorted.findIndex((row) => row.ckey === ckey);
+  return index < 0 ? null : { rank: index + 1, of: sorted.length };
+};
+
+const Career = (props: {
+  readonly own: CareerRow | null;
+  readonly board: CareerRow[];
+  readonly floor: number;
+}) => {
+  const { own, board, floor } = props;
   if (!own) {
     return (
       <NoticeBox info>
@@ -72,6 +91,24 @@ const Career = (props: { readonly own: CareerRow | null }) => {
   return (
     <>
       <div className="ClashStats__name">{own.name}</div>
+      <div className="ClashStats__ranks">
+        {SORTS.map((option) => {
+          const place = rankOf(board, own.ckey, option.key, floor);
+          return (
+            <span
+              key={option.key}
+              className={
+                place && place.rank <= 3
+                  ? 'ClashStats__rankChip ClashStats__rankChip--top'
+                  : 'ClashStats__rankChip'
+              }
+            >
+              {option.label} <b>{place ? `#${place.rank}` : '-'}</b>
+              {place && <span className="ClashStats__of"> of {place.of}</span>}
+            </span>
+          );
+        })}
+      </div>
       <div className="ClashStats__grid">
         <Tile big label="Kills" value={own.kills} />
         <Tile big label="K/D" value={own.kd.toFixed(2)} />
@@ -210,7 +247,7 @@ export const ClashStats = () => {
           </Tabs.Tab>
         </Tabs>
         {tab === 'career' ? (
-          <Career own={data.own} />
+          <Career own={data.own} board={data.board} floor={data.kd_floor} />
         ) : (
           <Leaderboard
             board={data.board}

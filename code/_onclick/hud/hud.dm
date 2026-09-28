@@ -116,12 +116,12 @@
 	static_inventory += clash_death_card
 	for(var/i = 1 to CLASH_KILLFEED_LINES)
 		var/atom/movable/screen/faction_killfeed/line = new
-		line.maptext_y = -8 - (i * 16)
+		line.maptext_y = -14 - (i * 16)
 		faction_killfeed += line
 		static_inventory += line
 	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
 	if(istype(clash_mode))
-		faction_score.maptext = clash_mode.get_score_maptext()
+		clash_mode.init_score_hud(faction_score, mymob)
 		clash_mode.render_killfeed_for(mymob)
 
 /datum/hud/Destroy()

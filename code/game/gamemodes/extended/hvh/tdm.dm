@@ -7,7 +7,7 @@
 	use_kits = TRUE
 	round_time_limit = 10 MINUTES
 	matches_per_round = 3
-	kill_limit = 25
+	kill_limit = 40
 	countdown_time = 20 SECONDS
 	spawn_protection = 3 SECONDS
 	idle_limit = 3 MINUTES

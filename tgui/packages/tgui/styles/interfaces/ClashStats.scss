@@ -13,6 +13,37 @@ $gold: #ffcf4d;
     letter-spacing: 0.05em;
   }
 
+  &__ranks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 8px;
+  }
+
+  &__rankChip {
+    padding: 1px 7px;
+    border: 1px solid $line;
+    border-radius: 2px;
+    background: $panel;
+    color: $dim;
+
+    b {
+      color: #fff;
+    }
+
+    &--top {
+      border-color: $gold;
+
+      b {
+        color: $gold;
+      }
+    }
+  }
+
+  &__of {
+    font-size: 10px;
+  }
+
   &__grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);

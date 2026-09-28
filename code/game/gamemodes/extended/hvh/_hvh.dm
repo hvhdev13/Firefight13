@@ -331,41 +331,19 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		entry["ckey"] = owner_ckey
 	return entry
 
+/// The small lines under the score bar: the limit, the series and any objectives
 /datum/game_mode/extended/faction_clash/hvh/proc/get_score_maptext()
-	var/uscm = get_match_score(FACTION_MARINE)
-	var/upp = get_match_score(FACTION_UPP)
-	var/list/lines = list("<span class='maptext center' style='font-size: 10px'><span style='color: #5a8fe6'>USCM [uscm]</span> | <span style='color: #e61919'>[upp] UPP</span></span>")
-	lines += "<span class='maptext center'><span style='color: #5a8fe6'>Players: [count_side(FACTION_MARINE)]</span> | <span style='color: #e61919'>Players: [count_side(FACTION_UPP)]</span></span>"
+	var/list/parts = list()
 	var/limit_text = get_limit_text()
 	if(limit_text)
-		lines += "<span class='maptext center'>[limit_text]</span>"
-	lines += get_objective_maptext()
+		parts += limit_text
 	if(matches_per_round > 1)
-		lines += "<span class='maptext center'>Match [get_display_match()] of [matches_per_round] | Series <span style='color: #5a8fe6'>[match_wins[FACTION_MARINE] || 0]</span>-<span style='color: #e61919'>[match_wins[FACTION_UPP] || 0]</span></span>"
-	var/clock = get_round_clock()
-	if(clock)
-		lines += ""
-		lines += clock
+		parts += "Series <span style='color: [faction_color(FACTION_MARINE)]'>[match_wins[FACTION_MARINE] || 0]</span>-<span style='color: [faction_color(FACTION_UPP)]'>[match_wins[FACTION_UPP] || 0]</span> · best of [matches_per_round]"
+	var/list/lines = list()
+	if(length(parts))
+		lines += "<span class='maptext center' style='color: #c3c9ce'>[parts.Join("  ·  ")]</span>"
+	lines += get_objective_maptext()
 	return lines.Join("<br>")
-
-/datum/game_mode/extended/faction_clash/hvh/proc/get_round_clock()
-	if(round_finished)
-		return null
-	if(intermission_end_time)
-		var/pause = CEILING(max(0, intermission_end_time - world.time) / 10, 1)
-		return "<span class='maptext center'>Next match in [pause]</span>"
-	if(countdown_end_time)
-		var/hold = CEILING(max(0, countdown_end_time - world.time) / 10, 1)
-		return "<span class='maptext center'>Match starts in [hold]</span>"
-	if(!match_live)
-		return null
-	if(!round_end_time)
-		return null
-	var/remaining = max(0, round_end_time - world.time)
-	var/seconds = CEILING(remaining / 10, 1)
-	var/minutes = floor(seconds / 60)
-	seconds = seconds % 60
-	return "<span class='maptext center'>[minutes]:[seconds < 10 ? "0[seconds]" : "[seconds]"] left</span>"
 
 /// Everything the live scoreboard shows, from viewer's point of view
 /datum/game_mode/extended/faction_clash/hvh/proc/get_scoreboard_data(mob/viewer)
@@ -454,8 +432,12 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		"mvp" = !!leader && name == leader,
 	)
 
-/datum/game_mode/extended/faction_clash/hvh/proc/get_killfeed_line(list/entry)
-	return "<span class='maptext' style='text-align: right; font-size: 6px'><span style='color: [entry["killer_color"]]'>[entry["killer"]][entry["assists"] ? " +[entry["assists"]]" : ""]</span> killed <span style='color: [entry["victim_color"]]'>[entry["victim"]]</span>[entry["cause"] ? " ([entry["cause"]])" : ""]</span>"
+/datum/game_mode/extended/faction_clash/hvh/proc/get_killfeed_line(list/entry, mob/viewer)
+	// Lines you are in get a gold outline so your own kills and deaths stand out
+	var/involved = viewer && (entry["killer"] == viewer.real_name || entry["victim"] == viewer.real_name)
+	var/outline = involved ? "-dm-text-outline: 1px #7a5a00" : "-dm-text-outline: 1px black"
+	var/weapon = entry["cause"] ? " <span style='color: #9aa3ab'>\[[html_encode(entry["cause"])]\]</span> " : " <span style='color: #9aa3ab'>&gt;</span> "
+	return "<span class='maptext' style='text-align: right; font-size: 6px; [outline]'><span style='color: [entry["killer_color"]]'>[html_encode(entry["killer"])][entry["assists"] ? " <span style='color: #9aa3ab'>+[entry["assists"]]</span>" : ""]</span>[weapon]<span style='color: [entry["victim_color"]]'>[html_encode(entry["victim"])]</span></span>"
 
 /datum/game_mode/extended/faction_clash/hvh/proc/render_killfeed_for(mob/player)
 	var/list/lines = player.hud_used?.faction_killfeed
@@ -468,7 +450,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 			line.maptext = ""
 			line.alpha = 255
 			continue
-		line.maptext = get_killfeed_line(killfeed[entry_index])
+		line.maptext = get_killfeed_line(killfeed[entry_index], player)
 		line.alpha = 255
 
 /datum/game_mode/extended/faction_clash/hvh/proc/render_killfeed()
@@ -510,10 +492,17 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 
 /datum/game_mode/extended/faction_clash/hvh/proc/update_score_huds()
 	var/base = get_score_maptext()
+	var/list/panel = build_score_panel()
 	for(var/mob/player as anything in GLOB.player_list)
 		var/atom/movable/screen/faction_score/display = player.hud_used?.faction_score
 		if(display)
 			display.maptext = compose_hud_maptext(player, base)
+			display.show_panel(panel, player)
+
+/// Fills in a freshly made HUD's score bar
+/datum/game_mode/extended/faction_clash/hvh/proc/init_score_hud(atom/movable/screen/faction_score/display, mob/viewer)
+	display.maptext = compose_hud_maptext(viewer, get_score_maptext())
+	display.show_panel(build_score_panel(), viewer)
 
 /datum/game_mode/extended/faction_clash/hvh/proc/update_respawn_huds()
 	if(round_finished)
@@ -521,12 +510,14 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		respawn_timer_id = null
 		return
 	var/base = get_score_maptext()
+	var/list/panel = build_score_panel()
 	for(var/mob/player as anything in GLOB.player_list)
 		player.hud_used?.clash_respawn?.update(player)
 		player.hud_used?.clash_death_card?.update(player)
 		var/atom/movable/screen/faction_score/display = player.hud_used?.faction_score
 		if(!display)
 			continue
+		display.show_panel(panel, player)
 		var/text = compose_hud_maptext(player, base)
 		if(display.maptext != text)
 			display.maptext = text
@@ -630,25 +621,27 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		. += name
 
 /datum/game_mode/extended/faction_clash/hvh/proc/report_environment_death(mob/victim, cause)
-	var/list/notes = list()
-	var/kills = life_kills[victim.real_name]
-	if(kills)
-		notes += "You got [kills] kill\s that life."
-	set_clash_death_card(victim, "ELIMINATED", null, "#8a939c", cause ? "Killed by [html_encode(cause)]" : "Cause unknown", notes)
+	set_clash_death_card(victim, "ELIMINATED", null, "#8a939c", cause ? "Killed by [html_encode(cause)]" : "Cause unknown", null, null, null, get_life_line(victim))
 	if(!cause)
 		return
 	to_chat(victim, SPAN_WARNING("Killed by [cause]."))
 
 /// Builds the on-screen recap of who killed victim and how
 /datum/game_mode/extended/faction_clash/hvh/proc/show_death_card(mob/victim, mob/killer, cause, distance, health_left, list/assisters)
+	var/victim_name = victim.real_name
+	var/killer_name = killer.real_name
 	var/list/details = list()
 	if(cause)
 		details += html_encode(cause)
-	details += "[distance] tile\s"
-	details += "[health_left]% health left"
+	details += "[distance] tile\s away"
 	var/list/notes = list()
-	var/victim_name = victim.real_name
-	var/killer_name = killer.real_name
+	if(victim.faction == killer.faction)
+		notes += "<span style='color: #ff8a70'>Friendly fire.</span>"
+	// What the killer has done this match
+	var/list/killer_entry = player_scores[killer_name]
+	var/streak = kill_streaks[killer_name]
+	if(killer_entry)
+		notes += "Their match: [killer_entry["kills"]] kills, [killer_entry["deaths"]] deaths[streak >= 2 ? ", [streak] streak" : ""]"
 	if(match_live && victim.faction != killer.faction)
 		var/list/by_killer = rivalries[victim_name]
 		if(!by_killer)
@@ -657,21 +650,29 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		by_killer[killer_name] = (by_killer[killer_name] || 0) + 1
 		var/times = by_killer[killer_name]
 		if(times >= 2)
-			notes += "They have killed you [times] times this match."
-	var/streak = kill_streaks[killer_name]
-	if(streak >= 3)
-		notes += "They are on a [streak] kill streak."
+			notes += "<span style='color: #ff8a70'>NEMESIS</span>: they have killed you [times] times"
 	if(length(assisters))
-		notes += "Assisted by [html_encode(english_list(assisters))]."
-	var/kills = life_kills[victim_name]
-	if(kills)
-		notes += "You got [kills] kill\s that life."
-	if(victim.faction == killer.faction)
-		notes.Insert(1, "Friendly fire.")
-	// Four notes fit under the headline
-	if(length(notes) > 4)
-		notes.Cut(5)
-	set_clash_death_card(victim, "KILLED BY", killer_name, faction_color(killer.faction), details.Join("  ·  "), notes)
+		notes += "Assisted by [html_encode(english_list(assisters))]"
+	if(length(notes) > 3)
+		notes.Cut(4)
+	// The weapon only when it is still what they hold, a swapped hand would show the wrong one
+	var/obj/item/weapon = killer.get_active_hand()
+	if(!istype(weapon) || (cause && weapon.name != cause))
+		weapon = null
+	set_clash_death_card(victim, "KILLED BY", killer_name, faction_color(killer.faction), details.Join("  ·  "), notes, weapon, health_left, get_life_line(victim))
+
+/// One line summing up the life that just ended, for the bottom of the death card
+/datum/game_mode/extended/faction_clash/hvh/proc/get_life_line(mob/victim)
+	var/list/parts = list()
+	var/kills = life_kills[victim.real_name] || 0
+	parts += "[kills] kill\s"
+	var/alive = round(victim.life_time_total / 10)
+	if(alive > 0)
+		parts += "[floor(alive / 60)]:[alive % 60 < 10 ? "0" : ""][alive % 60] alive"
+	var/list/entry = player_scores[victim.real_name]
+	if(entry)
+		parts += "match [entry["kills"]]/[entry["deaths"]] K/D"
+	return "YOUR LIFE  ·  [parts.Join("  ·  ")]"
 
 /datum/game_mode/extended/faction_clash/hvh/proc/add_killfeed(killer, killer_faction, victim, victim_faction, cause, assists = 0)
 	killfeed += list(list(
@@ -773,6 +774,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	environment_kills = round_environment_kills
 	round_finished = get_round_result()
 	record_career()
+	update_score_huds()
 	log_debug("HVH: round result [round_finished]")
 	roundend_ceasefire()
 

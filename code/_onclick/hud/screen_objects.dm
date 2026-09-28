@@ -24,11 +24,14 @@
 	icon_state = null
 	// Clickable, opens the live scoreboard
 	mouse_opacity = MOUSE_OPACITY_OPAQUE
-	screen_loc = "LEFT,TOP"
-	maptext_height = 80
-	maptext_width = 480
-	maptext_y = -54
+	// A score bar across the top middle, the limit and objectives in small text under it
+	screen_loc = "CENTER-4,TOP:-10"
+	maptext_height = 40
+	maptext_width = 288
+	maptext_y = -42
 	maptext = ""
+	/// State of the score bar last drawn, so it only redraws on change
+	var/shown_panel
 
 //Faction Clash killfeed line
 /atom/movable/screen/faction_killfeed
@@ -37,8 +40,8 @@
 	mouse_opacity = MOUSE_OPACITY_TRANSPARENT
 	screen_loc = "RIGHT,TOP"
 	maptext_height = 16
-	maptext_width = 184
-	maptext_x = -158
+	maptext_width = 260
+	maptext_x = -234
 	maptext = ""
 
 /atom/movable/screen/cinematic
