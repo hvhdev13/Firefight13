@@ -6,7 +6,6 @@
 
 /area/clash_arena/var/clash_faction
 
-/// Whether mover is one of this base's own team being held in during the pre-match countdown
 /proc/clash_is_held(atom/movable/mover, faction, atom/newloc)
 	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
 	if(!faction || !istype(clash_mode) || !clash_mode.bases_sealed || !isliving(mover))

@@ -1,4 +1,3 @@
-/// Longest a guard can last, even if its owner never leaves base
 #define CLASH_SPAWN_GUARD_CAP (60 SECONDS)
 
 /**
@@ -7,9 +6,7 @@
  * Firing a gun, a melee attack or using a held item (priming a grenade) ends it at once.
  */
 /datum/component/clash_spawn_guard
-	// A second grant restarts this guard. Replacing it would let the old one's cleanup strip the new one's protection.
 	dupe_mode = COMPONENT_DUPE_UNIQUE_PASSARGS
-	/// How long protection lasts after leaving base
 	var/grace
 	var/grace_timer
 	var/cap_timer
@@ -21,8 +18,6 @@
 
 /datum/component/clash_spawn_guard/RegisterWithParent()
 	var/mob/living/guarded = parent
-	// The same flags grant_spawn_protection() sets: bullets pass through RECENTSPAWN, damage procs no-op on GODMODE.
-	// Set here rather than through it, since its own end timer cannot be cancelled and would cut a restarted guard short.
 	guarded.status_flags |= RECENTSPAWN|GODMODE
 	guarded.add_filter("clash_spawn_guard", 2, outline_filter(1, "#ffffffb0"))
 	RegisterSignal(guarded, list(COMSIG_MOB_FIRED_GUN, COMSIG_MOB_ITEM_ATTACK_SELF, COMSIG_MOB_MELEE_ATTACK, COMSIG_MOB_DEATH), PROC_REF(on_break))
@@ -40,7 +35,6 @@
 	src.grace = grace
 	restart()
 
-/// Starts the protection window over, as for a fresh spawn
 /datum/component/clash_spawn_guard/proc/restart()
 	deltimer(grace_timer)
 	grace_timer = null

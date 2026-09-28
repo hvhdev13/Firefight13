@@ -1,17 +1,12 @@
-/// Objective centres of the running match, bots hold these when there are any
 GLOBAL_LIST_EMPTY(clash_objective_turfs)
-/// Mapper placed objectives, used instead of computed ones when present
 GLOBAL_LIST_EMPTY(clash_objective_landmarks)
 GLOBAL_DATUM(clash_zone_tile_icon, /icon)
 
-/// Steps the placement flood fill takes out from the middle of the map
 #define CLASH_ZONE_SEARCH_STEPS 60
 
 /obj/effect/landmark/clash_objective
 	name = "Clash objective"
-	/// Shown on the zone and in callouts, zones are ordered by it
 	var/label = "A"
-	/// Tiles from the centre the zone reaches, null for the mode default
 	var/radius
 
 /obj/effect/landmark/clash_objective/Initialize(mapload, ...)
@@ -40,7 +35,6 @@ GLOBAL_DATUM(clash_zone_tile_icon, /icon)
 	GLOB.clash_zone_tile_icon = tile
 	return tile
 
-/// Floor tint marking a zone, coloured by whoever holds it
 /obj/effect/clash_zone_tile
 	name = "objective"
 	anchored = TRUE
@@ -51,7 +45,6 @@ GLOBAL_DATUM(clash_zone_tile_icon, /icon)
 	. = ..()
 	icon = get_clash_zone_tile_icon()
 
-/// Letter floating over a zone's centre, with capture progress under it
 /obj/effect/clash_zone_label
 	name = "objective"
 	anchored = TRUE
@@ -62,23 +55,17 @@ GLOBAL_DATUM(clash_zone_tile_icon, /icon)
 	maptext_x = -32
 	maptext_y = 12
 
-/// One capture zone: a disc of tiles, who holds it, and who is taking it
 /datum/clash_zone
 	var/label
 	var/turf/center
 	var/radius
-	/// Faction holding it, or null
 	var/owner
-	/// Faction part way through taking it, or null
 	var/capturing
-	/// Deciseconds of capture built up by capturing
 	var/progress = 0
 	var/contested = FALSE
-	/// Turf to TRUE for every tile inside the zone
 	var/list/covered = list()
 	var/list/obj/effect/clash_zone_tile/tiles = list()
 	var/obj/effect/clash_zone_label/marker
-	/// Colour and state last drawn, so an unchanged zone is not redrawn
 	var/shown
 
 /datum/clash_zone/New(label, turf/center, radius)
@@ -108,7 +95,6 @@ GLOBAL_DATUM(clash_zone_tile_icon, /icon)
 	progress = 0
 	contested = FALSE
 
-/// Fighters standing in the zone by faction. Only conscious players count, bots never hold or contest.
 /datum/clash_zone/proc/get_occupants()
 	. = list()
 	for(var/mob/living/carbon/human/fighter as anything in GLOB.alive_human_list)
@@ -117,7 +103,6 @@ GLOBAL_DATUM(clash_zone_tile_icon, /icon)
 		if(fighter.faction in list(FACTION_MARINE, FACTION_UPP))
 			.[fighter.faction] = (.[fighter.faction] || 0) + 1
 
-/// Short status for the HUD and callouts
 /datum/clash_zone/proc/get_state_text(capture_time)
 	if(contested)
 		return "contested"
@@ -138,7 +123,6 @@ GLOBAL_DATUM(clash_zone_tile_icon, /icon)
 	var/state_line = state == "open" ? "" : "<br><span style='font-size: 6px'>[state]</span>"
 	marker.maptext = "<span class='maptext center' style='font-size: 12px; color: [tint]'>[label]</span>[state_line]"
 
-/// Open, walkable and not blocked by anything anchored, doors count as open
 /proc/clash_turf_passable(turf/spot)
 	if(!spot || spot.density)
 		return FALSE
@@ -151,7 +135,6 @@ GLOBAL_DATUM(clash_zone_tile_icon, /icon)
 	var/area/clash_arena/here = get_area(spot)
 	return istype(here) && here.clash_faction
 
-/// Average position of each side's base area on level z, faction to list(x, y)
 /proc/get_clash_base_centres(z)
 	var/list/sums = list()
 	for(var/area/clash_arena/base in GLOB.all_areas)
@@ -172,7 +155,6 @@ GLOBAL_DATUM(clash_zone_tile_icon, /icon)
 		var/list/sum = sums[faction]
 		.[faction] = list(sum[1] / sum[3], sum[2] / sum[3])
 
-/// Walkable turfs outside the bases reachable from start, for placing objectives where players can get to them
 /proc/get_clash_reachable_turfs(turf/start, max_steps = CLASH_ZONE_SEARCH_STEPS)
 	. = list()
 	if(!clash_turf_passable(start))
@@ -196,7 +178,6 @@ GLOBAL_DATUM(clash_zone_tile_icon, /icon)
 			steps[next] = taken + 1
 			queue += next
 
-/// The candidate turf closest to x, y
 /proc/get_clash_nearest_turf(list/candidates, x, y)
 	var/best_distance
 	for(var/turf/spot as anything in candidates)
@@ -205,7 +186,6 @@ GLOBAL_DATUM(clash_zone_tile_icon, /icon)
 			best_distance = distance
 			. = spot
 
-/// Walkable turf nearest x, y on level z, searching outward, or null
 /proc/get_clash_open_turf_near(x, y, z)
 	x = clamp(round(x), 1, world.maxx)
 	y = clamp(round(y), 1, world.maxy)
@@ -258,7 +238,6 @@ GLOBAL_DATUM(clash_zone_tile_icon, /icon)
 		var/span_y = upp[2] - uscm[2]
 		var/span = max(1, sqrt(span_x ** 2 + span_y ** 2))
 		var/offset = min(span * 0.3, 20)
-		// At right angles to the base to base line, so each flank is as far from both bases
 		flank_x = -span_y / span * offset
 		flank_y = span_x / span * offset
 	else

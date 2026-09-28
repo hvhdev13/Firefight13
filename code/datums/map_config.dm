@@ -69,25 +69,15 @@
 
 	var/force_mode
 
-	/// Team Deathmatch: length of one match in minutes, null uses the mode default
 	var/tdm_match_minutes
-	/// Team Deathmatch: matches per round, played as a best-of series, null uses the mode default
 	var/tdm_matches
-	/// Team Deathmatch: seconds between dying and being allowed to respawn, null uses the mode default
 	var/tdm_respawn_seconds
-	/// Team Deathmatch: kills that win the match early, 0 turns the limit off, null uses the mode default
 	var/tdm_kill_limit
-	/// Objective arena modes: points that win the match early, null uses the mode default
 	var/tdm_point_limit
-	/// Capture the Flag: captures that win the match early, null uses the mode default
 	var/tdm_capture_limit
-	/// Team Deathmatch: seconds both teams are held in base before the match starts, null uses the mode default
 	var/tdm_countdown_seconds
-	/// Team Deathmatch: seconds of protection after a fresh spawn leaves base, null uses the mode default
 	var/tdm_spawn_protection_seconds
-	/// Faction Clash: tickets each team starts with
 	var/fc_tickets
-	/// Faction Clash: minutes before the team with more tickets left wins
 	var/fc_match_minutes
 
 	var/perf_mode

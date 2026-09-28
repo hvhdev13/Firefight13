@@ -1,8 +1,6 @@
-/// Team Deathmatch: small arena rules, reached through the TDM map configs
 /datum/game_mode/extended/faction_clash/hvh/tdm
 	name = GAMEMODE_TDM
 	config_tag = GAMEMODE_TDM
-	// Only reached through a map's force_mode, never by the gamemode vote
 	fed_spawns = TRUE
 	use_kits = TRUE
 	round_time_limit = 10 MINUTES

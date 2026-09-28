@@ -22,15 +22,12 @@
 	name = "Scoreboard"
 	icon = null
 	icon_state = null
-	// Clicks pass through to the map, the bar sits over play and must never eat a shot. Tab opens the scoreboard.
 	mouse_opacity = MOUSE_OPACITY_TRANSPARENT
-	// A score bar across the top middle, the limit and objectives in small text under it
 	screen_loc = "CENTER-4,TOP:-10"
 	maptext_height = 40
 	maptext_width = 288
 	maptext_y = -42
 	maptext = ""
-	/// State of the score bar last drawn, so it only redraws on change
 	var/shown_panel
 
 //Faction Clash killfeed line

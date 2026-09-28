@@ -1,6 +1,5 @@
 /// Saved Faction Clash loadouts, ckey to list of slot name to /datum/clash_loadout
 GLOBAL_LIST_EMPTY(clash_loadouts)
-/// Loadouts equipped on spawn, ckey to list of job to slot name
 GLOBAL_LIST_EMPTY(clash_auto_loadouts)
 /// How many slots a player may keep per job
 #define CLASH_LOADOUT_SLOTS 3
@@ -25,14 +24,12 @@ GLOBAL_LIST_EMPTY(clash_auto_loadouts)
 		load_clash_loadouts(key)
 	return GLOB.clash_loadouts[key]
 
-/// Name of the slot this key equips on spawn as job, if any
 /proc/get_clash_auto_slot(key, job)
 	if(!get_clash_loadouts(key))
 		return null
 	var/list/auto = GLOB.clash_auto_loadouts[key]
 	return auto[job]
 
-/// Buys and equips a fresh spawn's chosen loadout for their role
 /proc/clash_equip_spawn_loadout(mob/living/carbon/human/spawned)
 	if(QDELETED(spawned) || spawned.stat == DEAD || !SSticker.mode || !MODE_HAS_FLAG(MODE_FACTION_CLASH) || clash_uses_kits())
 		return
@@ -251,7 +248,6 @@ GLOBAL_LIST_EMPTY(clash_auto_loadouts)
 /obj/structure/machinery/cm_vending/proc/add_clash_vendor_data(mob/user, list/data)
 	data["clash_loadouts"] = list()
 	data["clash_enabled"] = FALSE
-	// Arena maps use kits instead, see clash_kit
 	if(!SSticker.mode || !MODE_HAS_FLAG(MODE_FACTION_CLASH) || clash_uses_kits() || !ishuman(user))
 		return
 	var/mob/living/carbon/human/human_user = user

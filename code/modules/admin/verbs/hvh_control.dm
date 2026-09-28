@@ -1,4 +1,3 @@
-/// Admin controls for driving HvH matches, mostly for playtesting
 /client/proc/hvh_control()
 	set name = "HvH Control"
 	set desc = "End or skip HvH matches, set scores, move objectives, toggle bots."
@@ -29,7 +28,6 @@
 			else if(clash_mode.countdown_end_time)
 				clash_mode.start_match()
 			else if(!clash_mode.match_live && !clash_mode.match_number)
-				// Faction Clash waiting on its first landing
 				clash_mode.begin_countdown()
 			else
 				to_chat(usr, SPAN_WARNING("There is no countdown or break to skip."))

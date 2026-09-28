@@ -1,21 +1,16 @@
-/// Arena modes won on held ground instead of kills. Kills are still tracked for stats, streaks and MVP. Never picked directly.
 /datum/game_mode/extended/faction_clash/hvh/tdm/objective
 	name = "Objective"
 	config_tag = null
 	kill_limit = 0
 	score_label = "points"
-	/// Points that win the match early
 	var/point_limit = 120
 	var/zone_count = 1
 	var/zone_radius = 3
-	/// Deciseconds a side must hold a zone alone to take it, 0 to hold it only while standing on it
 	var/capture_time = 0
-	/// Whether a taken zone stays taken, and scores, after its holders leave
 	var/persistent = FALSE
 	var/list/datum/clash_zone/zones = list()
 	var/list/objective_points = list()
 	var/list/round_objective_points = list()
-	/// Factions already told they are close to the point limit this match
 	var/list/point_callouts_made = list()
 	var/objective_timer_id
 
@@ -61,7 +56,6 @@
 	. = ..()
 	.[1] = get_objective_rule()
 
-/// The rule line explaining how this mode scores
 /datum/game_mode/extended/faction_clash/hvh/tdm/objective/proc/get_objective_rule()
 	return ""
 
@@ -115,7 +109,6 @@
 	for(var/faction in objective_points)
 		round_objective_points[faction] = (round_objective_points[faction] || 0) + objective_points[faction]
 
-/// Once a second: settle who holds each zone, then score it
 /datum/game_mode/extended/faction_clash/hvh/tdm/objective/proc/tick_objectives()
 	if(round_finished)
 		deltimer(objective_timer_id)
@@ -140,7 +133,6 @@
 			announce_to_faction(faction, "[point_limit - points] points to win.")
 			announce_to_faction(enemy, "The enemy is [point_limit - points] points from winning.")
 
-/// Works out a zone's holder from who is standing in it
 /datum/game_mode/extended/faction_clash/hvh/tdm/objective/proc/settle_zone(datum/clash_zone/zone)
 	var/list/present = zone.get_occupants()
 	var/uscm = present[FACTION_MARINE] || 0
@@ -153,7 +145,6 @@
 		zone.owner = alone
 		return
 	if(!alone)
-		// Nobody pushing it, so a half taken zone slips back
 		if(!zone.contested && zone.capturing)
 			zone.progress = max(0, zone.progress - 1 SECONDS)
 			if(!zone.progress)
@@ -180,7 +171,6 @@
 	announce_to_faction(faction, "We have [what].")
 	announce_to_faction(enemy, "[team] has taken [what].")
 
-/// King of the Hill: one hill in the middle, a point a second while one side stands on it alone
 /datum/game_mode/extended/faction_clash/hvh/tdm/objective/koth
 	name = GAMEMODE_KOTH
 	config_tag = GAMEMODE_KOTH
@@ -192,7 +182,6 @@
 	var/unit = matches_per_round > 1 ? "Matches" : "Rounds"
 	return "[unit] last [round_time_limit / 600] minutes. Stand on the hill with no enemies on it to score a point every second. First to [point_limit] points wins, otherwise the most points when time runs out. Bots fight over the hill but cannot hold or contest it."
 
-/// Domination: three zones, taken by holding them alone for a few seconds, each scoring for its holder every second
 /datum/game_mode/extended/faction_clash/hvh/tdm/objective/domination
 	name = GAMEMODE_DOMINATION
 	config_tag = GAMEMODE_DOMINATION

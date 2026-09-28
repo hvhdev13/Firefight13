@@ -278,8 +278,6 @@
 	if(savefile_version == /datum/preferences::savefile_version)
 		return
 
-	// Tab used to offer switching to the command bar back here, it opens the scoreboard now
-
 /datum/preferences/proc/load_path(ckey,filename="preferences.sav")
 	if(!ckey)
 		return
@@ -469,7 +467,6 @@
 			if(!(i in remembered_key_bindings))
 				var/datum/keybinding/instance = GLOB.keybindings_by_name[i]
 				// Classic
-				// check_keybindings may have bound it already, and a key bound twice fires twice
 				if(LAZYLEN(instance.classic_keys))
 					for(var/bound_key in instance.classic_keys)
 						if(!(instance.name in key_bindings[bound_key]))

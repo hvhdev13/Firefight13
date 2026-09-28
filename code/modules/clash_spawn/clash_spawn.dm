@@ -1,7 +1,6 @@
 GLOBAL_LIST_EMPTY(clash_welcomed)
 GLOBAL_VAR_INIT(clash_feedback_contact, "")
 
-/// Whether fresh spawns and bots start with a full stomach this round
 /proc/clash_fed_spawns()
 	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
 	return istype(clash_mode) && clash_mode.fed_spawns
@@ -35,11 +34,9 @@ SUBSYSTEM_DEF(clash_spawn)
 		issue_clash_role_kit(spawned, spawned.job)
 		var/datum/clash_kit/kit = get_clash_active_kit(spawned.ckey, spawned.job)
 		if(kit)
-			// Even an empty kit dresses the base outfit, which the vendors used to hand out
 			apply_clash_kit(spawned, kit)
 			to_chat(spawned, SPAN_NOTICE("Kitted out as [kit.name]. Use the Loadout verb to change it."))
 	else
-		// Let the spawn finish settling in before buying gear onto it
 		addtimer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(clash_equip_spawn_loadout), spawned), 1 SECONDS)
 	var/ckey = spawned.ckey
 	if(!ckey || (ckey in GLOB.clash_welcomed))
@@ -48,10 +45,8 @@ SUBSYSTEM_DEF(clash_spawn)
 	if(!fexists(clash_welcome_path(ckey)))
 		INVOKE_ASYNC(src, PROC_REF(show_welcome), spawned)
 
-/// Vendor points a fighter spawned with, restored when a new match starts
 /mob/living/carbon/human/var/list/clash_spawn_points
 
-/// Where a fighter's job spawns them, the same lookup a fresh spawn uses
 /proc/get_clash_home_turf(mob/living/carbon/human/fighter)
 	var/datum/job/job = GLOB.RoleAuthority.roles_by_name[fighter.job]
 	var/squad = fighter.assigned_squad?.name

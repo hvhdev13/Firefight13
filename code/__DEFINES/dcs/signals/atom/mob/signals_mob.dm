@@ -154,7 +154,6 @@
 
 /// From /obj/item/proc/attack_self() : (obj/item/used)
 #define COMSIG_MOB_ITEM_ATTACK_SELF "mob_item_attack_self"
-/// From /obj/item/attack() and human unarmed harm or disarm, sent to the attacker: (mob/living/target, obj/item/weapon or null)
 #define COMSIG_MOB_MELEE_ATTACK "mob_melee_attack"
 
 /// From /obj/item/proc/dropped() : (obj/item/dropped)

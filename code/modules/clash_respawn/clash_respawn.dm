@@ -1,6 +1,5 @@
 #define RESPAWN_BUTTON_WIDTH 144
 #define RESPAWN_BUTTON_HEIGHT 32
-/// Steps the cooldown fill is drawn in, each one a cached icon
 #define RESPAWN_FILL_STEPS 48
 
 #define RESPAWN_STATE_COOLDOWN "cooldown"
@@ -9,7 +8,6 @@
 
 GLOBAL_LIST_EMPTY(clash_respawn_button_icons)
 
-/// The button drawn for a state, cooldown icons also carry how far the wait has filled, from 0 to RESPAWN_FILL_STEPS
 /proc/get_clash_respawn_button_icon(state, fill_step = 0)
 	var/key = state == RESPAWN_STATE_COOLDOWN ? "[state]-[fill_step]" : state
 	if(GLOB.clash_respawn_button_icons[key])
@@ -38,27 +36,21 @@ GLOBAL_LIST_EMPTY(clash_respawn_button_icons)
 			edge = rgb(190, 240, 195)
 	var/icon/button = icon('icons/effects/effects.dmi', "nothing")
 	button.Scale(RESPAWN_BUTTON_WIDTH, RESPAWN_BUTTON_HEIGHT)
-	// Outline with clipped corners
 	button.DrawBox(edge, 2, 1, RESPAWN_BUTTON_WIDTH - 1, RESPAWN_BUTTON_HEIGHT)
 	button.DrawBox(edge, 1, 2, RESPAWN_BUTTON_WIDTH, RESPAWN_BUTTON_HEIGHT - 1)
-	// Scanline body
 	for(var/row in 3 to RESPAWN_BUTTON_HEIGHT - 2)
 		button.DrawBox(row % 2 ? fill_light : fill_dark, 3, row, RESPAWN_BUTTON_WIDTH - 2, row)
-	// The wait fills the body left to right in the ready colours, so it reads as a progress bar
 	var/body_width = RESPAWN_BUTTON_WIDTH - 10
 	var/filled = state == RESPAWN_STATE_COOLDOWN ? round(body_width * fill_step / RESPAWN_FILL_STEPS) : 0
 	if(filled > 0)
 		for(var/row in 3 to RESPAWN_BUTTON_HEIGHT - 2)
 			button.DrawBox(row % 2 ? rgb(38, 56, 44) : rgb(34, 50, 39), 6, row, 5 + filled, row)
-		// Bright leading edge and a thin track along the bottom
 		button.DrawBox(rgb(96, 170, 104), 5 + filled, 3, 5 + filled, RESPAWN_BUTTON_HEIGHT - 2)
 		button.DrawBox(rgb(76, 175, 80), 6, 3, 5 + filled, 4)
-	// Bevel light top and left, shade bottom and right
 	button.DrawBox(bevel, 2, RESPAWN_BUTTON_HEIGHT - 1, RESPAWN_BUTTON_WIDTH - 1, RESPAWN_BUTTON_HEIGHT - 1)
 	button.DrawBox(bevel, 2, 2, 2, RESPAWN_BUTTON_HEIGHT - 1)
 	button.DrawBox(rgb(19, 22, 25), 2, 2, RESPAWN_BUTTON_WIDTH - 1, 2)
 	button.DrawBox(rgb(19, 22, 25), RESPAWN_BUTTON_WIDTH - 1, 2, RESPAWN_BUTTON_WIDTH - 1, RESPAWN_BUTTON_HEIGHT - 1)
-	// Side accents
 	button.DrawBox(accent, 3, 3, 5, RESPAWN_BUTTON_HEIGHT - 2)
 	button.DrawBox(accent, RESPAWN_BUTTON_WIDTH - 5, 3, RESPAWN_BUTTON_WIDTH - 3, RESPAWN_BUTTON_HEIGHT - 2)
 	GLOB.clash_respawn_button_icons[key] = button
@@ -76,15 +68,12 @@ GLOBAL_LIST_EMPTY(clash_respawn_button_icons)
 	var/hovered = FALSE
 	var/shown_seconds
 	var/shown_step
-	/// Whether this viewer watched the wait run down, so the ready chime is not played on login
 	var/counted_down = FALSE
 
-/// Whether viewer is out of the fight and may come back in: dead, or a ghost with no living body to return to
 /proc/clash_can_redeploy(mob/viewer)
 	if(isobserver(viewer))
 		var/mob/dead/observer/ghost = viewer
 		var/mob/body = ghost.mind?.current
-		// An admin ghosting out of a living body has somewhere to go back to
 		return !(ghost.can_reenter_corpse && body && body != ghost && body.stat != DEAD)
 	return isliving(viewer) && viewer.stat == DEAD && viewer.timeofdeath
 
@@ -100,12 +89,10 @@ GLOBAL_LIST_EMPTY(clash_respawn_button_icons)
 		counted_down = FALSE
 		return
 	if(!alpha)
-		// Slides up into place when the player dies
 		pixel_y = -8
 		animate(src, alpha = 255, pixel_y = 0, time = 3, easing = CUBIC_EASING|EASE_OUT)
 	mouse_opacity = MOUSE_OPACITY_OPAQUE
 	var/cooldown = clash_respawn_cooldown()
-	// The same wait the kit screen and respawn verb use, so admins see it ready at once
 	var/remaining = clash_respawn_wait(viewer)
 	if(remaining > 0)
 		counted_down = TRUE
@@ -124,7 +111,6 @@ GLOBAL_LIST_EMPTY(clash_respawn_button_icons)
 	if(was_waiting && counted_down && viewer.client)
 		playsound_client(viewer.client, 'sound/machines/ping.ogg', vol = 35)
 
-/// A slow breathing glow while the button waits to be clicked
 /atom/movable/screen/clash_respawn/proc/pulse()
 	if(state != RESPAWN_STATE_READY)
 		return
@@ -135,7 +121,6 @@ GLOBAL_LIST_EMPTY(clash_respawn_button_icons)
 	var/entering = state != new_state
 	state = new_state
 	icon = get_clash_respawn_button_icon(state, shown_step)
-	// In kit rounds the button is the way into the spawn menu, so it works through the cooldown too
 	var/kits = clash_uses_kits()
 	switch(state)
 		if(RESPAWN_STATE_COOLDOWN)
@@ -151,7 +136,6 @@ GLOBAL_LIST_EMPTY(clash_respawn_button_icons)
 	if(!entering)
 		return
 	if(state == RESPAWN_STATE_HOVER)
-		// Hover stops the breathing so the button sits steady under the cursor
 		animate(src, alpha = 255, time = 1)
 	else if(state == RESPAWN_STATE_READY)
 		pulse()
@@ -187,17 +171,13 @@ GLOBAL_LIST_EMPTY(clash_respawn_button_icons)
 
 #define DEATH_CARD_WIDTH 272
 #define DEATH_CARD_HEIGHT 104
-/// Bottom band holding your own life summary
 #define DEATH_CARD_BAND 16
-/// Square on the left holding the weapon that killed you
 #define DEATH_CARD_ICON_BOX 64
 
-/// What the death card shows, kept on the client so it survives ghosting into a new HUD
 /client/var/list/clash_death_card
 
 GLOBAL_LIST_EMPTY(clash_death_card_icons)
 
-/// Card backing in the killer's colour, with a weapon box and a health bar for them when there is a killer
 /proc/get_clash_death_card_icon(accent, has_killer, health)
 	var/health_step = isnum(health) ? clamp(round(health / 5), 0, 20) : -1
 	var/key = "[accent]|[has_killer]|[health_step]"
@@ -207,10 +187,8 @@ GLOBAL_LIST_EMPTY(clash_death_card_icons)
 	card.Scale(DEATH_CARD_WIDTH, DEATH_CARD_HEIGHT)
 	card.DrawBox(rgb(8, 10, 13, 220), 2, 1, DEATH_CARD_WIDTH - 1, DEATH_CARD_HEIGHT)
 	card.DrawBox(rgb(8, 10, 13, 220), 1, 2, DEATH_CARD_WIDTH, DEATH_CARD_HEIGHT - 1)
-	// A wash of the killer's colour behind the header, and a solid stripe on top
 	card.DrawBox(clash_tint(accent, 38), 2, DEATH_CARD_HEIGHT - 30, DEATH_CARD_WIDTH - 1, DEATH_CARD_HEIGHT - 1)
 	card.DrawBox(accent, 2, DEATH_CARD_HEIGHT - 3, DEATH_CARD_WIDTH - 1, DEATH_CARD_HEIGHT - 1)
-	// Your own life along the bottom
 	card.DrawBox(rgb(255, 255, 255, 14), 2, 2, DEATH_CARD_WIDTH - 1, DEATH_CARD_BAND)
 	card.DrawBox(rgb(255, 255, 255, 36), 2, DEATH_CARD_BAND + 1, DEATH_CARD_WIDTH - 1, DEATH_CARD_BAND + 1)
 	if(has_killer)
@@ -218,7 +196,6 @@ GLOBAL_LIST_EMPTY(clash_death_card_icons)
 		var/box_bottom = box_top - DEATH_CARD_ICON_BOX + 1
 		card.DrawBox(rgb(0, 0, 0, 120), 8, box_bottom, 8 + DEATH_CARD_ICON_BOX - 1, box_top)
 		card.DrawBox(clash_tint(accent, 120), 8, box_bottom, 8 + DEATH_CARD_ICON_BOX - 1, box_bottom)
-		// The killer's health when they got you, green to red
 		if(health_step >= 0)
 			var/bar_y = box_bottom - 5
 			card.DrawBox(rgb(255, 255, 255, 30), 8, bar_y, 8 + DEATH_CARD_ICON_BOX - 1, bar_y + 1)
@@ -229,7 +206,6 @@ GLOBAL_LIST_EMPTY(clash_death_card_icons)
 	GLOB.clash_death_card_icons[key] = card
 	return card
 
-/// Who killed you and how, shown while you are down, above the respawn button
 /atom/movable/screen/clash_death_card
 	name = "Death recap"
 	desc = "Click to hide."
@@ -237,13 +213,11 @@ GLOBAL_LIST_EMPTY(clash_death_card_icons)
 	screen_loc = "CENTER-4:8,CENTER-2:6"
 	alpha = 0
 	mouse_opacity = MOUSE_OPACITY_TRANSPARENT
-	/// The card data this is showing, so it redraws only on a new death
 	var/list/shown
 
 /atom/movable/screen/clash_death_card/proc/update(mob/viewer)
 	var/client/viewer_client = viewer.client
 	if(viewer.stat != DEAD && !isobserver(viewer))
-		// Alive again, the card is spent
 		if(viewer_client && ishuman(viewer))
 			viewer_client.clash_death_card = null
 		hide()
@@ -314,7 +288,6 @@ GLOBAL_LIST_EMPTY(clash_death_card_icons)
 		band.appearance_flags = RESET_COLOR|RESET_ALPHA|KEEP_APART
 		overlays += band
 	if(has_killer && weapon)
-		// The weapon at double size, centred in its box
 		var/mutable_appearance/gun = new(weapon)
 		gun.plane = FLOAT_PLANE
 		gun.layer = FLOAT_LAYER

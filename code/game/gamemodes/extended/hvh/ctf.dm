@@ -1,19 +1,13 @@
-/// Capture the Flag: each side's flag stands just outside its base. Take the enemy's to your own stand while yours is home to score.
 /datum/game_mode/extended/faction_clash/hvh/tdm/ctf
 	name = GAMEMODE_CTF
 	config_tag = GAMEMODE_CTF
 	kill_limit = 0
 	score_label = "captures"
-	/// Captures that win the match early
 	var/capture_limit = 3
-	/// How long a dropped flag lies before going home by itself
 	var/flag_return_time = 30 SECONDS
-	/// Faction to its flag
 	var/list/obj/item/clash_flag/flags = list()
-	/// Faction to the turf its flag stands on
 	var/list/stands = list()
 	var/list/captures = list()
-	/// Tinted tiles marking the stands
 	var/list/stand_tiles = list()
 	var/list/round_captures = list()
 	var/flag_timer_id
@@ -33,7 +27,6 @@
 	var/turf/uscm_home = stands[FACTION_MARINE]
 	var/turf/upp_home = stands[FACTION_UPP]
 	if(!uscm_home || !upp_home || get_dist(uscm_home, upp_home) < 10)
-		// Stands on top of each other would score a capture the moment a flag is picked up
 		message_admins("HVH: [name] could not place two flag stands far enough apart on this map. Matches will be decided on time as draws.")
 		stands = list()
 		return
@@ -153,7 +146,6 @@
 	. = ..()
 	captures = list()
 
-/// Works a flag's state out from where it actually is
 /datum/game_mode/extended/faction_clash/hvh/tdm/ctf/proc/settle_flag(obj/item/clash_flag/flag)
 	if(QDELETED(flag))
 		return
@@ -163,7 +155,6 @@
 			take_flag(flag, holder)
 		return
 	if(ismob(flag.loc) || !isturf(flag.loc))
-		// Only hands carry it, anywhere else it falls to the floor
 		if(ismob(flag.loc))
 			var/mob/wearer = flag.loc
 			wearer.drop_inv_item_on_ground(flag, TRUE, TRUE)
@@ -188,7 +179,6 @@
 	flag.show_planted(FALSE)
 	RegisterSignal(runner, list(COMSIG_MOB_DEATH, COMSIG_PARENT_QDELETING), PROC_REF(on_carrier_lost), override = TRUE)
 	runner.add_filter("clash_flag_carrier", 3, outline_filter(2, faction_color(flag.faction)))
-	// Carrying the flag is never safe
 	qdel(runner.GetComponent(/datum/component/clash_spawn_guard))
 	announce_flag(flag, "taken", runner)
 
@@ -206,7 +196,6 @@
 		UnregisterSignal(runner, list(COMSIG_MOB_DEATH, COMSIG_PARENT_QDELETING))
 		runner.remove_filter("clash_flag_carrier")
 
-/// A carrier died or is being deleted: the flag falls where they were instead of going with them
 /datum/game_mode/extended/faction_clash/hvh/tdm/ctf/proc/on_carrier_lost(mob/living/carbon/human/runner)
 	SIGNAL_HANDLER
 	var/turf/spot = get_turf(runner)
@@ -219,7 +208,6 @@
 			flag.forceMove(spot)
 		settle_flag(flag)
 
-/// Sends a flag back to its stand, from wherever it is
 /datum/game_mode/extended/faction_clash/hvh/tdm/ctf/proc/return_flag(obj/item/clash_flag/flag, mob/returner, silent = FALSE)
 	if(ismob(flag.loc))
 		var/mob/holder = flag.loc
@@ -251,7 +239,6 @@
 			announce_to_faction(other, "[who.real_name] captured the [owner_name] flag!")
 			announce_to_faction(owner, "[who.real_name] captured our flag.")
 
-/// Once a second: return lost flags and score captures
 /datum/game_mode/extended/faction_clash/hvh/tdm/ctf/proc/tick_flags()
 	if(round_finished)
 		deltimer(flag_timer_id)
@@ -267,7 +254,6 @@
 			continue
 		settle_flag(flag)
 		var/area/clash_arena/here = get_area(flag)
-		// Nobody can fetch a flag out of a base its owners are shut out of
 		if(istype(here) && here.clash_faction && here.clash_faction != flag.faction)
 			return_flag(flag)
 			continue

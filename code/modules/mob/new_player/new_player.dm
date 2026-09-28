@@ -119,7 +119,6 @@
 		return
 	return late_spawn(rank)
 
-/// Joins the round as rank. Returns TRUE once the player is in; tells them why not otherwise.
 /mob/new_player/proc/late_spawn(rank)
 	var/datum/job/player_rank = GLOB.RoleAuthority.roles_for_mode[rank]
 	if(!player_rank)

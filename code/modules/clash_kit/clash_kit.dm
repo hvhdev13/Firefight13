@@ -1,17 +1,10 @@
-/// Saved kits, ckey to job to list of kits
 GLOBAL_LIST_EMPTY(clash_kits)
-/// Which kit spawns with a role, ckey to job to index
 GLOBAL_LIST_EMPTY(clash_active_kits)
-/// Key of the pooled dummy every doll is drawn on
 #define CLASH_KIT_DUMMY "clash_kit"
-/// Key of the pooled dummy roles are dressed on to see what they are issued
 #define CLASH_KIT_ISSUE_DUMMY "clash_kit_issue"
-/// Job to slot to what that job hands out there, list(name, icon, icon_state)
 GLOBAL_LIST_EMPTY(clash_kit_issue_items)
-/// Jobs whose issue items are being worked out, to the screens waiting on them
 GLOBAL_LIST_EMPTY(clash_kit_issue_pending)
 
-/// One saved kit: slot to option id. A slot with no pick keeps the job's issue item.
 /datum/clash_kit
 	var/name
 	var/list/choices = list()
@@ -19,19 +12,16 @@ GLOBAL_LIST_EMPTY(clash_kit_issue_pending)
 /datum/clash_kit/proc/get_option(slot)
 	return get_clash_kit_option(choices[slot])
 
-/// Whether the arena kit system runs this round, else Faction Clash keeps its vendor loadouts
 /proc/clash_uses_kits()
 	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
 	return istype(clash_mode) && clash_mode.use_kits
 
-/// A file in a player's save folder
 /proc/clash_player_save_path(ckey, filename)
 	return "data/player_saves/[copytext(ckey, 1, 2)]/[ckey]/[filename]"
 
 /proc/clash_kit_faction_for_job(job)
 	return (job in UPP_JOB_LIST) ? FACTION_UPP : FACTION_MARINE
 
-/// Roles a kit can be made for, faction to job titles
 /proc/get_clash_kit_roles()
 	. = list(FACTION_MARINE = list(), FACTION_UPP = list())
 	for(var/title in GLOB.ROLES_CM_VS_UPP)
@@ -40,11 +30,9 @@ GLOBAL_LIST_EMPTY(clash_kit_issue_pending)
 /proc/clash_kit_path(ckey)
 	return clash_player_save_path(ckey, "clash_kits.sav")
 
-/// A player's kits for a role, loading them first time and filling out the slots
 /proc/get_clash_kits(ckey, job)
 	if(!ckey || !job)
 		return null
-	// Loading drops picks the catalogue does not know, so it has to exist first
 	build_clash_kit_catalog()
 	var/list/by_job = GLOB.clash_kits[ckey]
 	if(!by_job)
@@ -53,7 +41,6 @@ GLOBAL_LIST_EMPTY(clash_kit_issue_pending)
 		GLOB.clash_active_kits[ckey] = list()
 		load_clash_kits(ckey)
 	var/list/kits = by_job[job]
-	// A role never set up starts from the faction's starter classes
 	var/list/presets = kits ? list() : get_clash_kit_role_presets(job)
 	if(!kits)
 		kits = list()
@@ -126,7 +113,6 @@ GLOBAL_LIST_EMPTY(clash_kit_issue_pending)
 				break
 			var/datum/clash_kit/kit = new
 			kit.name = stored["name"]
-			// Drop picks the catalogue no longer has. Early saves keyed options by item alone.
 			for(var/slot in stored["choices"])
 				var/id = stored["choices"][slot]
 				if(!get_clash_kit_option(id) && ispath(text2path(id)))
@@ -154,7 +140,6 @@ GLOBAL_LIST_EMPTY(clash_kit_issue_pending)
 	catch(var/exception/error)
 		stack_trace("Clash kit could not issue [job] their full kit: [error]")
 
-/// Takes out whatever is worn in a slot and puts the kit's item there. What the old one held moves across where it fits.
 /proc/clash_kit_replace_worn(mob/living/carbon/human/wearer, wear_slot, item_type)
 	var/obj/item/old = wearer.get_item_by_slot(wear_slot)
 	var/list/carried = list()
@@ -181,7 +166,6 @@ GLOBAL_LIST_EMPTY(clash_kit_issue_pending)
 /proc/clash_is_sidearm(obj/item/weapon/gun/gun)
 	return istype(gun, /obj/item/weapon/gun/pistol) || istype(gun, /obj/item/weapon/gun/revolver)
 
-/// Deletes every gun the wearer has anywhere that is (or is not) a sidearm
 /proc/clash_kit_purge_guns(mob/living/carbon/human/wearer, sidearms)
 	for(var/obj/item/weapon/gun/gun in wearer.get_contents())
 		if(clash_is_sidearm(gun) != sidearms)
@@ -190,7 +174,6 @@ GLOBAL_LIST_EMPTY(clash_kit_issue_pending)
 			wearer.temp_drop_inv_item(gun, TRUE)
 		qdel(gun)
 
-/// Deletes loose magazines no gun the wearer has can take
 /proc/clash_kit_purge_stray_magazines(mob/living/carbon/human/wearer)
 	var/list/guns = list()
 	for(var/obj/item/weapon/gun/gun in wearer.get_contents())
@@ -228,7 +211,6 @@ GLOBAL_LIST_EMPTY(clash_kit_issue_pending)
 	if(sidearm?.faction != faction)
 		sidearm = null
 
-	// Uniform and the rest under the kit, only where the role left the slot empty
 	var/list/base_outfit = GLOB.clash_kit_base_outfits[faction]
 	for(var/wear_slot in base_outfit)
 		if(wearer.get_item_by_slot(wear_slot))
@@ -240,7 +222,6 @@ GLOBAL_LIST_EMPTY(clash_kit_issue_pending)
 	if(faction == FACTION_UPP && istype(wearer.w_uniform, /obj/item/clothing/under/marine/veteran/UPP) && !(locate(/obj/item/clothing/accessory/patch/upp) in wearer.w_uniform.accessories))
 		wearer.equip_to_slot_if_possible(new /obj/item/clothing/accessory/patch/upp(wearer), WEAR_ACCESSORY, TRUE, TRUE, TRUE)
 
-	// Armor first, holding the issue gun out of the way, since a new suit would drop it
 	var/obj/item/issue_primary = wearer.s_store
 	if(issue_primary)
 		wearer.temp_drop_inv_item(issue_primary, TRUE)
@@ -283,7 +264,6 @@ GLOBAL_LIST_EMPTY(clash_kit_issue_pending)
 			clash_kit_give_magazines(wearer, sidearm)
 	var/datum/clash_kit_option/grenades = kit.get_option(KIT_SLOT_GRENADE)
 	if(grenades && grenades.faction == faction)
-		// Picked grenades replace the issue ones
 		for(var/obj/item/explosive/grenade/issued in wearer.get_contents())
 			if(issued.loc == wearer)
 				wearer.temp_drop_inv_item(issued, TRUE)
@@ -297,11 +277,9 @@ GLOBAL_LIST_EMPTY(clash_kit_issue_pending)
 /proc/describe_clash_kit_item(obj/item/item)
 	return item ? list("name" = item.name, "icon" = "[item.icon]", "icon_state" = item.icon_state) : null
 
-/// What a role hands out in each kit slot, or null until it has been worked out
 /proc/get_clash_issue_items(job)
 	return GLOB.clash_kit_issue_items[job]
 
-/// Works out a role's issue items off the current tick, then refreshes the screen that asked
 /proc/queue_clash_issue_items(job, datum/requester)
 	if(!job || GLOB.clash_kit_issue_items[job])
 		return
@@ -312,7 +290,6 @@ GLOBAL_LIST_EMPTY(clash_kit_issue_pending)
 	GLOB.clash_kit_issue_pending[job] = list(requester)
 	addtimer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(build_clash_issue_items), job), 1)
 
-/// Dresses a dummy as the role and reads off what lands in each kit slot
 /proc/build_clash_issue_items(job)
 	var/list/found = list()
 	var/failed = FALSE
@@ -344,9 +321,7 @@ GLOBAL_LIST_EMPTY(clash_kit_issue_pending)
 		catch(var/exception/error)
 			failed = TRUE
 			stack_trace("Clash kit could not read the issue gear of [job]: [error]")
-		// Always hand the dummy back, or every later doll and lookup waits on it forever
 		unset_busy_human_dummy(CLASH_KIT_ISSUE_DUMMY)
-	// A failed read is not kept, so the next screen to open tries again
 	if(!failed)
 		GLOB.clash_kit_issue_items[job] = found
 	var/list/waiting = GLOB.clash_kit_issue_pending[job]
@@ -355,7 +330,6 @@ GLOBAL_LIST_EMPTY(clash_kit_issue_pending)
 		if(!QDELETED(requester))
 			SStgui.update_uis(requester)
 
-/// A picture of a fighter of this role wearing this kit, as a base64 PNG for the kit screen
 /proc/render_clash_kit_doll(datum/clash_kit/kit, job, client/viewer)
 	var/datum/job/role = GLOB.RoleAuthority.roles_by_name[job]
 	if(!role?.gear_preset)
@@ -378,7 +352,6 @@ GLOBAL_LIST_EMPTY(clash_kit_issue_pending)
 		. = flat ? icon2base64(flat) : null
 	catch(var/exception/error)
 		stack_trace("Clash kit could not draw a [job] doll: [error]")
-	// Always hand the dummy back, or every later doll waits on it forever
 	unset_busy_human_dummy(CLASH_KIT_DUMMY)
 
 #undef CLASH_KIT_DUMMY

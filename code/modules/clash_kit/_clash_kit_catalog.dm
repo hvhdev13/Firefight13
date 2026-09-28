@@ -1,4 +1,3 @@
-// Team Deathmatch kits: a curated menu per faction, one pick per slot, applied over the job's issue gear on spawn.
 #define KIT_SLOT_HELMET "helmet"
 #define KIT_SLOT_ARMOR "armor"
 #define KIT_SLOT_MASK "mask"
@@ -13,14 +12,10 @@
 #define KIT_SLOT_MUZZLE "muzzle"
 #define KIT_SLOT_UNDER "under"
 #define KIT_SLOT_STOCK "stock"
-/// Slots whose picks are worn, in the order they are put on
 GLOBAL_LIST_INIT(clash_kit_worn_slots, list(KIT_SLOT_HELMET, KIT_SLOT_ARMOR, KIT_SLOT_MASK, KIT_SLOT_BACK, KIT_SLOT_BELT, KIT_SLOT_POUCH_L, KIT_SLOT_POUCH_R))
-/// Slots whose picks go on the primary weapon
 GLOBAL_LIST_INIT(clash_kit_attachment_slots, list(KIT_SLOT_RAIL, KIT_SLOT_MUZZLE, KIT_SLOT_UNDER, KIT_SLOT_STOCK))
-/// Kits a player may keep per role
 #define CLASH_KIT_COUNT 5
 
-/// Kit slots in display order
 GLOBAL_LIST_INIT(clash_kit_slots, list(
 	KIT_SLOT_HELMET = list("name" = "Helmet", "image" = "inventory-head.png", "wear" = WEAR_HEAD),
 	KIT_SLOT_ARMOR = list("name" = "Armor", "image" = "inventory-suit.png", "wear" = WEAR_JACKET),
@@ -38,13 +33,9 @@ GLOBAL_LIST_INIT(clash_kit_slots, list(
 	KIT_SLOT_STOCK = list("name" = "Stock", "image" = null, "wear" = null),
 ))
 
-/// Option id to option
 GLOBAL_LIST_EMPTY(clash_kit_options)
-/// Faction to slot to list of options, in menu order
 GLOBAL_LIST_EMPTY(clash_kit_menu)
-/// Gun type to the attachment types it takes, read off one instance each
 GLOBAL_LIST_EMPTY(clash_kit_gun_attachables)
-/// Faction to starter classes, each list(name, slot to option id), handed to players with nothing saved for a role
 GLOBAL_LIST_EMPTY(clash_kit_presets)
 
 /**
@@ -68,18 +59,12 @@ GLOBAL_LIST_INIT(clash_kit_role_kits, list(
 	JOB_UPP_LT_DOKTOR = /datum/equipment_preset/upp/doctor/dressed,
 	JOB_UPP_SUPPLY = /datum/equipment_preset/upp/supply/dressed,
 ))
-/// Roles whose starter classes may swap their whole kit
 GLOBAL_LIST_INIT(clash_kit_rifleman_roles, list(JOB_SQUAD_MARINE, JOB_UPP))
-/// Roles whose weapon is the role, so their only starter class is their issue
 GLOBAL_LIST_INIT(clash_kit_heavy_roles, list(JOB_SQUAD_SMARTGUN, JOB_SQUAD_SPECIALIST, JOB_UPP_SPECIALIST))
-/// Roles whose own kit carries no primary, so a starter class with one comes first and is what they spawn with
 GLOBAL_LIST_INIT(clash_kit_unarmed_roles, list(JOB_SQUAD_TEAM_LEADER, JOB_DOCTOR, JOB_NURSE, JOB_FIELD_DOCTOR, JOB_CHIEF_REQUISITION, JOB_CARGO_TECH, JOB_UPP_LT_DOKTOR, JOB_UPP_SUPPLY))
-/// Slots a support role's starter classes may change, leaving their rigs, pouches and pack alone
 GLOBAL_LIST_INIT(clash_kit_weapon_slots, list(KIT_SLOT_HELMET, KIT_SLOT_ARMOR, KIT_SLOT_PRIMARY, KIT_SLOT_SIDEARM, KIT_SLOT_RAIL, KIT_SLOT_MUZZLE, KIT_SLOT_UNDER, KIT_SLOT_STOCK, KIT_SLOT_GRENADE))
-/// Job to its starter classes, worked out on first use
 GLOBAL_LIST_EMPTY(clash_kit_role_presets)
 
-/// The UPP soldier's full kit always as a rifleman, where the dressed preset rolls rifleman, breacher or both
 /datum/equipment_preset/upp/soldier/dressed/rifleman
 	name = "UPP Soldier (Rifleman)"
 
@@ -99,7 +84,6 @@ GLOBAL_LIST_EMPTY(clash_kit_role_presets)
 		return classes
 	var/list/side_classes = GLOB.clash_kit_presets[clash_kit_faction_for_job(job)]
 	var/whole_kit = (job in GLOB.clash_kit_rifleman_roles)
-	// The first side class is the rifleman, which standard issue already is
 	for(var/index in 2 to length(side_classes))
 		var/list/side_class = side_classes[index]
 		var/list/choices = side_class[2]
@@ -109,7 +93,6 @@ GLOBAL_LIST_EMPTY(clash_kit_role_presets)
 				kept[slot] = choices[slot]
 		classes += list(list(side_class[1], kept))
 	if(job in GLOB.clash_kit_unarmed_roles && length(classes) > 1)
-		// Nobody should spawn into an arena unarmed by default; standard issue stays one click away
 		classes.Swap(1, 2)
 	return classes
 /**
@@ -132,22 +115,17 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 	),
 ))
 
-/// One thing a player can put in a kit slot
 /datum/clash_kit_option
 	var/id
 	var/name
-	/// One line under the name in the menu
 	var/blurb
 	var/item_type
 	var/faction
 	var/slot
-	/// Guns: magazine type and how many come with it. Grenades: how many
 	var/ammo_type
 	var/ammo_count = 0
-	/// Numbers shown under the name, list of list(label, value), read off an instance once
 	var/list/stats = list()
 
-/// Options are keyed by side and slot as well as item, since both sides and both pouches share items
 /proc/clash_kit_option_id(faction, slot, item_type)
 	return "[faction]|[slot]|[item_type]"
 
@@ -174,7 +152,6 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 	option.stats = read_clash_kit_stats(option)
 	return option
 
-/// The numbers worth comparing for an option, from one throwaway instance
 /proc/read_clash_kit_stats(datum/clash_kit_option/option)
 	. = list()
 	var/obj/item/sample = new option.item_type
@@ -206,7 +183,6 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 /proc/get_clash_kit_option(id)
 	return id ? GLOB.clash_kit_options[id] : null
 
-/// Attachment types a gun takes, cached off an instance since the list is only set at runtime
 /proc/get_clash_gun_attachables(gun_type)
 	if(!gun_type)
 		return list()
@@ -221,7 +197,6 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 /proc/clash_kit_attachment_fits(attachment_type, gun_type)
 	return attachment_type in get_clash_gun_attachables(gun_type)
 
-/// Builds both factions' menus once
 /proc/build_clash_kit_catalog()
 	if(length(GLOB.clash_kit_options))
 		return
@@ -231,7 +206,6 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 	build_clash_kit_upp()
 	build_clash_kit_presets()
 
-/// Adds a starter class, keeping only picks the catalogue has and attachments the primary takes
 /proc/add_clash_kit_preset(faction, name, list/types_by_slot)
 	var/list/choices = list()
 	var/primary_type = types_by_slot[KIT_SLOT_PRIMARY]
@@ -307,7 +281,6 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 		KIT_SLOT_GRENADE = /obj/item/explosive/grenade/high_explosive/upp,
 	))
 
-/// Pouches and attachments both sides field the same way
 /proc/build_clash_kit_shared(faction)
 	for(var/slot in list(KIT_SLOT_POUCH_L, KIT_SLOT_POUCH_R))
 		add_clash_kit_option(faction, slot, "Magazine pouch", /obj/item/storage/pouch/magazine, "Three rifle magazines")

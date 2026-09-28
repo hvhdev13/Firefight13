@@ -1,16 +1,11 @@
-/// Where career stats live, one file for every player so the leaderboard reads it in one go
 #define CLASH_CAREER_PATH "data/clash_career.json"
-/// Kills needed before a player's K/D counts on the leaderboard, so one lucky life does not top it
 #define CLASH_CAREER_KD_FLOOR 25
 #define CLASH_CAREER_BOARD_SIZE 25
 
 GLOBAL_DATUM_INIT(clash_career, /datum/clash_career, new)
 
-/// Lifetime HvH stats per ckey, saved at the end of every finished round
 /datum/clash_career
-	/// ckey to list of stats
 	var/list/players
-	/// Guards against a round being written twice
 	var/recorded_round = FALSE
 
 /datum/clash_career/proc/load()
@@ -19,14 +14,12 @@ GLOBAL_DATUM_INIT(clash_career, /datum/clash_career, new)
 	players = list()
 	var/list/decoded = read_file(CLASH_CAREER_PATH)
 	if(isnull(decoded) && fexists(CLASH_CAREER_PATH))
-		// Keep the unreadable file aside, then fall back to the copy from before the last save
 		fcopy(CLASH_CAREER_PATH, "[CLASH_CAREER_PATH].bad")
 		decoded = read_file("[CLASH_CAREER_PATH].bak")
 		log_world("Clash career: [CLASH_CAREER_PATH] was unreadable, kept it as .bad and [decoded ? "restored the backup" : "found no usable backup"]")
 	if(islist(decoded))
 		players = decoded
 
-/// The decoded stats at path, or null when the file is missing or broken
 /datum/clash_career/proc/read_file(path)
 	if(!fexists(path))
 		return null
@@ -44,8 +37,6 @@ GLOBAL_DATUM_INIT(clash_career, /datum/clash_career, new)
 	var/temp_path = "[CLASH_CAREER_PATH].tmp"
 	fdel(temp_path)
 	text2file(json_encode(players), temp_path)
-	// Only swap in a file that reads back whole, and keep the last good one as a backup,
-	// so a crash mid-save costs at most this round
 	if(!read_file(temp_path))
 		log_world("Clash career: the new save did not read back, keeping the old file")
 		return
@@ -58,13 +49,11 @@ GLOBAL_DATUM_INIT(clash_career, /datum/clash_career, new)
 	load()
 	return players[ckey]
 
-/// Folds a finished round's score table into everyone's career, winner is a faction or null for a draw
 /datum/clash_career/proc/record_round(list/scores, winner, list/mvp_names, mode_name)
 	if(recorded_round)
 		return
 	recorded_round = TRUE
 	load()
-	// One player can show up under several names in a round, so fold their entries together first
 	var/list/by_ckey = list()
 	for(var/name in scores)
 		var/list/round_entry = scores[name]
@@ -81,7 +70,6 @@ GLOBAL_DATUM_INIT(clash_career, /datum/clash_career, new)
 		for(var/mvp in mvp_names)
 			if(mvp == name)
 				total["mvps"] += 1
-		// The name they did the most with is the one shown
 		if((round_entry["kills"] || 0) > (total["name_kills"] || -1))
 			total["name"] = name
 			total["name_kills"] = round_entry["kills"] || 0
@@ -105,11 +93,9 @@ GLOBAL_DATUM_INIT(clash_career, /datum/clash_career, new)
 		career["last_played"] = time2text(world.realtime, "YYYY-MM-DD")
 		count++
 	save()
-	// Anyone with the window open sees the round land
 	update_static_data_for_all_viewers()
 	log_game("Clash career: recorded [count] players for [mode_name]")
 
-/// One stat row for the UI, K/D and accuracy worked out here so every view agrees
 /proc/clash_career_row(ckey, list/career)
 	var/kills = career["kills"] || 0
 	var/deaths = career["deaths"] || 0

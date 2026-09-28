@@ -1,18 +1,13 @@
-/// Faction Clash: the full-size UPP vs USCM operation, dropship landing ceasefire and the warship storyline
 /datum/game_mode/extended/faction_clash/hvh/cm_vs_upp
 	name = GAMEMODE_FACTION_CLASH_UPP_CM
 	config_tag = GAMEMODE_FACTION_CLASH_UPP_CM
-	// Off until colony maps are back in rotation
 	votable = FALSE
 	map_vote_mode = GAMEMODE_FACTION_CLASH_UPP_CM
 	score_label = "tickets"
 	round_time_limit = 30 MINUTES
 	var/upp_ship = "ssv_rostock.dmm"
-	/// Tickets each team starts with, every death on the team costs one
 	var/tickets = 200
-	/// Faction to ticket callouts already made
 	var/list/ticket_callouts_made = list()
-	/// The match clock starts when the landing ceasefire ends, or this long into the round if nobody lands
 	var/first_match_fallback = 20 MINUTES
 	var/first_match_timer_id
 
@@ -25,7 +20,6 @@
 	log_debug("FC: [ground?.map_name || "unknown map"], [tickets] tickets a team, [round_time_limit / 600] minute cap")
 	return ..()
 
-/// Tickets faction has left
 /datum/game_mode/extended/faction_clash/hvh/cm_vs_upp/proc/tickets_left(faction)
 	return max(0, tickets - (faction_deaths[faction] || 0))
 
@@ -48,7 +42,6 @@
 	update_score_huds()
 	var/left = tickets_left(faction)
 	if(left <= 0)
-		// Finish just after this death is done being scored, so the killing blow still counts for its killer
 		addtimer(CALLBACK(src, PROC_REF(finish_match), "[faction == FACTION_MARINE ? "USCM" : "UPP"] ran out of tickets"), 1)
 		return
 	for(var/step in list(100, 50, 25, 10))
@@ -67,7 +60,6 @@
 		return
 
 /datum/game_mode/extended/faction_clash/hvh/cm_vs_upp/admin_set_score(faction, score)
-	// Tickets are what is left after deaths, so setting them moves the death count
 	faction_deaths[faction] = max(0, tickets - score)
 	update_score_huds()
 	if(tickets_left(faction) <= 0)
@@ -77,7 +69,6 @@
 	first_match_timer_id = addtimer(CALLBACK(src, PROC_REF(start_first_match)), first_match_fallback, TIMER_STOPPABLE)
 	log_debug("HVH: waiting for the first landing, match starts by [first_match_fallback / 600] minutes at the latest")
 
-/// Starts the clock and scoring once, whichever of the ceasefire end or the fallback comes first
 /datum/game_mode/extended/faction_clash/hvh/cm_vs_upp/proc/start_first_match()
 	deltimer(first_match_timer_id)
 	first_match_timer_id = null
@@ -134,7 +125,6 @@
 	marine_announcement("First troops have landed on the colony! Five minute long ceasefire is in effect to allow evacuation of civilians.", "ARES 3.2", 'sound/AI/commandreport.ogg', FACTION_MARINE)
 	marine_announcement("First troops have landed on the colony! Five minute long ceasefire is in effect to allow evacuation of civilians.", "1VAN/3", 'sound/AI/commandreport.ogg', FACTION_UPP)
 	set_gamemode_modifier(/datum/gamemode_modifier/ceasefire, enabled = TRUE)
-	// The ceasefire's end starts the match now, so the fallback is not needed
 	deltimer(first_match_timer_id)
 	first_match_timer_id = null
 	addtimer(CALLBACK(src,PROC_REF(ceasefire_warning)), 4 MINUTES)

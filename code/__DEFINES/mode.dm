@@ -68,7 +68,6 @@
 #define MODE_THUNDERSTORM (1<<13)// Enables thunderstorm effects on maps that are compatible with it. (Lit exterior tiles, rain effects)
 #define RESPAWN_COOLDOWN (40 SECONDS)
 
-// Capture the Flag flag states
 #define CLASH_FLAG_HOME "home"
 #define CLASH_FLAG_CARRIED "carried"
 #define CLASH_FLAG_DROPPED "dropped"

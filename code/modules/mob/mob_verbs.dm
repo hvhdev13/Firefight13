@@ -108,7 +108,6 @@
 
 	respawn_to_lobby()
 
-/// For a ghost that can still go back to a body someone could revive, that body
 /mob/proc/get_revivable_body()
 	var/mob/dead/observer/ghost = src
 	if(!istype(ghost) || !ghost.can_reenter_corpse || QDELETED(ghost.mind?.original))
@@ -118,7 +117,6 @@
 		return body
 	return null
 
-/// Sends a dead mob's player back to the lobby. confirmed skips the are-you-sure prompts, for callers that asked already.
 /mob/proc/respawn_to_lobby(confirmed = FALSE)
 	var/is_admin = 0
 	if(client.admin_holder && (client.admin_holder.rights & R_ADMIN))

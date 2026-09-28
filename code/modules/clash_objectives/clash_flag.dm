@@ -1,7 +1,5 @@
-/// Tiles past the edge of a base its flag stand is put, when computed
 #define CLASH_FLAG_STAND_OFFSET 4
 
-/// Mapper placed flag stands, used instead of computed ones when present. Must be outside the base shields.
 /obj/effect/landmark/clash_flag_stand
 	name = "Clash flag stand"
 	var/faction
@@ -37,7 +35,6 @@
 		WEAR_R_HAND = 'icons/mob/humans/onmob/inhands/items/items_righthand_64.dmi'
 		)
 	var/faction
-	/// Sprite name without the planted suffix
 	var/base_state
 	var/turf/home
 	var/state = CLASH_FLAG_HOME
@@ -106,7 +103,6 @@
 	if(istype(mode))
 		mode.settle_flag(src)
 
-/// Pole the flag stands in: tints the tiles a carrier has to reach to score
 /proc/place_clash_flag_stand(turf/home, colour)
 	. = list()
 	for(var/turf/spot as anything in RANGE_TURFS(1, home))
@@ -116,7 +112,6 @@
 		tile.color = colour
 		. += tile
 
-/// Whether mover is carrying the other side's flag
 /proc/clash_carries_enemy_flag(atom/movable/mover)
 	if(!ishuman(mover))
 		return FALSE

@@ -1,11 +1,8 @@
-/// Played to a shooter when their bullet hurts an enemy
 #define CLASH_HIT_SOUND 'sound/weapons/handling/gun_lever_action_hitsound.ogg'
-/// Shortest gap between two hit sounds for one shooter, so automatic fire does not stack them
 #define CLASH_HIT_SOUND_GAP (1 DECISECONDS)
 
 /mob/var/clash_next_hit_sound = 0
 
-/// Feeds HvH scoring with who hurt whom, for assists, and confirms hits to the shooter
 /datum/element/clash_combat_log
 
 /datum/element/clash_combat_log/Attach(datum/target)
