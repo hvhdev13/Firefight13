@@ -17,18 +17,26 @@ GLOBAL_DATUM_INIT(clash_career, /datum/clash_career, new)
 	if(islist(players))
 		return
 	players = list()
-	if(!fexists(CLASH_CAREER_PATH))
-		return
-	var/list/decoded
-	try
-		decoded = json_decode(file2text(CLASH_CAREER_PATH))
-	catch(var/exception/e)
-		// Keep the unreadable file aside rather than writing over it at round end
+	var/list/decoded = read_file(CLASH_CAREER_PATH)
+	if(isnull(decoded) && fexists(CLASH_CAREER_PATH))
+		// Keep the unreadable file aside, then fall back to the copy from before the last save
 		fcopy(CLASH_CAREER_PATH, "[CLASH_CAREER_PATH].bad")
-		log_world("Clash career: could not read [CLASH_CAREER_PATH], kept a copy as .bad: [e]")
-		return
+		decoded = read_file("[CLASH_CAREER_PATH].bak")
+		log_world("Clash career: [CLASH_CAREER_PATH] was unreadable, kept it as .bad and [decoded ? "restored the backup" : "found no usable backup"]")
 	if(islist(decoded))
 		players = decoded
+
+/// The decoded stats at path, or null when the file is missing or broken
+/datum/clash_career/proc/read_file(path)
+	if(!fexists(path))
+		return null
+	var/list/decoded
+	try
+		decoded = json_decode(file2text(path))
+	catch(var/exception/e)
+		log_world("Clash career: could not read [path]: [e]")
+		return null
+	return islist(decoded) ? decoded : null
 
 /datum/clash_career/proc/save()
 	if(!islist(players))
@@ -36,10 +44,15 @@ GLOBAL_DATUM_INIT(clash_career, /datum/clash_career, new)
 	var/temp_path = "[CLASH_CAREER_PATH].tmp"
 	fdel(temp_path)
 	text2file(json_encode(players), temp_path)
-	// Swap in whole so a crash mid-write never leaves a half file
-	if(fexists(temp_path))
-		fcopy(temp_path, CLASH_CAREER_PATH)
-		fdel(temp_path)
+	// Only swap in a file that reads back whole, and keep the last good one as a backup,
+	// so a crash mid-save costs at most this round
+	if(!read_file(temp_path))
+		log_world("Clash career: the new save did not read back, keeping the old file")
+		return
+	if(read_file(CLASH_CAREER_PATH))
+		fcopy(CLASH_CAREER_PATH, "[CLASH_CAREER_PATH].bak")
+	fcopy(temp_path, CLASH_CAREER_PATH)
+	fdel(temp_path)
 
 /datum/clash_career/proc/get_entry(ckey)
 	load()
