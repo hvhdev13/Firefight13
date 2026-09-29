@@ -242,13 +242,31 @@ const PackView = () => {
   );
 };
 
+const pointsLeft = (data: Data) => ({
+  points: data.budget[0] - (data.spent.points ?? 0),
+  snowflake: data.budget[1] - (data.spent.snowflake ?? 0),
+});
+
 const ShopView = () => {
   const { act, data } = useBackend<Data>();
-  const { shop, budget, spent } = data;
-  const left = {
-    points: budget[0] - (spent.points ?? 0),
-    snowflake: budget[1] - (spent.snowflake ?? 0),
-  };
+  const { shop, budget, extras } = data;
+  const [search, setSearch] = useState('');
+  const left = pointsLeft(data);
+  const owned: Record<string, number> = {};
+  for (const extra of extras) {
+    owned[extra.id] = (owned[extra.id] ?? 0) + 1;
+  }
+  const query = search.trim().toLowerCase();
+  const sections = shop
+    .map((section) => ({
+      ...section,
+      items: query
+        ? section.items.filter((item) =>
+            item.name.toLowerCase().includes(query),
+          )
+        : section.items,
+    }))
+    .filter((section) => section.items.length);
   const usesSnowflake = shop.some((section) =>
     section.items.some((item) => item.pool === 'snowflake'),
   );
@@ -272,24 +290,48 @@ const ShopView = () => {
           Bought gear is packed at spawn. What you do not spend stays for the
           vendors.
         </Box>
+        <Input
+          fluid
+          mt={1}
+          placeholder="Search"
+          value={search}
+          onInput={(_, value) => setSearch(value)}
+        />
       </Box>
-      {shop.map((section) => (
+      {!sections.length && (
+        <Box className="ClashKit__packEmpty">Nothing matches.</Box>
+      )}
+      {sections.map((section) => (
         <Box key={section.name} className="ClashKit__packHolder">
           <Box className="ClashKit__packHead">{section.name}</Box>
           {section.items.map((item) => {
             const short = left[item.pool] < item.cost;
+            const count = owned[item.id] ?? 0;
             return (
               <Box key={item.id} className="ClashKit__packItem">
                 <Stack align="center">
                   <Stack.Item>
                     <ItemIcon icon={item.icon} state={item.icon_state} />
                   </Stack.Item>
-                  <Stack.Item grow>{item.name}</Stack.Item>
+                  <Stack.Item grow>
+                    {item.name}
+                    {count > 0 && (
+                      <Box as="span" className="ClashKit__packBought">
+                        ×{count}
+                      </Box>
+                    )}
+                  </Stack.Item>
                   <Stack.Item className="ClashKit__shopCost">
                     {item.cost}
                     {item.pool === 'snowflake' ? ' sp' : ''}
                   </Stack.Item>
                   <Stack.Item>
+                    <Button
+                      icon="minus"
+                      disabled={!count}
+                      tooltip="Return one"
+                      onClick={() => act('unbuy_id', { id: item.id })}
+                    />
                     <Button
                       icon="cart-plus"
                       disabled={short}
@@ -480,6 +522,11 @@ export const ClashKit = () => {
 
   const [selectedSlot, setSelectedSlot] = useState('primary');
   const [tab, setTab] = useState<Tab>('gear');
+  const left = pointsLeft(data);
+  const packProblems = data.extras.filter(
+    (extra) => EXTRA_PROBLEMS[extra.status],
+  ).length;
+  const { shop } = data;
   // The server sends the wait once; the client counts it down
   const [waitLeft, setWaitLeft] = useState(respawn_in);
   useEffect(() => {
@@ -622,7 +669,24 @@ export const ClashKit = () => {
                       <Icon name="pen" className="ClashKit__kitNamePen" />
                     </Box>
                   )}
-                  <Box className="ClashKit__dollSub">Your {job} class</Box>
+                  <Box className="ClashKit__dollSub">
+                    Your {job} class
+                    {kits.length > 1 && (
+                      <Dropdown
+                        ml={1}
+                        width="150px"
+                        options={kits
+                          .map((entry, index) => ({
+                            value: String(index + 1),
+                            displayText: entry.name,
+                          }))
+                          .filter((_, index) => index + 1 !== kit_index)}
+                        selected=""
+                        displayText="Copy from..."
+                        onSelected={(value) => act('copy', { index: value })}
+                      />
+                    )}
+                  </Box>
                 </Box>
 
                 <Box className="ClashKit__dollGrid">
@@ -685,8 +749,14 @@ export const ClashKit = () => {
                   {(
                     [
                       ['gear', current?.name ?? 'Gear'],
-                      ['pack', 'Pack'],
-                      ['shop', 'Shop'],
+                      [
+                        'pack',
+                        packProblems ? `Pack (${packProblems}!)` : 'Pack',
+                      ],
+                      [
+                        'shop',
+                        shop.length ? `Shop · ${left.points} pts` : 'Shop',
+                      ],
                     ] as [Tab, string][]
                   ).map(([id, label]) => (
                     <Box

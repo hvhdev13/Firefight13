@@ -240,9 +240,10 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
  * A picked gun replaces every gun of its kind the wearer has, so re-kitting cannot stack weapons;
  * unpicked slots keep the issue item, and magazines that fit nothing left are removed.
  */
-/proc/apply_clash_kit(mob/living/carbon/human/wearer, datum/clash_kit/kit, mode = CLASH_KIT_SPAWN, job)
+/proc/apply_clash_kit(mob/living/carbon/human/wearer, datum/clash_kit/kit, mode = CLASH_KIT_SPAWN, job, datum/preferences/prefs)
 	if(!kit || QDELETED(wearer))
 		return
+	var/list/cosmetics = clash_cosmetic_paths(prefs || wearer.client?.prefs || GLOB.preferences_datums[wearer.ckey])
 	var/faction = wearer.faction
 	var/datum/clash_kit_option/primary = kit.get_option(KIT_SLOT_PRIMARY)
 	var/datum/clash_kit_option/sidearm = kit.get_option(KIT_SLOT_SIDEARM)
@@ -270,7 +271,11 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 		var/datum/clash_kit_option/option = kit.get_option(slot)
 		if(!option || option.faction != faction)
 			continue
-		clash_kit_replace_worn(wearer, GLOB.clash_kit_slots[slot]["wear"], option.item_type)
+		var/wear_slot = GLOB.clash_kit_slots[slot]["wear"]
+		var/obj/item/worn = wearer.get_item_by_slot(wear_slot)
+		if(worn && (worn.type in cosmetics))
+			continue
+		clash_kit_replace_worn(wearer, wear_slot, option.item_type)
 
 	var/obj/item/weapon/gun/main_gun
 	if(primary)
@@ -311,6 +316,13 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 				qdel(grenade)
 	. = stock_clash_kit(wearer, kit, job || wearer.job, mode)
 	wearer.regenerate_icons()
+
+/proc/clash_cosmetic_paths(datum/preferences/prefs)
+	. = list()
+	for(var/gear_type in prefs?.gear)
+		var/datum/gear/cosmetic = GLOB.gear_datums_by_type[gear_type]
+		if(cosmetic)
+			. += cosmetic.path
 
 /proc/reapply_clash_kit(mob/living/carbon/human/wearer, datum/clash_kit/kit)
 	apply_clash_kit(wearer, kit, CLASH_KIT_RESET)
@@ -371,7 +383,7 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 		if(!QDELETED(requester))
 			SStgui.update_uis(requester)
 
-/proc/render_clash_kit_doll(datum/clash_kit/kit, job, client/viewer)
+/proc/render_clash_kit_doll(datum/clash_kit/kit, job, client/viewer, draw = TRUE)
 	var/datum/job/role = GLOB.RoleAuthority.roles_by_name[job]
 	if(!role?.gear_preset)
 		return null
@@ -384,9 +396,16 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 		model.update_body()
 		model.update_hair()
 		arm_equipment(model, role.gear_preset, FALSE, FALSE, null, TRUE)
+		model.job = job
+		for(var/gear_type in viewer?.prefs?.gear)
+			var/datum/gear/cosmetic = GLOB.gear_datums_by_type[gear_type]
+			cosmetic?.equip_to_user(model, FALSE, FALSE)
 		issue_clash_role_kit(model, job)
 		GLOB.clash_kit_budgets[job] = list(model.vendor_points, model.vendor_snowflake_points)
-		var/list/statuses = apply_clash_kit(model, kit, CLASH_KIT_PREVIEW, job)
+		var/list/statuses = apply_clash_kit(model, kit, CLASH_KIT_PREVIEW, job, viewer?.prefs)
+		if(!draw)
+			qdel(model)
+			return list("statuses" = statuses)
 		for(var/obj/limb/limb in model.limbs)
 			limb.blocks_emissive = EMISSIVE_BLOCK_NONE
 		model.regenerate_icons()

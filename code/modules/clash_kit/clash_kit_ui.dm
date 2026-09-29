@@ -43,6 +43,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 	var/list/doll_cache = list()
 	var/render_queued = FALSE
 	var/list/side_jobs = list()
+	var/list/named_kits = list()
 	COOLDOWN_DECLARE(equip_cooldown)
 
 /datum/clash_kit_screen/New(ckey)
@@ -218,7 +219,8 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 	return body?.job
 
 /datum/clash_kit_screen/proc/get_doll_key(datum/clash_kit/kit)
-	return json_encode(list(job, kit?.choices, kit?.extras, kit?.removed))
+	var/datum/preferences/prefs = GLOB.preferences_datums[ckey]
+	return json_encode(list(job, kit?.choices, kit?.extras, kit?.removed, prefs?.gear))
 
 /datum/clash_kit_screen/proc/describe_extras(datum/clash_kit/kit, list/statuses)
 	. = list()
@@ -285,14 +287,15 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 			if(length(side_roles))
 				set_job(side_jobs[params["faction"]] || side_roles[1])
 		if("kit")
-			var/index = text2num(params["index"])
+			var/index = round(text2num(params["index"]))
 			if(index >= 1 && index <= CLASH_KIT_COUNT)
 				kit_index = index
 				var/list/active = GLOB.clash_active_kits[ckey]
 				active[job] = kit_index
 				save_clash_kits(ckey)
 				var/datum/clash_kit/picked = get_kit()
-				if(findtext(picked.name, "Custom") == 1 && !length(picked.choices))
+				if(findtext(picked.name, "Custom") == 1 && !length(picked.choices) && !(picked in named_kits))
+					named_kits += picked
 					INVOKE_ASYNC(src, PROC_REF(name_new_kit), user, picked)
 		if("pick")
 			var/datum/clash_kit_option/option = get_clash_kit_option(params["id"])
@@ -323,17 +326,35 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 				to_chat(user, SPAN_WARNING("Not enough points left for [item["name"]]."))
 				return TRUE
 			kit.extras += item["id"]
-			var/list/result = render_now(user.client)
-			var/list/statuses = result?["statuses"]
+			var/list/trial = render_clash_kit_doll(kit, job, user.client, FALSE)
+			var/list/statuses = trial?["statuses"]
 			if(!length(statuses) || statuses[length(statuses)] != "ok")
 				kit.extras.Cut(length(kit.extras))
-				doll_cache -= doll_key
 				to_chat(user, SPAN_WARNING("[item["name"]] does not fit in your gear. Make room, or buy it from a vendor once you spawn."))
 				return TRUE
 			save_clash_kits(ckey)
+		if("unbuy_id")
+			if(!kit)
+				return TRUE
+			for(var/index in length(kit.extras) to 1 step -1)
+				if(kit.extras[index] == params["id"])
+					kit.extras.Cut(index, index + 1)
+					save_clash_kits(ckey)
+					break
+		if("copy")
+			var/list/kits = get_clash_kits(ckey, job)
+			var/index = round(text2num(params["index"]))
+			if(!kit || !(index in 1 to length(kits)) || index == kit_index)
+				return TRUE
+			var/datum/clash_kit/source = kits[index]
+			kit.choices = source.choices.Copy()
+			kit.extras = source.extras.Copy()
+			kit.removed = source.removed.Copy()
+			save_clash_kits(ckey)
+			to_chat(user, SPAN_NOTICE("Copied [source.name] into [kit.name]."))
 		if("unbuy")
-			var/index = text2num(params["index"])
-			if(!kit || !index || index > length(kit.extras))
+			var/index = round(text2num(params["index"]))
+			if(!kit || !(index in 1 to length(kit.extras)))
 				return TRUE
 			kit.extras.Cut(index, index + 1)
 			save_clash_kits(ckey)
