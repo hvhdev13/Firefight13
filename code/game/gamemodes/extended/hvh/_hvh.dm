@@ -681,6 +681,13 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 			killfeed.Cut(i, i + 1)
 	render_killfeed()
 
+/proc/clash_announcement(message, title, sound_to_play, faction)
+	var/list/targets = list()
+	for(var/mob/listener as anything in GLOB.human_mob_list + GLOB.dead_mob_list)
+		if(isobserver(listener) || (ishuman(listener) && listener.stat == CONSCIOUS && listener.faction == faction))
+			targets += listener
+	announcement_helper(message, title, targets, sound_to_play)
+
 /datum/game_mode/extended/faction_clash/hvh/proc/announce_to_faction(faction, message)
 	for(var/mob/player as anything in GLOB.player_list)
 		if(player.faction == faction)
@@ -1058,7 +1065,8 @@ GLOBAL_VAR(clash_start_mode)
 	open_first_match()
 	for(var/obj/structure/machinery/cm_vending/vendor in GLOB.machines)
 		vendor.vend_delay = 0
-	SSweather.force_weather_holder(/datum/weather_ss_map_holder/faction_clash)
+	if(!arena_rules)
+		SSweather.force_weather_holder(/datum/weather_ss_map_holder/faction_clash)
 	for(var/area/area in GLOB.all_areas)
 		if(is_mainship_level(area.z))
 			continue
@@ -1143,8 +1151,8 @@ GLOBAL_VAR(clash_start_mode)
 
 /datum/game_mode/extended/faction_clash/hvh/proc/deleyed_announce()
 	var/briefing = "[name] is live. [get_win_condition()]\n\nRespawns are open. The enemy staging area is shielded, do not waste time on it."
-	marine_announcement(briefing, "ARES 3.2", 'sound/AI/commandreport.ogg', FACTION_MARINE)
-	marine_announcement(briefing, "1VAN/3", 'sound/AI/commandreport.ogg', FACTION_UPP)
+	clash_announcement(briefing, "ARES 3.2", 'sound/AI/commandreport.ogg', FACTION_MARINE)
+	clash_announcement(briefing, "1VAN/3", 'sound/AI/commandreport.ogg', FACTION_UPP)
 
 /datum/game_mode/extended/faction_clash/hvh/proc/get_win_condition()
 	var/unit = matches_per_round > 1 ? "Each match" : "The round"
@@ -1153,13 +1161,13 @@ GLOBAL_VAR(clash_start_mode)
 
 /datum/game_mode/extended/faction_clash/hvh/proc/announce_ceasefire()
 	var/result = get_round_result_line()
-	marine_announcement("[finish_reason]. [result]\n\nCeasefire is in effect. Final scores in two minutes.", "ARES 3.2", 'sound/AI/commandreport.ogg', FACTION_MARINE)
-	marine_announcement("[finish_reason]. [result]\n\nCeasefire is in effect. Final scores in two minutes.", "1VAN/3", 'sound/AI/commandreport.ogg', FACTION_UPP)
+	clash_announcement("[finish_reason]. [result]\n\nCeasefire is in effect. Final scores in two minutes.", "ARES 3.2", 'sound/AI/commandreport.ogg', FACTION_MARINE)
+	clash_announcement("[finish_reason]. [result]\n\nCeasefire is in effect. Final scores in two minutes.", "1VAN/3", 'sound/AI/commandreport.ogg', FACTION_UPP)
 
 /datum/game_mode/extended/faction_clash/hvh/proc/announce_final_result()
 	var/result = get_round_result_line()
-	marine_announcement("Round over. [result]", "ARES 3.2", 'sound/AI/commandreport.ogg', FACTION_MARINE)
-	marine_announcement("Round over. [result]", "1VAN/3", 'sound/AI/commandreport.ogg', FACTION_UPP)
+	clash_announcement("Round over. [result]", "ARES 3.2", 'sound/AI/commandreport.ogg', FACTION_MARINE)
+	clash_announcement("Round over. [result]", "1VAN/3", 'sound/AI/commandreport.ogg', FACTION_UPP)
 
 /datum/game_mode/extended/faction_clash/hvh/proc/announce_scoreboard()
 	var/uscm = faction_kills[FACTION_MARINE] || 0

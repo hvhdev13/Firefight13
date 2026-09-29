@@ -40,5 +40,5 @@
 
 /datum/game_mode/extended/faction_clash/hvh/tdm/roundend_ceasefire()
 	var/result = get_round_result_line()
-	marine_announcement("[finish_reason]. [result]\n\nFinal scores in two minutes.", "ARES 3.2", 'sound/AI/commandreport.ogg', FACTION_MARINE)
-	marine_announcement("[finish_reason]. [result]\n\nFinal scores in two minutes.", "1VAN/3", 'sound/AI/commandreport.ogg', FACTION_UPP)
+	clash_announcement("[finish_reason]. [result]\n\nFinal scores in two minutes.", "ARES 3.2", 'sound/AI/commandreport.ogg', FACTION_MARINE)
+	clash_announcement("[finish_reason]. [result]\n\nFinal scores in two minutes.", "1VAN/3", 'sound/AI/commandreport.ogg', FACTION_UPP)
