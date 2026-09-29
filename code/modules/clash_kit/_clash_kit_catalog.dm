@@ -15,6 +15,12 @@
 GLOBAL_LIST_INIT(clash_kit_worn_slots, list(KIT_SLOT_HELMET, KIT_SLOT_ARMOR, KIT_SLOT_MASK, KIT_SLOT_BACK, KIT_SLOT_BELT, KIT_SLOT_POUCH_L, KIT_SLOT_POUCH_R))
 GLOBAL_LIST_INIT(clash_kit_attachment_slots, list(KIT_SLOT_RAIL, KIT_SLOT_MUZZLE, KIT_SLOT_UNDER, KIT_SLOT_STOCK))
 #define CLASH_KIT_COUNT 5
+#define CLASH_KIT_SPAWN "spawn"
+#define CLASH_KIT_RESET "reset"
+#define CLASH_KIT_EQUIP "equip"
+#define CLASH_KIT_PREVIEW "preview"
+#define CLASH_SHOP_POINTS "points"
+#define CLASH_SHOP_SNOWFLAKE "snowflake"
 
 GLOBAL_LIST_INIT(clash_kit_slots, list(
 	KIT_SLOT_HELMET = list("name" = "Helmet", "image" = "inventory-head.png", "wear" = WEAR_HEAD),

@@ -1,6 +1,12 @@
 /// Saved Faction Clash loadouts, ckey to list of slot name to /datum/clash_loadout
 GLOBAL_LIST_EMPTY(clash_loadouts)
 GLOBAL_LIST_EMPTY(clash_auto_loadouts)
+GLOBAL_LIST_INIT(clash_loadout_skipped, list(
+	/obj/item/card/id,
+	/obj/item/dogtag,
+	/obj/item/device/radio/headset,
+	/obj/item/device/encryptionkey,
+))
 /// How many slots a player may keep per job
 #define CLASH_LOADOUT_SLOTS 3
 
@@ -63,6 +69,8 @@ GLOBAL_LIST_EMPTY(clash_auto_loadouts)
 		record(thing, null, user.get_slot_by_item(thing))
 
 /datum/clash_loadout/proc/record(obj/item/thing, parent, slot)
+	if(is_type_in_list(thing, GLOB.clash_loadout_skipped))
+		return
 	items += list(list("type" = thing.type, "name" = thing.name, "inner" = !isnull(parent), "parent" = parent, "slot" = slot))
 	var/index = length(items)
 	for(var/obj/item/inner in thing.contents)
@@ -118,6 +126,8 @@ GLOBAL_LIST_EMPTY(clash_auto_loadouts)
 	var/list/needed = list()
 	for(var/list/entry in items)
 		var/item_type = entry["type"]
+		if(is_path_in_list(item_type, GLOB.clash_loadout_skipped))
+			continue
 		needed[item_type] = (needed[item_type] || 0) + 1
 		if(clash_count_type(user, item_type) >= needed[item_type])
 			continue
@@ -182,10 +192,7 @@ GLOBAL_LIST_EMPTY(clash_auto_loadouts)
 	if(istype(parent, /obj/item/weapon/gun))
 		var/obj/item/weapon/gun/weapon = parent
 		if(istype(thing, /obj/item/attachable))
-			var/obj/item/attachable/attachment = thing
-			if(weapon.can_attach_to_gun(user, attachment))
-				attachment.Attach(weapon)
-				weapon.update_attachable(attachment.slot)
+			if(clash_fit_attachment(weapon, thing, user, FALSE))
 				return
 		else if(istype(thing, /obj/item/ammo_magazine))
 			var/obj/item/ammo_magazine/magazine = thing
@@ -227,6 +234,8 @@ GLOBAL_LIST_EMPTY(clash_auto_loadouts)
 	for(var/index in get_sorted_indexes())
 		var/list/entry = items[index]
 		var/item_type = entry["type"]
+		if(is_path_in_list(item_type, GLOB.clash_loadout_skipped))
+			continue
 		var/atom/parent = entry["parent"] ? placed["[entry["parent"]]"] : null
 		var/obj/item/existing = clash_find_unclaimed(parent ? parent.contents : user.contents, item_type, claimed) || clash_find_unclaimed(user.get_contents(), item_type, claimed)
 		if(existing)

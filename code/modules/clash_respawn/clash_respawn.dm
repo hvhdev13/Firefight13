@@ -170,9 +170,10 @@ GLOBAL_LIST_EMPTY(clash_respawn_button_icons)
 #undef RESPAWN_STATE_HOVER
 
 #define DEATH_CARD_WIDTH 272
-#define DEATH_CARD_HEIGHT 104
+#define DEATH_CARD_HEIGHT 132
 #define DEATH_CARD_BAND 16
 #define DEATH_CARD_ICON_BOX 64
+#define DEATH_CARD_GUN_STRIP 28
 
 /client/var/list/clash_death_card
 
@@ -193,8 +194,9 @@ GLOBAL_LIST_EMPTY(clash_death_card_icons)
 	card.DrawBox(rgb(255, 255, 255, 36), 2, DEATH_CARD_BAND + 1, DEATH_CARD_WIDTH - 1, DEATH_CARD_BAND + 1)
 	if(has_killer)
 		var/box_top = DEATH_CARD_HEIGHT - 8
-		var/box_bottom = box_top - DEATH_CARD_ICON_BOX + 1
+		var/box_bottom = box_top - DEATH_CARD_ICON_BOX - DEATH_CARD_GUN_STRIP + 1
 		card.DrawBox(rgb(14, 17, 21, 250), 8, box_bottom, 8 + DEATH_CARD_ICON_BOX - 1, box_top)
+		card.DrawBox(rgb(255, 255, 255, 24), 10, box_bottom + DEATH_CARD_GUN_STRIP, 8 + DEATH_CARD_ICON_BOX - 3, box_bottom + DEATH_CARD_GUN_STRIP)
 		card.DrawBox(clash_tint(accent, 120), 8, box_bottom, 8 + DEATH_CARD_ICON_BOX - 1, box_bottom)
 		if(health_step >= 0)
 			var/bar_y = box_bottom - 5
@@ -268,11 +270,15 @@ GLOBAL_LIST_EMPTY(clash_death_card_icons)
 	picture.maptext = null
 	picture.pixel_x = 0
 	picture.pixel_y = 0
+	picture.pixel_w = 0
+	picture.pixel_z = 0
+	picture.alpha = 255
+	picture.filters = null
 	picture.transform = matrix(scale, 0, center_x - width / 2, 0, scale, center_y - height / 2)
 	picture.appearance_flags = RESET_ALPHA|KEEP_APART|PIXEL_SCALE
 	return picture
 
-/proc/set_clash_death_card(mob/victim, headline, killer_name, color, detail, list/notes, obj/item/weapon, health, life_line, icon/portrait)
+/proc/set_clash_death_card(mob/victim, headline, killer_name, color, detail, list/notes, obj/item/weapon, health, life_line, mutable_appearance/portrait)
 	if(!victim?.client)
 		return
 	var/has_killer = !!killer_name
@@ -315,15 +321,12 @@ GLOBAL_LIST_EMPTY(clash_death_card_icons)
 		health_label.appearance_flags = RESET_COLOR|RESET_ALPHA|KEEP_APART
 		overlays += health_label
 	var/box_center_x = 8 + DEATH_CARD_ICON_BOX / 2
-	var/box_bottom = DEATH_CARD_HEIGHT - 8 - DEATH_CARD_ICON_BOX
+	var/box_bottom = DEATH_CARD_HEIGHT - 8 - DEATH_CARD_ICON_BOX - DEATH_CARD_GUN_STRIP
 	if(has_killer && portrait)
-		overlays += clash_death_card_picture(portrait, portrait.Width(), portrait.Height(), box_center_x, box_bottom + DEATH_CARD_ICON_BOX / 2, 2, DEATH_CARD_ICON_BOX)
+		overlays += clash_death_card_picture(portrait, world.icon_size, world.icon_size, box_center_x, box_bottom + DEATH_CARD_GUN_STRIP + DEATH_CARD_ICON_BOX / 2, 2, DEATH_CARD_ICON_BOX)
 	if(has_killer && weapon)
 		var/icon/weapon_icon = icon(weapon.icon, weapon.icon_state)
-		var/weapon_width = weapon_icon.Width()
-		var/weapon_height = weapon_icon.Height()
-		var/weapon_scale = min(1, (DEATH_CARD_ICON_BOX - 4) / max(weapon_width, weapon_height))
-		overlays += clash_death_card_picture(weapon, weapon_width, weapon_height, box_center_x, box_bottom + 2 + weapon_height * weapon_scale / 2, 1, DEATH_CARD_ICON_BOX - 4)
+		overlays += clash_death_card_picture(weapon, weapon_icon.Width(), weapon_icon.Height(), box_center_x, box_bottom + DEATH_CARD_GUN_STRIP / 2, 2, DEATH_CARD_ICON_BOX)
 	victim.client.clash_death_card = list(
 		"color" = color,
 		"has_killer" = has_killer,
@@ -337,3 +340,4 @@ GLOBAL_LIST_EMPTY(clash_death_card_icons)
 #undef DEATH_CARD_HEIGHT
 #undef DEATH_CARD_BAND
 #undef DEATH_CARD_ICON_BOX
+#undef DEATH_CARD_GUN_STRIP

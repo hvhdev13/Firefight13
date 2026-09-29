@@ -2,7 +2,7 @@
 
 /client/proc/hvh_control()
 	set name = "HvH Control"
-	set desc = "End or skip HvH matches, set scores, move objectives, toggle bots."
+	set desc = "End or skip HvH matches, set scores, move objectives, open the bot panel."
 	set category = "Admin.Events"
 
 	if(!check_rights(R_EVENT))
@@ -14,13 +14,16 @@
 			return
 		to_chat(usr, SPAN_WARNING("This is not an HvH round."))
 		return
-	var/list/actions = list("End match now", "Skip countdown or break", "Set a team's score", "Toggle bots ([GLOB.clash_bots_enabled ? "on" : "off"])")
+	var/list/actions = list("End match now", "Skip countdown or break", "Set a team's score", "Bot Control Panel")
 	if(clash_mode.can_rebuild_objectives())
 		actions += list("Re-place objectives", "Jump to an objective")
 	actions += "Change game mode"
 	var/choice = tgui_input_list(usr, "What should happen?", "HvH Control", actions)
 	if(choice == "Change game mode")
 		hvh_change_mode()
+		return
+	if(choice == "Bot Control Panel")
+		clash_bot_panel()
 		return
 	if(!choice || SSticker.mode != clash_mode || clash_mode.round_finished)
 		return
@@ -65,9 +68,6 @@
 				admin.admin_ghost()
 			admin.mob.forceMove(spot)
 			return
-		else
-			GLOB.clash_bots_enabled = !GLOB.clash_bots_enabled
-			choice = "Bots [GLOB.clash_bots_enabled ? "enabled" : "disabled"]"
 	message_admins("[key_name_admin(usr)] used HvH Control: [choice].")
 	log_admin("[key_name(usr)] used HvH Control: [choice].")
 

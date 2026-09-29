@@ -1,5 +1,5 @@
 #define SCORE_PANEL_WIDTH 224
-#define SCORE_PANEL_HEIGHT 48
+#define SCORE_PANEL_HEIGHT 36
 #define SCORE_SIDE_WIDTH 78
 #define SCORE_FILL_STEPS 24
 
@@ -63,21 +63,21 @@ GLOBAL_LIST_EMPTY(clash_score_panel_icons)
 	var/list/clock = get_clock_parts()
 	var/right_start = SCORE_PANEL_WIDTH - SCORE_SIDE_WIDTH + 1
 	var/text_width = SCORE_SIDE_WIDTH - 12
-	var/name_y = SCORE_PANEL_HEIGHT - 13
-	var/big = "font-family: \"VCR OSD Mono\"; font-size: 16px; -dm-text-outline: 1px black; vertical-align: bottom; color: #ffffff"
+	var/name_y = SCORE_PANEL_HEIGHT - 12
+	var/big = "font-family: \"VCR OSD Mono\"; font-size: 14px; -dm-text-outline: 1px black; vertical-align: bottom; color: #ffffff"
 	var/small = "font-family: \"Small Fonts\"; font-size: 6px; -dm-text-outline: 1px black; vertical-align: bottom"
 	var/list/texts = list()
 	texts += clash_score_text("<span style='[small]; color: #e8ecef; text-align: left'>USCM</span>", 9, name_y, text_width, 10)
 	texts += clash_score_text("<span style='[small]; color: #8a939c; text-align: right'>[score_label]</span>", 8, name_y, text_width, 10)
-	texts += clash_score_text("<span style='[big]; text-align: right'>[uscm]</span>", 8, 7, text_width, 28)
+	texts += clash_score_text("<span style='[big]; text-align: right'>[uscm]</span>", 8, 7, text_width, 17)
 	texts += clash_score_text("<span style='[small]; color: #9aa3ab; text-align: left'>[uscm_alive] alive</span>", 9, 7, text_width, 10)
 	texts += clash_score_text("<span style='[small]; color: #e8ecef; text-align: right'>UPP</span>", right_start + 3, name_y, text_width, 10)
 	texts += clash_score_text("<span style='[small]; color: #8a939c; text-align: left'>[score_label]</span>", right_start + 4, name_y, text_width, 10)
-	texts += clash_score_text("<span style='[big]; text-align: left'>[upp]</span>", right_start + 4, 7, text_width, 28)
+	texts += clash_score_text("<span style='[big]; text-align: left'>[upp]</span>", right_start + 4, 7, text_width, 17)
 	texts += clash_score_text("<span style='[small]; color: #9aa3ab; text-align: right'>[upp_alive] alive</span>", right_start + 3, 7, text_width, 10)
 	var/center_width = right_start - SCORE_SIDE_WIDTH - 2
-	texts += clash_score_text("<span style='font-family: \"VCR OSD Mono\"; font-size: 12px; -dm-text-outline: 1px black; vertical-align: bottom; text-align: center; color: [clock[3] ? "#ff6a6a" : "#e8ecef"]'>[clock[1]]</span>", SCORE_SIDE_WIDTH + 1, 17, center_width, 22)
-	texts += clash_score_text("<span style='[small]; text-align: center; color: #9aa3ab'>[clock[2]]</span>", SCORE_SIDE_WIDTH + 1, 5, center_width, 10)
+	texts += clash_score_text("<span style='font-family: \"VCR OSD Mono\"; font-size: 12px; -dm-text-outline: 1px black; vertical-align: bottom; text-align: center; color: [clock[3] ? "#ff6a6a" : "#e8ecef"]'>[clock[1]]</span>", SCORE_SIDE_WIDTH + 1, 14, center_width, 18)
+	texts += clash_score_text("<span style='[small]; text-align: center; color: #9aa3ab'>[clock[2]]</span>", SCORE_SIDE_WIDTH + 1, 4, center_width, 10)
 	return list(
 		"key" = "[uscm]|[upp]|[limit]|[clock[1]]|[clock[2]]|[uscm_alive]|[upp_alive]",
 		"texts" = texts,

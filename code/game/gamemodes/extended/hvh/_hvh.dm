@@ -620,11 +620,11 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		notes.Cut(4)
 	var/obj/item/weapon = isitem(cause_object) ? cause_object : null
 	if(!weapon && cause)
-		for(var/obj/item/held in list(killer.get_active_hand(), killer.get_inactive_hand()))
+		for(var/obj/item/held in list(killer.get_active_hand(), killer.get_inactive_hand()) + killer.contents)
 			if(held.name == cause || initial(held.name) == cause)
 				weapon = held
 				break
-	var/icon/portrait = victim.client ? getFlatIcon(killer, SOUTH, no_anim = TRUE) : null
+	var/mutable_appearance/portrait = victim.client ? new /mutable_appearance(killer) : null
 	set_clash_death_card(victim, "KILLED BY", killer_name, faction_color(killer.faction), details.Join("  ·  "), notes, weapon, health_left, get_life_line(victim), portrait)
 
 /datum/game_mode/extended/faction_clash/hvh/proc/get_life_line(mob/victim)
@@ -863,12 +863,10 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		if(clash_uses_kits() && fighter.ckey)
 			var/datum/clash_kit/kit = get_clash_active_kit(fighter.ckey, fighter.job)
 			if(kit)
-				INVOKE_ASYNC(GLOBAL_PROC, GLOBAL_PROC_REF(apply_clash_kit), fighter, kit)
+				INVOKE_ASYNC(GLOBAL_PROC, GLOBAL_PROC_REF(reapply_clash_kit), fighter, kit)
 	for(var/datum/clash_bot/bot as anything in GLOB.clash_bots.Copy())
-		if(bot.post?.team_fill && !bot.post.active)
-			bot.retire()
-		else
-			bot.return_to_post()
+		bot.retire()
+	clash_bot_refill()
 	for(var/mob/player as anything in GLOB.player_list)
 		if((isobserver(player) || player.stat == DEAD) && player.timeofdeath)
 			player.timeofdeath = min(player.timeofdeath, world.time - respawn_cooldown)

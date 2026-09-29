@@ -1,7 +1,7 @@
 @use '../base.scss';
 
 $accent: #7fb5ff;
-$accent-upp: #ffc04d;
+$accent-upp: #ff5a4d;
 $line: rgba(255, 255, 255, 0.12);
 $line-strong: rgba(255, 255, 255, 0.45);
 $panel: rgba(0, 0, 0, 0.3);
@@ -19,15 +19,43 @@ $panel: rgba(0, 0, 0, 0.3);
     border-bottom: 1px solid $line;
   }
 
-  &__badge {
+  &__sides {
+    display: flex;
     margin-right: 10px;
+  }
+
+  &__side {
     padding: 2px 10px;
-    border: 1px solid var(--kit-accent);
-    border-radius: 2px;
-    color: var(--kit-accent);
+    border: 1px solid $line;
+    color: rgba(255, 255, 255, 0.5);
     font-weight: bold;
     letter-spacing: 0.15em;
     font-size: 0.85em;
+    cursor: pointer;
+    user-select: none;
+
+    &:first-child {
+      border-radius: 2px 0 0 2px;
+    }
+
+    &:last-child {
+      border-left: none;
+      border-radius: 0 2px 2px 0;
+    }
+
+    &:hover {
+      color: #fff;
+    }
+
+    &--selected {
+      border-color: var(--kit-accent);
+      color: var(--kit-accent);
+      background: rgba(255, 255, 255, 0.08);
+
+      &:last-child {
+        border-left: 1px solid var(--kit-accent);
+      }
+    }
   }
 
   &__kitTabs {
@@ -273,7 +301,7 @@ $panel: rgba(0, 0, 0, 0.3);
     padding: 0 12px;
     font-size: 0.85em;
     opacity: 0.7;
-    text-align: right;
+    text-align: left;
   }
 
   &__slotEmpty {
@@ -315,25 +343,108 @@ $panel: rgba(0, 0, 0, 0.3);
     padding: 8px 4px 0 10px;
   }
 
-  &__optionsHeader {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    padding: 0 4px 6px;
-    border-bottom: 1px solid $line;
-    margin-bottom: 6px;
-  }
-
-  &__optionsTitle {
-    font-size: 1.1em;
-    font-weight: bold;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-
   &__optionsCount {
     font-size: 0.8em;
     opacity: 0.5;
+  }
+
+  &__tabs {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    padding: 0 4px 6px;
+    border-bottom: 1px solid $line;
+    margin-bottom: 6px;
+
+    .ClashKit__optionsCount {
+      margin-left: auto;
+    }
+  }
+
+  &__tab {
+    padding: 2px 10px;
+    border: 1px solid transparent;
+    border-radius: 2px;
+    font-weight: bold;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.6;
+    cursor: pointer;
+    user-select: none;
+
+    &:hover {
+      opacity: 1;
+    }
+
+    &--selected {
+      border-color: var(--kit-accent);
+      color: var(--kit-accent);
+      opacity: 1;
+    }
+  }
+
+  &__packHolder {
+    margin-bottom: 8px;
+    border: 1px solid $line;
+    border-radius: 3px;
+    background: $panel;
+  }
+
+  &__packHead {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 8px;
+    border-bottom: 1px solid $line;
+    font-weight: bold;
+    letter-spacing: 0.05em;
+  }
+
+  &__packItem {
+    padding: 2px 8px;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .ClashKit__optionIcon {
+      width: 36px;
+    }
+  }
+
+  &__packBought {
+    margin-left: 6px;
+    padding: 0 5px;
+    border-radius: 8px;
+    background: var(--kit-accent);
+    color: #000;
+    font-size: 0.75em;
+  }
+
+  &__packEmpty {
+    padding: 6px 8px;
+    opacity: 0.5;
+    font-style: italic;
+  }
+
+  &__packNote {
+    padding: 4px 8px 8px;
+    opacity: 0.7;
+  }
+
+  &__packWarn {
+    border-left-color: #e6a23c;
+    cursor: default;
+  }
+
+  &__shopPoints {
+    padding: 4px 8px 8px;
+  }
+
+  &__shopCost {
+    min-width: 36px;
+    text-align: right;
+    color: var(--kit-accent);
+    font-weight: bold;
   }
 
   &__optionsList {
@@ -433,10 +544,11 @@ $panel: rgba(0, 0, 0, 0.3);
   }
 
   &__deploy {
-    min-width: 200px;
+    min-width: 320px;
     text-align: center;
-    font-size: 1.15em;
-    padding: 5px 18px;
+    font-size: 1.5em;
+    font-weight: bold;
+    padding: 8px 28px;
     border-color: var(--kit-accent) !important;
     color: #fff !important;
     background: rgba(255, 255, 255, 0.1) !important;

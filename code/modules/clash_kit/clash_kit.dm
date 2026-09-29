@@ -6,6 +6,8 @@ GLOBAL_LIST_EMPTY(clash_kit_issue_pending)
 /datum/clash_kit
 	var/name
 	var/list/choices = list()
+	var/list/extras = list()
+	var/list/removed = list()
 
 /datum/clash_kit/proc/get_option(slot)
 	return get_clash_kit_option(choices[slot])
@@ -90,7 +92,7 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 	for(var/job in by_job)
 		var/list/stored = list()
 		for(var/datum/clash_kit/kit as anything in by_job[job])
-			stored += list(list("name" = kit.name, "choices" = kit.choices))
+			stored += list(list("name" = kit.name, "choices" = kit.choices, "extras" = kit.extras, "removed" = kit.removed))
 		payload[job] = stored
 	var/savefile/save = new(clash_kit_path(ckey))
 	save.cd = "/"
@@ -127,6 +129,12 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 					id = clash_kit_option_id(clash_kit_faction_for_job(job), slot, text2path(id))
 				if(get_clash_kit_option(id))
 					kit.choices[slot] = id
+			for(var/extra in stored["extras"])
+				if(ispath(text2path(extra), /obj/item))
+					kit.extras += extra
+			for(var/unwanted in stored["removed"])
+				if(ispath(text2path(unwanted), /obj/item))
+					kit.removed += unwanted
 			kits += kit
 		by_job[job] = kits
 
@@ -152,8 +160,9 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 	var/obj/item/old = wearer.get_item_by_slot(wear_slot)
 	var/list/carried = list()
 	if(old)
-		if(isstorage(old))
-			for(var/obj/item/thing in old.contents)
+		var/obj/item/storage/old_storage = clash_kit_storage_of(old)
+		if(old_storage)
+			for(var/obj/item/thing in old_storage.contents)
 				carried += thing
 				thing.forceMove(wearer)
 		wearer.temp_drop_inv_item(old, TRUE)
@@ -162,11 +171,10 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 	if(!wearer.equip_to_slot_if_possible(fresh, wear_slot, TRUE, FALSE, TRUE))
 		qdel(fresh)
 		fresh = null
+	var/obj/item/storage/holder = clash_kit_storage_of(fresh)
 	for(var/obj/item/thing as anything in carried)
-		if(isstorage(fresh))
-			var/obj/item/storage/holder = fresh
-			if(holder.can_be_inserted(thing, wearer, TRUE) && holder.handle_item_insertion(thing, TRUE, wearer))
-				continue
+		if(holder?.can_be_inserted(thing, wearer, TRUE) && holder.handle_item_insertion(thing, TRUE, wearer))
+			continue
 		if(!wearer.equip_to_appropriate_slot(thing))
 			qdel(thing)
 	return fresh
@@ -179,6 +187,21 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 		thing.forceMove(floor)
 	else
 		qdel(thing)
+
+/proc/clash_fit_attachment(obj/item/weapon/gun/gun, obj/item/attachable/attachment, mob/living/carbon/human/wearer, discard_old)
+	if(!gun.can_attach_to_gun(wearer, attachment))
+		return FALSE
+	var/obj/item/attachable/old = gun.attachments[attachment.slot]
+	if(old && !get_turf(gun))
+		gun.attachments[attachment.slot] = null
+		qdel(old)
+	attachment.Attach(gun)
+	gun.update_attachable(attachment.slot)
+	if(!QDELETED(old) && (discard_old || (old.type in gun.starting_attachment_types)))
+		if(old.loc == wearer)
+			wearer.temp_drop_inv_item(old, TRUE)
+		qdel(old)
+	return TRUE
 
 /proc/clash_is_sidearm(obj/item/weapon/gun/gun)
 	return istype(gun, /obj/item/weapon/gun/pistol) || istype(gun, /obj/item/weapon/gun/revolver)
@@ -217,7 +240,7 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
  * A picked gun replaces every gun of its kind the wearer has, so re-kitting cannot stack weapons;
  * unpicked slots keep the issue item, and magazines that fit nothing left are removed.
  */
-/proc/apply_clash_kit(mob/living/carbon/human/wearer, datum/clash_kit/kit)
+/proc/apply_clash_kit(mob/living/carbon/human/wearer, datum/clash_kit/kit, mode = CLASH_KIT_SPAWN, job)
 	if(!kit || QDELETED(wearer))
 		return
 	var/faction = wearer.faction
@@ -260,10 +283,7 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 			if(!option || !clash_kit_attachment_fits(option.item_type, main_gun.type))
 				continue
 			var/obj/item/attachable/attachment = new option.item_type(main_gun)
-			if(main_gun.can_attach_to_gun(wearer, attachment))
-				attachment.Attach(main_gun)
-				main_gun.update_attachable(attachment.slot)
-			else
+			if(!clash_fit_attachment(main_gun, attachment, wearer, TRUE))
 				qdel(attachment)
 	else if(!QDELETED(issue_primary))
 		if(!wearer.equip_to_slot_if_possible(issue_primary, WEAR_J_STORE, TRUE, FALSE, TRUE) && !wearer.equip_to_appropriate_slot(issue_primary))
@@ -289,7 +309,11 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 			var/obj/item/grenade = new grenades.item_type(wearer)
 			if(!wearer.equip_to_appropriate_slot(grenade))
 				qdel(grenade)
+	. = stock_clash_kit(wearer, kit, job || wearer.job, mode)
 	wearer.regenerate_icons()
+
+/proc/reapply_clash_kit(mob/living/carbon/human/wearer, datum/clash_kit/kit)
+	apply_clash_kit(wearer, kit, CLASH_KIT_RESET)
 
 /proc/describe_clash_kit_item(obj/item/item)
 	return item ? list("name" = item.name, "icon" = "[item.icon]", "icon_state" = item.icon_state) : null
@@ -361,12 +385,13 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 		model.update_hair()
 		arm_equipment(model, role.gear_preset, FALSE, FALSE, null, TRUE)
 		issue_clash_role_kit(model, job)
-		apply_clash_kit(model, kit)
+		GLOB.clash_kit_budgets[job] = list(model.vendor_points, model.vendor_snowflake_points)
+		var/list/statuses = apply_clash_kit(model, kit, CLASH_KIT_PREVIEW, job)
 		for(var/obj/limb/limb in model.limbs)
 			limb.blocks_emissive = EMISSIVE_BLOCK_NONE
 		model.regenerate_icons()
 		var/icon/flat = getFlatIcon(model)
-		. = flat ? icon2base64(flat) : null
+		. = list("doll" = flat ? icon2base64(flat) : null, "pack" = describe_clash_kit_pack(model), "statuses" = statuses)
 	catch(var/exception/error)
 		stack_trace("Clash kit could not draw a [job] doll: [error]")
 	qdel(model)

@@ -24,6 +24,8 @@ SUBSYSTEM_DEF(clash_spawn)
 /datum/controller/subsystem/clash_spawn/proc/on_spawned(mob/living/carbon/human/spawned)
 	SIGNAL_HANDLER
 	UnregisterSignal(spawned, COMSIG_POST_SPAWN_UPDATE)
+	if(spawned.mind)
+		spawned.mind.clash_job = spawned.job
 	if(clash_fed_spawns())
 		spawned.nutrition = NUTRITION_NORMAL
 	spawned.clash_spawn_points = list(spawned.vendor_points, spawned.vendor_snowflake_points)
@@ -46,6 +48,7 @@ SUBSYSTEM_DEF(clash_spawn)
 		INVOKE_ASYNC(src, PROC_REF(show_welcome), spawned)
 
 /mob/living/carbon/human/var/list/clash_spawn_points
+/datum/mind/var/clash_job
 
 /proc/get_clash_home_turf(mob/living/carbon/human/fighter)
 	var/datum/job/job = GLOB.RoleAuthority.roles_by_name[fighter.job]

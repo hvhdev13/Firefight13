@@ -43,6 +43,40 @@ interface IssueItem {
   icon_state: string;
 }
 
+interface PackItem {
+  type: string;
+  name: string;
+  icon: string;
+  icon_state: string;
+  extra: BooleanLike;
+}
+
+interface PackContainer {
+  name: string;
+  capacity: string;
+  items: PackItem[];
+}
+
+interface Extra {
+  id: string;
+  name: string;
+  status: 'ok' | 'room' | 'points' | 'gone' | 'pending';
+}
+
+interface ShopItem {
+  id: string;
+  name: string;
+  cost: number;
+  pool: 'points' | 'snowflake';
+  icon: string;
+  icon_state: string;
+}
+
+interface ShopSection {
+  name: string;
+  items: ShopItem[];
+}
+
 interface KitSummary {
   name: string;
   set: number;
@@ -72,7 +106,206 @@ interface Data extends StaticData {
   deploy_block: string | null;
   revivable: BooleanLike;
   hint: string | null;
+  pack: PackContainer[];
+  extras: Extra[];
+  removed: { type: string; name: string }[];
+  shop: ShopSection[];
+  budget: [number, number];
+  spent: { points: number; snowflake: number };
 }
+
+type Tab = 'gear' | 'pack' | 'shop';
+
+const EXTRA_PROBLEMS: Record<string, string> = {
+  room: 'No room, will not be packed',
+  points: 'Not enough points, will not be bought',
+  gone: 'No longer sold to this role',
+};
+
+const ItemIcon = (props: { readonly icon: string; readonly state: string }) => (
+  <Box className="ClashKit__optionIcon">
+    <DmIcon
+      icon={props.icon}
+      icon_state={props.state}
+      fallback={<Icon name="spinner" spin />}
+    />
+  </Box>
+);
+
+const PackView = () => {
+  const { act, data } = useBackend<Data>();
+  const { pack, extras, removed, doll_pending } = data;
+  const problems = extras
+    .map((extra, index) => ({ ...extra, index: index + 1 }))
+    .filter((extra) => EXTRA_PROBLEMS[extra.status]);
+  return (
+    <>
+      {!!doll_pending && (
+        <Box className="ClashKit__packNote">
+          <Icon name="circle-notch" spin /> Repacking...
+        </Box>
+      )}
+      {problems.map((extra) => (
+        <Box key={extra.index} className="ClashKit__option ClashKit__packWarn">
+          <Stack align="center">
+            <Stack.Item grow>
+              <Box className="ClashKit__optionName">{extra.name}</Box>
+              <Box className="ClashKit__optionBlurb">
+                {EXTRA_PROBLEMS[extra.status]}
+              </Box>
+            </Stack.Item>
+            <Stack.Item>
+              <Button
+                icon="xmark"
+                color="transparent"
+                tooltip="Take it off the list"
+                onClick={() => act('unbuy', { index: extra.index })}
+              />
+            </Stack.Item>
+          </Stack>
+        </Box>
+      ))}
+      {pack.map((holder, holderIndex) => (
+        <Box key={holderIndex} className="ClashKit__packHolder">
+          <Box className="ClashKit__packHead">
+            <Box as="span">{holder.name}</Box>
+            <Box as="span" className="ClashKit__optionsCount">
+              {holder.capacity}
+            </Box>
+          </Box>
+          {holder.items.length ? (
+            holder.items.map((item, itemIndex) => (
+              <Box key={itemIndex} className="ClashKit__packItem">
+                <Stack align="center">
+                  <Stack.Item>
+                    <ItemIcon icon={item.icon} state={item.icon_state} />
+                  </Stack.Item>
+                  <Stack.Item grow>
+                    {item.name}
+                    {!!item.extra && (
+                      <Box as="span" className="ClashKit__packBought">
+                        bought
+                      </Box>
+                    )}
+                  </Stack.Item>
+                  <Stack.Item>
+                    <Button
+                      icon="xmark"
+                      color="transparent"
+                      tooltip={
+                        item.extra
+                          ? 'Return it and get the points back'
+                          : 'Leave it behind to make room'
+                      }
+                      onClick={() =>
+                        act('drop_item', {
+                          type: item.type,
+                          extra: item.extra ? 1 : 0,
+                        })
+                      }
+                    />
+                  </Stack.Item>
+                </Stack>
+              </Box>
+            ))
+          ) : (
+            <Box className="ClashKit__packEmpty">Empty</Box>
+          )}
+        </Box>
+      ))}
+      {!pack.length && !doll_pending && (
+        <Box className="ClashKit__packEmpty">
+          This kit has nothing to pack into.
+        </Box>
+      )}
+      {!!removed.length && (
+        <Box className="ClashKit__packHolder">
+          <Box className="ClashKit__packHead">Left behind</Box>
+          {removed.map((item, index) => (
+            <Box key={index} className="ClashKit__packItem">
+              <Stack align="center">
+                <Stack.Item grow>{item.name}</Stack.Item>
+                <Stack.Item>
+                  <Button
+                    icon="rotate-left"
+                    color="transparent"
+                    tooltip="Pack it again"
+                    onClick={() => act('restore_item', { type: item.type })}
+                  />
+                </Stack.Item>
+              </Stack>
+            </Box>
+          ))}
+        </Box>
+      )}
+    </>
+  );
+};
+
+const ShopView = () => {
+  const { act, data } = useBackend<Data>();
+  const { shop, budget, spent } = data;
+  const left = {
+    points: budget[0] - (spent.points ?? 0),
+    snowflake: budget[1] - (spent.snowflake ?? 0),
+  };
+  const usesSnowflake = shop.some((section) =>
+    section.items.some((item) => item.pool === 'snowflake'),
+  );
+  if (!shop.length) {
+    return (
+      <Box className="ClashKit__packEmpty">
+        This role has nothing to buy with points.
+      </Box>
+    );
+  }
+  return (
+    <>
+      <Box className="ClashKit__shopPoints">
+        Points left: <b>{left.points}</b> / {budget[0]}
+        {usesSnowflake && (
+          <Box as="span" ml={2}>
+            Specialist points: <b>{left.snowflake}</b> / {budget[1]}
+          </Box>
+        )}
+        <Box className="ClashKit__optionBlurb">
+          Bought gear is packed at spawn. What you do not spend stays for the
+          vendors.
+        </Box>
+      </Box>
+      {shop.map((section) => (
+        <Box key={section.name} className="ClashKit__packHolder">
+          <Box className="ClashKit__packHead">{section.name}</Box>
+          {section.items.map((item) => {
+            const short = left[item.pool] < item.cost;
+            return (
+              <Box key={item.id} className="ClashKit__packItem">
+                <Stack align="center">
+                  <Stack.Item>
+                    <ItemIcon icon={item.icon} state={item.icon_state} />
+                  </Stack.Item>
+                  <Stack.Item grow>{item.name}</Stack.Item>
+                  <Stack.Item className="ClashKit__shopCost">
+                    {item.cost}
+                    {item.pool === 'snowflake' ? ' sp' : ''}
+                  </Stack.Item>
+                  <Stack.Item>
+                    <Button
+                      icon="cart-plus"
+                      disabled={short}
+                      tooltip={short ? 'Not enough points' : 'Buy and pack it'}
+                      onClick={() => act('buy', { id: item.id })}
+                    />
+                  </Stack.Item>
+                </Stack>
+              </Box>
+            );
+          })}
+        </Box>
+      ))}
+    </>
+  );
+};
 
 /** Worn gear down the left of the doll, carried gear down the right */
 const LEFT_SLOTS = ['helmet', 'mask', 'armor', 'back'];
@@ -246,6 +479,7 @@ export const ClashKit = () => {
   } = data;
 
   const [selectedSlot, setSelectedSlot] = useState('primary');
+  const [tab, setTab] = useState<Tab>('gear');
   // The server sends the wait once; the client counts it down
   const [waitLeft, setWaitLeft] = useState(respawn_in);
   useEffect(() => {
@@ -279,14 +513,8 @@ export const ClashKit = () => {
       ? `Deploy in ${clock(waitLeft)}`
       : `Deploy as ${job}`;
   const isUpp = faction === 'UPP';
-  const factionName = roles.find((group) => group.faction === faction)?.name;
-
-  const roleOptions = roles.flatMap((group) =>
-    group.jobs.map((title) => ({
-      value: title,
-      displayText: `${group.name} · ${title}`,
-    })),
-  );
+  const roleOptions =
+    roles.find((group) => group.faction === faction)?.jobs ?? [];
 
   const tile = (id: string, small?: boolean, dimmed?: boolean) => (
     <SlotTile
@@ -297,12 +525,15 @@ export const ClashKit = () => {
       selected={selectedSlot === id}
       small={small}
       dimmed={dimmed}
-      onClick={() => setSelectedSlot(id)}
+      onClick={() => {
+        setSelectedSlot(id);
+        setTab('gear');
+      }}
     />
   );
 
   return (
-    <Window width={1080} height={700} theme={isUpp ? 'crtupp' : 'crtblue'}>
+    <Window width={1080} height={700} theme={isUpp ? 'crtred' : 'crtblue'}>
       <Window.Content
         className={classes(['ClashKit', isUpp && 'ClashKit--upp'])}
       >
@@ -310,7 +541,20 @@ export const ClashKit = () => {
           {/* Header */}
           <Stack.Item className="ClashKit__header">
             <Stack align="center">
-              <Stack.Item className="ClashKit__badge">{factionName}</Stack.Item>
+              <Stack.Item className="ClashKit__sides">
+                {roles.map((group) => (
+                  <Box
+                    key={group.faction}
+                    className={classes([
+                      'ClashKit__side',
+                      group.faction === faction && 'ClashKit__side--selected',
+                    ])}
+                    onClick={() => act('side', { faction: group.faction })}
+                  >
+                    {group.name}
+                  </Box>
+                ))}
+              </Stack.Item>
               <Stack.Item>
                 <Dropdown
                   width="250px"
@@ -437,15 +681,45 @@ export const ClashKit = () => {
 
               {/* Options */}
               <Stack.Item grow className="ClashKit__optionsPanel">
-                <Box className="ClashKit__optionsHeader">
-                  <Box as="span" className="ClashKit__optionsTitle">
-                    {current?.name}
-                  </Box>
-                  <Box as="span" className="ClashKit__optionsCount">
-                    {options.length} options
-                  </Box>
+                <Box className="ClashKit__tabs">
+                  {(
+                    [
+                      ['gear', current?.name ?? 'Gear'],
+                      ['pack', 'Pack'],
+                      ['shop', 'Shop'],
+                    ] as [Tab, string][]
+                  ).map(([id, label]) => (
+                    <Box
+                      key={id}
+                      className={classes([
+                        'ClashKit__tab',
+                        tab === id && 'ClashKit__tab--selected',
+                      ])}
+                      onClick={() => setTab(id)}
+                    >
+                      {label}
+                    </Box>
+                  ))}
+                  {tab === 'gear' && (
+                    <Box as="span" className="ClashKit__optionsCount">
+                      {options.length} options
+                    </Box>
+                  )}
                 </Box>
-                <Box className="ClashKit__optionsList">
+                {tab === 'pack' && (
+                  <Box className="ClashKit__optionsList">
+                    <PackView />
+                  </Box>
+                )}
+                {tab === 'shop' && (
+                  <Box className="ClashKit__optionsList">
+                    <ShopView />
+                  </Box>
+                )}
+                <Box
+                  className="ClashKit__optionsList"
+                  style={{ display: tab === 'gear' ? undefined : 'none' }}
+                >
                   <OptionRow
                     issued={issued}
                     label={issued ? issued.name : 'Nothing'}
@@ -483,35 +757,28 @@ export const ClashKit = () => {
           {/* Footer */}
           <Stack.Item className="ClashKit__footer">
             <Stack align="center">
-              {!!live && (
-                <Stack.Item>
-                  <Button
-                    icon="shirt"
-                    disabled={!can_equip_now}
-                    tooltip={
-                      can_equip_now
-                        ? 'Swap your gear for this kit now'
-                        : 'Only inside your own base, as this role'
-                    }
-                    onClick={() => act('equip_now')}
-                  >
-                    Equip now
-                  </Button>
-                </Stack.Item>
-              )}
-              <Stack.Item grow className="ClashKit__hint">
-                {hint}
-              </Stack.Item>
-              <Stack.Item>
-                <Button.Confirm
-                  icon="rotate-left"
-                  color="transparent"
-                  confirmContent="Back to job issue?"
-                  tooltip="Clear every pick in this kit"
-                  onClick={() => act('reset')}
-                >
-                  Reset
-                </Button.Confirm>
+              <Stack.Item grow basis={0}>
+                <Stack align="center">
+                  {!!live && (
+                    <Stack.Item>
+                      <Button
+                        icon="shirt"
+                        disabled={!can_equip_now}
+                        tooltip={
+                          can_equip_now
+                            ? 'Swap your gear for this kit now'
+                            : 'Only inside your own base, as this role'
+                        }
+                        onClick={() => act('equip_now')}
+                      >
+                        Equip now
+                      </Button>
+                    </Stack.Item>
+                  )}
+                  <Stack.Item grow className="ClashKit__hint">
+                    {hint}
+                  </Stack.Item>
+                </Stack>
               </Stack.Item>
               {!!deploy_state && (
                 <Stack.Item>
@@ -543,6 +810,17 @@ export const ClashKit = () => {
                   )}
                 </Stack.Item>
               )}
+              <Stack.Item grow basis={0} textAlign="right">
+                <Button.Confirm
+                  icon="rotate-left"
+                  color="transparent"
+                  confirmContent="Back to job issue?"
+                  tooltip="Clear every pick in this kit"
+                  onClick={() => act('reset')}
+                >
+                  Reset
+                </Button.Confirm>
+              </Stack.Item>
             </Stack>
           </Stack.Item>
         </Stack>

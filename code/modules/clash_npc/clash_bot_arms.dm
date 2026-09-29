@@ -32,10 +32,13 @@
 		else
 			continue
 		homes[thing] = thing.loc
+	set_firemode()
+	ready_gun(primary)
+
+/datum/clash_bot/proc/set_firemode()
 	var/wanted_firemode = post?.bot_firemode
 	if(primary && wanted_firemode && primary.gun_firemode != wanted_firemode && (wanted_firemode in primary.gun_firemode_list))
 		primary.do_toggle_firemode(body, null, wanted_firemode)
-	ready_gun(primary)
 
 /datum/clash_bot/proc/check_hands()
 	var/obj/limb/right = body.get_limb("r_hand")

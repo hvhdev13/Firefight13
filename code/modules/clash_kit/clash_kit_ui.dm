@@ -38,10 +38,11 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 	var/ckey
 	var/job
 	var/kit_index = 1
-	var/doll
+	var/list/render
 	var/doll_key
 	var/list/doll_cache = list()
 	var/render_queued = FALSE
+	var/list/side_jobs = list()
 	COOLDOWN_DECLARE(equip_cooldown)
 
 /datum/clash_kit_screen/New(ckey)
@@ -60,6 +61,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 	if(job == new_job)
 		return
 	job = new_job
+	side_jobs[clash_kit_faction_for_job(job)] = job
 	kit_index = get_clash_active_kit_index(ckey, job)
 
 /datum/clash_kit_screen/proc/get_kit()
@@ -116,7 +118,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 	var/wanted = get_doll_key(kit)
 	var/doll_pending = FALSE
 	if(doll_cache[wanted])
-		doll = doll_cache[wanted]
+		render = doll_cache[wanted]
 		doll_key = wanted
 	else if(doll_key != wanted)
 		doll_pending = TRUE
@@ -164,8 +166,14 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 		"choices" = kit?.choices || list(),
 		"issue" = issue || list(),
 		"fits" = fits,
-		"doll" = doll,
+		"doll" = render?["doll"],
 		"doll_pending" = doll_pending,
+		"pack" = render?["pack"] || list(),
+		"extras" = describe_extras(kit, doll_key == wanted ? render?["statuses"] : null),
+		"removed" = describe_removed(kit),
+		"shop" = get_clash_shop(job)["sections"],
+		"budget" = get_clash_kit_budget(job),
+		"spent" = kit ? get_clash_kit_spent(kit, job) : list(),
 		"can_equip_now" = can_equip_now,
 		"live" = !!fighter,
 		"deploy_state" = deploy_state,
@@ -210,7 +218,45 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 	return body?.job
 
 /datum/clash_kit_screen/proc/get_doll_key(datum/clash_kit/kit)
-	return json_encode(list(job, kit?.choices))
+	return json_encode(list(job, kit?.choices, kit?.extras, kit?.removed))
+
+/datum/clash_kit_screen/proc/describe_extras(datum/clash_kit/kit, list/statuses)
+	. = list()
+	if(!kit)
+		return
+	var/list/by_id = get_clash_shop(job)["by_id"]
+	for(var/index in 1 to length(kit.extras))
+		var/list/item = by_id[kit.extras[index]]
+		. += list(list("id" = kit.extras[index], "name" = item ? item["name"] : "Not sold to this role", "status" = LAZYACCESS(statuses, index) || "pending"))
+
+/datum/clash_kit_screen/proc/describe_removed(datum/clash_kit/kit)
+	. = list()
+	if(!kit)
+		return
+	for(var/type_text in kit.removed)
+		var/obj/item/item_type = text2path(type_text)
+		. += list(list("type" = type_text, "name" = initial(item_type.name)))
+
+/datum/clash_kit_screen/proc/pack_holds(type_text)
+	for(var/list/holder in render?["pack"])
+		for(var/list/item in holder["items"])
+			if(item["type"] == type_text && !item["extra"])
+				return TRUE
+	return FALSE
+
+/datum/clash_kit_screen/proc/render_now(client/viewer)
+	var/datum/clash_kit/kit = get_kit()
+	var/key = get_doll_key(kit)
+	if(!doll_cache[key])
+		var/list/rendered = render_clash_kit_doll(kit, job, viewer)
+		if(!rendered)
+			return null
+		doll_cache[key] = rendered
+		if(length(doll_cache) > 24)
+			doll_cache.Cut(1, 2)
+	render = doll_cache[key]
+	doll_key = key
+	return render
 
 /datum/clash_kit_screen/proc/queue_doll(client/viewer)
 	if(render_queued)
@@ -220,16 +266,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 
 /datum/clash_kit_screen/proc/render_doll(client/viewer)
 	render_queued = FALSE
-	var/datum/clash_kit/kit = get_kit()
-	var/key = get_doll_key(kit)
-	if(!doll_cache[key])
-		var/rendered = render_clash_kit_doll(kit, job, viewer)
-		if(rendered)
-			doll_cache[key] = rendered
-			if(length(doll_cache) > 24)
-				doll_cache.Cut(1, 2)
-	doll = doll_cache[key]
-	doll_key = key
+	render_now(viewer)
 	SStgui.update_uis(src)
 
 /datum/clash_kit_screen/ui_act(action, list/params, datum/tgui/ui, datum/ui_state/state)
@@ -242,6 +279,11 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 		if("role")
 			if(params["job"] in GLOB.ROLES_CM_VS_UPP)
 				set_job(params["job"])
+		if("side")
+			var/list/roles = get_clash_kit_roles()
+			var/list/side_roles = roles[params["faction"]]
+			if(length(side_roles))
+				set_job(side_jobs[params["faction"]] || side_roles[1])
 		if("kit")
 			var/index = text2num(params["index"])
 			if(index >= 1 && index <= CLASH_KIT_COUNT)
@@ -249,6 +291,9 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 				var/list/active = GLOB.clash_active_kits[ckey]
 				active[job] = kit_index
 				save_clash_kits(ckey)
+				var/datum/clash_kit/picked = get_kit()
+				if(findtext(picked.name, "Custom") == 1 && !length(picked.choices))
+					INVOKE_ASYNC(src, PROC_REF(name_new_kit), user, picked)
 		if("pick")
 			var/datum/clash_kit_option/option = get_clash_kit_option(params["id"])
 			if(!kit || !option || option.faction != clash_kit_faction_for_job(job) || option.slot != params["slot"])
@@ -264,6 +309,47 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 			if(!kit)
 				return TRUE
 			kit.choices = list()
+			kit.extras = list()
+			kit.removed = list()
+			save_clash_kits(ckey)
+		if("buy")
+			var/list/item = get_clash_shop(job)["by_id"][params["id"]]
+			if(!kit || !item)
+				return TRUE
+			var/list/spent = get_clash_kit_spent(kit, job)
+			var/list/budget = get_clash_kit_budget(job)
+			var/left = item["pool"] == CLASH_SHOP_SNOWFLAKE ? budget[2] - spent[CLASH_SHOP_SNOWFLAKE] : budget[1] - spent[CLASH_SHOP_POINTS]
+			if(left < item["cost"])
+				to_chat(user, SPAN_WARNING("Not enough points left for [item["name"]]."))
+				return TRUE
+			kit.extras += item["id"]
+			var/list/result = render_now(user.client)
+			var/list/statuses = result?["statuses"]
+			if(!length(statuses) || statuses[length(statuses)] != "ok")
+				kit.extras.Cut(length(kit.extras))
+				doll_cache -= doll_key
+				to_chat(user, SPAN_WARNING("[item["name"]] does not fit in your gear. Make room, or buy it from a vendor once you spawn."))
+				return TRUE
+			save_clash_kits(ckey)
+		if("unbuy")
+			var/index = text2num(params["index"])
+			if(!kit || !index || index > length(kit.extras))
+				return TRUE
+			kit.extras.Cut(index, index + 1)
+			save_clash_kits(ckey)
+		if("drop_item")
+			if(!kit || !params["type"])
+				return TRUE
+			var/extra_index = kit.extras.Find(params["type"])
+			if(extra_index && params["extra"])
+				kit.extras.Cut(extra_index, extra_index + 1)
+			else if(pack_holds(params["type"]))
+				kit.removed += params["type"]
+			save_clash_kits(ckey)
+		if("restore_item")
+			if(!kit || !(params["type"] in kit.removed))
+				return TRUE
+			kit.removed -= params["type"]
 			save_clash_kits(ckey)
 		if("rename")
 			var/new_name = sanitize(copytext(trim("[params["name"]]"), 1, 25))
@@ -281,12 +367,21 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 				to_chat(user, SPAN_WARNING("Give it a moment before re-kitting again."))
 				return TRUE
 			COOLDOWN_START(src, equip_cooldown, 10 SECONDS)
-			apply_clash_kit(fighter, kit)
+			apply_clash_kit(fighter, kit, CLASH_KIT_EQUIP)
 			to_chat(user, SPAN_NOTICE("Re-kitted as [kit.name]."))
 		if("deploy")
 			deploy(user)
 			return TRUE
 	return TRUE
+
+/datum/clash_kit_screen/proc/name_new_kit(mob/user, datum/clash_kit/kit)
+	var/entered = tgui_input_text(user, "Name your new loadout.", "New loadout", "", 24, encode = FALSE)
+	var/new_name = sanitize(copytext(trim("[entered]"), 1, 25))
+	if(!length(new_name))
+		return
+	kit.name = new_name
+	save_clash_kits(ckey)
+	SStgui.update_uis(src)
 
 /datum/clash_kit_screen/proc/deploy(mob/user)
 	var/state = get_deploy_state(user)
