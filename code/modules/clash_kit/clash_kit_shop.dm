@@ -85,10 +85,6 @@ GLOBAL_LIST_EMPTY(clash_kit_budgets)
 		holder = holder.loc
 	return holder == wearer
 
-/**
- * Buys and packs a kit's shop extras with the wearer's own vendor points, and drops the issued items the kit takes out.
- * Returns one status per extra: "ok", "room", "points" or "gone". Nothing is ever dropped on the floor.
- */
 /proc/stock_clash_kit(mob/living/carbon/human/wearer, datum/clash_kit/kit, job, mode)
 	for(var/datum/weakref/given_ref as anything in wearer.clash_kit_extras)
 		var/obj/item/given = given_ref.resolve()

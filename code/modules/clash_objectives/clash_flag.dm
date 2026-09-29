@@ -12,11 +12,6 @@
 	name = "Clash flag stand (UPP)"
 	faction = FACTION_UPP
 
-/**
- * Capture the Flag flag. Planted and anchored at its stand; enemies take it by hand, its own side returns it by touching it
- * where it lies. It only rides in hands: anywhere else it is put, it falls to the floor. The mode settles its state after
- * every move rather than trusting any one hook, so hand swaps, throws and drops all end up right.
- */
 /obj/item/clash_flag
 	name = "flag"
 	desc = "Take it back to your own flag to score. Your own side returns it by touching it where it lies."
@@ -121,11 +116,6 @@
 			return TRUE
 	return FALSE
 
-/**
- * Where each side's flag stands, faction to turf. Mapped landmarks win. Otherwise from each base's middle,
- * walk toward the middle of the map until clear of the base, go a few tiles further, and snap to ground
- * players can reach from the middle, which is never inside a base.
- */
 /proc/get_clash_flag_spots()
 	. = list()
 	var/list/levels = SSmapping.levels_by_trait(ZTRAIT_GROUND)

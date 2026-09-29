@@ -44,11 +44,6 @@ GLOBAL_LIST_EMPTY(clash_kit_menu)
 GLOBAL_LIST_EMPTY(clash_kit_gun_attachables)
 GLOBAL_LIST_EMPTY(clash_kit_presets)
 
-/**
- * The full kit each role fights in. Jobs spawn from bare presets and gear up at the prep vendors; these are
- * the game's own fully equipped versions of the same roles, handed out on spawn in kit rounds instead.
- * Roles not listed (the ship roles) are dressed by their job already.
- */
 GLOBAL_LIST_INIT(clash_kit_role_kits, list(
 	JOB_SQUAD_MARINE = /datum/equipment_preset/uscm/private_equipped,
 	JOB_SQUAD_ENGI = /datum/equipment_preset/uscm/engineer_equipped,
@@ -77,10 +72,6 @@ GLOBAL_LIST_EMPTY(clash_kit_role_presets)
 /datum/equipment_preset/upp/soldier/dressed/rifleman/load_upp_soldier(mob/living/carbon/human/new_human, obj/item/clothing/under/marine/veteran/UPP/UPP)
 	load_upp_rifleman(new_human)
 
-/**
- * A role's starter classes. Every role starts with its standard issue. Riflemen add the side's whole-kit
- * classes; support and lead roles get the same classes as weapon and armour swaps that keep their gear.
- */
 /proc/get_clash_kit_role_presets(job)
 	if(GLOB.clash_kit_role_presets[job])
 		return GLOB.clash_kit_role_presets[job]
@@ -101,11 +92,6 @@ GLOBAL_LIST_EMPTY(clash_kit_role_presets)
 	if(job in GLOB.clash_kit_unarmed_roles && length(classes) > 1)
 		classes.Swap(1, 2)
 	return classes
-/**
- * What every fighter of a side wears under their kit, by wear slot, in the order it is put on.
- * The rifleman presets issue next to nothing and leave the rest to the prep vendors, but belts and
- * pouches cannot be worn without a uniform, so a kit fills these in wherever the role left a slot empty.
- */
 GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 	FACTION_MARINE = list(
 		WEAR_BODY = /obj/item/clothing/under/marine,

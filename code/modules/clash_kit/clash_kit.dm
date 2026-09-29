@@ -138,10 +138,6 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 			kits += kit
 		by_job[job] = kits
 
-/**
- * Hands a fighter their role's full kit, over the bare job preset they spawned from.
- * The job's empty pack makes way for the kit's packed one; anything else already worn stays.
- */
 /proc/issue_clash_role_kit(mob/living/carbon/human/fighter, job)
 	var/kit_path = GLOB.clash_kit_role_kits[job]
 	var/datum/equipment_preset/full_kit = kit_path && GLOB.equipment_presets.gear_path_presets_list[kit_path]
@@ -203,6 +199,15 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 		qdel(old)
 	return TRUE
 
+/proc/clash_kit_primary_of(mob/living/carbon/human/wearer)
+	var/obj/item/weapon/gun/stored = wearer.s_store
+	if(istype(stored) && !clash_is_sidearm(stored))
+		return stored
+	for(var/obj/item/weapon/gun/carried in wearer.get_contents())
+		if(!clash_is_sidearm(carried) && !istype(carried.loc, /obj/item/weapon/gun))
+			return carried
+	return null
+
 /proc/clash_is_sidearm(obj/item/weapon/gun/gun)
 	return istype(gun, /obj/item/weapon/gun/pistol) || istype(gun, /obj/item/weapon/gun/revolver)
 
@@ -235,11 +240,6 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 		if(!wearer.equip_to_appropriate_slot(magazine))
 			qdel(magazine)
 
-/**
- * Dresses wearer in a kit over what their job issued. Picks that are not this side's are skipped.
- * A picked gun replaces every gun of its kind the wearer has, so re-kitting cannot stack weapons;
- * unpicked slots keep the issue item, and magazines that fit nothing left are removed.
- */
 /proc/apply_clash_kit(mob/living/carbon/human/wearer, datum/clash_kit/kit, mode = CLASH_KIT_SPAWN, job, datum/preferences/prefs)
 	if(!kit || QDELETED(wearer))
 		return
@@ -410,7 +410,9 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 			limb.blocks_emissive = EMISSIVE_BLOCK_NONE
 		model.regenerate_icons()
 		var/icon/flat = getFlatIcon(model)
-		. = list("doll" = flat ? icon2base64(flat) : null, "pack" = describe_clash_kit_pack(model), "statuses" = statuses)
+		var/obj/item/weapon/gun/primary = clash_kit_primary_of(model)
+		var/icon/gun_flat = primary && getFlatIcon(primary)
+		. = list("doll" = flat ? icon2base64(flat) : null, "gun" = gun_flat ? icon2base64(gun_flat) : null, "pack" = describe_clash_kit_pack(model), "statuses" = statuses)
 	catch(var/exception/error)
 		stack_trace("Clash kit could not draw a [job] doll: [error]")
 	qdel(model)

@@ -35,5 +35,5 @@
     "tdm_kill_limit": 40,
     "tdm_koth_point_limit": 90,
     "tdm_countdown_seconds": 20,
-    "tdm_spawn_protection_seconds": 3
+    "tdm_spawn_protection_seconds": 5
 }

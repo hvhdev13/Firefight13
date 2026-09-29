@@ -34,5 +34,5 @@
     "tdm_respawn_seconds": 30,
     "tdm_kill_limit": 40,
     "tdm_countdown_seconds": 20,
-    "tdm_spawn_protection_seconds": 3
+    "tdm_spawn_protection_seconds": 5
 }

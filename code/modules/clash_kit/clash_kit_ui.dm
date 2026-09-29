@@ -168,6 +168,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 		"issue" = issue || list(),
 		"fits" = fits,
 		"doll" = render?["doll"],
+		"gun" = render?["gun"],
 		"doll_pending" = doll_pending,
 		"pack" = render?["pack"] || list(),
 		"extras" = describe_extras(kit, doll_key == wanted ? render?["statuses"] : null),

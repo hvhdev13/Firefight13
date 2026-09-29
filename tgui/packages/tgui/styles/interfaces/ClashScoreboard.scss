@@ -10,7 +10,6 @@ $hot: #ff8a3d;
 .ClashScoreboard {
   font-size: 12px;
 
-  // Header: score, clock, score
   &__header {
     display: flex;
     align-items: stretch;
@@ -157,7 +156,6 @@ $hot: #ff8a3d;
     font-size: 11px;
   }
 
-  // Limit, objectives and past matches
   &__sub {
     display: flex;
     flex-wrap: wrap;
@@ -198,7 +196,6 @@ $hot: #ff8a3d;
     color: #eee;
   }
 
-  // Team tables
   &__teams {
     display: flex;
     gap: 8px;

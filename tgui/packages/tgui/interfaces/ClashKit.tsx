@@ -98,6 +98,7 @@ interface Data extends StaticData {
   issue: Record<string, IssueItem>;
   fits: string[];
   doll: string | null;
+  gun: string | null;
   doll_pending: BooleanLike;
   can_equip_now: BooleanLike;
   live: BooleanLike;
@@ -349,7 +350,6 @@ const ShopView = () => {
   );
 };
 
-/** Worn gear down the left of the doll, carried gear down the right */
 const LEFT_SLOTS = ['helmet', 'mask', 'armor', 'back'];
 const RIGHT_SLOTS = ['primary', 'sidearm', 'grenade', 'belt'];
 const POUCH_SLOTS = ['pouch_l', 'pouch_r'];
@@ -527,7 +527,6 @@ export const ClashKit = () => {
     (extra) => EXTRA_PROBLEMS[extra.status],
   ).length;
   const { shop } = data;
-  // The server sends the wait once; the client counts it down
   const [waitLeft, setWaitLeft] = useState(respawn_in);
   useEffect(() => {
     setWaitLeft(respawn_in);
@@ -549,7 +548,6 @@ export const ClashKit = () => {
   const primary = findOption(menus, faction, 'primary', choices.primary);
   const current = slotById[selectedSlot];
   const options = menus[faction]?.[selectedSlot] ?? [];
-  // Issue attachments only come with the issued gun
   const issueFor = (id: string) =>
     ATTACHMENT_SLOTS.includes(id) && choices.primary ? undefined : issue?.[id];
   const issued = issueFor(selectedSlot);
@@ -580,12 +578,11 @@ export const ClashKit = () => {
   );
 
   return (
-    <Window width={1080} height={700} theme={isUpp ? 'crtred' : 'crtblue'}>
+    <Window width={1080} height={800} theme={isUpp ? 'crtred' : 'crtblue'}>
       <Window.Content
         className={classes(['ClashKit', isUpp && 'ClashKit--upp'])}
       >
         <Stack fill vertical>
-          {/* Header */}
           <Stack.Item className="ClashKit__header">
             <Stack align="center">
               <Stack.Item className="ClashKit__sides">
@@ -641,10 +638,8 @@ export const ClashKit = () => {
             </Stack>
           </Stack.Item>
 
-          {/* Body */}
           <Stack.Item grow>
             <Stack fill>
-              {/* Doll with gear around it */}
               <Stack.Item className="ClashKit__dollPanel">
                 <Box className="ClashKit__dollTitle">
                   {renaming ? (
@@ -741,9 +736,24 @@ export const ClashKit = () => {
                 <Box className="ClashKit__attachRow">
                   {ATTACHMENT_SLOTS.map((id) => tile(id, true, !primary))}
                 </Box>
+                <Box
+                  className={classes([
+                    'ClashKit__gunFrame',
+                    doll_pending && 'ClashKit__gunFrame--pending',
+                  ])}
+                >
+                  {data.gun ? (
+                    <img
+                      className="ClashKit__gun"
+                      src={`data:image/png;base64,${data.gun}`}
+                      alt=""
+                    />
+                  ) : (
+                    <Box className="ClashKit__gunEmpty">No primary</Box>
+                  )}
+                </Box>
               </Stack.Item>
 
-              {/* Options */}
               <Stack.Item grow className="ClashKit__optionsPanel">
                 <Box className="ClashKit__tabs">
                   {(
@@ -824,7 +834,6 @@ export const ClashKit = () => {
             </Stack>
           </Stack.Item>
 
-          {/* Footer */}
           <Stack.Item className="ClashKit__footer">
             <Stack align="center">
               <Stack.Item grow basis={0}>

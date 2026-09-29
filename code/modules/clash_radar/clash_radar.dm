@@ -1,16 +1,9 @@
-/// Pixel width and height of the radar
 #define RADAR_SIZE 96
-/// Tiles shown in each direction from the viewer
 #define RADAR_RANGE 7
-/// Pixels kept clear between the furthest contact and the rim, so marks stay inside the glass
 #define RADAR_EDGE_MARGIN 8
-/// How often contacts are redrawn
 #define RADAR_REFRESH (5 DECISECONDS)
-/// Degrees covered by the fading tail of the sweep
 #define RADAR_SWEEP_TAIL 45
-/// Deciseconds for one full sweep
 #define RADAR_SWEEP_PERIOD 20
-/// How faint a contact goes before the sweep reaches it again
 #define RADAR_BLIP_FADED_ALPHA 30
 
 #define RADAR_COLOR_BEVEL rgb(77, 86, 94)
@@ -22,14 +15,12 @@ GLOBAL_DATUM(clash_radar_backdrop, /icon)
 GLOBAL_DATUM(clash_radar_sweep, /icon)
 GLOBAL_LIST_EMPTY(clash_radar_marks)
 
-/// 1 when turn() rotates clockwise on screen, -1 when it rotates counter clockwise
 /proc/get_clash_turn_sign()
 	if(isnull(GLOB.clash_turn_sign))
 		var/matrix/probe = turn(matrix(), 90)
 		GLOB.clash_turn_sign = probe.d > 0 ? -1 : 1
 	return GLOB.clash_turn_sign
 
-/// Builds an icon from rows of characters, top row first, each character looked up in palette
 /proc/clash_pattern_icon(list/rows, list/palette)
 	var/height = length(rows)
 	var/width = length(rows[1])
@@ -193,7 +184,6 @@ GLOBAL_LIST_EMPTY(clash_radar_marks)
 		blip.alpha = 0
 		blip.contact = null
 
-/// Degrees the sweep has turned from north, clockwise
 /atom/movable/screen/clash_radar/proc/get_sweep_angle()
 	var/elapsed = world.time - sweep_started
 	return 360 * (elapsed - RADAR_SWEEP_PERIOD * floor(elapsed / RADAR_SWEEP_PERIOD)) / RADAR_SWEEP_PERIOD

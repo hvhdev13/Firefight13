@@ -128,7 +128,7 @@
 			marine_announcement("ALERT: Battle situation has developed not necessarily to the Unions advantage\n\nDispatching request for new directives to Sector Command.\n\nConcluding operational report for dispatch, commencing final data entry and systems scan.", "1VAN/3", 'sound/AI/commandreport.ogg', FACTION_UPP)
 
 /datum/game_mode/extended/faction_clash/hvh/cm_vs_upp/ds_first_landed(obj/docking_port/stationary/marine_dropship)
-	if(round_started > 0) //we enter here on shipspawn but do not want this
+	if(round_started > 0)
 		return
 	.=..()
 	marine_announcement("First troops have landed on the colony! Five minute long ceasefire is in effect to allow evacuation of civilians.", "ARES 3.2", 'sound/AI/commandreport.ogg', FACTION_MARINE)

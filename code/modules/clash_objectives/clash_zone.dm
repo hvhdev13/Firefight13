@@ -201,11 +201,6 @@ GLOBAL_DATUM(clash_zone_tile_icon, /icon)
 			return get_clash_nearest_turf(ring, x, y)
 	return null
 
-/**
- * Where to put count objectives on the ground level, as a list of list(label, turf, radius).
- * Mapped landmarks win. Otherwise the middle of the line between the two bases, and for more than one,
- * the flanks either side of it, snapped to ground players can actually walk to from the middle.
- */
 /proc/get_clash_objective_spots(count, radius)
 	. = list()
 	var/list/levels = SSmapping.levels_by_trait(ZTRAIT_GROUND)

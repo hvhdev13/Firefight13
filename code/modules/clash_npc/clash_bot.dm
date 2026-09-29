@@ -1,30 +1,16 @@
-/// How often a bot looks around, shoots and steps
 #define CLASH_BOT_TICK 3
-/// Tiles a bot can see and engage within
 #define CLASH_BOT_SIGHT 9
-/// Accuracy a bot keeps compared to a player firing the same gun
 #define CLASH_BOT_ACCURACY 0.7
-/// Deciseconds a bot spends swapping a magazine
 #define CLASH_BOT_RELOAD_DELAY 25
-/// Tiles a bot searches when picking a place to fight from
 #define CLASH_BOT_COVER_RANGE 5
-/// Deciseconds between cover searches while in a fight
 #define CLASH_BOT_COVER_RESCAN 30
-/// Deciseconds between path searches for one bot
 #define CLASH_BOT_REPATH_DELAY 20
-/// Path searches allowed across every bot in one tick
 #define CLASH_BOT_PATHS_PER_TICK 2
-/// Deciseconds a bot remembers where an enemy was or who shot at it
 #define CLASH_BOT_MEMORY 60
-/// Health fraction below which a bot fights from further back
 #define CLASH_BOT_WOUNDED 0.45
-/// Failed steps before a bot gives up on its current route
 #define CLASH_BOT_STUCK_LIMIT 3
-/// Deciseconds between sweeps for a new target
 #define CLASH_BOT_SEARCH_DELAY 6
-/// Deciseconds between attempts to patch itself up
 #define CLASH_BOT_HEAL_DELAY 100
-/// Tiles a bot will go to fetch a magazine from the ground or a body
 #define CLASH_BOT_SCAVENGE_RANGE 8
 #define CLASH_BOT_CLOSE_RANGE 4
 
@@ -280,7 +266,6 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 		return
 	start_volley(target, rand(4, 8))
 
-/// Keeps a recently seen enemy's head down by firing a short string at where they were last seen
 /datum/clash_bot/proc/suppress()
 	if(firing || world.time < next_fire || !has_ammo())
 		return
@@ -535,7 +520,6 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 			best = max(best, thing.projectile_coverage * 0.7)
 	return best / 5
 
-/// Higher is better. Rewards cover facing every known enemy and a firing line to the main one, or staying out of sight while hurt or reloading
 /datum/clash_bot/proc/score_spot(turf/spot, list/enemies, hiding)
 	var/score = 0
 	var/turf/primary = enemies[1]

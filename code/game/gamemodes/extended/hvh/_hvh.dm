@@ -149,7 +149,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		. += "Each match starts after a [countdown_time / 10] second countdown. Until then you are held in your base."
 	. += "You can respawn [respawn_cooldown / 10] seconds after dying, using the Respawn button in the centre of the screen."
 	if(spawn_protection)
-		. += "After spawning you cannot be hurt inside your base, and for [spawn_protection / 10] seconds after leaving it. Firing, melee attacks or using an item end it early."
+		. += "For [spawn_protection / 10] seconds after spawning you cannot be hurt. Firing, melee attacks or using an item end it early."
 	if(idle_limit)
 		. += "Fighters idle for [idle_limit / 600] minutes are moved to observer so the slot frees up."
 	if(arena_rules)
@@ -1067,10 +1067,10 @@ GLOBAL_VAR(clash_start_mode)
 
 /datum/game_mode/extended/faction_clash/hvh/process()
 	if(--round_started > 0)
-		return FALSE //Initial countdown, just to be safe, so that everyone has a chance to spawn before we check anything.
+		return FALSE
 	. = ..()
 	if(!round_finished)
-		if(++round_checkwin >= 5) //Only check win conditions every 5 ticks.
+		if(++round_checkwin >= 5)
 			if(GLOB.round_should_check_for_win)
 				check_win()
 			round_checkwin = 0

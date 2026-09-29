@@ -253,12 +253,6 @@ GLOBAL_LIST_EMPTY(clash_death_card_icons)
 	hide()
 	return TRUE
 
-/**
- * Fills in victim's death card and shows it at once
- *
- * killer_name is null for a death to the environment. weapon is the item that did it, drawn large beside the text.
- * health is the killer's health left in percent, or null. life_line sums up the life that just ended.
- */
 /proc/clash_death_card_picture(appearance_source, width, height, center_x, center_y, max_scale, room)
 	var/scale = min(max_scale, room / max(width, height))
 	if(scale >= 1)

@@ -321,7 +321,6 @@ export const ClashScoreboard = () => {
             return;
           }
           key.event.preventDefault();
-          // A held Tab repeats into the window it just opened, so only a fresh press closes it
           if (key.event.repeat || Date.now() - openedAt < 400) {
             return;
           }

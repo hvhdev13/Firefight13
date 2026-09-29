@@ -1,4 +1,3 @@
-/// Saved Faction Clash loadouts, ckey to list of slot name to /datum/clash_loadout
 GLOBAL_LIST_EMPTY(clash_loadouts)
 GLOBAL_LIST_EMPTY(clash_auto_loadouts)
 GLOBAL_LIST_INIT(clash_loadout_skipped, list(
@@ -7,7 +6,6 @@ GLOBAL_LIST_INIT(clash_loadout_skipped, list(
 	/obj/item/device/radio/headset,
 	/obj/item/device/encryptionkey,
 ))
-/// How many slots a player may keep per job
 #define CLASH_LOADOUT_SLOTS 3
 
 /datum/clash_loadout
@@ -76,7 +74,6 @@ GLOBAL_LIST_INIT(clash_loadout_skipped, list(
 	for(var/obj/item/inner in thing.contents)
 		record(inner, index)
 
-/// Uniform first, then armor, then the rest of the worn gear, then what goes inside it
 /proc/clash_equip_order(list/entry)
 	if(entry["inner"])
 		return 4
@@ -95,7 +92,6 @@ GLOBAL_LIST_INIT(clash_loadout_skipped, list(
 				sorted += index
 	return sorted
 
-/// Every vendor this user is allowed to buy from
 /proc/get_clash_vendors(mob/living/carbon/human/user)
 	var/list/vendors = list()
 	for(var/obj/structure/machinery/cm_vending/vendor in GLOB.machines)
@@ -108,7 +104,6 @@ GLOBAL_LIST_INIT(clash_loadout_skipped, list(
 		vendors += vendor
 	return vendors
 
-/// Finds a vendor holding this type with stock left, returns list(vendor, itemspec)
 /proc/find_clash_product(list/vendors, mob/living/carbon/human/user, item_type)
 	for(var/obj/structure/machinery/cm_vending/vendor as anything in vendors)
 		for(var/list/itemspec in vendor.get_available_products(user))
@@ -161,7 +156,6 @@ GLOBAL_LIST_INIT(clash_loadout_skipped, list(
 			return thing
 	return null
 
-/// Mirrors the checks of the vendor's own vend action, returns the item of item_type that was handed out
 /proc/clash_vend(obj/structure/machinery/cm_vending/vendor, list/itemspec, mob/living/carbon/human/user, item_type)
 	if(vendor.stat & IN_USE)
 		return null
