@@ -23,6 +23,17 @@
         }
     ],
     "gamemodes": [
-        "Faction Clash UPP CM"
-    ]
+        "Team Deathmatch",
+        "King of the Hill",
+        "Domination",
+        "Capture the Flag"
+    ],
+    "force_mode": "Team Deathmatch",
+    "tdm_matches": 3,
+    "tdm_match_minutes": 8,
+    "tdm_respawn_seconds": 15,
+    "tdm_kill_limit": 40,
+    "tdm_koth_point_limit": 90,
+    "tdm_countdown_seconds": 20,
+    "tdm_spawn_protection_seconds": 5
 }

@@ -69,6 +69,18 @@
 
 	var/force_mode
 
+	var/tdm_match_minutes
+	var/tdm_matches
+	var/tdm_respawn_seconds
+	var/tdm_kill_limit
+	var/tdm_koth_point_limit
+	var/tdm_domination_point_limit
+	var/tdm_capture_limit
+	var/tdm_countdown_seconds
+	var/tdm_spawn_protection_seconds
+	var/fc_tickets
+	var/fc_match_minutes
+
 	var/perf_mode
 
 	var/disable_ship_map = FALSE
@@ -411,6 +423,83 @@
 
 	if(json["force_mode"])
 		force_mode = json["force_mode"]
+
+	temp = json["tdm_match_minutes"]
+	if(isnum(temp) && temp > 0)
+		tdm_match_minutes = temp
+	else if(!isnull(temp))
+		log_world("map_config tdm_match_minutes is not a positive number!")
+		return
+
+	temp = json["tdm_matches"]
+	if(isnum(temp) && temp >= 1)
+		tdm_matches = round(temp)
+	else if(!isnull(temp))
+		log_world("map_config tdm_matches is not a positive number!")
+		return
+
+	temp = json["tdm_respawn_seconds"]
+	if(isnum(temp) && temp >= 0)
+		tdm_respawn_seconds = temp
+	else if(!isnull(temp))
+		log_world("map_config tdm_respawn_seconds is not a number!")
+		return
+
+	temp = json["tdm_kill_limit"]
+	if(isnum(temp) && temp >= 0)
+		tdm_kill_limit = temp
+	else if(!isnull(temp))
+		log_world("map_config tdm_kill_limit is not a number!")
+		return
+
+	temp = json["tdm_koth_point_limit"]
+	if(isnum(temp) && temp > 0)
+		tdm_koth_point_limit = temp
+	else if(!isnull(temp))
+		log_world("map_config tdm_koth_point_limit is not a positive number!")
+		return
+
+	temp = json["tdm_domination_point_limit"]
+	if(isnum(temp) && temp > 0)
+		tdm_domination_point_limit = temp
+	else if(!isnull(temp))
+		log_world("map_config tdm_domination_point_limit is not a positive number!")
+		return
+
+	temp = json["tdm_capture_limit"]
+	if(isnum(temp) && temp > 0)
+		tdm_capture_limit = temp
+	else if(!isnull(temp))
+		log_world("map_config tdm_capture_limit is not a positive number!")
+		return
+
+	temp = json["tdm_countdown_seconds"]
+	if(isnum(temp) && temp >= 0)
+		tdm_countdown_seconds = temp
+	else if(!isnull(temp))
+		log_world("map_config tdm_countdown_seconds is not a number!")
+		return
+
+	temp = json["tdm_spawn_protection_seconds"]
+	if(isnum(temp) && temp >= 0)
+		tdm_spawn_protection_seconds = temp
+	else if(!isnull(temp))
+		log_world("map_config tdm_spawn_protection_seconds is not a number!")
+		return
+
+	temp = json["fc_tickets"]
+	if(isnum(temp) && temp > 0)
+		fc_tickets = round(temp)
+	else if(!isnull(temp))
+		log_world("map_config fc_tickets is not a positive number!")
+		return
+
+	temp = json["fc_match_minutes"]
+	if(isnum(temp) && temp > 0)
+		fc_match_minutes = temp
+	else if(!isnull(temp))
+		log_world("map_config fc_match_minutes is not a positive number!")
+		return
 
 	if(json["disable_ship_map"])
 		disable_ship_map = json["disable_ship_map"]

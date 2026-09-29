@@ -32,10 +32,13 @@
 		else
 			continue
 		homes[thing] = thing.loc
+	set_firemode()
+	ready_gun(primary)
+
+/datum/clash_bot/proc/set_firemode()
 	var/wanted_firemode = post?.bot_firemode
 	if(primary && wanted_firemode && primary.gun_firemode != wanted_firemode && (wanted_firemode in primary.gun_firemode_list))
 		primary.do_toggle_firemode(body, null, wanted_firemode)
-	ready_gun(primary)
 
 /datum/clash_bot/proc/check_hands()
 	var/obj/limb/right = body.get_limb("r_hand")
@@ -169,6 +172,7 @@
 	grenade.activate(body)
 	body.drop_inv_item_to_loc(grenade, get_turf(body), force = TRUE)
 	grenade.throw_atom(landing, CLASH_BOT_GRENADE_MAX, SPEED_FAST, body, TRUE)
+	homes -= grenade
 	grenade = null
 	return TRUE
 

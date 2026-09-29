@@ -241,7 +241,7 @@ SUBSYSTEM_DEF(mapping)
 		Loadship(FailedZs, ship_map.map_name, ship_map.map_path, ship_map.map_file, ship_map.traits, ZTRAITS_MAIN_SHIP, override_map_path = ship_base_path)
 
 	// loads the UPP ship if the game mode is faction clash (Generally run by the Prepare event under prep event verb)
-	if(!ground_map.disable_ship_map && trim(file2text("data/mode.txt")) == GAMEMODE_FACTION_CLASH_UPP_CM)
+	if(!ground_map.disable_ship_map && resolve_clash_start_mode() == GAMEMODE_FACTION_CLASH_UPP_CM)
 		Loadship(FailedZs, "ssv_rostock", "templates/", list("ssv_rostock.dmm") , list(),ZTRAITS_MAIN_SHIP , override_map_path = "maps/")
 
 	#ifndef RUNTIME_MAP

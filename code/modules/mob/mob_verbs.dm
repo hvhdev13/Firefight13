@@ -106,6 +106,18 @@
 	set name = "Respawn"
 	set category = "OOC"
 
+	respawn_to_lobby()
+
+/mob/proc/get_revivable_body()
+	var/mob/dead/observer/ghost = src
+	if(!istype(ghost) || !ghost.can_reenter_corpse || QDELETED(ghost.mind?.original))
+		return null
+	var/mob/living/carbon/human/body = ghost.mind.original
+	if(istype(body) && body.stat == DEAD && body.check_tod() && body.is_revivable())
+		return body
+	return null
+
+/mob/proc/respawn_to_lobby(confirmed = FALSE)
 	var/is_admin = 0
 	if(client.admin_holder && (client.admin_holder.rights & R_ADMIN))
 		is_admin = 1
@@ -136,19 +148,17 @@
 	var/mob/dead/observer/abandoning_ghost
 	if(MODE_HAS_FLAG(MODE_FACTION_CLASH) && !is_admin)
 		var/deathtime = world.time - src.timeofdeath
-		if(deathtime < RESPAWN_COOLDOWN)
-			to_chat(usr, SPAN_WARNING("You must wait at least [DisplayTimeText(RESPAWN_COOLDOWN)] before respawning."))
+		var/cooldown = clash_respawn_cooldown()
+		if(deathtime < cooldown)
+			to_chat(usr, SPAN_WARNING("You must wait at least [DisplayTimeText(cooldown)] before respawning."))
 			log_debug("HVH: respawn blocked for [key_name(usr)], dead [deathtime / 10]s")
 			return
-		var/mob/dead/observer/ghost = src
-		if(istype(ghost) && ghost.can_reenter_corpse && !QDELETED(ghost.mind?.original))
-			var/mob/living/carbon/human/body = ghost.mind.original
-			if(istype(body) && body.stat == DEAD && body.check_tod() && body.is_revivable())
-				if(alert(usr, "Your body can still be revived. Respawn anyway?", "Confirm Respawn", "Yes", "No") != "Yes")
-					return
-				abandoning_ghost = ghost
+		if(get_revivable_body())
+			if(!confirmed && alert(usr, "Your body can still be revived. Respawn anyway?", "Confirm Respawn", "Yes", "No") != "Yes")
+				return
+			abandoning_ghost = src
 
-	if(alert("Are you sure you want to respawn?",,"Yes","No") != "Yes")
+	if(!confirmed && alert("Are you sure you want to respawn?",,"Yes","No") != "Yes")
 		return
 
 	abandoning_ghost?.can_reenter_corpse = FALSE
@@ -168,10 +178,12 @@
 		log_game("[usr.key] AM failed due to disconnect.")
 		return
 
-	var/mob/old_body = mind?.original
-	var/datum/job/old_job = old_body ? GLOB.RoleAuthority.roles_for_mode[old_body.job] : null
+	var/old_job_title = mind?.clash_job || mind?.original?.job
+	var/datum/job/old_job = old_job_title ? GLOB.RoleAuthority.roles_for_mode[old_job_title] : null
 	if(old_job)
 		GLOB.RoleAuthority.free_role(old_job, TRUE)
+	if(mind)
+		mind.clash_job = null
 
 	var/mob/new_player/M = new /mob/new_player()
 	if(!client)

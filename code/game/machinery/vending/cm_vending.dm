@@ -569,6 +569,11 @@ GLOBAL_LIST_EMPTY(vending_products)
 				return TRUE
 			clash_delete_loadout(human_user, params["slot"])
 			return TRUE
+		if ("clash_auto")
+			if(!human_user)
+				return TRUE
+			clash_toggle_auto_loadout(human_user, params["slot"])
+			return TRUE
 		if ("vend")
 			if(stat & IN_USE)
 				return

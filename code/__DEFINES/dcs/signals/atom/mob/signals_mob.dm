@@ -154,6 +154,7 @@
 
 /// From /obj/item/proc/attack_self() : (obj/item/used)
 #define COMSIG_MOB_ITEM_ATTACK_SELF "mob_item_attack_self"
+#define COMSIG_MOB_MELEE_ATTACK "mob_melee_attack"
 
 /// From /obj/item/proc/dropped() : (obj/item/dropped)
 #define COMSIG_MOB_ITEM_DROPPED "mob_item_dropped"

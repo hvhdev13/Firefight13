@@ -106,7 +106,10 @@
 	. = ..()
 
 	. += ""
-	if(ishumansynth_strict(src)) // So that yautja or other species don't see the ships security alert
+	var/list/clash_lines = get_clash_status_lines(src)
+	if(clash_lines)
+		. += clash_lines
+	else if(ishumansynth_strict(src)) // So that yautja or other species don't see the ships security alert
 		. += "Security Level: [uppertext(get_security_level())]"
 
 	if(species?.has_species_tab_items)
@@ -114,10 +117,10 @@
 		for(var/tab_item in species_tab_items)
 			. += tab_item
 
-	if(faction == FACTION_MARINE & !isnull(SSticker) && !isnull(SSticker.mode) && !isnull(SSticker.mode.active_lz) && !isnull(SSticker.mode.active_lz.loc) && !isnull(SSticker.mode.active_lz.loc.loc))
+	if(!clash_lines && faction == FACTION_MARINE & !isnull(SSticker) && !isnull(SSticker.mode) && !isnull(SSticker.mode.active_lz) && !isnull(SSticker.mode.active_lz.loc) && !isnull(SSticker.mode.active_lz.loc.loc))
 		. += "Primary LZ: [SSticker.mode.active_lz.loc.loc.name]"
 
-	if(faction == FACTION_MARINE & !isnull(SSticker) && !isnull(SSticker.mode))
+	if(!clash_lines && faction == FACTION_MARINE & !isnull(SSticker) && !isnull(SSticker.mode))
 		. += "Operation Name: [GLOB.round_statistics.round_name]"
 
 	if(assigned_squad)

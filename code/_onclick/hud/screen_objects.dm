@@ -19,14 +19,16 @@
 
 //Faction Clash score display
 /atom/movable/screen/faction_score
+	name = "Scoreboard"
 	icon = null
 	icon_state = null
 	mouse_opacity = MOUSE_OPACITY_TRANSPARENT
-	screen_loc = "LEFT,TOP"
-	maptext_height = 80
-	maptext_width = 480
-	maptext_y = -54
+	screen_loc = "CENTER-3,TOP-2:20"
+	maptext_height = 40
+	maptext_width = 224
+	maptext_y = -42
 	maptext = ""
+	var/shown_panel
 
 //Faction Clash killfeed line
 /atom/movable/screen/faction_killfeed
@@ -35,8 +37,8 @@
 	mouse_opacity = MOUSE_OPACITY_TRANSPARENT
 	screen_loc = "RIGHT,TOP"
 	maptext_height = 16
-	maptext_width = 184
-	maptext_x = -158
+	maptext_width = 260
+	maptext_x = -234
 	maptext = ""
 
 /atom/movable/screen/cinematic

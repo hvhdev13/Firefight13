@@ -1,4 +1,3 @@
-/// Tiles a single path search may expand before settling for the closest point it reached
 #define CLASH_BOT_PATH_BUDGET 1200
 
 /proc/clash_heap_push(list/heap, score, turf/item)
@@ -52,7 +51,6 @@
 			return TRUE
 	return FALSE
 
-/// Returns the steps toward goal, or toward the closest reachable tile when the search runs out of budget
 /datum/clash_bot/proc/find_path(turf/goal)
 	var/turf/start = get_turf(body)
 	if(!start || !goal || start == goal)

@@ -85,6 +85,7 @@
 			return 1
 
 		if(INTENT_HARM)
+			SEND_SIGNAL(attacking_mob, COMSIG_MOB_MELEE_ATTACK, src, null)
 			// See if they can attack, and which attacks to use.
 			var/datum/unarmed_attack/attack = attacking_mob.species.unarmed
 			if(!attack.is_usable(attacking_mob))
@@ -116,6 +117,7 @@
 			apply_damage(final_damage, BRUTE, affecting, sharp=attack.sharp, edge = attack.edge)
 
 		if(INTENT_DISARM)
+			SEND_SIGNAL(attacking_mob, COMSIG_MOB_MELEE_ATTACK, src, null)
 			if(attacking_mob == src)
 				check_for_injuries(src)
 				return 1

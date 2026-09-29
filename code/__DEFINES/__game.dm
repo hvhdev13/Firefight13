@@ -56,6 +56,11 @@
 #define GAMEMODE_HIVE_WARS "Hive Wars"
 #define GAMEMODE_FACTION_CLASH "Faction Clash"
 #define GAMEMODE_FACTION_CLASH_UPP_CM "Faction Clash UPP CM"
+#define GAMEMODE_TDM "Team Deathmatch"
+#define GAMEMODE_KOTH "King of the Hill"
+#define GAMEMODE_DOMINATION "Domination"
+#define GAMEMODE_CTF "Capture the Flag"
+#define HVH_MODE_TAGS list(GAMEMODE_FACTION_CLASH_UPP_CM, GAMEMODE_TDM, GAMEMODE_KOTH, GAMEMODE_DOMINATION, GAMEMODE_CTF)
 #define GAMEMODE_HUNTER_GAMES "Hunter Games"
 #define GAMEMODE_INFECTION "Infection"
 #define GAMEMODE_EXTENDED "Extended"

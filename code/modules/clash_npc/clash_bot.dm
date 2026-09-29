@@ -1,37 +1,31 @@
-/// How often a bot looks around, shoots and steps
 #define CLASH_BOT_TICK 3
-/// Tiles a bot can see and engage within
 #define CLASH_BOT_SIGHT 9
-/// Accuracy a bot keeps compared to a player firing the same gun
 #define CLASH_BOT_ACCURACY 0.7
-/// Deciseconds a bot spends swapping a magazine
 #define CLASH_BOT_RELOAD_DELAY 25
-/// Tiles a bot searches when picking a place to fight from
 #define CLASH_BOT_COVER_RANGE 5
-/// Deciseconds between cover searches while in a fight
 #define CLASH_BOT_COVER_RESCAN 30
-/// Deciseconds between path searches for one bot
 #define CLASH_BOT_REPATH_DELAY 20
-/// Path searches allowed across every bot in one tick
 #define CLASH_BOT_PATHS_PER_TICK 2
-/// Deciseconds a bot remembers where an enemy was or who shot at it
 #define CLASH_BOT_MEMORY 60
-/// Health fraction below which a bot fights from further back
 #define CLASH_BOT_WOUNDED 0.45
-/// Failed steps before a bot gives up on its current route
 #define CLASH_BOT_STUCK_LIMIT 3
-/// Deciseconds between sweeps for a new target
 #define CLASH_BOT_SEARCH_DELAY 6
-/// Deciseconds between attempts to patch itself up
 #define CLASH_BOT_HEAL_DELAY 100
-/// Tiles a bot will go to fetch a magazine from the ground or a body
 #define CLASH_BOT_SCAVENGE_RANGE 8
+#define CLASH_BOT_CLOSE_RANGE 4
 
 GLOBAL_LIST_EMPTY(clash_bots)
 GLOBAL_LIST_EMPTY(clash_bot_cover_claims)
 GLOBAL_VAR(clash_bot_timer)
 GLOBAL_VAR_INIT(clash_bot_paths_this_tick, 0)
 GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
+
+/proc/set_clash_bots_enabled(enabled)
+	GLOB.clash_bots_enabled = enabled
+	if(enabled)
+		return
+	for(var/datum/clash_bot/bot as anything in GLOB.clash_bots)
+		bot.stop_volley()
 
 /proc/think_clash_bots()
 	GLOB.clash_bot_paths_this_tick = 0
@@ -203,11 +197,14 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 		threat = null
 	if(!can_engage(target))
 		target = null
-	if(threat && threat != target && world.time - threat_at < CLASH_BOT_MEMORY && can_engage(threat))
-		target = threat
-	if(!target && world.time >= next_search)
+	if(world.time >= next_search)
 		next_search = world.time + CLASH_BOT_SEARCH_DELAY + rand(0, 3)
-		target = find_target()
+		var/mob/living/carbon/human/closest = find_target()
+		if(closest && (!target || (get_dist(body, closest) <= CLASH_BOT_CLOSE_RANGE && get_dist(body, closest) < get_dist(body, target))))
+			target = closest
+	var/close_target = target && get_dist(body, target) <= CLASH_BOT_CLOSE_RANGE
+	if(threat && threat != target && !close_target && world.time - threat_at < CLASH_BOT_MEMORY && can_engage(threat))
+		target = threat
 	if(!target)
 		return
 	contact_turf = get_turf(target)
@@ -269,7 +266,6 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 		return
 	start_volley(target, rand(4, 8))
 
-/// Keeps a recently seen enemy's head down by firing a short string at where they were last seen
 /datum/clash_bot/proc/suppress()
 	if(firing || world.time < next_fire || !has_ammo())
 		return
@@ -292,7 +288,10 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 	if(!firing)
 		return
 	firing = FALSE
-	gun?.stop_fire()
+	if(gun && body?.get_active_hand() == gun)
+		gun.stop_fire()
+	else
+		gun?.reset_fire()
 	next_fire = world.time + rand(5, 10)
 
 /datum/clash_bot/proc/reload()
@@ -394,15 +393,45 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 		INVOKE_ASYNC(src, PROC_REF(reload))
 
 /datum/clash_bot/proc/rearm()
-	if(!post?.bot_magazine)
+	if(!post)
 		return
-	for(var/count in 1 to post.bot_magazines)
-		var/obj/item/ammo_magazine/spare = new post.bot_magazine(body)
-		body.equip_to_appropriate_slot(spare)
-		track_clash_bot_gear(spare)
+	if(!reachable(primary) && post.bot_gun)
+		primary = new post.bot_gun(get_turf(body))
+		track_clash_bot_gear(primary)
+		set_firemode()
+	top_up(post.bot_magazine, post.bot_magazines)
+	if(post.bot_sidearm)
+		if(!reachable(sidearm))
+			sidearm = supply(post.bot_sidearm)
+		top_up(post.bot_sidearm_magazine, post.bot_sidearm_magazines)
+	if(post.bot_grenade && !reachable(grenade))
+		grenade = supply(post.bot_grenade)
 	dry = FALSE
-	if(primary && gun == primary)
+	ready_gun(primary)
+	if(primary && gun == primary && !loaded(primary))
 		INVOKE_ASYNC(src, PROC_REF(reload))
+
+/datum/clash_bot/proc/supply(item_type)
+	var/obj/item/thing = new item_type(body)
+	if(!body.equip_to_appropriate_slot(thing))
+		qdel(thing)
+		return null
+	homes[thing] = thing.loc
+	track_clash_bot_gear(thing)
+	return thing
+
+/datum/clash_bot/proc/top_up(magazine_type, wanted)
+	if(!magazine_type)
+		return
+	for(var/obj/item/ammo_magazine/spare in body.get_contents())
+		if(spare.type == magazine_type && spare.current_rounds > 0 && !istype(spare.loc, /obj/item/weapon/gun))
+			wanted--
+	for(var/count in 1 to wanted)
+		var/obj/item/ammo_magazine/spare = new magazine_type(body)
+		if(!body.equip_to_appropriate_slot(spare))
+			qdel(spare)
+			return
+		track_clash_bot_gear(spare)
 
 /datum/clash_bot/proc/find_magazine(obj/item/weapon/gun/weapon)
 	for(var/obj/item/ammo_magazine/spare in body.get_contents())
@@ -416,6 +445,34 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 	release_cover()
 	GLOB.clash_bot_cover_claims[spot] = src
 	claimed = spot
+
+/datum/clash_bot/proc/retire()
+	var/mob/living/carbon/human/old_body = body
+	var/obj/effect/landmark/clash_npc/old_post = post
+	if(old_post?.bot == src)
+		old_post.bot = null
+	qdel(src)
+	if(!QDELETED(old_body))
+		qdel(old_body)
+	if(old_post?.temporary)
+		qdel(old_post)
+
+/datum/clash_bot/proc/get_state()
+	if(!GLOB.clash_bots_enabled)
+		return "Paused"
+	if(stranded_since)
+		return "Bleeding out"
+	if(charging)
+		return "Charging"
+	if(target)
+		return "Fighting"
+	if(hands == 2 && (dry || !primary))
+		return "Restocking"
+	if(contact_recent())
+		return "Alert"
+	if(destination)
+		return "Moving"
+	return "Holding"
 
 /datum/clash_bot/proc/release_cover()
 	if(claimed && GLOB.clash_bot_cover_claims[claimed] == src)
@@ -463,7 +520,6 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 			best = max(best, thing.projectile_coverage * 0.7)
 	return best / 5
 
-/// Higher is better. Rewards cover facing every known enemy and a firing line to the main one, or staying out of sight while hurt or reloading
 /datum/clash_bot/proc/score_spot(turf/spot, list/enemies, hiding)
 	var/score = 0
 	var/turf/primary = enemies[1]
@@ -522,7 +578,7 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 		if(!destination || get_dist(destination, aim) > 2)
 			set_destination(aim)
 		return
-	if(dry && hands == 2)
+	if(hands == 2 && (dry || !primary))
 		resupply()
 		return
 	if(target || contact_recent())
@@ -620,3 +676,4 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 #undef CLASH_BOT_SEARCH_DELAY
 #undef CLASH_BOT_HEAL_DELAY
 #undef CLASH_BOT_SCAVENGE_RANGE
+#undef CLASH_BOT_CLOSE_RANGE

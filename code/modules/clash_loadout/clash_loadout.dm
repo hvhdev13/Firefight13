@@ -1,6 +1,11 @@
-/// Saved Faction Clash loadouts, ckey to list of slot name to /datum/clash_loadout
 GLOBAL_LIST_EMPTY(clash_loadouts)
-/// How many slots a player may keep per job
+GLOBAL_LIST_EMPTY(clash_auto_loadouts)
+GLOBAL_LIST_INIT(clash_loadout_skipped, list(
+	/obj/item/card/id,
+	/obj/item/dogtag,
+	/obj/item/device/radio/headset,
+	/obj/item/device/encryptionkey,
+))
 #define CLASH_LOADOUT_SLOTS 3
 
 /datum/clash_loadout
@@ -19,8 +24,29 @@ GLOBAL_LIST_EMPTY(clash_loadouts)
 		return null
 	if(!GLOB.clash_loadouts[key])
 		GLOB.clash_loadouts[key] = list()
+		GLOB.clash_auto_loadouts[key] = list()
 		load_clash_loadouts(key)
 	return GLOB.clash_loadouts[key]
+
+/proc/get_clash_auto_slot(key, job)
+	if(!get_clash_loadouts(key))
+		return null
+	var/list/auto = GLOB.clash_auto_loadouts[key]
+	return auto[job]
+
+/proc/clash_equip_spawn_loadout(mob/living/carbon/human/spawned)
+	if(QDELETED(spawned) || spawned.stat == DEAD || !SSticker.mode || !MODE_HAS_FLAG(MODE_FACTION_CLASH) || clash_uses_kits())
+		return
+	var/key = clash_loadout_key(spawned)
+	var/slot_name = get_clash_auto_slot(key, spawned.job)
+	if(!slot_name)
+		return
+	var/list/slots = get_clash_loadouts_for_job(key, spawned.job)
+	var/datum/clash_loadout/loadout = slots[slot_name]
+	if(!loadout)
+		return
+	to_chat(spawned, SPAN_NOTICE("Equipping your saved loadout [slot_name]."))
+	loadout.restore(spawned)
 
 /proc/get_clash_loadouts_for_job(key, job)
 	var/list/all_slots = get_clash_loadouts(key)
@@ -41,12 +67,13 @@ GLOBAL_LIST_EMPTY(clash_loadouts)
 		record(thing, null, user.get_slot_by_item(thing))
 
 /datum/clash_loadout/proc/record(obj/item/thing, parent, slot)
+	if(is_type_in_list(thing, GLOB.clash_loadout_skipped))
+		return
 	items += list(list("type" = thing.type, "name" = thing.name, "inner" = !isnull(parent), "parent" = parent, "slot" = slot))
 	var/index = length(items)
 	for(var/obj/item/inner in thing.contents)
 		record(inner, index)
 
-/// Uniform first, then armor, then the rest of the worn gear, then what goes inside it
 /proc/clash_equip_order(list/entry)
 	if(entry["inner"])
 		return 4
@@ -65,7 +92,6 @@ GLOBAL_LIST_EMPTY(clash_loadouts)
 				sorted += index
 	return sorted
 
-/// Every vendor this user is allowed to buy from
 /proc/get_clash_vendors(mob/living/carbon/human/user)
 	var/list/vendors = list()
 	for(var/obj/structure/machinery/cm_vending/vendor in GLOB.machines)
@@ -78,7 +104,6 @@ GLOBAL_LIST_EMPTY(clash_loadouts)
 		vendors += vendor
 	return vendors
 
-/// Finds a vendor holding this type with stock left, returns list(vendor, itemspec)
 /proc/find_clash_product(list/vendors, mob/living/carbon/human/user, item_type)
 	for(var/obj/structure/machinery/cm_vending/vendor as anything in vendors)
 		for(var/list/itemspec in vendor.get_available_products(user))
@@ -96,6 +121,8 @@ GLOBAL_LIST_EMPTY(clash_loadouts)
 	var/list/needed = list()
 	for(var/list/entry in items)
 		var/item_type = entry["type"]
+		if(is_path_in_list(item_type, GLOB.clash_loadout_skipped))
+			continue
 		needed[item_type] = (needed[item_type] || 0) + 1
 		if(clash_count_type(user, item_type) >= needed[item_type])
 			continue
@@ -129,7 +156,6 @@ GLOBAL_LIST_EMPTY(clash_loadouts)
 			return thing
 	return null
 
-/// Mirrors the checks of the vendor's own vend action, returns the item of item_type that was handed out
 /proc/clash_vend(obj/structure/machinery/cm_vending/vendor, list/itemspec, mob/living/carbon/human/user, item_type)
 	if(vendor.stat & IN_USE)
 		return null
@@ -160,10 +186,7 @@ GLOBAL_LIST_EMPTY(clash_loadouts)
 	if(istype(parent, /obj/item/weapon/gun))
 		var/obj/item/weapon/gun/weapon = parent
 		if(istype(thing, /obj/item/attachable))
-			var/obj/item/attachable/attachment = thing
-			if(weapon.can_attach_to_gun(user, attachment))
-				attachment.Attach(weapon)
-				weapon.update_attachable(attachment.slot)
+			if(clash_fit_attachment(weapon, thing, user, FALSE))
 				return
 		else if(istype(thing, /obj/item/ammo_magazine))
 			var/obj/item/ammo_magazine/magazine = thing
@@ -205,6 +228,8 @@ GLOBAL_LIST_EMPTY(clash_loadouts)
 	for(var/index in get_sorted_indexes())
 		var/list/entry = items[index]
 		var/item_type = entry["type"]
+		if(is_path_in_list(item_type, GLOB.clash_loadout_skipped))
+			continue
 		var/atom/parent = entry["parent"] ? placed["[entry["parent"]]"] : null
 		var/obj/item/existing = clash_find_unclaimed(parent ? parent.contents : user.contents, item_type, claimed) || clash_find_unclaimed(user.get_contents(), item_type, claimed)
 		if(existing)
@@ -226,14 +251,15 @@ GLOBAL_LIST_EMPTY(clash_loadouts)
 /obj/structure/machinery/cm_vending/proc/add_clash_vendor_data(mob/user, list/data)
 	data["clash_loadouts"] = list()
 	data["clash_enabled"] = FALSE
-	if(!SSticker.mode || !MODE_HAS_FLAG(MODE_FACTION_CLASH) || !ishuman(user))
+	if(!SSticker.mode || !MODE_HAS_FLAG(MODE_FACTION_CLASH) || clash_uses_kits() || !ishuman(user))
 		return
 	var/mob/living/carbon/human/human_user = user
 	data["clash_enabled"] = TRUE
 	var/list/slots = get_clash_loadouts_for_job(clash_loadout_key(human_user), human_user.job)
+	var/auto_slot = get_clash_auto_slot(clash_loadout_key(human_user), human_user.job)
 	for(var/slot_name in slots)
 		var/datum/clash_loadout/loadout = slots[slot_name]
-		data["clash_loadouts"] += list(list("name" = slot_name, "count" = length(loadout.items), "role" = loadout.job, "faction" = (loadout.job in UPP_JOB_LIST) ? "UPP" : "USCM"))
+		data["clash_loadouts"] += list(list("name" = slot_name, "count" = length(loadout.items), "role" = loadout.job, "faction" = (loadout.job in UPP_JOB_LIST) ? "UPP" : "USCM", "auto" = auto_slot == slot_name))
 
 /obj/structure/machinery/cm_vending/proc/clash_save_loadout(mob/living/carbon/human/user, overwrite_slot)
 	var/key = clash_loadout_key(user)
@@ -271,12 +297,29 @@ GLOBAL_LIST_EMPTY(clash_loadouts)
 	if(!loadout || loadout.job != user.job)
 		return
 	all_slots -= slot_name
+	var/list/auto = GLOB.clash_auto_loadouts[clash_loadout_key(user)]
+	if(auto?[user.job] == slot_name)
+		auto -= user.job
 	qdel(loadout)
 	save_clash_loadouts(clash_loadout_key(user))
 	to_chat(user, SPAN_NOTICE("Loadout [slot_name] deleted."))
 
+/obj/structure/machinery/cm_vending/proc/clash_toggle_auto_loadout(mob/living/carbon/human/user, slot_name)
+	var/key = clash_loadout_key(user)
+	var/list/slots = get_clash_loadouts_for_job(key, user.job)
+	if(!slots[slot_name])
+		return
+	var/list/auto = GLOB.clash_auto_loadouts[key]
+	if(auto[user.job] == slot_name)
+		auto -= user.job
+		to_chat(user, SPAN_NOTICE("[slot_name] will no longer be equipped when you spawn."))
+	else
+		auto[user.job] = slot_name
+		to_chat(user, SPAN_NOTICE("[slot_name] will be equipped whenever you spawn as [user.job]."))
+	save_clash_loadouts(key)
+
 /proc/clash_loadout_path(key)
-	return "data/player_saves/[copytext(key, 1, 2)]/[key]/clash_loadouts.sav"
+	return clash_player_save_path(key, "clash_loadouts.sav")
 
 /proc/save_clash_loadouts(key)
 	if(!key || IsGuestKey(key))
@@ -289,6 +332,7 @@ GLOBAL_LIST_EMPTY(clash_loadouts)
 	var/savefile/save = new(clash_loadout_path(key))
 	save.cd = "/"
 	save["loadouts"] << payload
+	save["auto"] << GLOB.clash_auto_loadouts[key]
 
 /proc/load_clash_loadouts(key)
 	if(!key || IsGuestKey(key))
@@ -298,6 +342,10 @@ GLOBAL_LIST_EMPTY(clash_loadouts)
 		return
 	var/savefile/save = new(path)
 	save.cd = "/"
+	var/list/stored_auto
+	save["auto"] >> stored_auto
+	if(islist(stored_auto))
+		GLOB.clash_auto_loadouts[key] = stored_auto
 	var/list/payload
 	save["loadouts"] >> payload
 	if(!islist(payload))

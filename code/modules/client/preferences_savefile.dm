@@ -1,5 +1,5 @@
 #define SAVEFILE_VERSION_MIN 8
-#define SAVEFILE_VERSION_MAX 37
+#define SAVEFILE_VERSION_MAX 38
 
 //handles converting savefiles to new formats
 //MAKE SURE YOU KEEP THIS UP TO DATE!
@@ -235,7 +235,7 @@
 		pref_toggles |= TOGGLE_WIELD_ASSIST // enabled by default for new saves
 		S["toggle_prefs"] << pref_toggles
 
-	if(savefile_version < 35) // we have removed Tab from the default binds, allow users to bind it back if they want. needs to be async after logging in
+	if(savefile_version < 35) // we have removed Tab from the default binds
 		updated_from = savefile_version
 
 	if(savefile_version < 36)
@@ -249,6 +249,16 @@
 		S["toggles_sound"] >> toggles_insert
 		toggles_insert |= (SOUND_ROUND_END)
 		S["toggles_sound"] << toggles_insert
+
+	if(savefile_version < 38) // Tab opens the scoreboard now, so it no longer switches to the command bar
+		var/list/old_bindings
+		S["key_bindings"] >> old_bindings
+		if(islist(old_bindings) && islist(old_bindings["Tab"]))
+			var/list/tab_binds = old_bindings["Tab"]
+			tab_binds -= /datum/keybinding/client/switch_input::name
+			if(!length(tab_binds))
+				old_bindings -= "Tab"
+			S["key_bindings"] << old_bindings
 
 	if(updated_from)
 		RegisterSignal(owner, COMSIG_CLIENT_LOGGED_IN, PROC_REF(handle_logged_in))
@@ -267,13 +277,6 @@
 
 	if(savefile_version == /datum/preferences::savefile_version)
 		return
-
-	if(savefile_version < 34)
-		var/question = tgui_alert(owner, "Tab is no longer bound to switching between the map and the command bar. Restore this bind?", "Default Bind Changed", list("No", "Yes"))
-		if(question == "Yes")
-			LAZYADD(key_bindings["Tab"], /datum/keybinding/client/switch_input::name)
-			owner?.update_special_keybinds()
-			save_preferences()
 
 /datum/preferences/proc/load_path(ckey,filename="preferences.sav")
 	if(!ckey)
@@ -466,12 +469,14 @@
 				// Classic
 				if(LAZYLEN(instance.classic_keys))
 					for(var/bound_key in instance.classic_keys)
-						LAZYADD(key_bindings[bound_key], list(instance.name))
+						if(!(instance.name in key_bindings[bound_key]))
+							LAZYADD(key_bindings[bound_key], list(instance.name))
 
 				// Hotkey
 				if(LAZYLEN(instance.hotkey_keys))
 					for(var/bound_key in instance.hotkey_keys)
-						LAZYADD(key_bindings[bound_key], list(instance.name))
+						if(!(instance.name in key_bindings[bound_key]))
+							LAZYADD(key_bindings[bound_key], list(instance.name))
 
 	S["remembered_key_bindings"] << GLOB.keybindings_by_name
 

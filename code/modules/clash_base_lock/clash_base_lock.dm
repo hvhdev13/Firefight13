@@ -6,10 +6,29 @@
 
 /area/clash_arena/var/clash_faction
 
+/proc/clash_is_held(atom/movable/mover, faction, atom/newloc)
+	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
+	if(!faction || !istype(clash_mode) || !clash_mode.bases_sealed || !isliving(mover))
+		return FALSE
+	var/mob/living/held = mover
+	if(held.faction != faction)
+		return FALSE
+	var/area/clash_arena/destination = get_area(newloc)
+	return !istype(destination) || destination.clash_faction != faction
+
 /area/clash_arena/Enter(atom/movable/mover, atom/oldloc)
 	if(clash_is_intruder(mover, clash_faction))
 		if(isliving(mover))
 			mover.balloon_alert(mover, "enemy base")
+		return FALSE
+	if(clash_faction && clash_carries_enemy_flag(mover))
+		mover.balloon_alert(mover, "take the flag to your stand")
+		return FALSE
+	return ..()
+
+/area/clash_arena/Exit(atom/movable/mover, atom/newloc)
+	if(clash_is_held(mover, clash_faction, newloc))
+		mover.balloon_alert(mover, "match not started")
 		return FALSE
 	return ..()
 

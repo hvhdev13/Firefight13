@@ -1,21 +1,19 @@
-/// Most bots one faction may have alive at once
-#define CLASH_BOT_TEAM_CAP 10
-/// Team fill tops each side up to this many fighters, counting players and bots
-#define CLASH_BOT_TEAM_SIZE 10
-/// Deciseconds between team fill checks
 #define CLASH_BOT_FILL_INTERVAL (10 SECONDS)
-/// Deciseconds a dead bot's body stays before it is cleared away
 #define CLASH_BOT_CORPSE_TIME (90 SECONDS)
-/// Deciseconds gear a bot dropped lies on the ground before it is cleared away
 #define CLASH_BOT_LITTER_TIME (30 SECONDS)
-/// Deciseconds between checks for dropped bot gear
 #define CLASH_BOT_LITTER_SWEEP (5 SECONDS)
+#define CLASH_BOT_BLIP_DELAY 5
+#define CLASH_BOT_BLIP_COLOR list(0.19, 0.29, 0.42, 0.37, 0.58, 0.83, 0.07, 0.11, 0.15, 0.05, 0.1, 0.25)
 
 GLOBAL_LIST_EMPTY(clash_npc_spawners)
 GLOBAL_LIST_EMPTY(clash_bot_rallies)
 GLOBAL_VAR(clash_bot_fill_timer)
 GLOBAL_LIST_EMPTY(clash_bot_gear)
 GLOBAL_VAR(clash_bot_litter_timer)
+GLOBAL_LIST_INIT(clash_bot_caps, list(FACTION_MARINE = 10, FACTION_UPP = 10, FACTION_CLF = 10))
+GLOBAL_LIST_INIT(clash_bot_fill_targets, list(FACTION_MARINE = 10, FACTION_UPP = 10, FACTION_CLF = 0))
+GLOBAL_LIST_EMPTY(clash_bot_sides_off)
+GLOBAL_VAR(clash_bot_respawn_delay)
 
 /obj/effect/landmark/clash_bot_rally
 	name = "Clash bot rally point"
@@ -54,15 +52,13 @@ GLOBAL_VAR(clash_bot_litter_timer)
 	var/bot_sidearm_magazines = 2
 	var/bot_grenade = /obj/item/explosive/grenade/high_explosive
 	var/bot_medical = /obj/item/storage/pouch/firstaid/full
-	/// Deciseconds before a replacement is sent out, 0 to never respawn
 	var/respawn_delay = 30 SECONDS
-	/// Tiles the bot will stray from its hold point to take cover
 	var/hold_radius = 6
-	/// Bots from this spawner walk out and hold at a rally point with this id instead of the spawner
 	var/rally_id
-	/// Only sends a bot while this side is short of players
 	var/team_fill = FALSE
 	var/active = TRUE
+	var/temporary = FALSE
+	var/spawning = FALSE
 	var/datum/clash_bot/bot
 
 /obj/effect/landmark/clash_npc/Initialize(mapload, ...)
@@ -85,6 +81,21 @@ GLOBAL_VAR(clash_bot_litter_timer)
 		INVOKE_ASYNC(src, PROC_REF(spawn_npc))
 
 /obj/effect/landmark/clash_npc/proc/get_hold_turf()
+	if(!rally_id && length(GLOB.clash_objective_turfs))
+		var/turf/best_objective
+		var/fewest
+		for(var/turf/objective as anything in GLOB.clash_objective_turfs)
+			if(objective.z != z)
+				continue
+			var/held = rand(0, 1)
+			for(var/datum/clash_bot/other as anything in GLOB.clash_bots)
+				if(other.anchor == objective)
+					held += 2
+			if(isnull(fewest) || held < fewest)
+				best_objective = objective
+				fewest = held
+		if(best_objective)
+			return best_objective
 	var/turf/best = get_turf(src)
 	var/best_count
 	for(var/obj/effect/landmark/clash_bot_rally/rally as anything in GLOB.clash_bot_rallies)
@@ -101,17 +112,22 @@ GLOBAL_VAR(clash_bot_litter_timer)
 	return best
 
 /obj/effect/landmark/clash_npc/proc/spawn_npc()
-	if(bot || !active)
+	if(bot || spawning || !active)
 		return
-	if(!GLOB.clash_bots_enabled || clash_bot_count(faction) >= CLASH_BOT_TEAM_CAP)
-		addtimer(CALLBACK(src, PROC_REF(spawn_npc)), respawn_delay || 30 SECONDS)
+	if(!GLOB.clash_bots_enabled || (faction in GLOB.clash_bot_sides_off) || clash_bot_count(faction) >= GLOB.clash_bot_caps[faction])
+		if(temporary)
+			qdel(src)
+			return
+		addtimer(CALLBACK(src, PROC_REF(spawn_npc)), respawn_delay || 30 SECONDS, TIMER_UNIQUE)
 		return
+	spawning = TRUE
 	var/mob/living/carbon/human/npc = new(get_turf(src))
 	arm_equipment(npc, equipment_preset, TRUE, FALSE)
 	npc.statistic_exempt = TRUE
 	if(clash_fed_spawns())
 		npc.nutrition = NUTRITION_NORMAL
 	npc.AddElement(/datum/element/clash_hit_flinch)
+	npc.AddElement(/datum/element/clash_combat_log)
 	npc.setDir(dir)
 	npc.real_name = "[npc.real_name] \[BOT\]"
 	npc.name = npc.real_name
@@ -132,13 +148,35 @@ GLOBAL_VAR(clash_bot_litter_timer)
 	for(var/obj/item/gear in npc.get_contents())
 		track_clash_bot_gear(gear)
 	bot = new(npc, src)
+	spawning = FALSE
+	RegisterSignal(npc, list(COMSIG_MOB_DEATH, COMSIG_MOB_STAT_SET_ALIVE, COMSIG_HUMAN_SET_UNDEFIBBABLE, COMSIG_HUMAN_SQUAD_CHANGED), PROC_REF(queue_blip_tint))
+	queue_blip_tint(npc)
+
+/obj/effect/landmark/clash_npc/proc/queue_blip_tint(mob/living/carbon/human/body)
+	SIGNAL_HANDLER
+	addtimer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(tint_clash_bot_blip), WEAKREF(body)), CLASH_BOT_BLIP_DELAY)
+
+/proc/tint_clash_bot_blip(datum/weakref/body_ref)
+	var/mob/living/carbon/human/body = body_ref?.resolve()
+	var/image/blip = body && SSminimaps.images_by_source[body]
+	if(blip)
+		blip.color = CLASH_BOT_BLIP_COLOR
 
 /obj/effect/landmark/clash_npc/proc/bot_died(mob/living/carbon/human/body)
 	bot = null
 	if(body)
 		addtimer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(clear_clash_bot_corpse), WEAKREF(body)), CLASH_BOT_CORPSE_TIME)
-	if(respawn_delay && active)
-		addtimer(CALLBACK(src, PROC_REF(spawn_npc)), respawn_delay)
+	if(temporary)
+		qdel(src)
+		return
+	var/delay = isnull(GLOB.clash_bot_respawn_delay) ? respawn_delay : GLOB.clash_bot_respawn_delay
+	if(delay && active)
+		addtimer(CALLBACK(src, PROC_REF(spawn_npc)), delay)
+
+/proc/clash_bot_refill()
+	for(var/obj/effect/landmark/clash_npc/spawner as anything in GLOB.clash_npc_spawners)
+		if(spawner.active && !spawner.bot)
+			INVOKE_ASYNC(spawner, TYPE_PROC_REF(/obj/effect/landmark/clash_npc, spawn_npc))
 
 /proc/clear_clash_bot_corpse(datum/weakref/body_ref)
 	var/mob/living/carbon/human/body = body_ref?.resolve()
@@ -150,7 +188,6 @@ GLOBAL_VAR(clash_bot_litter_timer)
 	if(!GLOB.clash_bot_litter_timer)
 		GLOB.clash_bot_litter_timer = addtimer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(sweep_clash_bot_litter)), CLASH_BOT_LITTER_SWEEP, TIMER_LOOP|TIMER_STOPPABLE)
 
-/// Clears bot gear that has lain loose on the ground too long, and stops tracking gear a player has taken
 /proc/sweep_clash_bot_litter()
 	for(var/datum/weakref/gear_ref as anything in GLOB.clash_bot_gear.Copy())
 		var/obj/item/gear = gear_ref.resolve()
@@ -191,11 +228,10 @@ GLOBAL_VAR(clash_bot_litter_timer)
 		if(ishuman(fighter) && fighter.faction == faction)
 			.++
 
-/// Sends fill bots to whichever side has fewer players, and stops replacing them as players arrive
 /proc/clash_bot_fill()
 	var/list/wanted = list()
-	wanted[FACTION_MARINE] = CLASH_BOT_TEAM_SIZE - clash_player_count(FACTION_MARINE)
-	wanted[FACTION_UPP] = CLASH_BOT_TEAM_SIZE - clash_player_count(FACTION_UPP)
+	for(var/faction in GLOB.clash_bot_fill_targets)
+		wanted[faction] = GLOB.clash_bot_fill_targets[faction] - clash_player_count(faction)
 	for(var/obj/effect/landmark/clash_npc/spawner as anything in GLOB.clash_npc_spawners)
 		if(!spawner.team_fill)
 			continue
@@ -242,9 +278,9 @@ GLOBAL_VAR(clash_bot_litter_timer)
 	bot_gun = /obj/item/weapon/gun/rifle/ak4047
 	bot_magazine = /obj/item/ammo_magazine/rifle/ak4047
 
-#undef CLASH_BOT_TEAM_CAP
-#undef CLASH_BOT_TEAM_SIZE
 #undef CLASH_BOT_FILL_INTERVAL
 #undef CLASH_BOT_CORPSE_TIME
 #undef CLASH_BOT_LITTER_TIME
 #undef CLASH_BOT_LITTER_SWEEP
+#undef CLASH_BOT_BLIP_DELAY
+#undef CLASH_BOT_BLIP_COLOR

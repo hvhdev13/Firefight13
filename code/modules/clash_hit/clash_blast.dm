@@ -1,5 +1,5 @@
 /proc/clash_blast_delimb(mob/living/carbon/human/victim, obj/limb/focused, damage, mob/attack_source)
-	if(victim.stat == DEAD || (victim.chem_effect_flags & CHEM_EFFECT_RESIST_FRACTURE) || attack_source?.faction == victim.faction)
+	if(victim.stat == DEAD || (victim.status_flags & GODMODE) || (victim.chem_effect_flags & CHEM_EFFECT_RESIST_FRACTURE) || attack_source?.faction == victim.faction)
 		return
 	if(!prob(damage * 3))
 		return

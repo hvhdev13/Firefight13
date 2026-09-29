@@ -62,6 +62,7 @@ interface ClashLoadout {
   count: number;
   role: string;
   faction: string;
+  auto?: boolean;
 }
 
 const CLASH_SLOT_COUNT = 3;
@@ -104,6 +105,18 @@ const ClashLoadoutSlots = () => {
                   >
                     Equip
                   </Button>
+                </Flex.Item>
+                <Flex.Item ml={0.5}>
+                  <Button
+                    icon="rotate"
+                    selected={loadout.auto}
+                    tooltip={
+                      loadout.auto
+                        ? 'Equipped when you spawn. Click to stop.'
+                        : 'Equip this whenever you spawn as this role'
+                    }
+                    onClick={() => act('clash_auto', { slot: loadout.name })}
+                  />
                 </Flex.Item>
                 <Flex.Item ml={0.5}>
                   <Button.Confirm
