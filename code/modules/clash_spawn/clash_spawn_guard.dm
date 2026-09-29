@@ -43,7 +43,4 @@
 	expire()
 
 /datum/component/clash_spawn_guard/proc/expire()
-	var/mob/living/guarded = parent
-	if(guarded.stat != DEAD)
-		guarded.balloon_alert(guarded, "spawn protection over")
 	qdel(src)

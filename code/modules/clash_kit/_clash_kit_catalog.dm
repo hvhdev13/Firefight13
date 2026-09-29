@@ -12,9 +12,10 @@
 #define KIT_SLOT_MUZZLE "muzzle"
 #define KIT_SLOT_UNDER "under"
 #define KIT_SLOT_STOCK "stock"
+#define KIT_SLOT_WEBBING "webbing"
 GLOBAL_LIST_INIT(clash_kit_worn_slots, list(KIT_SLOT_HELMET, KIT_SLOT_ARMOR, KIT_SLOT_MASK, KIT_SLOT_BACK, KIT_SLOT_BELT, KIT_SLOT_POUCH_L, KIT_SLOT_POUCH_R))
 GLOBAL_LIST_INIT(clash_kit_attachment_slots, list(KIT_SLOT_RAIL, KIT_SLOT_MUZZLE, KIT_SLOT_UNDER, KIT_SLOT_STOCK))
-#define CLASH_KIT_COUNT 5
+#define CLASH_KIT_COUNT 7
 #define CLASH_KIT_SPAWN "spawn"
 #define CLASH_KIT_RESET "reset"
 #define CLASH_KIT_EQUIP "equip"
@@ -37,6 +38,7 @@ GLOBAL_LIST_INIT(clash_kit_slots, list(
 	KIT_SLOT_MUZZLE = list("name" = "Muzzle", "image" = null, "wear" = null),
 	KIT_SLOT_UNDER = list("name" = "Underbarrel", "image" = null, "wear" = null),
 	KIT_SLOT_STOCK = list("name" = "Stock", "image" = null, "wear" = null),
+	KIT_SLOT_WEBBING = list("name" = "Accessory", "image" = "inventory-uniform.png", "wear" = null),
 ))
 
 GLOBAL_LIST_EMPTY(clash_kit_options)
@@ -75,7 +77,7 @@ GLOBAL_LIST_EMPTY(clash_kit_role_presets)
 /proc/get_clash_kit_role_presets(job)
 	if(GLOB.clash_kit_role_presets[job])
 		return GLOB.clash_kit_role_presets[job]
-	var/list/classes = list(list("Standard issue", list()))
+	var/list/classes = list(list("Default", list()))
 	GLOB.clash_kit_role_presets[job] = classes
 	if(job in GLOB.clash_kit_heavy_roles)
 		return classes
@@ -147,7 +149,10 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 /proc/read_clash_kit_stats(datum/clash_kit_option/option)
 	. = list()
 	var/obj/item/sample = new option.item_type
-	if(istype(sample, /obj/item/clothing))
+	if(istype(sample, /obj/item/clothing/accessory/storage))
+		var/obj/item/clothing/accessory/storage/webbing = sample
+		. += isnull(webbing.hold.storage_slots) ? list(list("Space", webbing.hold.max_storage_space)) : list(list("Slots", webbing.hold.storage_slots))
+	else if(istype(sample, /obj/item/clothing))
 		var/obj/item/clothing/worn = sample
 		if(worn.armor_bullet || worn.armor_melee || worn.armor_bomb)
 			. += list(list("Bullet", worn.armor_bullet), list("Melee", worn.armor_melee), list("Blast", worn.armor_bomb))
@@ -196,7 +201,25 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 	build_clash_kit_shared(FACTION_UPP)
 	build_clash_kit_uscm()
 	build_clash_kit_upp()
+	add_clash_kit_gun_attachments(FACTION_MARINE)
+	add_clash_kit_gun_attachments(FACTION_UPP)
 	build_clash_kit_presets()
+
+/proc/add_clash_kit_gun_attachments(faction)
+	var/list/fits_by_type = list()
+	for(var/datum/clash_kit_option/gun as anything in GLOB.clash_kit_menu[faction][KIT_SLOT_PRIMARY])
+		for(var/attachment_type in get_clash_gun_attachables(gun.item_type))
+			if(ispath(attachment_type, /obj/item/attachable/bayonet))
+				continue
+			var/obj/item/attachable/attachment = attachment_type
+			if(!(initial(attachment.slot) in GLOB.clash_kit_attachment_slots))
+				continue
+			if(GLOB.clash_kit_options[clash_kit_option_id(faction, initial(attachment.slot), attachment_type)])
+				continue
+			LAZYADD(fits_by_type[attachment_type], gun.name)
+	for(var/attachment_type in fits_by_type)
+		var/obj/item/attachable/attachment = attachment_type
+		add_clash_kit_option(faction, initial(attachment.slot), capitalize(initial(attachment.name)), attachment_type, "Fits the [english_list(fits_by_type[attachment_type])]")
 
 /proc/add_clash_kit_preset(faction, name, list/types_by_slot)
 	var/list/choices = list()
@@ -285,6 +308,16 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 		add_clash_kit_option(faction, slot, "Explosive pouch", /obj/item/storage/pouch/explosive, "Carries your grenades")
 		add_clash_kit_option(faction, slot, "Medium general pouch", /obj/item/storage/pouch/general/medium, "Tools, flares, whatever fits")
 		add_clash_kit_option(faction, slot, "Bayonet sheath", faction == FACTION_UPP ? /obj/item/storage/pouch/bayonet/upp : /obj/item/storage/pouch/bayonet, "Spare blade on the hip")
+	add_clash_kit_option(faction, KIT_SLOT_WEBBING, "Webbing", /obj/item/clothing/accessory/storage/webbing, "Chest rig for small gear")
+	add_clash_kit_option(faction, KIT_SLOT_WEBBING, "Black webbing", /obj/item/clothing/accessory/storage/webbing/black, "Chest rig for small gear")
+	add_clash_kit_option(faction, KIT_SLOT_WEBBING, "Brown webbing vest", /obj/item/clothing/accessory/storage/black_vest/brown_vest, "Vest with pockets")
+	add_clash_kit_option(faction, KIT_SLOT_WEBBING, "Black webbing vest", /obj/item/clothing/accessory/storage/black_vest, "Vest with pockets")
+	add_clash_kit_option(faction, KIT_SLOT_WEBBING, "Drop pouch", /obj/item/clothing/accessory/storage/droppouch, "Loose items up to medium size")
+	add_clash_kit_option(faction, KIT_SLOT_WEBBING, "Black drop pouch", /obj/item/clothing/accessory/storage/droppouch/black, "Loose items up to medium size")
+	add_clash_kit_option(faction, KIT_SLOT_WEBBING, "Shoulder holster", /obj/item/clothing/accessory/storage/holster, "Carries a sidearm")
+	if(faction == FACTION_MARINE)
+		add_clash_kit_option(faction, KIT_SLOT_WEBBING, "Leg pouch", /obj/item/clothing/accessory/storage/black_vest/leg_pouch, "Pockets on the thigh")
+		add_clash_kit_option(faction, KIT_SLOT_WEBBING, "Black leg pouch", /obj/item/clothing/accessory/storage/black_vest/black_leg_pouch, "Pockets on the thigh")
 	add_clash_kit_option(faction, KIT_SLOT_RAIL, "Red dot sight", /obj/item/attachable/reddot, "Accuracy up")
 	add_clash_kit_option(faction, KIT_SLOT_RAIL, "Reflex sight", /obj/item/attachable/reflex, "Accuracy up, less than the red dot, no scatter penalty")
 	add_clash_kit_option(faction, KIT_SLOT_RAIL, "Rail flashlight", /obj/item/attachable/flashlight, "Light")

@@ -28,6 +28,16 @@
 	log_debug("TDM: [ground?.map_name || "unknown map"], best of [matches_per_round], [round_time_limit / 600] minute matches, first to [kill_limit || "none"], [respawn_cooldown / 10]s respawn, [countdown_time / 10]s countdown, [spawn_protection / 10]s spawn protection")
 	return ..()
 
+/datum/game_mode/extended/faction_clash/hvh/tdm/get_welcome_rules()
+	if(type != /datum/game_mode/extended/faction_clash/hvh/tdm)
+		return ..()
+	return list(
+		"[matches_per_round] match\s per round.",
+		"First team to [kill_limit] kills wins or with the most kills when time runs out wins.",
+		"You can respawn [respawn_cooldown / 10] seconds after dying using the Respawn button in the center of your screen.",
+		"Players named \[BOT\] are bots. Kills on bots and by bots do not count toward the score.",
+	)
+
 /datum/game_mode/extended/faction_clash/hvh/tdm/roundend_ceasefire()
 	var/result = get_round_result_line()
 	marine_announcement("[finish_reason]. [result]\n\nFinal scores in two minutes.", "ARES 3.2", 'sound/AI/commandreport.ogg', FACTION_MARINE)

@@ -23,6 +23,7 @@ interface Slot {
 
 interface Option {
   id: string;
+  type: string;
   name: string;
   blurb: string;
   icon: string;
@@ -39,6 +40,7 @@ interface RoleGroup {
 
 interface IssueItem {
   name: string;
+  type?: string;
   icon: string;
   icon_state: string;
 }
@@ -352,7 +354,7 @@ const ShopView = () => {
 
 const LEFT_SLOTS = ['helmet', 'mask', 'armor', 'back'];
 const RIGHT_SLOTS = ['primary', 'sidearm', 'grenade', 'belt'];
-const POUCH_SLOTS = ['pouch_l', 'pouch_r'];
+const POUCH_SLOTS = ['pouch_l', 'webbing', 'pouch_r'];
 const ATTACHMENT_SLOTS = ['rail', 'muzzle', 'under', 'stock'];
 
 const clock = (seconds: number) =>
@@ -451,9 +453,11 @@ const OptionRow = (props: {
   readonly blurb?: string;
   readonly picked: boolean;
   readonly disabled?: boolean;
+  readonly issueTag?: boolean;
   readonly onClick: () => void;
 }) => {
-  const { option, issued, label, blurb, picked, disabled, onClick } = props;
+  const { option, issued, label, blurb, picked, disabled, issueTag, onClick } =
+    props;
   const art = option ?? issued;
   return (
     <Box
@@ -479,6 +483,11 @@ const OptionRow = (props: {
         <Stack.Item grow>
           <Box className="ClashKit__optionName">
             {option?.name ?? label}
+            {issueTag && (
+              <Box as="span" className="ClashKit__optionIssue">
+                issued
+              </Box>
+            )}
             {option && option.ammo > 0 && (
               <Box as="span" className="ClashKit__optionAmmo">
                 ×{option.ammo}
@@ -551,6 +560,9 @@ export const ClashKit = () => {
   const issueFor = (id: string) =>
     ATTACHMENT_SLOTS.includes(id) && choices.primary ? undefined : issue?.[id];
   const issued = issueFor(selectedSlot);
+  const issuedOption = issued?.type
+    ? options.find((option) => option.type === issued.type)
+    : undefined;
   const waiting = deploy_state === 'dead' && waitLeft > 0;
   const deployLabel = deploy_block
     ? 'Cannot deploy'
@@ -585,21 +597,21 @@ export const ClashKit = () => {
         <Stack fill vertical>
           <Stack.Item className="ClashKit__header">
             <Stack align="center">
-              <Stack.Item className="ClashKit__sides">
-                {roles.map((group) => (
-                  <Box
-                    key={group.faction}
-                    className={classes([
-                      'ClashKit__side',
-                      group.faction === faction && 'ClashKit__side--selected',
-                    ])}
-                    onClick={() => act('side', { faction: group.faction })}
-                  >
-                    {group.name}
-                  </Box>
-                ))}
-              </Stack.Item>
-              <Stack.Item>
+              <Stack.Item className="ClashKit__headLeft">
+                <Box className="ClashKit__sides">
+                  {roles.map((group) => (
+                    <Box
+                      key={group.faction}
+                      className={classes([
+                        'ClashKit__side',
+                        group.faction === faction && 'ClashKit__side--selected',
+                      ])}
+                      onClick={() => act('side', { faction: group.faction })}
+                    >
+                      {group.name}
+                    </Box>
+                  ))}
+                </Box>
                 <Dropdown
                   width="250px"
                   options={roleOptions}
@@ -608,7 +620,7 @@ export const ClashKit = () => {
                   onSelected={(value) => act('role', { job: value })}
                 />
               </Stack.Item>
-              <Stack.Item grow>
+              <Stack.Item grow basis={0}>
                 <Box className="ClashKit__kitTabs">
                   {kits.map((entry, index) => {
                     const number = index + 1;
@@ -624,7 +636,9 @@ export const ClashKit = () => {
                         {number === kit_index && (
                           <Icon name="check" className="ClashKit__kitStar" />
                         )}
-                        {entry.name}
+                        <Box as="span" className="ClashKit__kitLabel">
+                          {entry.name}
+                        </Box>
                         {entry.set > 0 && (
                           <Box as="span" className="ClashKit__kitCount">
                             {entry.set}
@@ -800,31 +814,40 @@ export const ClashKit = () => {
                   className="ClashKit__optionsList"
                   style={{ display: tab === 'gear' ? undefined : 'none' }}
                 >
-                  <OptionRow
-                    issued={issued}
-                    label={issued ? issued.name : 'Nothing'}
-                    blurb={
-                      issued
-                        ? `What a ${job} is issued`
-                        : current?.attachment
-                          ? 'Leave this slot empty'
-                          : `A ${job} gets nothing here`
-                    }
-                    picked={!choices[selectedSlot]}
-                    onClick={() => act('clear', { slot: selectedSlot })}
-                  />
+                  {!issuedOption && (
+                    <OptionRow
+                      issued={issued}
+                      label={issued ? issued.name : 'Nothing'}
+                      blurb={
+                        issued
+                          ? `What a ${job} is issued`
+                          : current?.attachment
+                            ? 'Leave this slot empty'
+                            : `A ${job} gets nothing here`
+                      }
+                      picked={!choices[selectedSlot]}
+                      onClick={() => act('clear', { slot: selectedSlot })}
+                    />
+                  )}
                   {options.map((option) => {
                     const unfit =
                       !!current?.attachment &&
                       (!primary || !fits.includes(option.id));
+                    const isIssue = option.id === issuedOption?.id;
                     return (
                       <OptionRow
                         key={option.id}
                         option={option}
-                        picked={choices[selectedSlot] === option.id}
-                        disabled={unfit}
+                        issueTag={isIssue}
+                        picked={
+                          choices[selectedSlot] === option.id ||
+                          (isIssue && !choices[selectedSlot])
+                        }
+                        disabled={unfit && !isIssue}
                         onClick={() =>
-                          act('pick', { slot: selectedSlot, id: option.id })
+                          isIssue
+                            ? act('clear', { slot: selectedSlot })
+                            : act('pick', { slot: selectedSlot, id: option.id })
                         }
                       />
                     );

@@ -91,19 +91,18 @@ SUBSYSTEM_DEF(clash_spawn)
 		for(var/line in clash_mode.get_welcome_rules())
 			page += "<li>[line]</li>"
 	page += "</ul>"
-	page += "<h2>Controls</h2><table class='keys'>"
+	page += "<h2>Controls/Verbs</h2><table class='keys'>"
 	page += "<tr><td><span class='key'>Tab</span></td><td>Show or hide the scoreboard.</td></tr>"
 	if(kits)
-		page += "<tr><td><span class='key'>Loadout</span></td><td>Build up to [CLASH_KIT_COUNT] kits per role, like classes. The selected kit is on you every time you spawn as that role. Open it from the lobby, the Deploy button when you are down, or the Loadout verb.</td></tr>"
-		page += "<tr><td><span class='key'>Deploy</span></td><td>The button in the middle of the screen when you are down. It counts down your respawn, then sends you back in.</td></tr>"
+		page += "<tr><td><span class='key'>Loadout</span></td><td>Build custom kits. The selected kit is on you every time you spawn as that role. Open it from the lobby, the Deploy button when you are down, or the Loadout verb.</td></tr>"
 	else
 		page += "<tr><td><span class='key'>Respawn</span></td><td>The button in the middle of the screen when you are down.</td></tr>"
 		page += "<tr><td><span class='key'>Vendors</span></td><td>Save your loadout with Save current in the Saved Loadouts section, 3 slots per role.</td></tr>"
 	page += "<tr><td><span class='key'>Stats</span></td><td>The Career Stats verb, or the button on the scoreboard, shows your career and the leaderboard.</td></tr>"
 	page += "</table>"
 	page += "<h2>Good to know</h2><ul>"
-	page += "<li>Friendly fire is on, and explosions can take off limbs.</li>"
-	page += "<li>Near the end of each round you vote for the next mode, then for a map that can run it.</li>"
+	page += "<li>Friendly fire is on and explosions have a high chance of taking off limbs.</li>"
+	page += "<li>Two end-of-round votes: one for the next mode and then one for the map that can run it.</li>"
 	page += "<li>Only rounds that finish on their own count toward career stats.</li>"
 	page += "</ul>"
 	if(GLOB.clash_feedback_contact)
