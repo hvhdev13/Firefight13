@@ -57,14 +57,25 @@ $panel: rgba(0, 0, 0, 0.3);
     }
   }
 
+  &__headLeft {
+    display: flex;
+    align-items: center;
+    width: 434px;
+    flex-shrink: 0;
+  }
+
   &__kitTabs {
     display: flex;
     gap: 4px;
-    margin-left: 12px;
+    margin-left: 10px;
   }
 
   &__kitTab {
-    padding: 3px 10px;
+    display: flex;
+    align-items: center;
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 3px 6px;
     border: 1px solid $line;
     border-radius: 2px;
     background: $panel;
@@ -84,6 +95,11 @@ $panel: rgba(0, 0, 0, 0.3);
       background: rgba(255, 255, 255, 0.08);
       color: #fff;
     }
+  }
+
+  &__kitLabel {
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   &__kitStar {
@@ -195,7 +211,6 @@ $panel: rgba(0, 0, 0, 0.3);
     opacity: 0.7;
   }
 
-  &__pouchRow,
   &__gunFrame {
     height: 120px;
     margin: 10px 8px 0;
@@ -233,6 +248,7 @@ $panel: rgba(0, 0, 0, 0.3);
     font-style: italic;
   }
 
+  &__pouchRow,
   &__attachRow {
     display: flex;
     gap: 6px;
@@ -534,6 +550,17 @@ $panel: rgba(0, 0, 0, 0.3);
     font-weight: normal;
     opacity: 0.6;
     font-size: 0.85em;
+  }
+
+  &__optionIssue {
+    margin-left: 6px;
+    padding: 0 5px;
+    border: 1px solid var(--kit-accent);
+    border-radius: 8px;
+    color: var(--kit-accent);
+    font-size: 0.7em;
+    font-weight: normal;
+    text-transform: uppercase;
   }
 
   &__optionBlurb {

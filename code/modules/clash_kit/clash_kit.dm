@@ -122,7 +122,7 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 			if(length(kits) >= CLASH_KIT_COUNT)
 				break
 			var/datum/clash_kit/kit = new
-			kit.name = stored["name"]
+			kit.name = stored["name"] == "Standard issue" ? "Default" : stored["name"]
 			for(var/slot in stored["choices"])
 				var/id = stored["choices"][slot]
 				if(!get_clash_kit_option(id) && ispath(text2path(id)))
@@ -198,6 +198,58 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 			wearer.temp_drop_inv_item(old, TRUE)
 		qdel(old)
 	return TRUE
+
+/proc/clash_kit_fit_webbing(mob/living/carbon/human/wearer, item_type, list/cosmetics)
+	var/obj/item/clothing/under/uniform = wearer.w_uniform
+	if(!uniform)
+		return
+	usr = null
+	var/obj/item/clothing/accessory/storage/wanted = item_type
+	var/wanted_slot = initial(wanted.worn_accessory_slot)
+	var/list/carried = list()
+	for(var/obj/item/clothing/accessory/storage/old in uniform.accessories?.Copy())
+		if(old.worn_accessory_slot != wanted_slot)
+			continue
+		if(old.type in cosmetics)
+			return
+		for(var/obj/item/thing in old.hold.contents)
+			carried += thing
+			thing.forceMove(wearer)
+		uniform.remove_accessory(wearer, old)
+		var/mob/holder = old.loc
+		if(ismob(holder))
+			holder.temp_drop_inv_item(old, TRUE)
+		qdel(old)
+	var/obj/item/clothing/accessory/storage/fresh = new item_type(wearer)
+	if(uniform.can_attach_accessory(fresh))
+		uniform.attach_accessory(wearer, fresh, TRUE)
+	else
+		qdel(fresh)
+		fresh = null
+	for(var/obj/item/thing as anything in carried)
+		if(fresh?.hold.can_be_inserted(thing, wearer, TRUE) && fresh.hold.handle_item_insertion(thing, TRUE, wearer))
+			continue
+		if(!wearer.equip_to_appropriate_slot(thing))
+			qdel(thing)
+
+/proc/clash_trim_icon(icon/source)
+	var/width = source.Width()
+	var/height = source.Height()
+	var/left = width + 1
+	var/right = 0
+	var/bottom = height + 1
+	var/top = 0
+	for(var/x in 1 to width)
+		for(var/y in 1 to height)
+			if(!source.GetPixel(x, y))
+				continue
+			left = min(left, x)
+			right = max(right, x)
+			bottom = min(bottom, y)
+			top = max(top, y)
+	if(right)
+		source.Crop(left, bottom, right, top)
+	return source
 
 /proc/clash_kit_primary_of(mob/living/carbon/human/wearer)
 	var/obj/item/weapon/gun/stored = wearer.s_store
@@ -277,6 +329,10 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 			continue
 		clash_kit_replace_worn(wearer, wear_slot, option.item_type)
 
+	var/datum/clash_kit_option/webbing = kit.get_option(KIT_SLOT_WEBBING)
+	if(webbing?.faction == faction)
+		clash_kit_fit_webbing(wearer, webbing.item_type, cosmetics)
+
 	var/obj/item/weapon/gun/main_gun
 	if(primary)
 		clash_kit_purge_guns(wearer, FALSE)
@@ -328,7 +384,7 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 	apply_clash_kit(wearer, kit, CLASH_KIT_RESET)
 
 /proc/describe_clash_kit_item(obj/item/item)
-	return item ? list("name" = item.name, "icon" = "[item.icon]", "icon_state" = item.icon_state) : null
+	return item ? list("name" = item.name, "type" = "[item.type]", "icon" = "[item.icon]", "icon_state" = item.icon_state) : null
 
 /proc/get_clash_issue_items(job)
 	return GLOB.clash_kit_issue_items[job]
@@ -368,6 +424,9 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 						var/list/info = describe_clash_kit_item(gun.attachments[attachment_slot])
 						if(info)
 							found[attachment_slot] = info
+			var/obj/item/clothing/accessory/storage/issued_webbing = locate() in model.w_uniform?.accessories
+			if(issued_webbing)
+				found[KIT_SLOT_WEBBING] = describe_clash_kit_item(issued_webbing)
 			var/obj/item/explosive/grenade/grenade = locate() in model.get_contents()
 			if(grenade)
 				found[KIT_SLOT_GRENADE] = describe_clash_kit_item(grenade)
@@ -411,7 +470,7 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 		model.regenerate_icons()
 		var/icon/flat = getFlatIcon(model)
 		var/obj/item/weapon/gun/primary = clash_kit_primary_of(model)
-		var/icon/gun_flat = primary && getFlatIcon(primary)
+		var/icon/gun_flat = primary && clash_trim_icon(getFlatIcon(primary))
 		. = list("doll" = flat ? icon2base64(flat) : null, "gun" = gun_flat ? icon2base64(gun_flat) : null, "pack" = describe_clash_kit_pack(model), "statuses" = statuses)
 	catch(var/exception/error)
 		stack_trace("Clash kit could not draw a [job] doll: [error]")

@@ -457,6 +457,11 @@ const LobbyButtons = (props: {
                     index={5}
                     onClick={() => act('late_join')}
                     icon="users"
+                    tooltip={
+                      data.kits_enabled
+                        ? 'Pick a USCM role and loadout, then deploy'
+                        : undefined
+                    }
                   >
                     Join the USCM
                   </LobbyButton>
@@ -477,29 +482,20 @@ const LobbyButtons = (props: {
                   index={7}
                   onClick={() => act('late_join_upp')}
                   icon="users-between-lines"
+                  tooltip={
+                    data.kits_enabled
+                      ? 'Pick a UPP role and loadout, then deploy'
+                      : undefined
+                  }
                 >
                   Join the UPP
-                </LobbyButton>
-              </Stack.Item>
-            )}
-            {!!data.kits_enabled && (
-              <Stack.Item>
-                <LobbyButton
-                  index={7 + (upp_enabled ? 1 : 0)}
-                  onClick={() => act('clash_loadout')}
-                  icon="person-rifle"
-                  tooltip="Pick a role and loadout, then deploy straight in"
-                >
-                  Loadout
                 </LobbyButton>
               </Stack.Item>
             )}
             {!!predator_enabled && (
               <Stack.Item>
                 <LobbyButton
-                  index={
-                    7 + (upp_enabled ? 1 : 0) + (data.kits_enabled ? 1 : 0)
-                  }
+                  index={7 + (upp_enabled ? 1 : 0)}
                   onClick={() => {
                     setModal(
                       <ModalConfirm>

@@ -134,6 +134,9 @@
 			return TRUE
 
 		if("late_join")
+			if(clash_uses_kits())
+				open_clash_kit_screen(src, FACTION_MARINE)
+				return TRUE
 			if(SSticker.current_state != GAME_STATE_PLAYING || !SSticker.mode)
 				to_chat(src, SPAN_WARNING("The round is either not ready, or has already finished..."))
 				return FALSE
@@ -151,6 +154,9 @@
 			return TRUE
 
 		if("late_join_upp")
+			if(clash_uses_kits())
+				open_clash_kit_screen(src, FACTION_UPP)
+				return TRUE
 			if(SSticker.current_state != GAME_STATE_PLAYING || !SSticker.mode)
 				to_chat(src, SPAN_WARNING("The round is either not ready, or has already finished..."))
 				return FALSE

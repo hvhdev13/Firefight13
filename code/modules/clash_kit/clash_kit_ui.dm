@@ -10,7 +10,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 		GLOB.clash_kit_screens[ckey] = screen
 	return screen
 
-/proc/open_clash_kit_screen(mob/user)
+/proc/open_clash_kit_screen(mob/user, faction)
 	if(!clash_uses_kits())
 		to_chat(user, SPAN_WARNING("Kits are only used on arena maps. Faction Clash keeps the vendor loadouts."))
 		return
@@ -19,6 +19,8 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 		return
 	close_clash_scoreboard(user)
 	screen.pick_job_for(user)
+	if(faction)
+		screen.show_side(faction)
 	screen.tgui_interact(user)
 
 /proc/get_open_clash_kit_screen(mob/user)
@@ -65,6 +67,12 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 	side_jobs[clash_kit_faction_for_job(job)] = job
 	kit_index = get_clash_active_kit_index(ckey, job)
 
+/datum/clash_kit_screen/proc/show_side(faction)
+	var/list/roles = get_clash_kit_roles()
+	var/list/side_roles = roles[faction]
+	if(length(side_roles) && clash_kit_faction_for_job(job) != faction)
+		set_job(side_jobs[faction] || side_roles[1])
+
 /datum/clash_kit_screen/proc/get_kit()
 	var/list/kits = get_clash_kits(ckey, job)
 	return kits ? kits[clamp(kit_index, 1, length(kits))] : null
@@ -100,6 +108,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 					"blurb" = option.blurb,
 					"icon" = "[initial(item.icon)]",
 					"icon_state" = initial(item.icon_state),
+					"type" = "[option.item_type]",
 					"ammo" = option.ammo_count,
 					"stats" = option.stats,
 				))
@@ -283,10 +292,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 			if(params["job"] in GLOB.ROLES_CM_VS_UPP)
 				set_job(params["job"])
 		if("side")
-			var/list/roles = get_clash_kit_roles()
-			var/list/side_roles = roles[params["faction"]]
-			if(length(side_roles))
-				set_job(side_jobs[params["faction"]] || side_roles[1])
+			show_side(params["faction"])
 		if("kit")
 			var/index = round(text2num(params["index"]))
 			if(index >= 1 && index <= CLASH_KIT_COUNT)

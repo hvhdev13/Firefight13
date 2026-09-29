@@ -78,6 +78,8 @@ GLOBAL_LIST_EMPTY(clash_kit_budgets)
 		var/obj/item/storage/holder = clash_kit_storage_of(worn)
 		if(holder)
 			. += holder
+	for(var/obj/item/clothing/accessory/storage/webbing in wearer.w_uniform?.accessories)
+		. += webbing.hold
 
 /proc/clash_kit_carried(mob/living/carbon/human/wearer, obj/item/thing)
 	var/atom/holder = thing.loc
