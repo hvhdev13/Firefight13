@@ -746,7 +746,11 @@
 		overlays += image("icon"=src.cover_icon,"icon_state"=cover_icon_state,"layer"=CATWALK_LAYER,"dir" = dir)
 	else
 		name = default_name
-		overlays += image("icon"=src.icon,"icon_state"=icon_overlay,"layer"=ABOVE_MOB_LAYER,"dir" = dir)
+		var/image/water_overlay = image("icon"=src.icon,"icon_state"=icon_overlay,"layer"=ABOVE_MOB_LAYER,"dir" = dir)
+		for(var/obj/effect/decal/strata_decals/mud in src)
+			if(istype(mud, /obj/effect/decal/strata_decals/mud_corner) || istype(mud, /obj/effect/decal/strata_decals/tyrargo_mud_corner))
+				water_overlay.filters += filter(arglist(alpha_mask_filter(icon = icon(mud.icon, mud.icon_state, mud.dir), flags = MASK_INVERSE)))
+		overlays += water_overlay
 
 /turf/open/gm/river/Entered(atom/movable/AM)
 	..()

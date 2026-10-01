@@ -188,6 +188,10 @@
 	},
 /turf/open/floor/almayer/green/northeast,
 /area/clash_arena/tdm_jungle/uscm_base/req)
+"bq" = (
+/obj/effect/landmark/clash_npc/uscm,
+/turf/open/hybrisa/street/cement1,
+/area/clash_arena/tdm_deathmatch2000/battlefield)
 "bs" = (
 /obj/structure/machinery/light{
 	dir = 8
@@ -2463,6 +2467,10 @@
 /obj/item/tool/shovel/etool/folded,
 /turf/open/floor/strata/green3,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
+"Cn" = (
+/obj/effect/landmark/clash_npc/upp,
+/turf/open/hybrisa/street/cement2,
+/area/clash_arena/tdm_deathmatch2000/battlefield)
 "Cp" = (
 /obj/effect/decal/warning_stripes{
 	icon_state = "NW-out";
@@ -2730,6 +2738,14 @@
 /obj/item/clothing/accessory/storage/webbing,
 /turf/open/floor/almayer/green/north,
 /area/clash_arena/tdm_jungle/uscm_base/req)
+"Gj" = (
+/obj/structure/sign/flag/upp{
+	dir = 1;
+	pixel_y = 26;
+	pixel_x = -17
+	},
+/turf/open/floor/strata/floor3/east,
+/area/clash_arena/tdm_deathmatch2000/battlefield)
 "GI" = (
 /turf/open/floor/almayer/plating,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
@@ -2912,6 +2928,16 @@
 "Jc" = (
 /turf/open/floor/almayer/green/east,
 /area/clash_arena/tdm_jungle/uscm_base/req)
+"Ji" = (
+/obj/structure/machinery/light{
+	dir = 1
+	},
+/obj/structure/sign/flag/upp{
+	pixel_y = 27;
+	pixel_x = -1
+	},
+/turf/open/floor/strata/red3/south,
+/area/clash_arena/tdm_deathmatch2000/upp_base)
 "Jl" = (
 /obj/effect/decal/warning_stripes{
 	icon_state = "N";
@@ -13746,7 +13772,7 @@ lU
 HW
 Il
 zf
-cb
+nF
 aM
 jM
 Uy
@@ -13888,7 +13914,7 @@ VW
 VW
 VW
 Cv
-jf
+zx
 aM
 jM
 Uy
@@ -14030,7 +14056,7 @@ ng
 WO
 ng
 zf
-jf
+cb
 aM
 jM
 Uy
@@ -14172,8 +14198,8 @@ lx
 lx
 lx
 Cp
-cb
-AM
+jf
+Ji
 jM
 Uy
 nX
@@ -15024,7 +15050,7 @@ jM
 Nv
 Uy
 le
-Vm
+aP
 aM
 jM
 Uy
@@ -15733,7 +15759,7 @@ PG
 PG
 PG
 PG
-FJ
+Gj
 ax
 FJ
 ax
@@ -16159,7 +16185,7 @@ at
 at
 at
 at
-at
+Cn
 at
 at
 oT
@@ -22693,7 +22719,7 @@ yO
 yO
 yO
 yO
-yO
+bq
 yO
 yO
 yO
