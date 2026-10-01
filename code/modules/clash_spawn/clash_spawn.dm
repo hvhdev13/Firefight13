@@ -14,7 +14,29 @@ SUBSYSTEM_DEF(clash_spawn)
 
 /datum/controller/subsystem/clash_spawn/Initialize()
 	RegisterSignal(SSdcs, COMSIG_GLOB_MOB_LOGGED_IN, PROC_REF(on_mob_logged_in))
+	RegisterSignal(SSdcs, COMSIG_GLOB_MODE_PREGAME_LOBBY, PROC_REF(fill_missing_spawns))
 	return SS_INIT_SUCCESS
+
+/datum/controller/subsystem/clash_spawn/proc/fill_missing_spawns()
+	SIGNAL_HANDLER
+	var/list/uscm_base = list()
+	for(var/squad in list(SQUAD_MARINE_1, SQUAD_MARINE_2, SQUAD_MARINE_3, SQUAD_MARINE_4))
+		if(length(GLOB.latejoin_by_squad[squad]))
+			uscm_base |= GLOB.latejoin_by_squad[squad]
+	var/list/bases = list(FACTION_MARINE = uscm_base, FACTION_UPP = GLOB.latejoin_by_job[JOB_UPP])
+	for(var/title in GLOB.ROLES_CM_VS_UPP)
+		var/datum/job/role = GLOB.RoleAuthority.roles_by_name[title]
+		if(!role || (role.flags_startup_parameters & ROLE_ADD_TO_SQUAD))
+			continue
+		var/list/base = bases[clash_kit_faction_for_job(title)]
+		if(!length(base))
+			continue
+		if(!length(GLOB.latejoin_by_job[title]))
+			GLOB.latejoin_by_job[title] = base.Copy()
+			log_game("HvH: [title] has no late join spawn on this map, using its side's base.")
+		if(!length(GLOB.spawns_by_job[role.type]) && !length(GLOB.spawns_by_job[title]))
+			GLOB.spawns_by_job[title] = base.Copy()
+			log_game("HvH: [title] has no round start spawn on this map, using its side's base.")
 
 /datum/controller/subsystem/clash_spawn/proc/on_mob_logged_in(datum/source, mob/new_mob)
 	SIGNAL_HANDLER

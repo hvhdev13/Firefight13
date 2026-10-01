@@ -1724,6 +1724,7 @@
 #include "code\modules\clans\rank.dm"
 #include "code\modules\clans\ship.dm"
 #include "code\modules\clash_base_lock\clash_base_lock.dm"
+#include "code\modules\clash_fixes\clash_fixes.dm"
 #include "code\modules\clash_hit\clash_blast.dm"
 #include "code\modules\clash_hit\clash_combat_log.dm"
 #include "code\modules\clash_hit\clash_hit_effects.dm"

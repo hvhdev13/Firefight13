@@ -139,8 +139,9 @@ GLOBAL_LIST_EMPTY(clash_kit_budgets)
 		wearer.clash_kit_extras[WEAKREF(bought)] = item
 		. += "ok"
 
-/proc/describe_clash_kit_pack(mob/living/carbon/human/wearer)
+/proc/describe_clash_kit_pack(mob/living/carbon/human/wearer, datum/clash_kit/kit, obj/item/weapon/gun/primary)
 	. = list()
+	var/list/shells = primary && clash_kit_shells_for(primary)
 	var/list/extras = list()
 	for(var/datum/weakref/given_ref as anything in wearer.clash_kit_extras)
 		extras += given_ref.resolve()
@@ -152,4 +153,8 @@ GLOBAL_LIST_EMPTY(clash_kit_budgets)
 			items += list(list("type" = "[thing.type]", "name" = thing.name, "icon" = "[thing.icon]", "icon_state" = thing.icon_state, "extra" = (thing in extras)))
 		var/label = istype(holder, /obj/item/storage/internal) ? "[holder.name] pockets" : holder.name
 		var/capacity = isnull(holder.storage_slots) ? "[used]/[holder.max_storage_space]" : "[length(holder.contents)]/[holder.storage_slots]"
-		. += list(list("name" = capitalize(label), "capacity" = capacity, "items" = items))
+		var/list/entry = list("name" = capitalize(label), "capacity" = capacity, "items" = items, "type" = "[holder.type]")
+		if(shells && clash_kit_holds_ammo(holder) && holder.can_hold_type(shells[shells[1]], wearer))
+			entry["shells"] = GLOB.clash_kit_shell_names
+			entry["fill"] = kit?.fills["[holder.type]"] || GLOB.clash_kit_shell_names[1]
+		. += list(entry)

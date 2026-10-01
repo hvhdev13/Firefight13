@@ -20,6 +20,9 @@ GLOBAL_LIST_INIT(clash_kit_attachment_slots, list(KIT_SLOT_RAIL, KIT_SLOT_MUZZLE
 #define CLASH_KIT_RESET "reset"
 #define CLASH_KIT_EQUIP "equip"
 #define CLASH_KIT_PREVIEW "preview"
+#define CLASH_KIT_FILL_LIMIT 30
+#define CLASH_KIT_SPARE_PRIMARY 4
+#define CLASH_KIT_SPARE_SIDEARM 3
 #define CLASH_SHOP_POINTS "points"
 #define CLASH_SHOP_SNOWFLAKE "snowflake"
 
@@ -40,6 +43,20 @@ GLOBAL_LIST_INIT(clash_kit_slots, list(
 	KIT_SLOT_STOCK = list("name" = "Stock", "image" = null, "wear" = null),
 	KIT_SLOT_WEBBING = list("name" = "Accessory", "image" = "inventory-uniform.png", "wear" = null),
 ))
+
+GLOBAL_LIST_INIT(clash_kit_shells, list(
+	"12g" = list(
+		"Buckshot" = /obj/item/ammo_magazine/handful/shotgun/buckshot,
+		"Slug" = /obj/item/ammo_magazine/handful/shotgun/slug,
+		"Flechette" = /obj/item/ammo_magazine/handful/shotgun/flechette,
+	),
+	"8g" = list(
+		"Buckshot" = /obj/item/ammo_magazine/handful/shotgun/heavy/buckshot,
+		"Slug" = /obj/item/ammo_magazine/handful/shotgun/heavy/slug,
+		"Flechette" = /obj/item/ammo_magazine/handful/shotgun/heavy/flechette,
+	),
+))
+GLOBAL_LIST_INIT(clash_kit_shell_names, list("Buckshot", "Slug", "Flechette"))
 
 GLOBAL_LIST_EMPTY(clash_kit_options)
 GLOBAL_LIST_EMPTY(clash_kit_menu)

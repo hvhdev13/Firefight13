@@ -8,6 +8,7 @@ GLOBAL_LIST_EMPTY(clash_kit_issue_pending)
 	var/list/choices = list()
 	var/list/extras = list()
 	var/list/removed = list()
+	var/list/fills = list()
 
 /datum/clash_kit/proc/get_option(slot)
 	return get_clash_kit_option(choices[slot])
@@ -92,7 +93,7 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 	for(var/job in by_job)
 		var/list/stored = list()
 		for(var/datum/clash_kit/kit as anything in by_job[job])
-			stored += list(list("name" = kit.name, "choices" = kit.choices, "extras" = kit.extras, "removed" = kit.removed))
+			stored += list(list("name" = kit.name, "choices" = kit.choices, "extras" = kit.extras, "removed" = kit.removed, "fills" = kit.fills))
 		payload[job] = stored
 	var/savefile/save = new(clash_kit_path(ckey))
 	save.cd = "/"
@@ -135,22 +136,35 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 			for(var/unwanted in stored["removed"])
 				if(ispath(text2path(unwanted), /obj/item))
 					kit.removed += unwanted
+			for(var/container in stored["fills"])
+				if(ispath(text2path(container), /obj/item/storage) && (stored["fills"][container] in GLOB.clash_kit_shell_names))
+					kit.fills[container] = stored["fills"][container]
 			kits += kit
 		by_job[job] = kits
 
 /proc/issue_clash_role_kit(mob/living/carbon/human/fighter, job)
 	var/kit_path = GLOB.clash_kit_role_kits[job]
 	var/datum/equipment_preset/full_kit = kit_path && GLOB.equipment_presets.gear_path_presets_list[kit_path]
-	if(!full_kit)
+	if(full_kit)
+		var/obj/item/pack = fighter.back
+		if(pack && !length(pack.contents))
+			fighter.temp_drop_inv_item(pack, TRUE)
+			qdel(pack)
+		try
+			full_kit.load_gear(fighter, fighter.client)
+		catch(var/exception/error)
+			stack_trace("Clash kit could not issue [job] their full kit: [error]")
+	clash_kit_default_webbing(fighter)
+
+/proc/clash_kit_default_webbing(mob/living/carbon/human/fighter)
+	var/obj/item/clothing/under/uniform = fighter.w_uniform
+	if(!uniform || (locate(/obj/item/clothing/accessory/storage) in uniform.accessories))
 		return
-	var/obj/item/pack = fighter.back
-	if(pack && !length(pack.contents))
-		fighter.temp_drop_inv_item(pack, TRUE)
-		qdel(pack)
-	try
-		full_kit.load_gear(fighter, fighter.client)
-	catch(var/exception/error)
-		stack_trace("Clash kit could not issue [job] their full kit: [error]")
+	var/obj/item/clothing/accessory/storage/webbing = new /obj/item/clothing/accessory/storage/webbing/black(fighter)
+	if(uniform.can_attach_accessory(webbing))
+		uniform.attach_accessory(fighter, webbing, TRUE)
+	else
+		qdel(webbing)
 
 /proc/clash_kit_replace_worn(mob/living/carbon/human/wearer, wear_slot, item_type)
 	var/obj/item/old = wearer.get_item_by_slot(wear_slot)
@@ -286,11 +300,80 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 		if(!fits)
 			qdel(magazine)
 
-/proc/clash_kit_give_magazines(mob/living/carbon/human/wearer, datum/clash_kit_option/gun_option)
-	for(var/count in 1 to gun_option.ammo_count)
-		var/obj/item/magazine = new gun_option.ammo_type(wearer)
-		if(!wearer.equip_to_appropriate_slot(magazine))
-			qdel(magazine)
+/proc/clash_kit_shells_for(obj/item/weapon/gun/gun)
+	var/obj/item/weapon/gun/shotgun/shotgun = gun
+	return istype(shotgun) ? GLOB.clash_kit_shells[shotgun.gauge] : null
+
+/proc/clash_kit_magazine_for(obj/item/weapon/gun/gun)
+	for(var/id in GLOB.clash_kit_options)
+		var/datum/clash_kit_option/option = GLOB.clash_kit_options[id]
+		if(option.item_type == gun.type && option.ammo_type)
+			return option.ammo_type
+	var/obj/item/weapon/gun/base = gun.type
+	var/magazine = initial(base.current_mag)
+	return (ispath(magazine, /obj/item/ammo_magazine) && !ispath(magazine, /obj/item/ammo_magazine/internal)) ? magazine : null
+
+/proc/clash_kit_sidearm_of(mob/living/carbon/human/wearer)
+	for(var/obj/item/weapon/gun/carried in wearer.get_contents())
+		if(clash_is_sidearm(carried) && !istype(carried.loc, /obj/item/weapon/gun))
+			return carried
+	return null
+
+/proc/clash_kit_holds_ammo(obj/item/storage/holder)
+	for(var/path in holder.can_hold)
+		if(ispath(path, /obj/item/ammo_magazine))
+			return TRUE
+	return FALSE
+
+/proc/clash_kit_top_up(obj/item/storage/holder, ammo_type, mob/living/carbon/human/wearer)
+	. = FALSE
+	for(var/count in 1 to CLASH_KIT_FILL_LIMIT)
+		var/obj/item/ammo = new ammo_type
+		if(!holder.can_be_inserted(ammo, wearer, TRUE) || !holder.handle_item_insertion(ammo, TRUE, wearer))
+			qdel(ammo)
+			return
+		. = TRUE
+
+/proc/clash_kit_spare_ammo(mob/living/carbon/human/wearer, ammo_type, count)
+	var/list/containers = clash_kit_containers(wearer)
+	for(var/index in 1 to count)
+		var/obj/item/ammo = new ammo_type(wearer)
+		if(wearer.equip_to_appropriate_slot(ammo))
+			continue
+		var/placed = FALSE
+		for(var/obj/item/storage/holder as anything in containers)
+			if(holder.can_be_inserted(ammo, wearer, TRUE) && holder.handle_item_insertion(ammo, TRUE, wearer))
+				placed = TRUE
+				break
+		if(!placed)
+			qdel(ammo)
+			return
+
+/proc/clash_kit_fill_ammo(mob/living/carbon/human/wearer, datum/clash_kit/kit, mode)
+	var/obj/item/weapon/gun/primary = clash_kit_primary_of(wearer)
+	var/obj/item/weapon/gun/sidearm = clash_kit_sidearm_of(wearer)
+	var/list/shells = primary && clash_kit_shells_for(primary)
+	var/primary_ammo = shells ? null : (primary && clash_kit_magazine_for(primary))
+	var/sidearm_ammo = sidearm && clash_kit_magazine_for(sidearm)
+	var/primary_filled = FALSE
+	var/sidearm_filled = FALSE
+	for(var/obj/item/storage/holder as anything in clash_kit_containers(wearer))
+		if(!clash_kit_holds_ammo(holder))
+			continue
+		var/shell_type = shells && shells[kit.fills["[holder.type]"] || shells[1]]
+		var/ammo_type = shell_type || primary_ammo
+		if(ammo_type && holder.can_hold_type(ammo_type, wearer))
+			clash_kit_top_up(holder, ammo_type, wearer)
+			primary_filled = TRUE
+		else if(sidearm_ammo && holder.can_hold_type(sidearm_ammo, wearer))
+			clash_kit_top_up(holder, sidearm_ammo, wearer)
+			sidearm_filled = TRUE
+	if(mode != CLASH_KIT_SPAWN && mode != CLASH_KIT_PREVIEW)
+		return
+	if(!primary_filled && (shells || primary_ammo))
+		clash_kit_spare_ammo(wearer, shells ? shells[shells[1]] : primary_ammo, CLASH_KIT_SPARE_PRIMARY)
+	if(!sidearm_filled && sidearm_ammo)
+		clash_kit_spare_ammo(wearer, sidearm_ammo, CLASH_KIT_SPARE_SIDEARM)
 
 /proc/apply_clash_kit(mob/living/carbon/human/wearer, datum/clash_kit/kit, mode = CLASH_KIT_SPAWN, job, datum/preferences/prefs)
 	if(!kit || QDELETED(wearer))
@@ -312,6 +395,7 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 		var/obj/item/base_item = new base_type(wearer)
 		if(!wearer.equip_to_slot_if_possible(base_item, wear_slot, TRUE, FALSE, TRUE))
 			qdel(base_item)
+	clash_kit_default_webbing(wearer)
 	if(faction == FACTION_UPP && istype(wearer.w_uniform, /obj/item/clothing/under/marine/veteran/UPP) && !(locate(/obj/item/clothing/accessory/patch/upp) in wearer.w_uniform.accessories))
 		wearer.equip_to_slot_if_possible(new /obj/item/clothing/accessory/patch/upp(wearer), WEAR_ACCESSORY, TRUE, TRUE, TRUE)
 
@@ -356,10 +440,6 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 			clash_kit_hand_or_floor(wearer, side_gun)
 	if(primary || sidearm)
 		clash_kit_purge_stray_magazines(wearer)
-		if(primary)
-			clash_kit_give_magazines(wearer, primary)
-		if(sidearm)
-			clash_kit_give_magazines(wearer, sidearm)
 	var/datum/clash_kit_option/grenades = kit.get_option(KIT_SLOT_GRENADE)
 	if(grenades && grenades.faction == faction)
 		for(var/obj/item/explosive/grenade/issued in wearer.get_contents())
@@ -370,6 +450,7 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 			var/obj/item/grenade = new grenades.item_type(wearer)
 			if(!wearer.equip_to_appropriate_slot(grenade))
 				qdel(grenade)
+	clash_kit_fill_ammo(wearer, kit, mode)
 	. = stock_clash_kit(wearer, kit, job || wearer.job, mode)
 	wearer.regenerate_icons()
 
@@ -471,7 +552,7 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 		var/icon/flat = getFlatIcon(model)
 		var/obj/item/weapon/gun/primary = clash_kit_primary_of(model)
 		var/icon/gun_flat = primary && clash_trim_icon(getFlatIcon(primary))
-		. = list("doll" = flat ? icon2base64(flat) : null, "gun" = gun_flat ? icon2base64(gun_flat) : null, "pack" = describe_clash_kit_pack(model), "statuses" = statuses)
+		. = list("doll" = flat ? icon2base64(flat) : null, "gun" = gun_flat ? icon2base64(gun_flat) : null, "pack" = describe_clash_kit_pack(model, kit, primary), "statuses" = statuses)
 	catch(var/exception/error)
 		stack_trace("Clash kit could not draw a [job] doll: [error]")
 	qdel(model)

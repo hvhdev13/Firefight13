@@ -57,6 +57,9 @@ interface PackContainer {
   name: string;
   capacity: string;
   items: PackItem[];
+  type: string;
+  shells?: string[];
+  fill?: string;
 }
 
 interface Extra {
@@ -172,6 +175,17 @@ const PackView = () => {
         <Box key={holderIndex} className="ClashKit__packHolder">
           <Box className="ClashKit__packHead">
             <Box as="span">{holder.name}</Box>
+            {!!holder.shells && (
+              <Dropdown
+                width="110px"
+                options={holder.shells}
+                selected={holder.fill}
+                displayText={holder.fill}
+                onSelected={(value) =>
+                  act('fill', { container: holder.type, shell: value })
+                }
+              />
+            )}
             <Box as="span" className="ClashKit__optionsCount">
               {holder.capacity}
             </Box>

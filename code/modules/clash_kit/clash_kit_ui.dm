@@ -230,7 +230,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 
 /datum/clash_kit_screen/proc/get_doll_key(datum/clash_kit/kit)
 	var/datum/preferences/prefs = GLOB.preferences_datums[ckey]
-	return json_encode(list(job, kit?.choices, kit?.extras, kit?.removed, prefs?.gear))
+	return json_encode(list(job, kit?.choices, kit?.extras, kit?.removed, kit?.fills, prefs?.gear))
 
 /datum/clash_kit_screen/proc/describe_extras(datum/clash_kit/kit, list/statuses)
 	. = list()
@@ -321,6 +321,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 			kit.choices = list()
 			kit.extras = list()
 			kit.removed = list()
+			kit.fills = list()
 			save_clash_kits(ckey)
 		if("buy")
 			var/list/item = get_clash_shop(job)["by_id"][params["id"]]
@@ -357,6 +358,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 			kit.choices = source.choices.Copy()
 			kit.extras = source.extras.Copy()
 			kit.removed = source.removed.Copy()
+			kit.fills = source.fills.Copy()
 			save_clash_kits(ckey)
 			to_chat(user, SPAN_NOTICE("Copied [source.name] into [kit.name]."))
 		if("unbuy")
@@ -373,6 +375,11 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 				kit.extras.Cut(extra_index, extra_index + 1)
 			else if(pack_holds(params["type"]))
 				kit.removed += params["type"]
+			save_clash_kits(ckey)
+		if("fill")
+			if(!kit || !(params["shell"] in GLOB.clash_kit_shell_names) || !ispath(text2path(params["container"]), /obj/item/storage))
+				return TRUE
+			kit.fills[params["container"]] = params["shell"]
 			save_clash_kits(ckey)
 		if("restore_item")
 			if(!kit || !(params["type"] in kit.removed))
