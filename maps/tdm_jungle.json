@@ -3,6 +3,7 @@
     "map_path": "map_files/TDM_Jungle",
     "map_file": "TDM_Jungle.dmm",
     "disable_ship_map": true,
+    "disable_hunter_ship": true,
     "perf_mode": 31,
     "camouflage": "jungle",
     "traits": [

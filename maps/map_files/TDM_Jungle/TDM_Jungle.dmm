@@ -2370,9 +2370,10 @@
 /turf/open/gm/coast/dirt/forestbeachcorner/north_east,
 /area/clash_arena/tdm_jungle/battlefield)
 "pe" = (
-/obj/structure/flora/tree/tyrargo/tree_5,
-/obj/effect/decal/strata_decals/grasses,
-/turf/open/auto_turf/tyrargo_grass/layer0_mud,
+/obj/effect/decal/strata_decals/mud_corner{
+	dir = 4
+	},
+/turf/open/gm/coast/dirt/forestdir/west,
 /area/clash_arena/tdm_jungle/battlefield)
 "pg" = (
 /obj/structure/window/framed/almayer/hull,
@@ -2932,6 +2933,12 @@
 /obj/structure/machinery/cm_vending/sorted/cargo_guns/upp_squad_guns,
 /turf/open/floor/corsat/spiralplate,
 /area/clash_arena/tdm_jungle/upp_base)
+"sr" = (
+/obj/effect/decal/strata_decals/mud_corner{
+	dir = 6
+	},
+/turf/open/gm/coast/dirt/forestbeachcorner/north_west,
+/area/clash_arena/tdm_jungle/battlefield)
 "sv" = (
 /turf/open/floor/corsat/marked,
 /area/clash_arena/tdm_jungle/upp_base)
@@ -3073,6 +3080,9 @@
 /obj/structure/prop/tyrargo/boards/boards_2{
 	pixel_x = 23;
 	pixel_y = 1
+	},
+/obj/effect/decal/strata_decals/mud_corner{
+	dir = 4
 	},
 /turf/open/gm/coast/dirt/forestdir/west,
 /area/clash_arena/tdm_jungle/battlefield)
@@ -3697,6 +3707,9 @@
 "yc" = (
 /obj/structure/barricade/handrail/kutjevo{
 	explo_proof = 1
+	},
+/obj/effect/decal/strata_decals/mud_corner{
+	dir = 4
 	},
 /turf/open/gm/coast/dirt/forestdir/west,
 /area/clash_arena/tdm_jungle/battlefield)
@@ -6076,6 +6089,9 @@
 /area/clash_arena/tdm_jungle/uscm_base/req)
 "NI" = (
 /obj/structure/prop/tyrargo/boards/boards_2,
+/obj/effect/decal/strata_decals/mud_corner{
+	dir = 4
+	},
 /turf/open/gm/coast/dirt/forestdir/west,
 /area/clash_arena/tdm_jungle/battlefield)
 "NM" = (
@@ -6887,6 +6903,9 @@
 /turf/open/auto_turf/tyrargo_grass,
 /area/clash_arena/tdm_jungle/battlefield)
 "Uj" = (
+/obj/effect/decal/strata_decals/mud_corner{
+	dir = 1
+	},
 /turf/open/gm/coast/dirt/forestdir/south,
 /area/clash_arena/tdm_jungle/battlefield)
 "Un" = (
@@ -34244,9 +34263,9 @@ jJ
 jJ
 aS
 aS
-no
-no
-no
+pe
+pe
+pe
 NI
 tw
 zd
@@ -34260,7 +34279,7 @@ tJ
 FN
 Fz
 Fz
-tJ
+Fz
 WF
 vD
 WF
@@ -34459,13 +34478,13 @@ tJ
 Wn
 Hq
 MQ
+tJ
+tJ
 TF
 Fz
 TF
 tJ
 yR
-WF
-vD
 fj
 LM
 si
@@ -34661,13 +34680,13 @@ Up
 Hq
 Hq
 tJ
+tJ
+tJ
 Fz
 wL
 Fz
 LI
 mV
-ZH
-vD
 fj
 vD
 At
@@ -34860,16 +34879,16 @@ bd
 Uj
 TF
 PZ
-Hq
-Up
-Up
+PZ
+TF
+TF
+TF
+TF
 He
 wL
 wL
 yj
 eR
-eR
-va
 va
 oN
 SB
@@ -35063,15 +35082,15 @@ cW
 zd
 TF
 TF
-TF
+sr
+pe
+zd
 Ce
 He
 wL
 nG
 YI
 Sc
-BE
-BE
 BE
 BE
 bd
@@ -35265,15 +35284,15 @@ bd
 cW
 no
 no
-no
+ji
+bd
+cW
 yc
 He
 wL
 nG
 Jq
 ji
-bd
-bd
 bd
 bd
 bd
@@ -35468,13 +35487,13 @@ bd
 bd
 bd
 bd
+bd
+bd
 oL
 He
 wL
 nG
 qy
-bd
-bd
 bd
 bd
 bd
@@ -35670,13 +35689,13 @@ bd
 bd
 bd
 bd
+bd
+bd
 oL
 He
 wL
 nG
 qy
-bd
-bd
 bd
 bd
 bd
@@ -35872,13 +35891,13 @@ Cd
 Cd
 Cd
 Cd
+Hg
+Hg
 qd
 He
 wL
 nG
 qS
-Cd
-Cd
 Cd
 Cd
 Yg
@@ -36074,14 +36093,14 @@ Fz
 Fz
 Fz
 KL
+Fz
+Fz
 Zs
 He
 wL
 nG
 ko
 Cn
-Fz
-Fz
 Fz
 HS
 Yg
@@ -36277,13 +36296,13 @@ aO
 Fz
 Fz
 Fz
+Fz
+Fz
 He
 wL
 wL
 LL
 nc
-Fz
-Fz
 Fz
 aO
 Kk
@@ -36480,12 +36499,12 @@ Fz
 Fz
 tv
 Fz
+Fz
+Fz
 wL
 Fz
 Fz
 cZ
-cZ
-tv
 Fz
 yQ
 ji
@@ -36884,7 +36903,7 @@ Fz
 Fz
 Fz
 Fz
-Fz
+aO
 Fz
 Fz
 Dz
@@ -37082,10 +37101,10 @@ vD
 jV
 vD
 vD
-Fz
-Fz
-pe
 vD
+vD
+ZH
+Fz
 oa
 cZ
 Fz
@@ -37285,11 +37304,11 @@ vD
 Yq
 vD
 vD
+vD
+vD
 Fz
-vD
-vD
-TF
-uZ
+Fz
+cZ
 Fz
 Sc
 ji
@@ -37487,10 +37506,10 @@ mQ
 RO
 vD
 Yq
-Fz
 vD
 Fz
-VK
+Fz
+Fz
 PZ
 Yq
 Gt
@@ -37690,9 +37709,9 @@ Un
 wg
 vD
 Fz
-vD
-vD
-vD
+Fz
+Fz
+Fz
 vD
 Sc
 oV
@@ -37892,7 +37911,7 @@ Un
 wg
 vD
 Fz
-vD
+Fz
 Fz
 vD
 Sc

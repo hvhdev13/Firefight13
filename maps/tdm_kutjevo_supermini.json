@@ -4,6 +4,7 @@
     "map_file": "TDM_KutjevoSuperMini.dmm",
     "webmap_url": "Kutjevo",
     "disable_ship_map": true,
+    "disable_hunter_ship": true,
     "perf_mode": 31,
     "camouflage": "desert",
     "map_item_type": "/obj/item/map/kutjevo_map",

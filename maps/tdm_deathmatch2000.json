@@ -3,6 +3,7 @@
     "map_path": "map_files/TDM_Deathmatch2000",
     "map_file": "TDM_Deathmatch2000.dmm",
     "disable_ship_map": true,
+    "disable_hunter_ship": true,
     "perf_mode": 31,
     "traits": [
         {

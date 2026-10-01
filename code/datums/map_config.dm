@@ -84,6 +84,7 @@
 	var/perf_mode
 
 	var/disable_ship_map = FALSE
+	var/disable_hunter_ship = FALSE
 
 	var/list/monkey_types = list(/mob/living/carbon/human/monkey)
 
@@ -503,6 +504,9 @@
 
 	if(json["disable_ship_map"])
 		disable_ship_map = json["disable_ship_map"]
+
+	if(json["disable_hunter_ship"])
+		disable_hunter_ship = json["disable_hunter_ship"]
 
 	if(json["perf_mode"])
 		perf_mode = json["perf_mode"]
