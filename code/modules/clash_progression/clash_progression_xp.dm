@@ -119,6 +119,8 @@
 			kind = CLASH_UNLOCK_GUN
 		else if(ispath(rung[2], /obj/item/explosive/grenade))
 			kind = CLASH_UNLOCK_GEAR
+		else if(ispath(rung[2], /obj/item/storage))
+			kind = CLASH_UNLOCK_CARRIER
 		clash_notify_unlock(ckey, kind, clash_item_name(faction, rung[2]), source, rung[2])
 	for(var/title in GLOB.clash_role_levels)
 		if(GLOB.clash_role_levels[title] == level && clash_kit_faction_for_job(title) == faction)
@@ -171,8 +173,12 @@
 	var/list/carrier_step = GLOB.clash_carrier_tracks[family][step]
 	if(!carrier_step[1])
 		return
+	build_clash_option_gates()
 	for(var/index in 2 to length(carrier_step))
 		var/item_type = carrier_step[index]
+		var/list/gate = GLOB.clash_option_gates[clash_gate_key(faction, item_type)]
+		if(gate?["level"] && faction_level(faction) >= gate["level"])
+			return
 		if(clash_item_option(faction, item_type))
 			clash_notify_unlock(ckey, CLASH_UNLOCK_CARRIER, clash_item_name(faction, item_type), "[GLOB.clash_family_names[family]] step [step]", item_type)
 			return

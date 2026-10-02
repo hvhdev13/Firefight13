@@ -434,7 +434,6 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 	add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "QYJ-72 machine gun", /obj/item/weapon/gun/pkp, "Belt fed. Open the feed cover to reload", /obj/item/ammo_magazine/pkp, 4)
 	add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "M240A1 incinerator", /obj/item/weapon/gun/flamer/m240, "Burns out a room. Light the pilot first", /obj/item/ammo_magazine/flamer_tank, 4)
 	add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "Type 88 marksman rifle", /obj/item/weapon/gun/rifle/sniper/svd, "Semi auto, long reach", /obj/item/ammo_magazine/sniper/svd, 4)
-	add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "Type 71-F pulse rifle", /obj/item/weapon/gun/rifle/type71/flamer, "Type 71 with a built-in flamethrower", /obj/item/ammo_magazine/rifle/type71, 4)
 	add_clash_kit_option(faction, KIT_SLOT_SIDEARM, "Type 73 pistol", /obj/item/weapon/gun/pistol/t73, "Standard sidearm", /obj/item/ammo_magazine/pistol/t73, 3)
 	add_clash_kit_option(faction, KIT_SLOT_SIDEARM, "NP92 pistol", /obj/item/weapon/gun/pistol/np92, "Bigger magazine", /obj/item/ammo_magazine/pistol/np92, 3)
 	add_clash_kit_option(faction, KIT_SLOT_SIDEARM, "Type 44 revolver", /obj/item/weapon/gun/revolver/upp, "Six heavy rounds", /obj/item/ammo_magazine/revolver/upp, 3)

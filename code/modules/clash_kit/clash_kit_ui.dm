@@ -146,7 +146,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 	if(primary)
 		for(var/slot in GLOB.clash_kit_attachment_slots)
 			for(var/datum/clash_kit_option/option as anything in GLOB.clash_kit_menu[primary.faction][slot])
-				if(clash_kit_attachment_fits(option.item_type, primary.item_type))
+				if(clash_kit_attachment_fits(option.item_type, primary.item_type) && (!clash_progression_gating() || GLOB.clash_weapon_unlock_levels[clash_track_type(primary.item_type)]?[option.item_type]))
 					fits += option.id
 	var/mob/living/carbon/human/fighter = ishuman(user) && user.stat != DEAD ? user : null
 	var/area/clash_arena/here = fighter ? get_area(fighter) : null

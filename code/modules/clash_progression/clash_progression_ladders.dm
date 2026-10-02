@@ -26,14 +26,19 @@ GLOBAL_LIST_INIT(clash_faction_ladders, list(
 		list(2, /obj/item/explosive/grenade/high_explosive),
 		list(2, /obj/item/clothing/head/helmet/marine/jungle),
 		list(3, /obj/item/weapon/gun/shotgun/pump/m37a),
+		list(3, /obj/item/storage/pouch/shotgun),
 		list(5, /obj/item/weapon/gun/smg/m39),
+		list(5, /obj/item/storage/pouch/magazine/large),
 		list(6, /obj/item/clothing/mask/rebreather),
 		list(7, /obj/item/weapon/gun/pistol/mod88),
+		list(7, /obj/item/storage/pouch/magazine/pistol),
 		list(9, /obj/item/clothing/accessory/storage/webbing),
 		list(11, /obj/item/weapon/gun/rifle/lmg),
 		list(13, /obj/item/weapon/gun/revolver/m44),
+		list(13, /obj/item/storage/belt/gun/m44),
 		list(14, /obj/item/clothing/head/helmet/marine/desert),
 		list(15, /obj/item/weapon/gun/flamer/m240),
+		list(15, /obj/item/storage/pouch/flamertank),
 		list(16, /obj/item/clothing/mask/rebreather/scarf),
 		list(18, /obj/item/weapon/gun/rifle/m4ra),
 		list(19, /obj/item/clothing/accessory/storage/black_vest, "webbing_vest"),
@@ -50,14 +55,19 @@ GLOBAL_LIST_INIT(clash_faction_ladders, list(
 		list(2, /obj/item/explosive/grenade/high_explosive/upp),
 		list(2, /obj/item/clothing/head/helmet/marine/veteran/UPP/army),
 		list(3, /obj/item/weapon/gun/shotgun/type23),
+		list(3, /obj/item/storage/pouch/shotgun),
 		list(5, /obj/item/weapon/gun/smg/bizon),
+		list(5, /obj/item/storage/pouch/magazine/large),
 		list(6, /obj/item/clothing/mask/rebreather),
 		list(7, /obj/item/weapon/gun/pistol/np92),
+		list(7, /obj/item/storage/pouch/magazine/pistol),
 		list(9, /obj/item/clothing/accessory/storage/webbing),
 		list(11, /obj/item/weapon/gun/pkp),
 		list(13, /obj/item/weapon/gun/revolver/upp),
+		list(13, /obj/item/storage/belt/gun/type47),
 		list(14, /obj/item/clothing/mask/rebreather/scarf/tacticalmask/green),
 		list(15, /obj/item/weapon/gun/flamer/m240),
+		list(15, /obj/item/storage/pouch/flamertank),
 		list(16, /obj/item/clothing/mask/rebreather/scarf/tacticalmask/black),
 		list(18, /obj/item/weapon/gun/rifle/type71/carbine),
 		list(19, /obj/item/clothing/accessory/storage/black_vest, "webbing_vest"),
@@ -65,7 +75,6 @@ GLOBAL_LIST_INIT(clash_faction_ladders, list(
 		list(22, /obj/item/clothing/mask/rebreather/scarf/tacticalmask/tan),
 		list(24, /obj/item/weapon/gun/rifle/sniper/svd),
 		list(25, /obj/item/clothing/accessory/storage/droppouch/black, "drop_pouch"),
-		list(27, /obj/item/weapon/gun/rifle/type71/flamer),
 		list(28, /obj/item/clothing/head/uppcap/beret),
 		list(29, /obj/item/clothing/head/uppcap/ushanka),
 		list(30, /obj/item/clothing/mask/gas),
@@ -73,12 +82,23 @@ GLOBAL_LIST_INIT(clash_faction_ladders, list(
 ))
 
 GLOBAL_LIST_INIT(clash_role_levels, list(
-	JOB_SQUAD_TEAM_LEADER = 5,
-	JOB_SQUAD_SMARTGUN = 8,
-	JOB_SQUAD_LEADER = 12,
-	JOB_SQUAD_SPECIALIST = 12,
-	JOB_UPP_SPECIALIST = 8,
-	JOB_UPP_LEADER = 12,
+	JOB_SQUAD_ENGI = 3,
+	JOB_SQUAD_MEDIC = 5,
+	JOB_DOCTOR = 7,
+	JOB_NURSE = 7,
+	JOB_FIELD_DOCTOR = 7,
+	JOB_CHIEF_REQUISITION = 7,
+	JOB_CARGO_TECH = 7,
+	JOB_SQUAD_SMARTGUN = 11,
+	JOB_SQUAD_TEAM_LEADER = 13,
+	JOB_SQUAD_LEADER = 13,
+	JOB_SQUAD_SPECIALIST = 15,
+	JOB_UPP_ENGI = 3,
+	JOB_UPP_MEDIC = 5,
+	JOB_UPP_LT_DOKTOR = 7,
+	JOB_UPP_SUPPLY = 7,
+	JOB_UPP_SPECIALIST = 11,
+	JOB_UPP_LEADER = 13,
 ))
 
 GLOBAL_LIST_INIT(clash_preset_levels, list(
@@ -210,10 +230,13 @@ GLOBAL_LIST_EMPTY(clash_option_gates)
 				for(var/index in 2 to length(carrier_step))
 					gates[clash_gate_key(faction, carrier_step[index])] = list("kind" = CLASH_GATE_CARRIER, "family" = family, "step" = step, "xp" = carrier_step[1])
 		for(var/list/rung as anything in GLOB.clash_faction_ladders[faction])
+			var/key = clash_gate_key(faction, rung[2])
 			if(length(rung) > 2)
-				gates[clash_gate_key(faction, rung[2])] = list("kind" = CLASH_GATE_TWIN, "level" = rung[1], "gear" = rung[3])
+				gates[key] = list("kind" = CLASH_GATE_TWIN, "level" = rung[1], "gear" = rung[3])
+			else if(gates[key]?["kind"] == CLASH_GATE_CARRIER)
+				gates[key]["level"] = rung[1]
 			else
-				gates[clash_gate_key(faction, rung[2])] = list("kind" = CLASH_GATE_FACTION, "level" = rung[1])
+				gates[key] = list("kind" = CLASH_GATE_FACTION, "level" = rung[1])
 
 /proc/clash_class_gear_level(class, gear)
 	var/list/order = GLOB.clash_class_gear[class]

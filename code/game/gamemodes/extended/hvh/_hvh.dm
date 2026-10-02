@@ -587,7 +587,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 
 /datum/game_mode/extended/faction_clash/hvh/proc/report_environment_death(mob/victim, cause)
 	var/next_unlock = clash_next_unlock_text(victim.mind?.ckey || victim.ckey, victim.faction, "<br>")
-	set_clash_death_card(victim, "ELIMINATED", null, "#8a939c", cause ? "Killed by [html_encode(cause)]" : "Cause unknown", next_unlock ? list("<span style='color: #e8b931'>[next_unlock]</span>") : null, null, null, get_life_line(victim))
+	set_clash_death_card(victim, "ELIMINATED", null, "#8a939c", cause ? "Killed by [html_encode(cause)]" : "Cause unknown", null, null, null, get_life_line(victim), null, next_unlock)
 	if(!cause)
 		return
 	to_chat(victim, SPAN_WARNING("Killed by [cause]."))
@@ -620,8 +620,6 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	if(length(notes) > 3)
 		notes.Cut(4)
 	var/next_unlock = clash_next_unlock_text(victim.mind?.ckey || victim.ckey, victim.faction, "<br>")
-	if(next_unlock)
-		notes += "<span style='color: #e8b931'>[next_unlock]</span>"
 	var/obj/item/weapon = isitem(cause_object) ? cause_object : null
 	if(!weapon && cause)
 		for(var/obj/item/held in list(killer.get_active_hand(), killer.get_inactive_hand()) + killer.contents)
@@ -629,7 +627,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 				weapon = held
 				break
 	var/mutable_appearance/portrait = victim.client ? new /mutable_appearance(killer) : null
-	set_clash_death_card(victim, "KILLED BY", killer_name, faction_color(killer.faction), details.Join("  ·  "), notes, weapon, health_left, get_life_line(victim), portrait)
+	set_clash_death_card(victim, "KILLED BY", killer_name, faction_color(killer.faction), details.Join("  ·  "), notes, weapon, health_left, get_life_line(victim), portrait, next_unlock)
 
 /datum/game_mode/extended/faction_clash/hvh/proc/get_life_line(mob/victim)
 	var/list/parts = list()

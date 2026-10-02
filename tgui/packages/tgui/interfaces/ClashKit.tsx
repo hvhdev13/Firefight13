@@ -761,7 +761,12 @@ export const ClashKit = () => {
   const kit = kits[kit_index - 1];
   const primary = findOption(menus, faction, 'primary', choices.primary);
   const current = slotById[selectedSlot];
-  const options = menus[faction]?.[selectedSlot] ?? [];
+  const options = (menus[faction]?.[selectedSlot] ?? []).filter(
+    (option) =>
+      !slotById[selectedSlot]?.attachment ||
+      !choices.primary ||
+      fits.includes(option.id),
+  );
   const issueFor = (id: string) =>
     ATTACHMENT_SLOTS.includes(id) && choices.primary ? undefined : issue?.[id];
   const issued = issueFor(selectedSlot);

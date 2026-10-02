@@ -16,7 +16,7 @@
 			if(GLOB.clash_role_levels[title] == next && clash_kit_faction_for_job(title) == faction)
 				names += "[title] role"
 		if(length(names))
-			return "Next unlock:[separator]Level [next], [clash_number_text(max(0, clash_faction_xp_for(next) - xp))] XP to go.[separator]Unlocks: [english_list(names)]"
+			return "Your next unlock:[separator]Level [next], [clash_number_text(max(0, clash_faction_xp_for(next) - xp))] XP to go.[separator]Unlocks: [english_list(names)]"
 	return null
 
 /proc/clash_scoreboard_level(ckey, faction)
@@ -139,6 +139,7 @@
 
 /proc/clash_carrier_progress(datum/clash_progress/progress, faction)
 	. = list()
+	build_clash_option_gates()
 	for(var/family in GLOB.clash_carrier_tracks)
 		var/list/steps = GLOB.clash_carrier_tracks[family]
 		var/list/names = list()
@@ -146,7 +147,8 @@
 			var/name
 			for(var/index in 2 to length(carrier_step))
 				var/datum/clash_kit_option/option = clash_item_option(faction, carrier_step[index])
-				if(option)
+				var/list/gate = GLOB.clash_option_gates[clash_gate_key(faction, carrier_step[index])]
+				if(option && !(gate?["level"] && progress.faction_level(faction) >= gate["level"]))
 					name = option.name
 					break
 			names += list(name)

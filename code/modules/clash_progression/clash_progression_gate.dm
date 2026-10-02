@@ -132,8 +132,10 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 				return "Unlocks at [clash_side_name(option.faction)] level [gate["level"]]"
 			return clash_gear_lock_text(progress, GLOB.clash_job_classes[job], gate["gear"])
 		if(CLASH_GATE_CARRIER)
-			if(progress.carrier_step(gate["family"]) < gate["step"])
-				return "Unlocks at [clash_number_text(gate["xp"])] [GLOB.clash_family_names[gate["family"]]] XP"
+			if(progress.carrier_step(gate["family"]) >= gate["step"] || (gate["level"] && progress.faction_level(option.faction) >= gate["level"]))
+				return null
+			var/xp_text = "[clash_number_text(gate["xp"])] [GLOB.clash_family_names[gate["family"]]] XP"
+			return gate["level"] ? "Unlocks at [clash_side_name(option.faction)] level [gate["level"]] or [xp_text]" : "Unlocks at [xp_text]"
 	return null
 
 /proc/clash_gear_lock_text(datum/clash_progress/progress, class, gear)
@@ -157,22 +159,16 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 /proc/clash_role_unlocked(client/player, title)
 	return !clash_role_lock_text(player, title)
 
-/datum/job/marine/tl/can_play_role_in_scenario(client/client)
+/datum/job/marine/can_play_role_in_scenario(client/client)
 	return ..() && clash_role_unlocked(client, title)
 
-/datum/job/marine/smartgunner/can_play_role_in_scenario(client/client)
+/datum/job/civilian/can_play_role_in_scenario(client/client)
 	return ..() && clash_role_unlocked(client, title)
 
-/datum/job/marine/leader/can_play_role_in_scenario(client/client)
+/datum/job/logistics/can_play_role_in_scenario(client/client)
 	return ..() && clash_role_unlocked(client, title)
 
-/datum/job/marine/specialist/can_play_role_in_scenario(client/client)
-	return ..() && clash_role_unlocked(client, title)
-
-/datum/job/antag/upp/machinegunner/can_play_role_in_scenario(client/client)
-	return ..() && clash_role_unlocked(client, title)
-
-/datum/job/antag/upp/leader/can_play_role_in_scenario(client/client)
+/datum/job/antag/upp/can_play_role_in_scenario(client/client)
 	return ..() && clash_role_unlocked(client, title)
 
 /proc/clash_late_join_lock_text(mob/new_player/player, datum/job/job, faction)
