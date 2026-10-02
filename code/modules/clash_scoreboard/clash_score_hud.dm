@@ -126,10 +126,10 @@ GLOBAL_LIST_EMPTY(clash_score_panel_icons)
 	icon = null
 	overlays.Cut()
 
-/proc/clash_place_killfeed_line(atom/movable/screen/faction_killfeed/line, index)
+/proc/clash_place_killfeed_line(atom/movable/screen/faction_killfeed/line, index, below_objectives)
 	line.screen_loc = "CENTER-3,TOP-2:20"
 	line.maptext_x = SCORE_PANEL_LEFT + SCORE_PANEL_WIDTH - line.maptext_width
-	line.maptext_y = -6 - index * 12
+	line.maptext_y = -6 - index * 12 - (below_objectives ? 24 : 0)
 
 #undef SCORE_CANVAS_WIDTH
 #undef SCORE_PANEL_WIDTH

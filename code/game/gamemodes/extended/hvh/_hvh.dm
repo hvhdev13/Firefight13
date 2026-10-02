@@ -430,9 +430,10 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	var/list/lines = player.hud_used?.faction_killfeed
 	if(!length(lines))
 		return
+	var/below_objectives = length(get_objective_maptext())
 	for(var/i = 1 to length(lines))
 		var/atom/movable/screen/faction_killfeed/line = lines[i]
-		clash_place_killfeed_line(line, i)
+		clash_place_killfeed_line(line, i, below_objectives)
 		var/entry_index = length(killfeed) - i + 1
 		if(entry_index < 1)
 			line.maptext = ""
