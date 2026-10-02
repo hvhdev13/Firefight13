@@ -36,7 +36,7 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 		return null
 	var/datum/clash_progress/progress = clash_gate_progress(ckey)
 	if(option.slot in GLOB.clash_kit_attachment_slots)
-		if(!primary_type)
+		if(!primary_type || !clash_kit_attachment_fits(option.item_type, primary_type))
 			return null
 		var/obj/item/weapon/gun/gun_type = primary_type
 		var/list/levels = GLOB.clash_weapon_unlock_levels[primary_type]

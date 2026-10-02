@@ -74,7 +74,7 @@
 				locks[option.id] = lock_text
 				continue
 			var/list/gate = GLOB.clash_option_gates[clash_gate_key(faction, option.item_type)]
-			if((attachment ? primary_type : gate && gate["kind"] != CLASH_GATE_FREE) && !(option.id in progress.seen))
+			if((attachment ? primary_type && clash_kit_attachment_fits(option.item_type, primary_type) : gate && gate["kind"] != CLASH_GATE_FREE) && !(option.id in progress.seen))
 				fresh += option.id
 	var/list/role_locks = list()
 	var/client/player = GLOB.directory[ckey]

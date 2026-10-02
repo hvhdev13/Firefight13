@@ -38,7 +38,7 @@
 
 /datum/element/clash_combat_log/proc/on_revived(mob/living/carbon/human/source)
 	SIGNAL_HANDLER
-	clash_progress_revive(source)
+	INVOKE_ASYNC(GLOBAL_PROC, GLOBAL_PROC_REF(clash_progress_revive), source)
 
 #undef CLASH_HIT_SOUND
 #undef CLASH_HIT_SOUND_GAP
