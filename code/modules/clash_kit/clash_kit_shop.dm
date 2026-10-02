@@ -116,12 +116,13 @@ GLOBAL_LIST_EMPTY(clash_kit_budgets)
 	var/list/by_id = get_clash_shop(job)["by_id"]
 	var/list/limits = clash_shop_budget(ckey, job)
 	var/list/spent = list(CLASH_SHOP_POINTS = 0, CLASH_SHOP_SNOWFLAKE = 0)
+	var/obj/item/weapon/gun/primary = clash_kit_primary_of(wearer)
 	for(var/id in kit.extras)
 		var/list/item = by_id[id]
 		if(!item)
 			. += "gone"
 			continue
-		if(!clash_shop_item_unlocked(ckey, job, item["cost"], text2path(id), clash_kit_primary_of(wearer)?.type))
+		if(!clash_shop_item_unlocked(ckey, job, item["cost"], text2path(id), primary?.type))
 			. += "locked"
 			continue
 		var/snowflake = item["pool"] == CLASH_SHOP_SNOWFLAKE

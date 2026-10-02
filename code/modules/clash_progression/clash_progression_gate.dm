@@ -68,7 +68,10 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 			var/obj/item/attachable/attachment = gun.attachments[slot]
 			if(!attachment || !(attachment.flags_attach_features & ATTACH_REMOVABLE) || !levels[attachment.type] || level >= levels[attachment.type])
 				continue
-			attachment.Detach(null, gun)
+			if(get_turf(gun))
+				attachment.Detach(null, gun)
+			else
+				gun.attachments[slot] = null
 			gun.update_attachable(slot)
 			qdel(attachment)
 
@@ -90,7 +93,8 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 	var/primary_type = issued_gun ? text2path(issued_gun["type"]) : null
 	var/track_type = clash_track_type(primary_type)
 	var/list/levels = GLOB.clash_weapon_unlock_levels[track_type]
-	var/level = clash_gate_progress(ckey).weapon_level(track_type)
+	var/datum/clash_progress/progress = clash_gate_progress(ckey)
+	var/level = progress.weapon_level(track_type)
 	. = issue.Copy()
 	var/list/grenade = issue[KIT_SLOT_GRENADE]
 	if(grenade && clash_option_lock_text(ckey, clash_kit_option_id(clash_kit_faction_for_job(job), KIT_SLOT_GRENADE, text2path(grenade["type"])), job))
@@ -153,10 +157,23 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 /proc/clash_role_unlocked(client/player, title)
 	return !clash_role_lock_text(player, title)
 
-/datum/job/can_play_role_in_scenario(client/client)
-	. = ..()
-	if(. && !clash_role_unlocked(client, title))
-		return FALSE
+/datum/job/marine/tl/can_play_role_in_scenario(client/client)
+	return ..() && clash_role_unlocked(client, title)
+
+/datum/job/marine/smartgunner/can_play_role_in_scenario(client/client)
+	return ..() && clash_role_unlocked(client, title)
+
+/datum/job/marine/leader/can_play_role_in_scenario(client/client)
+	return ..() && clash_role_unlocked(client, title)
+
+/datum/job/marine/specialist/can_play_role_in_scenario(client/client)
+	return ..() && clash_role_unlocked(client, title)
+
+/datum/job/antag/upp/machinegunner/can_play_role_in_scenario(client/client)
+	return ..() && clash_role_unlocked(client, title)
+
+/datum/job/antag/upp/leader/can_play_role_in_scenario(client/client)
+	return ..() && clash_role_unlocked(client, title)
 
 /proc/clash_late_join_lock_text(mob/new_player/player, datum/job/job, faction)
 	var/lock_text = clash_role_lock_text(player.client, job.title)
@@ -175,7 +192,8 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 			return "Pick a primary to unlock attachments"
 		return clash_attachment_lock_text(clash_gate_progress(ckey), item_type, primary_type)
 	var/class = GLOB.clash_job_classes[job]
-	if(cost <= clash_shop_cost_limit(clash_gate_progress(ckey).class_level(class)))
+	var/datum/clash_progress/progress = clash_gate_progress(ckey)
+	if(cost <= clash_shop_cost_limit(progress.class_level(class)))
 		return null
 	for(var/list/tier as anything in GLOB.clash_shop_tiers)
 		if(tier[2] >= cost)
@@ -188,7 +206,8 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 /proc/clash_shop_budget(ckey, job)
 	if(!clash_progression_gating())
 		return null
-	var/level = clash_gate_progress(ckey).class_level(GLOB.clash_job_classes[job])
+	var/datum/clash_progress/progress = clash_gate_progress(ckey)
+	var/level = progress.class_level(GLOB.clash_job_classes[job])
 	return list(min(CLASH_SHOP_BASE + level, CLASH_SHOP_CAP), CLASH_SHOP_SNOWFLAKE_BASE + CLASH_SHOP_SNOWFLAKE_STEP * level)
 
 /proc/clash_filter_kit(datum/clash_kit/kit, ckey, job)
