@@ -147,7 +147,7 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 			filtered.choices[slot] = id
 	return filtered
 
-/proc/clash_set_progress_level(ckey, track, key, level)
+/proc/clash_set_progress_level(ckey, track, key, level, mob/admin = usr)
 	var/datum/clash_progress/progress = clash_progress_of(ckey)
 	if(!progress || !isnum(level))
 		return FALSE
@@ -198,6 +198,6 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 			return FALSE
 	progress.check_unlocks(track, key, old_level, faction)
 	progress.save()
-	log_admin("[key_name(usr)] set the [track] progression of [ckey] for [key] to [level].")
-	message_admins("[key_name_admin(usr)] set the [track] progression of [ckey] for [key] to [level].")
+	log_admin("[key_name(admin)] set the [track] progression of [ckey] for [key] to [level].")
+	message_admins("[key_name_admin(admin)] set the [track] progression of [ckey] for [key] to [level].")
 	return TRUE

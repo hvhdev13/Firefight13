@@ -192,6 +192,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 		"deploy_block" = deploy_state ? get_deploy_block(user) : null,
 		"revivable" = deploy_state == "dead" && !!user.get_revivable_body(),
 		"hint" = hint,
+		"progress" = clash_progress_ui_data(ckey, job, primary?.item_type),
 	)
 
 /datum/clash_kit_screen/proc/get_deploy_state(mob/user)
@@ -420,6 +421,14 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 		if("deploy")
 			deploy(user)
 			return TRUE
+		if("seen")
+			var/datum/clash_progress/progress = clash_progress_of(ckey)
+			if(!progress || !islist(params["ids"]))
+				return TRUE
+			for(var/id in params["ids"])
+				if(get_clash_kit_option(id) && !(id in progress.seen))
+					progress.seen += id
+					progress.dirty = TRUE
 	return TRUE
 
 /datum/clash_kit_screen/proc/name_new_kit(mob/user, datum/clash_kit/kit)

@@ -2,7 +2,7 @@
 
 /client/proc/hvh_control()
 	set name = "HvH Control"
-	set desc = "End or skip HvH matches, set scores, move objectives, open the bot panel."
+	set desc = "End or skip HvH matches, set scores, move objectives, open the bot and progression panels."
 	set category = "Admin.Events"
 
 	if(!check_rights(R_EVENT))
@@ -14,7 +14,7 @@
 			return
 		to_chat(usr, SPAN_WARNING("This is not an HvH round."))
 		return
-	var/list/actions = list("End match now", "Skip countdown or break", "Set a team's score", "Bot Control Panel")
+	var/list/actions = list("End match now", "Skip countdown or break", "Set a team's score", "Bot Control Panel", "Progression Panel")
 	if(clash_mode.can_rebuild_objectives())
 		actions += list("Re-place objectives", "Jump to an objective")
 	actions += "Change game mode"
@@ -24,6 +24,9 @@
 		return
 	if(choice == "Bot Control Panel")
 		clash_bot_panel()
+		return
+	if(choice == "Progression Panel")
+		GLOB.clash_progression_admin.tgui_interact(mob)
 		return
 	if(!choice || SSticker.mode != clash_mode || clash_mode.round_finished)
 		return

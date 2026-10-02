@@ -21,12 +21,53 @@ interface CareerRow {
   last_played?: string;
 }
 
+export interface ProgressFaction {
+  id: string;
+  side: string;
+  level: number;
+  insignia: string;
+  xp: number;
+}
+
+export interface ProgressClass {
+  id: string;
+  name: string;
+  level: number;
+  xp: number;
+}
+
+export interface ProgressCarrier {
+  id: string;
+  family: string;
+  step: number;
+  steps: number;
+  xp: number;
+}
+
+export interface ProgressWeapon {
+  type: string;
+  name: string;
+  level: number;
+  max: number;
+  xp: number;
+  mastery: number;
+  mastered: boolean;
+}
+
+export interface CareerProgress {
+  factions: ProgressFaction[];
+  classes: ProgressClass[];
+  carriers: ProgressCarrier[];
+  weapons: ProgressWeapon[];
+}
+
 interface StatsData {
   viewer: string;
   own: CareerRow | null;
   board: CareerRow[];
   kd_floor: number;
   board_size: number;
+  progress: CareerProgress | null;
 }
 
 type SortKey = 'kills' | 'kd' | 'wins' | 'mvps' | 'best_streak' | 'accuracy';
@@ -135,6 +176,84 @@ const Career = (props: {
   );
 };
 
+export const ProgressionView = (props: {
+  readonly progress: CareerProgress;
+}) => {
+  const { progress } = props;
+  const weapons = [...progress.weapons].sort(
+    (a, b) => b.xp - a.xp || a.name.localeCompare(b.name),
+  );
+  return (
+    <>
+      <div className="ClashStats__grid">
+        {progress.factions.map((faction) => (
+          <Tile
+            big
+            key={faction.id}
+            label={`${faction.side} level`}
+            value={faction.level}
+            sub={`${faction.insignia} · ${faction.xp.toLocaleString('en-US')} XP`}
+          />
+        ))}
+        {progress.classes.map((entry) => (
+          <Tile
+            key={entry.id}
+            label={entry.name}
+            value={entry.level}
+            sub={`${entry.xp.toLocaleString('en-US')} XP`}
+          />
+        ))}
+      </div>
+      <table className="ClashStats__table">
+        <thead>
+          <tr>
+            <th className="ClashStats__nameCol">Ammo carriers</th>
+            <th>Step</th>
+            <th>XP</th>
+          </tr>
+        </thead>
+        <tbody>
+          {progress.carriers.map((carrier) => (
+            <tr key={carrier.id}>
+              <td className="ClashStats__nameCol">{carrier.family}</td>
+              <td>
+                {carrier.step} / {carrier.steps}
+              </td>
+              <td>{carrier.xp.toLocaleString('en-US')}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <table className="ClashStats__table">
+        <thead>
+          <tr>
+            <th className="ClashStats__nameCol">Weapon</th>
+            <th>Level</th>
+            <th>XP</th>
+            <th>Mastery</th>
+          </tr>
+        </thead>
+        <tbody>
+          {weapons.map((weapon) => (
+            <tr key={weapon.type}>
+              <td className="ClashStats__nameCol">{weapon.name}</td>
+              <td>
+                {weapon.level} / {weapon.max}
+              </td>
+              <td>{weapon.xp.toLocaleString('en-US')}</td>
+              <td className={weapon.mastered ? 'ClashStats__main' : undefined}>
+                {weapon.mastered
+                  ? 'Mastered'
+                  : `${Math.floor(weapon.mastery * 100)}%`}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </>
+  );
+};
+
 const Leaderboard = (props: {
   readonly board: CareerRow[];
   readonly viewer: string;
@@ -226,7 +345,7 @@ const Leaderboard = (props: {
 
 export const ClashStats = () => {
   const { data } = useBackend<StatsData>();
-  const [tab, setTab] = useState<'career' | 'board'>('career');
+  const [tab, setTab] = useState<'career' | 'progress' | 'board'>('career');
   return (
     <Window width={560} height={520}>
       <Window.Content scrollable className="ClashStats">
@@ -239,6 +358,13 @@ export const ClashStats = () => {
             Your career
           </Tabs.Tab>
           <Tabs.Tab
+            icon="arrow-up-right-dots"
+            selected={tab === 'progress'}
+            onClick={() => setTab('progress')}
+          >
+            Progression
+          </Tabs.Tab>
+          <Tabs.Tab
             icon="trophy"
             selected={tab === 'board'}
             onClick={() => setTab('board')}
@@ -246,9 +372,18 @@ export const ClashStats = () => {
             Leaderboard
           </Tabs.Tab>
         </Tabs>
-        {tab === 'career' ? (
+        {tab === 'career' && (
           <Career own={data.own} board={data.board} floor={data.kd_floor} />
-        ) : (
+        )}
+        {tab === 'progress' &&
+          (data.progress ? (
+            <ProgressionView progress={data.progress} />
+          ) : (
+            <NoticeBox info>
+              Progression is not saved for guest accounts.
+            </NoticeBox>
+          ))}
+        {tab === 'board' && (
           <Leaderboard
             board={data.board}
             viewer={data.viewer}

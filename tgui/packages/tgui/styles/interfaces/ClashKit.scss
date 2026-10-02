@@ -568,6 +568,86 @@ $panel: rgba(0, 0, 0, 0.3);
     opacity: 0.7;
   }
 
+  &__optionNew,
+  &__slotNew {
+    padding: 0 5px;
+    border-radius: 8px;
+    background: #e8b931;
+    color: #1a1a1a;
+    font-size: 0.7em;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+
+  &__optionNew {
+    margin-left: 6px;
+  }
+
+  &__slotNew {
+    position: absolute;
+    top: 3px;
+    left: 4px;
+  }
+
+  &__optionLock {
+    color: #e8b931;
+    font-size: 0.85em;
+  }
+
+  &__progress {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 18px;
+    margin-bottom: 6px;
+  }
+
+  &__progressNext {
+    color: #e8b931;
+    font-size: 0.85em;
+  }
+
+  &__level {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &__levelLabel {
+    font-weight: bold;
+  }
+
+  &__levelBar {
+    width: 140px;
+    height: 6px;
+    border: 1px solid $line;
+    background: $panel;
+  }
+
+  &__levelFill {
+    height: 100%;
+    background: var(--kit-accent);
+
+    &--mastery {
+      background: #e8b931;
+    }
+  }
+
+  &__levelNext {
+    font-size: 0.85em;
+    opacity: 0.7;
+  }
+
+  &__gunProgress {
+    margin: 6px 8px 0;
+    font-size: 0.9em;
+
+    .ClashKit__levelBar {
+      width: 100%;
+      margin: 3px 0;
+    }
+  }
+
   &__optionCheck {
     width: 20px;
     text-align: center;

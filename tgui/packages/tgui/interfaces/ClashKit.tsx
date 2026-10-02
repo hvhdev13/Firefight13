@@ -65,7 +65,7 @@ interface PackContainer {
 interface Extra {
   id: string;
   name: string;
-  status: 'ok' | 'room' | 'points' | 'gone' | 'pending';
+  status: 'ok' | 'room' | 'points' | 'gone' | 'locked' | 'pending';
 }
 
 interface ShopItem {
@@ -85,6 +85,46 @@ interface ShopSection {
 interface KitSummary {
   name: string;
   set: number;
+}
+
+interface LevelBar {
+  to_next: number;
+  fill: number;
+}
+
+interface GunProgress {
+  name: string;
+  level: number;
+  max: number;
+  mastery: number;
+  mastered: BooleanLike;
+  next?: string;
+  kills_to_go?: number;
+}
+
+interface CarrierProgress {
+  family: string;
+  step: number;
+  steps: number;
+  next?: string;
+  xp_to_go?: number;
+}
+
+interface KitProgress {
+  side: string;
+  faction_level: number;
+  insignia: string;
+  faction_bar: LevelBar;
+  class?: string;
+  class_level: number;
+  class_bar: LevelBar;
+  next?: string;
+  locks: Record<string, string>;
+  fresh: string[];
+  role_locks: Record<string, string>;
+  shop_locks: Record<string, string>;
+  gun?: GunProgress;
+  carriers: CarrierProgress[];
 }
 
 interface StaticData {
@@ -118,6 +158,7 @@ interface Data extends StaticData {
   shop: ShopSection[];
   budget: [number, number];
   spent: { points: number; snowflake: number };
+  progress?: KitProgress;
 }
 
 type Tab = 'gear' | 'pack' | 'shop';
@@ -126,7 +167,103 @@ const EXTRA_PROBLEMS: Record<string, string> = {
   room: 'No room, will not be packed',
   points: 'Not enough points, will not be bought',
   gone: 'No longer sold to this role',
+  locked: 'Locked for your class level, will not be bought',
 };
+
+const xpText = (value: number) => value.toLocaleString('en-US');
+
+const ProgressBar = (props: {
+  readonly label: string;
+  readonly bar: LevelBar;
+}) => {
+  const { label, bar } = props;
+  return (
+    <Box className="ClashKit__level">
+      <Box className="ClashKit__levelLabel">{label}</Box>
+      <Box className="ClashKit__levelBar">
+        <Box
+          className="ClashKit__levelFill"
+          style={{ width: `${Math.round(bar.fill * 100)}%` }}
+        />
+      </Box>
+      <Box className="ClashKit__levelNext">
+        {bar.to_next ? `${xpText(bar.to_next)} XP to next` : 'Max level'}
+      </Box>
+    </Box>
+  );
+};
+
+const ProgressStrip = (props: { readonly progress: KitProgress }) => {
+  const { progress } = props;
+  return (
+    <Box className="ClashKit__progress">
+      <ProgressBar
+        label={`${progress.side} level ${progress.faction_level} · ${progress.insignia}`}
+        bar={progress.faction_bar}
+      />
+      {progress.class && (
+        <ProgressBar
+          label={`${progress.class} level ${progress.class_level}`}
+          bar={progress.class_bar}
+        />
+      )}
+      {progress.next && (
+        <Box className="ClashKit__progressNext">{progress.next}</Box>
+      )}
+    </Box>
+  );
+};
+
+const GunPanel = (props: { readonly gun: GunProgress }) => {
+  const { gun } = props;
+  return (
+    <Box className="ClashKit__gunProgress">
+      <Box>
+        {gun.name} level <b>{gun.level}</b> / {gun.max}
+        {gun.next && (
+          <Box as="span" className="ClashKit__optionBlurb">
+            {' '}
+            · Next: {gun.next} in about {gun.kills_to_go} kills
+          </Box>
+        )}
+      </Box>
+      <Box className="ClashKit__levelBar">
+        <Box
+          className="ClashKit__levelFill ClashKit__levelFill--mastery"
+          style={{ width: `${Math.round(gun.mastery * 100)}%` }}
+        />
+      </Box>
+      <Box className="ClashKit__optionBlurb">
+        {gun.mastered
+          ? 'Mastered'
+          : `Mastery ${Math.floor(gun.mastery * 100)}%`}
+      </Box>
+    </Box>
+  );
+};
+
+const CarrierList = (props: { readonly carriers: CarrierProgress[] }) => (
+  <Box className="ClashKit__packHolder">
+    <Box className="ClashKit__packHead">Ammo carriers</Box>
+    {props.carriers.map((carrier) => (
+      <Box key={carrier.family} className="ClashKit__packItem">
+        <Stack align="center">
+          <Stack.Item grow>
+            {carrier.family}
+            <Box as="span" className="ClashKit__optionAmmo">
+              step {carrier.step} / {carrier.steps}
+            </Box>
+          </Stack.Item>
+          <Stack.Item className="ClashKit__optionBlurb">
+            {carrier.next
+              ? `${carrier.next} in ${xpText(carrier.xp_to_go ?? 0)} XP`
+              : 'All unlocked'}
+          </Stack.Item>
+        </Stack>
+      </Box>
+    ))}
+  </Box>
+);
 
 const ItemIcon = (props: { readonly icon: string; readonly state: string }) => (
   <Box className="ClashKit__optionIcon">
@@ -140,12 +277,13 @@ const ItemIcon = (props: { readonly icon: string; readonly state: string }) => (
 
 const PackView = () => {
   const { act, data } = useBackend<Data>();
-  const { pack, extras, removed, doll_pending } = data;
+  const { pack, extras, removed, doll_pending, progress } = data;
   const problems = extras
     .map((extra, index) => ({ ...extra, index: index + 1 }))
     .filter((extra) => EXTRA_PROBLEMS[extra.status]);
   return (
     <>
+      {progress && <CarrierList carriers={progress.carriers} />}
       {!!doll_pending && (
         <Box className="ClashKit__packNote">
           <Icon name="circle-notch" spin /> Repacking...
@@ -266,7 +404,7 @@ const pointsLeft = (data: Data) => ({
 
 const ShopView = () => {
   const { act, data } = useBackend<Data>();
-  const { shop, budget, extras } = data;
+  const { shop, budget, extras, progress } = data;
   const [search, setSearch] = useState('');
   const left = pointsLeft(data);
   const owned: Record<string, number> = {};
@@ -323,6 +461,7 @@ const ShopView = () => {
           <Box className="ClashKit__packHead">{section.name}</Box>
           {section.items.map((item) => {
             const short = left[item.pool] < item.cost;
+            const lock = progress?.shop_locks[item.id];
             const count = owned[item.id] ?? 0;
             return (
               <Box key={item.id} className="ClashKit__packItem">
@@ -332,6 +471,11 @@ const ShopView = () => {
                   </Stack.Item>
                   <Stack.Item grow>
                     {item.name}
+                    {lock && (
+                      <Box className="ClashKit__optionLock">
+                        <Icon name="lock" /> {lock}
+                      </Box>
+                    )}
                     {count > 0 && (
                       <Box as="span" className="ClashKit__packBought">
                         ×{count}
@@ -351,8 +495,11 @@ const ShopView = () => {
                     />
                     <Button
                       icon="cart-plus"
-                      disabled={short}
-                      tooltip={short ? 'Not enough points' : 'Buy and pack it'}
+                      disabled={short || !!lock}
+                      tooltip={
+                        lock ||
+                        (short ? 'Not enough points' : 'Buy and pack it')
+                      }
                       onClick={() => act('buy', { id: item.id })}
                     />
                   </Stack.Item>
@@ -391,15 +538,29 @@ const SlotTile = (props: {
   readonly selected: boolean;
   readonly dimmed?: boolean;
   readonly small?: boolean;
+  readonly lock?: string;
+  readonly fresh?: boolean;
   readonly onClick: () => void;
 }) => {
-  const { slot, picked, issued, selected, dimmed, small, onClick } = props;
+  const {
+    slot,
+    picked,
+    issued,
+    selected,
+    dimmed,
+    small,
+    lock,
+    fresh,
+    onClick,
+  } = props;
   const shown = picked ?? issued;
-  const tooltip = picked
-    ? picked.name
-    : issued
-      ? `${issued.name} (job issue)`
-      : `${slot.name}: nothing`;
+  const tooltip = lock
+    ? `${picked?.name}: locked, ${lock}. The starting item is used at spawn.`
+    : picked
+      ? picked.name
+      : issued
+        ? `${issued.name} (job issue)`
+        : `${slot.name}: nothing`;
   return (
     <Tooltip content={tooltip}>
       <Box
@@ -407,7 +568,7 @@ const SlotTile = (props: {
           'ClashKit__slot',
           small && 'ClashKit__slot--small',
           selected && 'ClashKit__slot--selected',
-          dimmed && 'ClashKit__slot--dimmed',
+          (dimmed || lock) && 'ClashKit__slot--dimmed',
           picked && 'ClashKit__slot--set',
         ])}
         onClick={onClick}
@@ -433,6 +594,7 @@ const SlotTile = (props: {
           !slot.image && <Icon className="ClashKit__slotEmpty" name="plus" />
         )}
         <Box className="ClashKit__slotLabel">{slot.name}</Box>
+        {fresh && <Box className="ClashKit__slotNew">new</Box>}
         {picked ? (
           <Box className="ClashKit__slotDot" />
         ) : (
@@ -468,10 +630,22 @@ const OptionRow = (props: {
   readonly picked: boolean;
   readonly disabled?: boolean;
   readonly issueTag?: boolean;
+  readonly lock?: string;
+  readonly fresh?: boolean;
   readonly onClick: () => void;
 }) => {
-  const { option, issued, label, blurb, picked, disabled, issueTag, onClick } =
-    props;
+  const {
+    option,
+    issued,
+    label,
+    blurb,
+    picked,
+    disabled,
+    issueTag,
+    lock,
+    fresh,
+    onClick,
+  } = props;
   const art = option ?? issued;
   return (
     <Box
@@ -502,6 +676,11 @@ const OptionRow = (props: {
                 issued
               </Box>
             )}
+            {fresh && (
+              <Box as="span" className="ClashKit__optionNew">
+                new
+              </Box>
+            )}
             {option && option.ammo > 0 && (
               <Box as="span" className="ClashKit__optionAmmo">
                 ×{option.ammo}
@@ -509,10 +688,21 @@ const OptionRow = (props: {
             )}
           </Box>
           <Box className="ClashKit__optionBlurb">{option?.blurb ?? blurb}</Box>
+          {lock && (
+            <Box className="ClashKit__optionLock">
+              <Icon name="lock" /> {lock}
+            </Box>
+          )}
           {option && <StatChips stats={option.stats} />}
         </Stack.Item>
         <Stack.Item className="ClashKit__optionCheck">
-          {picked ? <Icon name="check" /> : disabled && <Icon name="ban" />}
+          {picked ? (
+            <Icon name="check" />
+          ) : lock ? (
+            <Icon name="lock" />
+          ) : (
+            disabled && <Icon name="ban" />
+          )}
         </Stack.Item>
       </Stack>
     </Box>
@@ -541,6 +731,7 @@ export const ClashKit = () => {
     deploy_block,
     revivable,
     hint,
+    progress,
   } = data;
 
   const [selectedSlot, setSelectedSlot] = useState('primary');
@@ -584,8 +775,26 @@ export const ClashKit = () => {
       ? `Deploy in ${clock(waitLeft)}`
       : `Deploy as ${job}`;
   const isUpp = faction === 'UPP';
-  const roleOptions =
-    roles.find((group) => group.faction === faction)?.jobs ?? [];
+  const roleOptions = (
+    roles.find((group) => group.faction === faction)?.jobs ?? []
+  ).map((title) => ({
+    value: title,
+    displayText: progress?.role_locks[title]
+      ? `${title} (${progress.role_locks[title]})`
+      : title,
+  }));
+  const fresh = progress?.fresh ?? [];
+  const locks = progress?.locks ?? {};
+  const [newHere, setNewHere] = useState<string[]>([]);
+  useEffect(() => {
+    const ids = options
+      .filter((option) => fresh.includes(option.id))
+      .map((option) => option.id);
+    setNewHere(ids);
+    if (ids.length) {
+      act('seen', { ids });
+    }
+  }, [selectedSlot, job]);
 
   const tile = (id: string, small?: boolean, dimmed?: boolean) => (
     <SlotTile
@@ -596,6 +805,11 @@ export const ClashKit = () => {
       selected={selectedSlot === id}
       small={small}
       dimmed={dimmed}
+      lock={choices[id] ? locks[choices[id]] : undefined}
+      fresh={
+        selectedSlot !== id &&
+        !!menus[faction]?.[id]?.some((option) => fresh.includes(option.id))
+      }
       onClick={() => {
         setSelectedSlot(id);
         setTab('gear');
@@ -610,6 +824,7 @@ export const ClashKit = () => {
       >
         <Stack fill vertical>
           <Stack.Item className="ClashKit__header">
+            {progress && <ProgressStrip progress={progress} />}
             <Stack align="center">
               <Stack.Item className="ClashKit__headLeft">
                 <Box className="ClashKit__sides">
@@ -780,6 +995,7 @@ export const ClashKit = () => {
                     <Box className="ClashKit__gunEmpty">No primary</Box>
                   )}
                 </Box>
+                {progress?.gun && <GunPanel gun={progress.gun} />}
               </Stack.Item>
 
               <Stack.Item grow className="ClashKit__optionsPanel">
@@ -848,16 +1064,22 @@ export const ClashKit = () => {
                       !!current?.attachment &&
                       (!primary || !fits.includes(option.id));
                     const isIssue = option.id === issuedOption?.id;
+                    const lock = isIssue ? undefined : locks[option.id];
                     return (
                       <OptionRow
                         key={option.id}
                         option={option}
                         issueTag={isIssue}
+                        lock={lock}
+                        fresh={
+                          fresh.includes(option.id) ||
+                          newHere.includes(option.id)
+                        }
                         picked={
                           choices[selectedSlot] === option.id ||
                           (isIssue && !choices[selectedSlot])
                         }
-                        disabled={unfit && !isIssue}
+                        disabled={(unfit && !isIssue) || !!lock}
                         onClick={() =>
                           isIssue
                             ? act('clear', { slot: selectedSlot })
