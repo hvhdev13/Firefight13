@@ -271,7 +271,6 @@
 /obj/limb/var/clash_splint_paid = FALSE
 /obj/structure/barricade/var/clash_builder_ckey
 /obj/structure/barricade/var/clash_builder_faction
-/obj/structure/barricade/var/clash_builder_class
 /obj/structure/barricade/var/clash_enemy_damage = 0
 /obj/structure/barricade/var/clash_cover_carry = 0
 
@@ -305,6 +304,8 @@
 	clash_grant_support_xp(earner.mind?.ckey || earner.ckey, earner.faction, GLOB.clash_job_classes[earner.job || earner.mind?.clash_job], amount, source, route, cap)
 
 /proc/clash_progress_leader_assist(mob/living/carbon/human/killer)
+	if(!(killer.mind?.ckey || killer.ckey))
+		return
 	for(var/mob/living/carbon/human/leader in range(CLASH_XP_LEADER_RANGE, killer))
 		if(leader != killer && leader.stat == CONSCIOUS && leader.faction == killer.faction && GLOB.clash_job_classes[leader.job] == CLASH_CLASS_LEADER)
 			clash_award_xp(leader, CLASH_XP_LEADER_ASSIST, CLASH_XP_SOURCE_LEADER)
@@ -378,11 +379,10 @@
 /obj/structure/barricade/Initialize(mapload, mob/user)
 	. = ..()
 	var/mob/living/carbon/human/builder = user
-	if(!ishuman(builder) || builder.statistic_exempt || !(builder.mind?.ckey || builder.ckey))
+	if(!ishuman(builder) || builder.statistic_exempt || !(builder.mind?.ckey || builder.ckey) || GLOB.clash_job_classes[builder.job] != CLASH_CLASS_ENGINEER)
 		return
 	clash_builder_ckey = builder.mind?.ckey || builder.ckey
 	clash_builder_faction = builder.faction
-	clash_builder_class = GLOB.clash_job_classes[builder.job]
 
 /obj/structure/barricade/proc/clash_absorbed(mob/attacker, damage)
 	if(!clash_builder_ckey || damage <= 0)
@@ -394,7 +394,7 @@
 	clash_cover_carry += share
 	var/xp = round(clash_cover_carry / CLASH_XP_COVER_DAMAGE)
 	clash_cover_carry -= xp * CLASH_XP_COVER_DAMAGE
-	clash_grant_support_xp(clash_builder_ckey, clash_builder_faction, clash_builder_class, xp, CLASH_XP_SOURCE_COVER, CLASH_XP_SOURCE_COVER, CLASH_XP_ENGINEERING_CAP)
+	clash_grant_support_xp(clash_builder_ckey, clash_builder_faction, CLASH_CLASS_ENGINEER, xp, CLASH_XP_SOURCE_COVER, CLASH_XP_SOURCE_COVER, CLASH_XP_ENGINEERING_CAP)
 
 /obj/structure/barricade/bullet_act(obj/projectile/bullet)
 	var/before = health
@@ -410,7 +410,7 @@
 	var/mob/living/carbon/human/repairer = usr
 	var/before = health
 	. = ..()
-	if(damage >= 0 || clash_enemy_damage <= 0 || !ishuman(repairer) || repairer.faction != clash_builder_faction)
+	if(damage >= 0 || clash_enemy_damage <= 0 || !ishuman(repairer) || repairer.faction != clash_builder_faction || GLOB.clash_job_classes[repairer.job] != CLASH_CLASS_ENGINEER)
 		return
 	var/repaired = min(health - before, clash_enemy_damage)
 	if(repaired <= 0)

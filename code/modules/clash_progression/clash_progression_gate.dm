@@ -130,9 +130,16 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 		return clash_attachment_lock_text(progress, option.item_type, primary_type)
 	return clash_gate_lock_text(progress, option.faction, option.item_type, job)
 
-/proc/clash_gate_lock_text(datum/clash_progress/progress, faction, item_type, job)
+/proc/clash_gate_for(faction, item_type)
 	build_clash_option_gates()
-	var/list/gate = GLOB.clash_option_gates[clash_gate_key(faction, item_type)]
+	for(var/check = item_type; check; check = type2parent(check))
+		var/list/gate = GLOB.clash_option_gates[clash_gate_key(faction, check)]
+		if(gate)
+			return gate
+	return null
+
+/proc/clash_gate_lock_text(datum/clash_progress/progress, faction, item_type, job)
+	var/list/gate = clash_gate_for(faction, item_type)
 	if(!gate)
 		return null
 	switch(gate["kind"])
