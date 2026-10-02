@@ -72,17 +72,29 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 			gun.update_attachable(slot)
 			qdel(attachment)
 
-/proc/clash_filter_issue(list/issue, ckey)
+/proc/clash_strip_locked_grenades(mob/living/carbon/human/wearer, ckey, job)
+	if(!clash_progression_gating())
+		return
+	var/faction = clash_kit_faction_for_job(job)
+	for(var/obj/item/explosive/grenade/grenade in wearer.get_contents())
+		if(istype(grenade.loc, /obj/item/attachable) || !clash_option_lock_text(ckey, clash_kit_option_id(faction, KIT_SLOT_GRENADE, grenade.type), job))
+			continue
+		if(grenade.loc == wearer)
+			wearer.temp_drop_inv_item(grenade, TRUE)
+		qdel(grenade)
+
+/proc/clash_filter_issue(list/issue, ckey, job)
 	if(!issue || !clash_progression_gating())
 		return issue
 	var/list/issued_gun = issue[KIT_SLOT_PRIMARY]
 	var/primary_type = issued_gun ? text2path(issued_gun["type"]) : null
-	if(!primary_type)
-		return issue
 	var/track_type = clash_track_type(primary_type)
 	var/list/levels = GLOB.clash_weapon_unlock_levels[track_type]
 	var/level = clash_gate_progress(ckey).weapon_level(track_type)
 	. = issue.Copy()
+	var/list/grenade = issue[KIT_SLOT_GRENADE]
+	if(grenade && clash_option_lock_text(ckey, clash_kit_option_id(clash_kit_faction_for_job(job), KIT_SLOT_GRENADE, text2path(grenade["type"])), job))
+		. -= KIT_SLOT_GRENADE
 	for(var/slot in GLOB.clash_kit_attachment_slots)
 		var/list/info = issue[slot]
 		var/needed = info ? levels?[text2path(info["type"])] : null

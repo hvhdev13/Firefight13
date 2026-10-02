@@ -176,7 +176,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 		"kits" = kit_data,
 		"kit_index" = kit_index,
 		"choices" = kit?.choices || list(),
-		"issue" = clash_filter_issue(issue, ckey) || list(),
+		"issue" = clash_filter_issue(issue, ckey, job) || list(),
 		"fits" = fits,
 		"doll" = render?["doll"],
 		"gun" = render?["gun"],

@@ -6,7 +6,6 @@ GLOBAL_LIST_INIT(clash_starting_kits, list(
 		KIT_SLOT_POUCH_L = /obj/item/storage/pouch/firstaid/full,
 		KIT_SLOT_POUCH_R = /obj/item/storage/pouch/magazine,
 		KIT_SLOT_WEBBING = /obj/item/clothing/accessory/storage/webbing/black,
-		KIT_SLOT_GRENADE = /obj/item/explosive/grenade/high_explosive,
 		KIT_SLOT_PRIMARY = /obj/item/weapon/gun/rifle/m41a,
 		KIT_SLOT_SIDEARM = /obj/item/weapon/gun/pistol/m4a3,
 	),
@@ -17,7 +16,6 @@ GLOBAL_LIST_INIT(clash_starting_kits, list(
 		KIT_SLOT_POUCH_L = /obj/item/storage/pouch/firstaid/full,
 		KIT_SLOT_POUCH_R = /obj/item/storage/pouch/magazine,
 		KIT_SLOT_WEBBING = /obj/item/clothing/accessory/storage/webbing/black,
-		KIT_SLOT_GRENADE = /obj/item/explosive/grenade/high_explosive/upp,
 		KIT_SLOT_PRIMARY = /obj/item/weapon/gun/rifle/type71,
 		KIT_SLOT_SIDEARM = /obj/item/weapon/gun/pistol/t73,
 	),
@@ -25,6 +23,7 @@ GLOBAL_LIST_INIT(clash_starting_kits, list(
 
 GLOBAL_LIST_INIT(clash_faction_ladders, list(
 	FACTION_MARINE = list(
+		list(2, /obj/item/explosive/grenade/high_explosive),
 		list(2, /obj/item/clothing/head/helmet/marine/jungle),
 		list(3, /obj/item/weapon/gun/shotgun/pump/m37a),
 		list(5, /obj/item/weapon/gun/smg/m39),
@@ -48,6 +47,7 @@ GLOBAL_LIST_INIT(clash_faction_ladders, list(
 		list(30, /obj/item/weapon/gun/pistol/vp78),
 	),
 	FACTION_UPP = list(
+		list(2, /obj/item/explosive/grenade/high_explosive/upp),
 		list(2, /obj/item/clothing/head/helmet/marine/veteran/UPP/army),
 		list(3, /obj/item/weapon/gun/shotgun/type23),
 		list(5, /obj/item/weapon/gun/smg/bizon),

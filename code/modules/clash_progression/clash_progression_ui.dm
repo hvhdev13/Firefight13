@@ -1,4 +1,4 @@
-/proc/clash_next_unlock_text(ckey, faction)
+/proc/clash_next_unlock_text(ckey, faction, separator = " ")
 	if(!clash_progression_gating() || !(faction in list(FACTION_MARINE, FACTION_UPP)))
 		return null
 	var/datum/clash_progress/progress = clash_progress_of(ckey)
@@ -7,9 +7,16 @@
 	var/level = progress.faction_level(faction)
 	var/list/entry = progress.factions[faction]
 	var/xp = entry ? entry["xp"] : 0
-	for(var/list/rung as anything in GLOB.clash_faction_ladders[faction])
-		if(rung[1] > level && ispath(rung[2], /obj/item/weapon/gun))
-			return "Next: [clash_item_name(faction, rung[2])], [clash_number_text(max(0, clash_faction_xp_for(rung[1]) - xp))] XP to go"
+	for(var/next in level + 1 to CLASH_LEVEL_CAP)
+		var/list/names = list()
+		for(var/list/rung as anything in GLOB.clash_faction_ladders[faction])
+			if(rung[1] == next)
+				names += clash_item_name(faction, rung[2])
+		for(var/title in GLOB.clash_role_levels)
+			if(GLOB.clash_role_levels[title] == next && clash_kit_faction_for_job(title) == faction)
+				names += "[title] role"
+		if(length(names))
+			return "Next unlock:[separator]Level [next], [clash_number_text(max(0, clash_faction_xp_for(next) - xp))] XP to go.[separator]Unlocks: [english_list(names)]"
 	return null
 
 /proc/clash_scoreboard_level(ckey, faction)

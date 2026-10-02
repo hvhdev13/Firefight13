@@ -331,16 +331,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	return entry
 
 /datum/game_mode/extended/faction_clash/hvh/proc/get_score_maptext()
-	var/list/parts = list()
-	var/limit_text = get_limit_text()
-	if(limit_text)
-		parts += limit_text
-	if(matches_per_round > 1)
-		parts += "Series <span style='color: [faction_color(FACTION_MARINE)]'>[match_wins[FACTION_MARINE] || 0]</span>-<span style='color: [faction_color(FACTION_UPP)]'>[match_wins[FACTION_UPP] || 0]</span> · best of [matches_per_round]"
-	var/list/lines = list()
-	if(length(parts))
-		lines += "<span class='maptext center' style='color: #c3c9ce'>[parts.Join("  ·  ")]</span>"
-	lines += get_objective_maptext()
+	var/list/lines = get_objective_maptext()
 	return "<span style='vertical-align: top'>[lines.Join("<br>")]</span>"
 
 /datum/game_mode/extended/faction_clash/hvh/proc/get_scoreboard_data(mob/viewer)
@@ -595,8 +586,8 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		. += name
 
 /datum/game_mode/extended/faction_clash/hvh/proc/report_environment_death(mob/victim, cause)
-	var/next_unlock = clash_next_unlock_text(victim.mind?.ckey || victim.ckey, victim.faction)
-	set_clash_death_card(victim, "ELIMINATED", null, "#8a939c", cause ? "Killed by [html_encode(cause)]" : "Cause unknown", next_unlock ? list(next_unlock) : null, null, null, get_life_line(victim))
+	var/next_unlock = clash_next_unlock_text(victim.mind?.ckey || victim.ckey, victim.faction, "<br>")
+	set_clash_death_card(victim, "ELIMINATED", null, "#8a939c", cause ? "Killed by [html_encode(cause)]" : "Cause unknown", next_unlock ? list("<span style='color: #e8b931'>[next_unlock]</span>") : null, null, null, get_life_line(victim))
 	if(!cause)
 		return
 	to_chat(victim, SPAN_WARNING("Killed by [cause]."))
@@ -609,6 +600,8 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		details += html_encode(cause)
 	details += "[distance] tile\s away"
 	var/list/notes = list()
+	if(length(assisters))
+		notes += "Assists: [html_encode(english_list(assisters))]"
 	if(victim.faction == killer.faction)
 		notes += "<span style='color: #ff8a70'>Friendly fire.</span>"
 	var/list/killer_entry = player_scores[killer_name]
@@ -624,13 +617,11 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		var/times = by_killer[killer_name]
 		if(times >= 2)
 			notes += "<span style='color: #ff8a70'>NEMESIS</span>: they have killed you [times] times"
-	if(length(assisters))
-		notes += "Assisted by [html_encode(english_list(assisters))]"
 	if(length(notes) > 3)
 		notes.Cut(4)
-	var/next_unlock = clash_next_unlock_text(victim.mind?.ckey || victim.ckey, victim.faction)
+	var/next_unlock = clash_next_unlock_text(victim.mind?.ckey || victim.ckey, victim.faction, "<br>")
 	if(next_unlock)
-		notes += next_unlock
+		notes += "<span style='color: #e8b931'>[next_unlock]</span>"
 	var/obj/item/weapon = isitem(cause_object) ? cause_object : null
 	if(!weapon && cause)
 		for(var/obj/item/held in list(killer.get_active_hand(), killer.get_inactive_hand()) + killer.contents)
@@ -830,7 +821,6 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	GLOB.clash_progress.save_dirty()
 
 /datum/game_mode/extended/faction_clash/hvh/proc/begin_intermission()
-	hold_fire(TRUE)
 	intermission_end_time = world.time + CLASH_INTERMISSION
 	var/list/result = match_results[length(match_results)]
 	var/line = get_match_result_line(result)

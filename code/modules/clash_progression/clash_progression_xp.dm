@@ -114,7 +114,12 @@
 		if(rung[1] != level)
 			continue
 		found = TRUE
-		clash_notify_unlock(ckey, ispath(rung[2], /obj/item/weapon/gun) ? CLASH_UNLOCK_GUN : CLASH_UNLOCK_COSMETIC, clash_item_name(faction, rung[2]), source, rung[2])
+		var/kind = CLASH_UNLOCK_COSMETIC
+		if(ispath(rung[2], /obj/item/weapon/gun))
+			kind = CLASH_UNLOCK_GUN
+		else if(ispath(rung[2], /obj/item/explosive/grenade))
+			kind = CLASH_UNLOCK_GEAR
+		clash_notify_unlock(ckey, kind, clash_item_name(faction, rung[2]), source, rung[2])
 	for(var/title in GLOB.clash_role_levels)
 		if(GLOB.clash_role_levels[title] == level && clash_kit_faction_for_job(title) == faction)
 			found = TRUE
