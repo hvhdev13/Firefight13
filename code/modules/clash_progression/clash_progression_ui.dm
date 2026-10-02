@@ -73,9 +73,11 @@
 	var/list/class_entry = progress.classes[class]
 	var/list/locks = list()
 	var/list/fresh = list()
+	var/list/ranks = list()
 	for(var/slot in GLOB.clash_kit_menu[faction])
 		var/attachment = (slot in GLOB.clash_kit_attachment_slots)
 		for(var/datum/clash_kit_option/option as anything in GLOB.clash_kit_menu[faction][slot])
+			ranks[option.id] = clash_option_rank(progress, option, class, primary_type)
 			var/lock_text = clash_option_lock_text(ckey, option.id, job, primary_type)
 			if(lock_text)
 				locks[option.id] = lock_text
@@ -106,12 +108,29 @@
 		"class_bar" = clash_level_bar(class_entry ? class_entry["xp"] : 0, class_level, CLASH_CLASS_XP_BASE),
 		"next" = clash_next_unlock_text(ckey, faction),
 		"locks" = locks,
+		"ranks" = ranks,
 		"fresh" = fresh,
 		"role_locks" = role_locks,
 		"shop_locks" = shop_locks,
 		"gun" = clash_gun_progress(progress, clash_track_type(gun_type)),
 		"carriers" = clash_carrier_progress(progress, faction),
 	)
+
+/proc/clash_option_rank(datum/clash_progress/progress, datum/clash_kit_option/option, class, primary_type)
+	if(option.slot in GLOB.clash_kit_attachment_slots)
+		return GLOB.clash_weapon_unlock_levels[clash_track_type(primary_type)]?[option.item_type] || 1
+	var/list/gate = clash_gate_for(option.faction, option.item_type)
+	switch(gate?["kind"])
+		if(CLASH_GATE_FACTION)
+			return gate["level"]
+		if(CLASH_GATE_CLASS)
+			return clash_class_gear_level(class, gate["gear"]) || CLASH_LEVEL_CAP
+		if(CLASH_GATE_TWIN)
+			return max(gate["level"], clash_class_gear_level(class, gate["gear"]) || CLASH_LEVEL_CAP)
+		if(CLASH_GATE_CARRIER)
+			var/by_xp = progress.level_from_xp(gate["xp"], CLASH_FACTION_XP_BASE)
+			return gate["level"] ? min(gate["level"], by_xp) : by_xp
+	return 1
 
 /proc/clash_gun_progress(datum/clash_progress/progress, gun_type)
 	var/list/unlocks = GLOB.clash_weapon_tracks[gun_type]

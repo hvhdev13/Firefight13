@@ -120,6 +120,7 @@ interface KitProgress {
   class_bar: LevelBar;
   next?: string;
   locks: Record<string, string>;
+  ranks: Record<string, number>;
   fresh: string[];
   role_locks: Record<string, string>;
   shop_locks: Record<string, string>;
@@ -761,12 +762,15 @@ export const ClashKit = () => {
   const kit = kits[kit_index - 1];
   const primary = findOption(menus, faction, 'primary', choices.primary);
   const current = slotById[selectedSlot];
-  const options = (menus[faction]?.[selectedSlot] ?? []).filter(
-    (option) =>
-      !slotById[selectedSlot]?.attachment ||
-      !choices.primary ||
-      fits.includes(option.id),
-  );
+  const ranks = progress?.ranks ?? {};
+  const options = (menus[faction]?.[selectedSlot] ?? [])
+    .filter(
+      (option) =>
+        !slotById[selectedSlot]?.attachment ||
+        !choices.primary ||
+        fits.includes(option.id),
+    )
+    .sort((a, b) => (ranks[a.id] ?? 0) - (ranks[b.id] ?? 0));
   const issueFor = (id: string) =>
     ATTACHMENT_SLOTS.includes(id) && choices.primary ? undefined : issue?.[id];
   const issued = issueFor(selectedSlot);
