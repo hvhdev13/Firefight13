@@ -42,6 +42,7 @@ GLOBAL_LIST_INIT(clash_progression_settings, list("enabled" = TRUE, "xp_multipli
 	var/toasts = TRUE
 	var/prestige = 0
 	var/bot_xp_match = 0
+	var/zone_seconds = 0
 	var/list/ledger = list()
 	var/list/unlocked_round = list()
 	var/short_side

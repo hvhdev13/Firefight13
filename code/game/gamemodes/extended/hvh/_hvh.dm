@@ -91,6 +91,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	var/list/rivalries = list()
 	var/list/life_kills = list()
 	var/admin_tampered = FALSE
+	var/progression = FALSE
 	var/arena_rules = FALSE
 
 /proc/clash_respawn_cooldown()

@@ -28,6 +28,10 @@
 		if(held.name == cause || initial(held.name) == cause)
 			return held.type
 
+/proc/clash_progression_active()
+	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
+	return istype(clash_mode) && clash_mode.progression
+
 /proc/clash_award_xp(mob/living/carbon/human/earner, amount, source, gun_type)
 	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
 	if(!istype(clash_mode) || !clash_mode.match_live || earner.statistic_exempt)
@@ -35,7 +39,7 @@
 	clash_grant_xp(earner.mind?.ckey || earner.ckey, earner.faction, GLOB.clash_job_classes[earner.job || earner.mind?.clash_job], amount, source, gun_type)
 
 /proc/clash_grant_xp(ckey, faction, class, amount, source, gun_type)
-	if(!(faction in list(FACTION_MARINE, FACTION_UPP)))
+	if(!clash_progression_active() || !(faction in list(FACTION_MARINE, FACTION_UPP)))
 		return
 	var/datum/clash_progress/progress = clash_progress_of(ckey)
 	if(!progress)
@@ -103,12 +107,20 @@
 	clash_award_xp(runner, CLASH_XP_CAPTURE, CLASH_XP_SOURCE_CAPTURE)
 
 /proc/clash_progress_zone(datum/clash_zone/zone)
+	if(!clash_progression_active())
+		return
 	for(var/mob/living/carbon/human/fighter as anything in zone.get_occupant_mobs())
-		if(fighter.faction == zone.owner)
+		if(fighter.faction != zone.owner)
+			continue
+		var/datum/clash_progress/progress = clash_progress_of(fighter.ckey)
+		if(!progress)
+			continue
+		progress.zone_seconds++
+		if(!(progress.zone_seconds % CLASH_XP_ZONE_SECONDS))
 			clash_award_xp(fighter, CLASH_XP_ZONE, CLASH_XP_SOURCE_ZONE)
 
 /proc/clash_award_bot_kill(mob/living/carbon/human/body)
-	if(!GLOB.clash_progression_settings["bot_xp"] || QDELETED(body))
+	if(!clash_progression_active() || !GLOB.clash_progression_settings["bot_xp"] || QDELETED(body))
 		return
 	var/mob/living/carbon/human/killer = body.last_damage_data?.resolve_mob()
 	if(!ishuman(killer) || killer.faction == body.faction)
@@ -147,7 +159,7 @@
 	GLOB.clash_progress.save_dirty()
 
 /proc/clash_progress_join(mob/living/carbon/human/spawned)
-	if(!istype(SSticker.mode, /datum/game_mode/extended/faction_clash/hvh))
+	if(!clash_progression_active())
 		return
 	var/datum/clash_progress/progress = clash_progress_of(spawned.ckey)
 	if(!progress)
