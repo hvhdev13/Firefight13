@@ -208,16 +208,16 @@ export const ProgressionView = (props: {
         <thead>
           <tr>
             <th className="ClashStats__nameCol">Ammo carriers</th>
-            <th>Step</th>
+            <th>Unlocked</th>
             <th>XP</th>
           </tr>
         </thead>
         <tbody>
           {progress.carriers.map((carrier) => (
             <tr key={carrier.id}>
-              <td className="ClashStats__nameCol">{carrier.family}</td>
+              <td className="ClashStats__nameCol">{carrier.family} ammo</td>
               <td>
-                {carrier.step} / {carrier.steps}
+                {carrier.step} of {carrier.steps}
               </td>
               <td>{carrier.xp.toLocaleString('en-US')}</td>
             </tr>

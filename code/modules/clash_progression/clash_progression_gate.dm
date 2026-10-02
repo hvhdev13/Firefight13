@@ -27,6 +27,68 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 	for(var/index = length(.) - 3; index > 0; index -= 3)
 		. = "[copytext(., 1, index + 1)],[copytext(., index + 1)]"
 
+/proc/clash_track_type(gun_type)
+	var/check = gun_type
+	while(ispath(check, /obj/item/weapon/gun))
+		if(GLOB.clash_weapon_tracks[check])
+			return check
+		check = type2parent(check)
+	return gun_type
+
+/proc/clash_effective_primary(datum/clash_kit/kit, job)
+	var/datum/clash_kit_option/primary = kit?.get_option(KIT_SLOT_PRIMARY)
+	if(primary)
+		return primary.item_type
+	var/list/issue = get_clash_issue_items(job)
+	var/list/issued_gun = issue?[KIT_SLOT_PRIMARY]
+	return issued_gun ? text2path(issued_gun["type"]) : null
+
+/proc/clash_attachment_lock_text(datum/clash_progress/progress, attachment_type, gun_type)
+	var/track_type = clash_track_type(gun_type)
+	var/obj/item/weapon/gun/gun = track_type
+	var/list/levels = GLOB.clash_weapon_unlock_levels[track_type]
+	var/needed = levels?[attachment_type]
+	if(!needed)
+		return "Does not unlock on the [initial(gun.name)]"
+	if(progress.weapon_level(track_type) < needed)
+		return "Unlocks at [initial(gun.name)] level [needed]"
+	return null
+
+/proc/clash_strip_locked_attachments(mob/living/carbon/human/wearer, ckey)
+	if(!clash_progression_gating())
+		return
+	var/datum/clash_progress/progress = clash_gate_progress(ckey)
+	for(var/obj/item/weapon/gun/gun in wearer.get_contents())
+		var/track_type = clash_track_type(gun.type)
+		var/list/levels = GLOB.clash_weapon_unlock_levels[track_type]
+		if(!levels)
+			continue
+		var/level = progress.weapon_level(track_type)
+		for(var/slot in gun.attachments)
+			var/obj/item/attachable/attachment = gun.attachments[slot]
+			if(!attachment || !(attachment.flags_attach_features & ATTACH_REMOVABLE) || !levels[attachment.type] || level >= levels[attachment.type])
+				continue
+			attachment.Detach(null, gun)
+			gun.update_attachable(slot)
+			qdel(attachment)
+
+/proc/clash_filter_issue(list/issue, ckey)
+	if(!issue || !clash_progression_gating())
+		return issue
+	var/list/issued_gun = issue[KIT_SLOT_PRIMARY]
+	var/primary_type = issued_gun ? text2path(issued_gun["type"]) : null
+	if(!primary_type)
+		return issue
+	var/track_type = clash_track_type(primary_type)
+	var/list/levels = GLOB.clash_weapon_unlock_levels[track_type]
+	var/level = clash_gate_progress(ckey).weapon_level(track_type)
+	. = issue.Copy()
+	for(var/slot in GLOB.clash_kit_attachment_slots)
+		var/list/info = issue[slot]
+		var/needed = info ? levels?[text2path(info["type"])] : null
+		if(needed && level < needed)
+			. -= slot
+
 /proc/clash_option_unlocked(ckey, option_id, job, primary_type)
 	return !clash_option_lock_text(ckey, option_id, job, primary_type)
 
@@ -38,14 +100,7 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 	if(option.slot in GLOB.clash_kit_attachment_slots)
 		if(!primary_type || !clash_kit_attachment_fits(option.item_type, primary_type))
 			return null
-		var/obj/item/weapon/gun/gun_type = primary_type
-		var/list/levels = GLOB.clash_weapon_unlock_levels[primary_type]
-		var/needed = levels?[option.item_type]
-		if(!needed)
-			return "Does not unlock on the [initial(gun_type.name)]"
-		if(progress.weapon_level(primary_type) < needed)
-			return "Unlocks at [initial(gun_type.name)] level [needed]"
-		return null
+		return clash_attachment_lock_text(progress, option.item_type, primary_type)
 	build_clash_option_gates()
 	var/list/gate = GLOB.clash_option_gates[clash_gate_key(option.faction, option.item_type)]
 	if(!gate)
@@ -100,9 +155,13 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 	GLOB.clash_role_gate_bypass = FALSE
 	return open ? lock_text : null
 
-/proc/clash_shop_item_lock_text(ckey, job, cost)
+/proc/clash_shop_item_lock_text(ckey, job, cost, item_type, primary_type)
 	if(!clash_progression_gating())
 		return null
+	if(ispath(item_type, /obj/item/attachable))
+		if(!primary_type)
+			return "Pick a primary to unlock attachments"
+		return clash_attachment_lock_text(clash_gate_progress(ckey), item_type, primary_type)
 	var/class = GLOB.clash_job_classes[job]
 	if(cost <= clash_shop_cost_limit(clash_gate_progress(ckey).class_level(class)))
 		return null
@@ -111,8 +170,8 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 			return "Unlocks at [GLOB.clash_class_names[class] || "class"] level [tier[1]]"
 	return null
 
-/proc/clash_shop_item_unlocked(ckey, job, cost)
-	return !clash_shop_item_lock_text(ckey, job, cost)
+/proc/clash_shop_item_unlocked(ckey, job, cost, item_type, primary_type)
+	return !clash_shop_item_lock_text(ckey, job, cost, item_type, primary_type)
 
 /proc/clash_shop_budget(ckey, job)
 	if(!clash_progression_gating())

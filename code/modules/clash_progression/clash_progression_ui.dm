@@ -53,7 +53,7 @@
 	var/next_xp = clash_level_xp_for(level + 1, base)
 	return list("to_next" = max(0, next_xp - xp), "fill" = clamp((xp - floor_xp) / (next_xp - floor_xp), 0, 1))
 
-/proc/clash_progress_ui_data(ckey, job, primary_type)
+/proc/clash_progress_ui_data(ckey, job, primary_type, gun_type)
 	if(!clash_progression_gating())
 		return null
 	build_clash_option_gates()
@@ -86,7 +86,7 @@
 	var/list/shop_locks = list()
 	var/list/shop_items = get_clash_shop(job)["by_id"]
 	for(var/id in shop_items)
-		var/lock_text = clash_shop_item_lock_text(ckey, job, shop_items[id]["cost"])
+		var/lock_text = clash_shop_item_lock_text(ckey, job, shop_items[id]["cost"], text2path(id), gun_type)
 		if(lock_text)
 			shop_locks[id] = lock_text
 	return list(
@@ -102,7 +102,7 @@
 		"fresh" = fresh,
 		"role_locks" = role_locks,
 		"shop_locks" = shop_locks,
-		"gun" = clash_gun_progress(progress, primary_type),
+		"gun" = clash_gun_progress(progress, clash_track_type(gun_type)),
 		"carriers" = clash_carrier_progress(progress, faction),
 	)
 

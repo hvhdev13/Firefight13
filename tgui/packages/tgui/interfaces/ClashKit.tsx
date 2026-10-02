@@ -249,14 +249,14 @@ const CarrierList = (props: { readonly carriers: CarrierProgress[] }) => (
       <Box key={carrier.family} className="ClashKit__packItem">
         <Stack align="center">
           <Stack.Item grow>
-            {carrier.family}
+            {carrier.family} ammo
             <Box as="span" className="ClashKit__optionAmmo">
-              step {carrier.step} / {carrier.steps}
+              {carrier.step} of {carrier.steps} carriers unlocked
             </Box>
           </Stack.Item>
           <Stack.Item className="ClashKit__optionBlurb">
             {carrier.next
-              ? `${carrier.next} in ${xpText(carrier.xp_to_go ?? 0)} XP`
+              ? `Next: ${carrier.next} in ${xpText(carrier.xp_to_go ?? 0)} XP`
               : 'All unlocked'}
           </Stack.Item>
         </Stack>
@@ -766,7 +766,13 @@ export const ClashKit = () => {
     ATTACHMENT_SLOTS.includes(id) && choices.primary ? undefined : issue?.[id];
   const issued = issueFor(selectedSlot);
   const issuedOption = issued?.type
-    ? options.find((option) => option.type === issued.type)
+    ? options
+        .filter(
+          (option) =>
+            option.type === issued.type ||
+            issued.type?.startsWith(`${option.type}/`),
+        )
+        .sort((a, b) => b.type.length - a.type.length)[0]
     : undefined;
   const waiting = deploy_state === 'dead' && waitLeft > 0;
   const deployLabel = deploy_block

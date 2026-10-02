@@ -80,7 +80,7 @@ const PlayerProgress = (props: { readonly progress: CareerProgress }) => {
       <Section title="Ammo carriers">
         <LabeledList>
           {progress.carriers.map((carrier) => (
-            <LabeledList.Item key={carrier.id} label={carrier.family}>
+            <LabeledList.Item key={carrier.id} label={`${carrier.family} ammo`}>
               <LevelInput
                 track="carrier"
                 id={carrier.id}
@@ -88,7 +88,8 @@ const PlayerProgress = (props: { readonly progress: CareerProgress }) => {
                 min={0}
                 max={carrier.steps}
               />{' '}
-              of {carrier.steps}, {carrier.xp.toLocaleString('en-US')} XP
+              of {carrier.steps} carriers, {carrier.xp.toLocaleString('en-US')}{' '}
+              XP
             </LabeledList.Item>
           ))}
         </LabeledList>

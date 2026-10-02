@@ -70,6 +70,7 @@
 	if(!ispath(gun_type, /obj/item/explosive/grenade))
 		if(!ispath(gun_type, /obj/item/weapon/gun))
 			return
+		gun_type = clash_track_type(gun_type)
 		old_level = weapon_level(gun_type)
 		entry = weapon_entry(gun_type)
 		entry["xp"] += amount

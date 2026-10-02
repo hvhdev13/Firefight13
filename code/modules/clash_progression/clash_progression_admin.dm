@@ -2,6 +2,15 @@
 
 GLOBAL_DATUM_INIT(clash_progression_admin, /datum/clash_progression_admin, new)
 
+/client/proc/clash_progression_panel()
+	set name = "Progression Panel"
+	set desc = "Look up and set player progression, the XP multiplier, bot XP and the locks."
+	set category = "Admin.Events"
+
+	if(!check_rights(R_EVENT))
+		return
+	GLOB.clash_progression_admin.tgui_interact(mob)
+
 /datum/clash_progression_admin
 	var/list/lookups = list()
 

@@ -26,7 +26,7 @@
 		clash_bot_panel()
 		return
 	if(choice == "Progression Panel")
-		GLOB.clash_progression_admin.tgui_interact(mob)
+		clash_progression_panel()
 		return
 	if(!choice || SSticker.mode != clash_mode || clash_mode.round_finished)
 		return

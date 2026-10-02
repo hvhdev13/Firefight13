@@ -121,7 +121,7 @@ GLOBAL_LIST_EMPTY(clash_kit_budgets)
 		if(!item)
 			. += "gone"
 			continue
-		if(!clash_shop_item_unlocked(ckey, job, item["cost"]))
+		if(!clash_shop_item_unlocked(ckey, job, item["cost"], text2path(id), clash_kit_primary_of(wearer)?.type))
 			. += "locked"
 			continue
 		var/snowflake = item["pool"] == CLASH_SHOP_SNOWFLAKE

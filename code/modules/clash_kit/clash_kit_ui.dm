@@ -125,6 +125,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 /datum/clash_kit_screen/ui_data(mob/user)
 	var/list/kits = get_clash_kits(ckey, job)
 	var/datum/clash_kit/kit = get_kit()
+	clear_locked_attachments(kit)
 	var/wanted = get_doll_key(kit)
 	var/doll_pending = FALSE
 	if(doll_cache[wanted])
@@ -158,6 +159,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 	var/list/issue = get_clash_issue_items(job)
 	if(isnull(issue))
 		queue_clash_issue_items(job, src)
+	var/gun_type = clash_effective_primary(kit, job)
 	var/hint
 	if(fighter)
 		if(fighter.job != job)
@@ -174,7 +176,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 		"kits" = kit_data,
 		"kit_index" = kit_index,
 		"choices" = kit?.choices || list(),
-		"issue" = issue || list(),
+		"issue" = clash_filter_issue(issue, ckey) || list(),
 		"fits" = fits,
 		"doll" = render?["doll"],
 		"gun" = render?["gun"],
@@ -192,8 +194,20 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 		"deploy_block" = deploy_state ? get_deploy_block(user) : null,
 		"revivable" = deploy_state == "dead" && !!user.get_revivable_body(),
 		"hint" = hint,
-		"progress" = clash_progress_ui_data(ckey, job, primary?.item_type),
+		"progress" = clash_progress_ui_data(ckey, job, primary?.item_type, gun_type),
 	)
+
+/datum/clash_kit_screen/proc/clear_locked_attachments(datum/clash_kit/kit)
+	var/datum/clash_kit_option/primary = kit?.get_option(KIT_SLOT_PRIMARY)
+	if(!primary)
+		return
+	var/cleared = FALSE
+	for(var/slot in GLOB.clash_kit_attachment_slots)
+		if(kit.choices[slot] && clash_option_lock_text(ckey, kit.choices[slot], job, primary.item_type))
+			kit.choices -= slot
+			cleared = TRUE
+	if(cleared)
+		save_clash_kits(ckey)
 
 /datum/clash_kit_screen/proc/get_deploy_state(mob/user)
 	if(isnewplayer(user))
@@ -337,7 +351,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 			var/list/item = get_clash_shop(job)["by_id"][params["id"]]
 			if(!kit || !item)
 				return TRUE
-			var/lock_text = clash_shop_item_lock_text(ckey, job, item["cost"])
+			var/lock_text = clash_shop_item_lock_text(ckey, job, item["cost"], text2path(item["id"]), clash_effective_primary(kit, job))
 			if(lock_text)
 				to_chat(user, SPAN_WARNING("[item["name"]] is locked. [lock_text]."))
 				return TRUE
