@@ -7,7 +7,7 @@ GLOBAL_LIST_INIT(clash_attachment_groups, list(
 	list(/obj/item/attachable/stock),
 	list(/obj/item/attachable/verticalgrip),
 	list(/obj/item/attachable/scope/mini),
-	list(/obj/item/attachable/lasersight),
+	list(/obj/item/attachable/lasersight, /obj/item/attachable/flashlight/laser_light_combo),
 	list(/obj/item/attachable/compensator, /obj/item/attachable/burstfire_assembly, /obj/item/attachable/shotgun_choke),
 	list(/obj/item/attachable/gyro, /obj/item/attachable/heavy_barrel, /obj/item/attachable/suppressor, /obj/item/attachable/bipod),
 	list(/obj/item/attachable/attached_gun/shotgun, /obj/item/attachable/attached_gun/extinguisher, /obj/item/attachable/attached_gun/flare_launcher, /obj/item/attachable/attached_gun/flamer_nozzle),
