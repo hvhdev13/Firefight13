@@ -101,15 +101,6 @@ GLOBAL_LIST_INIT(clash_role_levels, list(
 	JOB_UPP_LEADER = 13,
 ))
 
-GLOBAL_LIST_INIT(clash_preset_levels, list(
-	"Rifleman" = 1,
-	"Assault" = 6,
-	"Carbineer" = 6,
-	"Breacher" = 14,
-	"Marksman" = 24,
-	"Gunner" = 24,
-))
-
 GLOBAL_LIST_INIT(clash_class_names, list(
 	CLASH_CLASS_RIFLEMAN = "Rifleman",
 	CLASH_CLASS_MEDIC = "Medic",

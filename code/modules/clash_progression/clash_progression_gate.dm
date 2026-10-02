@@ -159,28 +159,6 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 /proc/clash_role_unlocked(client/player, title)
 	return !clash_role_lock_text(player, title)
 
-/proc/clash_kit_lock_text(ckey, job, datum/clash_kit/kit)
-	var/level = kit?.preset && GLOB.clash_preset_levels[kit.preset]
-	var/class = GLOB.clash_job_classes[job]
-	if(!level || !class || !clash_progression_gating())
-		return null
-	var/datum/clash_progress/progress = clash_gate_progress(ckey)
-	if(progress.class_level(class) >= level)
-		return null
-	return "Unlocks at [GLOB.clash_class_names[class]] level [level]"
-
-/proc/clash_class_has_preset(class, name)
-	build_clash_kit_catalog()
-	for(var/job in GLOB.clash_job_classes)
-		if(GLOB.clash_job_classes[job] != class)
-			continue
-		var/list/presets = get_clash_kit_role_presets(job)
-		for(var/index in 2 to length(presets))
-			var/list/preset = presets[index]
-			if(preset[1] == name)
-				return TRUE
-	return FALSE
-
 /datum/job/marine/can_play_role_in_scenario(client/client)
 	return ..() && clash_role_unlocked(client, title)
 

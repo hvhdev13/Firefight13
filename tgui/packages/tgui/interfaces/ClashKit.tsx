@@ -85,7 +85,6 @@ interface ShopSection {
 interface KitSummary {
   name: string;
   set: number;
-  lock: string | null;
 }
 
 interface LevelBar {
@@ -871,16 +870,11 @@ export const ClashKit = () => {
                         className={classes([
                           'ClashKit__kitTab',
                           number === kit_index && 'ClashKit__kitTab--selected',
-                          entry.lock && 'ClashKit__kitTab--locked',
                         ])}
                         onClick={() => act('kit', { index: number })}
                       >
-                        {entry.lock ? (
-                          <Icon name="lock" className="ClashKit__kitStar" />
-                        ) : (
-                          number === kit_index && (
-                            <Icon name="check" className="ClashKit__kitStar" />
-                          )
+                        {number === kit_index && (
+                          <Icon name="check" className="ClashKit__kitStar" />
                         )}
                         <Box as="span" className="ClashKit__kitLabel">
                           {entry.name}
@@ -914,10 +908,6 @@ export const ClashKit = () => {
                       }}
                       onEscape={() => setRenaming(false)}
                     />
-                  ) : kit?.lock ? (
-                    <Box as="span" className="ClashKit__kitName">
-                      {kit.name}
-                    </Box>
                   ) : (
                     <Box
                       as="span"
@@ -930,7 +920,7 @@ export const ClashKit = () => {
                   )}
                   <Box className="ClashKit__dollSub">
                     Your {job} class
-                    {kits.length > 1 && !kit?.lock && (
+                    {kits.length > 1 && (
                       <Dropdown
                         ml={1}
                         width="150px"
@@ -939,21 +929,13 @@ export const ClashKit = () => {
                             value: String(index + 1),
                             displayText: entry.name,
                           }))
-                          .filter(
-                            (_, index) =>
-                              index + 1 !== kit_index && !kits[index].lock,
-                          )}
+                          .filter((_, index) => index + 1 !== kit_index)}
                         selected=""
                         displayText="Copy from..."
                         onSelected={(value) => act('copy', { index: value })}
                       />
                     )}
                   </Box>
-                  {kit?.lock && (
-                    <Box className="ClashKit__optionLock">
-                      <Icon name="lock" /> {kit.lock}. View only.
-                    </Box>
-                  )}
                 </Box>
 
                 <Box className="ClashKit__dollGrid">

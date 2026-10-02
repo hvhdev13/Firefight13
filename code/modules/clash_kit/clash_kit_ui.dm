@@ -140,7 +140,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 		for(var/slot in each.choices)
 			if(each.choices[slot])
 				set_count++
-		kit_data += list(list("name" = each.name, "set" = set_count, "lock" = clash_kit_lock_text(ckey, job, each)))
+		kit_data += list(list("name" = each.name, "set" = set_count))
 	var/datum/clash_kit_option/primary = kit?.get_option(KIT_SLOT_PRIMARY)
 	var/list/fits = list()
 	if(primary)
@@ -151,7 +151,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 	var/mob/living/carbon/human/fighter = ishuman(user) && user.stat != DEAD ? user : null
 	var/area/clash_arena/here = fighter ? get_area(fighter) : null
 	var/in_base = istype(here) && here.clash_faction == fighter?.faction
-	var/can_equip_now = fighter && fighter.stat == CONSCIOUS && fighter.job == job && in_base && !clash_kit_lock_text(ckey, job, kit)
+	var/can_equip_now = fighter && fighter.stat == CONSCIOUS && fighter.job == job && in_base
 	var/deploy_state = get_deploy_state(user)
 	var/respawn_in = deploy_state == "dead" ? clash_respawn_wait(user) : 0
 	if(respawn_in)
@@ -231,9 +231,6 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
 	if(istype(clash_mode) && !clash_mode.can_join_side(job))
 		return "Your side is full. Even the teams by joining the other side"
-	var/kit_lock = clash_kit_lock_text(ckey, job, get_kit())
-	if(kit_lock)
-		return kit_lock
 	if(get_held_job(user) == job)
 		return null
 	var/lock_text = clash_role_lock_text(user.client, job)
@@ -309,10 +306,6 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 		return
 	var/mob/user = ui.user
 	var/datum/clash_kit/kit = get_kit()
-	var/kit_lock = clash_kit_lock_text(ckey, job, kit)
-	if(kit_lock && !(action in list("role", "side", "kit", "deploy", "seen")))
-		to_chat(user, SPAN_WARNING("[kit.name] is locked. [kit_lock]."))
-		return TRUE
 	switch(action)
 		if("role")
 			if(params["job"] in GLOB.ROLES_CM_VS_UPP)
@@ -390,10 +383,6 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 			if(!kit || !(index in 1 to length(kits)) || index == kit_index)
 				return TRUE
 			var/datum/clash_kit/source = kits[index]
-			var/source_lock = clash_kit_lock_text(ckey, job, source)
-			if(source_lock)
-				to_chat(user, SPAN_WARNING("[source.name] is locked. [source_lock]."))
-				return TRUE
 			kit.choices = source.choices.Copy()
 			kit.extras = source.extras.Copy()
 			kit.removed = source.removed.Copy()

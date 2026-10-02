@@ -41,7 +41,6 @@
 #define CLASH_UNLOCK_ATTACHMENT "attachment"
 #define CLASH_UNLOCK_CARRIER "carrier"
 #define CLASH_UNLOCK_GEAR "gear"
-#define CLASH_UNLOCK_PRESET "preset"
 #define CLASH_UNLOCK_SHOP "shop"
 #define CLASH_UNLOCK_COSMETIC "cosmetic"
 #define CLASH_UNLOCK_LEVEL "level"
@@ -101,7 +100,6 @@ GLOBAL_LIST_INIT(clash_unlock_styles, list(
 	CLASH_UNLOCK_ATTACHMENT = list("order" = 4, "color" = "#4A90E2", "header" = "NEW ATTACHMENT", "sound" = 'sound/machines/ping.ogg'),
 	CLASH_UNLOCK_CARRIER = list("order" = 5, "color" = "#2BB5A8", "header" = "NEW CARRIER", "sound" = 'sound/machines/ding_short.ogg'),
 	CLASH_UNLOCK_GEAR = list("order" = 6, "color" = "#5CB85C", "header" = "NEW GEAR", "sound" = 'sound/machines/ding_short.ogg'),
-	CLASH_UNLOCK_PRESET = list("order" = 7, "color" = "#8A939C", "header" = "NEW PRESET", "sound" = 'sound/machines/terminal_button01.ogg'),
 	CLASH_UNLOCK_SHOP = list("order" = 7, "color" = "#8A939C", "header" = "SHOP UPGRADE", "sound" = 'sound/machines/terminal_button01.ogg'),
 	CLASH_UNLOCK_COSMETIC = list("order" = 8, "color" = "#9B6BD6", "header" = "NEW COSMETIC", "sound" = 'sound/machines/pda_ping.ogg'),
 	CLASH_UNLOCK_LEVEL = list("order" = 9, "color" = "#E6E6E6", "header" = "LEVEL UP", "sound" = 'sound/machines/ding.ogg', "strip" = TRUE),

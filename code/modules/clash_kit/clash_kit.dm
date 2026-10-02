@@ -5,7 +5,6 @@ GLOBAL_LIST_EMPTY(clash_kit_issue_pending)
 
 /datum/clash_kit
 	var/name
-	var/preset
 	var/list/choices = list()
 	var/list/extras = list()
 	var/list/removed = list()
@@ -53,19 +52,13 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 		GLOB.clash_active_kits[ckey] = list()
 		load_clash_kits(ckey)
 	var/list/kits = by_job[job]
-	var/list/presets = kits ? list() : get_clash_kit_role_presets(job)
 	if(!kits)
 		kits = list()
 		by_job[job] = kits
 	while(length(kits) < CLASH_KIT_COUNT)
 		var/datum/clash_kit/kit = new
-		var/list/preset = length(presets) > length(kits) ? presets[length(kits) + 1] : null
-		if(preset)
-			var/list/preset_choices = preset[2]
-			kit.name = preset[1]
-			kit.choices = preset_choices.Copy()
-			if(length(kits) && GLOB.clash_preset_levels[preset[1]])
-				kit.preset = preset[1]
+		if(!length(kits))
+			kit.name = "Default"
 		else
 			var/customs = 1
 			for(var/datum/clash_kit/other as anything in kits)
@@ -86,12 +79,7 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 	var/list/kits = get_clash_kits(ckey, job)
 	if(!kits)
 		return null
-	var/datum/clash_kit/kit = kits[get_clash_active_kit_index(ckey, job)]
-	if(!clash_kit_lock_text(ckey, job, kit))
-		return kit
-	for(var/datum/clash_kit/other as anything in kits)
-		if(!clash_kit_lock_text(ckey, job, other))
-			return other
+	return kits[get_clash_active_kit_index(ckey, job)]
 
 /proc/save_clash_kits(ckey)
 	if(!ckey || IsGuestKey(ckey))
@@ -101,7 +89,7 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 	for(var/job in by_job)
 		var/list/stored = list()
 		for(var/datum/clash_kit/kit as anything in by_job[job])
-			stored += list(list("name" = kit.name, "preset" = kit.preset, "choices" = kit.choices, "extras" = kit.extras, "removed" = kit.removed, "fills" = kit.fills))
+			stored += list(list("name" = kit.name, "choices" = kit.choices, "extras" = kit.extras, "removed" = kit.removed, "fills" = kit.fills))
 		payload[job] = stored
 	var/savefile/save = new(clash_kit_path(ckey))
 	save.cd = "/"
@@ -132,8 +120,6 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 				break
 			var/datum/clash_kit/kit = new
 			kit.name = stored["name"] == "Standard issue" ? "Default" : stored["name"]
-			if(GLOB.clash_preset_levels[stored["preset"]])
-				kit.preset = stored["preset"]
 			for(var/slot in stored["choices"])
 				var/id = stored["choices"][slot]
 				if(!get_clash_kit_option(id) && ispath(text2path(id)))
