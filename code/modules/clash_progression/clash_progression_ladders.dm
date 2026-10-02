@@ -225,3 +225,31 @@ GLOBAL_LIST_EMPTY(clash_option_gates)
 	for(var/list/tier as anything in GLOB.clash_shop_tiers)
 		if(class_level >= tier[1])
 			. = tier[2]
+
+/proc/clash_item_option(faction, item_type)
+	build_clash_kit_catalog()
+	for(var/slot in GLOB.clash_kit_menu[faction])
+		var/datum/clash_kit_option/option = GLOB.clash_kit_options[clash_kit_option_id(faction, slot, item_type)]
+		if(option)
+			return option
+	return null
+
+/proc/clash_item_name(faction, item_type)
+	var/datum/clash_kit_option/option = clash_item_option(faction, item_type)
+	if(option)
+		return option.name
+	var/obj/item/sample = item_type
+	return capitalize(initial(sample.name))
+
+/proc/clash_gear_type_for(gear, faction)
+	for(var/item_type in GLOB.clash_gear_types[gear])
+		if(clash_item_option(faction, item_type))
+			return item_type
+	return null
+
+/proc/clash_insignia_name(faction, level)
+	var/list/names = GLOB.clash_insignia_names[faction]
+	level = clamp(level, 1, CLASH_LEVEL_CAP)
+	var/rank = CEILING(level / 3, 1)
+	var/tier = level - (rank - 1) * 3
+	return "[names[rank]] [tier == 1 ? "I" : (tier == 2 ? "II" : "III")]"

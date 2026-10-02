@@ -196,6 +196,46 @@ $hot: #ff8a3d;
     color: #eee;
   }
 
+  &__progress {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 6px;
+    padding: 5px 8px;
+    border: 1px solid $line-strong;
+    background: $panel;
+  }
+
+  &__progressHead {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 14px;
+  }
+
+  &__progressTotal {
+    color: $gold;
+    font-size: 14px;
+    font-weight: bold;
+  }
+
+  &__progressSources,
+  &__progressUnlocks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+  }
+
+  &__level {
+    flex-shrink: 0;
+    min-width: 16px;
+    padding: 0 3px;
+    border: 1px solid $line-strong;
+    color: $gold;
+    font-size: 10px;
+    text-align: center;
+  }
+
   &__teams {
     display: flex;
     gap: 8px;

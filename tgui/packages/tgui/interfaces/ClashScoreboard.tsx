@@ -17,6 +17,7 @@ interface Row {
   streak: number;
   is_viewer: BooleanLike;
   mvp: BooleanLike;
+  level?: number;
 }
 
 interface Team {
@@ -45,6 +46,32 @@ interface MatchResult {
   mvp?: string;
 }
 
+interface ProgressSource {
+  source: string;
+  xp: number;
+}
+
+interface ProgressUnlock {
+  header: string;
+  name: string;
+  source: string;
+  color: string;
+}
+
+interface Progress {
+  total: number;
+  sources: ProgressSource[];
+  side: string;
+  faction_level: number;
+  faction_start: number;
+  insignia: string;
+  class?: string;
+  class_level?: number;
+  class_start?: number;
+  unlocks: ProgressUnlock[];
+  next?: string;
+}
+
 interface ScoreboardData {
   active: BooleanLike;
   mode?: string;
@@ -63,6 +90,7 @@ interface ScoreboardData {
   results?: MatchResult[];
   awards?: string[];
   kits?: BooleanLike;
+  progress?: Progress;
 }
 
 const byScore = (a: Row, b: Row) =>
@@ -100,6 +128,58 @@ const getStatus = (data: ScoreboardData) => {
     };
   }
   return { big: '--:--', small: 'Waiting' };
+};
+
+const gained = (now = 0, start = 0) =>
+  now > start ? ` (+${now - start})` : '';
+
+const ProgressReport = (props: { readonly progress: Progress }) => {
+  const { progress } = props;
+  return (
+    <div className="ClashScoreboard__progress">
+      <div className="ClashScoreboard__progressHead">
+        <span className="ClashScoreboard__progressTotal">
+          +{progress.total} XP
+        </span>
+        <span>
+          {progress.side} level {progress.faction_level}
+          {gained(progress.faction_level, progress.faction_start)}
+          <span className="ClashScoreboard__dim"> · {progress.insignia}</span>
+        </span>
+        {progress.class && (
+          <span>
+            {progress.class} level {progress.class_level}
+            {gained(progress.class_level, progress.class_start)}
+          </span>
+        )}
+      </div>
+      <div className="ClashScoreboard__progressSources">
+        {progress.sources.map((entry) => (
+          <span key={entry.source}>
+            {entry.source} <b>+{entry.xp}</b>
+          </span>
+        ))}
+      </div>
+      {progress.unlocks.length > 0 && (
+        <div className="ClashScoreboard__progressUnlocks">
+          {progress.unlocks.map((unlock, i) => (
+            <span
+              key={i}
+              className="ClashScoreboard__chip"
+              style={{ borderColor: unlock.color }}
+              title={unlock.source}
+            >
+              <b style={{ color: unlock.color }}>{unlock.header}</b>{' '}
+              {unlock.name}
+            </span>
+          ))}
+        </div>
+      )}
+      {progress.next && (
+        <div className="ClashScoreboard__dim">{progress.next}</div>
+      )}
+    </div>
+  );
 };
 
 const SeriesPips = (props: {
@@ -217,6 +297,14 @@ const TeamTable = (props: {
                     name={row.alive ? 'circle' : 'skull'}
                     className="ClashScoreboard__life"
                   />
+                  {!!row.level && (
+                    <span
+                      className="ClashScoreboard__level"
+                      title="Faction level"
+                    >
+                      {row.level}
+                    </span>
+                  )}
                   <span className="ClashScoreboard__playerName">
                     {row.name}
                   </span>
@@ -389,6 +477,9 @@ export const ClashScoreboard = () => {
                   </span>
                 ))}
               </div>
+            )}
+            {(!!data.finished || !!data.intermission) && data.progress && (
+              <ProgressReport progress={data.progress} />
             )}
             <div className="ClashScoreboard__teams">
               <TeamTable team={left} showCaptures={showCaptures} />

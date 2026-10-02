@@ -45,6 +45,7 @@ GLOBAL_LIST_INIT(clash_progression_settings, list("enabled" = TRUE, "xp_multipli
 	var/zone_seconds = 0
 	var/list/ledger = list()
 	var/list/unlocked_round = list()
+	var/list/start_levels = list()
 	var/short_side
 	var/side
 	var/class_id

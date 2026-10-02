@@ -52,49 +52,124 @@
 	progress.ledger[source] = (progress.ledger[source] || 0) + amount
 	if(bonus)
 		progress.ledger["Short side bonus"] = (progress.ledger["Short side bonus"] || 0) + bonus
+	clash_score_feed(ckey, amount + bonus, source)
 	progress.add_xp(amount + bonus, faction, class, gun_type)
 
 /datum/clash_progress/proc/add_xp(amount, faction, class, gun_type)
 	dirty = TRUE
+	var/old_level = faction_level(faction)
 	var/list/entry = faction_entry(faction)
 	entry["xp"] += amount
-	check_unlocks("faction", faction)
+	check_unlocks("faction", faction, old_level, faction)
 	if(class)
+		old_level = class_level(class)
 		entry = class_entry(class)
 		entry["xp"] += amount
-		check_unlocks("class", class)
-	if(!gun_type)
-		return
-	if(ispath(gun_type, /obj/item/explosive/grenade))
-		entry = carrier_entry(CLASH_FAMILY_GRENADE)
+		check_unlocks("class", class, old_level, faction)
+	var/family = CLASH_FAMILY_GRENADE
+	if(!ispath(gun_type, /obj/item/explosive/grenade))
+		if(!ispath(gun_type, /obj/item/weapon/gun))
+			return
+		old_level = weapon_level(gun_type)
+		entry = weapon_entry(gun_type)
 		entry["xp"] += amount
-		check_unlocks("carrier", CLASH_FAMILY_GRENADE)
-		return
-	if(!ispath(gun_type, /obj/item/weapon/gun))
-		return
-	entry = weapon_entry(gun_type)
-	entry["xp"] += amount
-	check_unlocks("weapon", gun_type)
-	var/family = clash_gun_family(gun_type)
+		check_unlocks("weapon", gun_type, old_level, faction)
+		family = clash_gun_family(gun_type)
+	old_level = carrier_step(family)
 	entry = carrier_entry(family)
 	entry["xp"] += amount
-	check_unlocks("carrier", family)
+	check_unlocks("carrier", family, old_level, faction)
 
-/datum/clash_progress/proc/check_unlocks(track, key)
+/datum/clash_progress/proc/check_unlocks(track, key, old_level, faction)
 	switch(track)
 		if("faction")
 			var/list/entry = faction_entry(key)
 			entry["best"] = faction_level(key)
+			for(var/level in old_level + 1 to entry["best"])
+				notify_faction_level(key, level)
 		if("class")
 			var/list/entry = class_entry(key)
 			entry["best"] = class_level(key)
+			for(var/level in old_level + 1 to entry["best"])
+				notify_class_level(key, level, faction)
 		if("weapon")
 			var/list/entry = weapon_entry(key)
 			entry["best"] = weapon_level(key)
-			entry["mastered"] = entry["mastered"] || entry["xp"] >= CLASH_WEAPON_MASTERY_XP
+			for(var/level in old_level + 1 to entry["best"])
+				notify_weapon_level(key, level)
+			if(!entry["mastered"] && entry["xp"] >= CLASH_WEAPON_MASTERY_XP)
+				entry["mastered"] = TRUE
+				clash_notify_unlock(ckey, CLASH_UNLOCK_MASTERY, clash_item_name(faction, key), "about 100 kills", key)
 		if("carrier")
 			var/list/entry = carrier_entry(key)
 			entry["best"] = carrier_step(key)
+			for(var/step in old_level + 1 to entry["best"])
+				notify_carrier_step(key, step, faction)
+
+/datum/clash_progress/proc/notify_faction_level(faction, level)
+	var/source = "[clash_side_name(faction)] level [level]"
+	var/found = FALSE
+	for(var/list/rung as anything in GLOB.clash_faction_ladders[faction])
+		if(rung[1] != level)
+			continue
+		found = TRUE
+		clash_notify_unlock(ckey, ispath(rung[2], /obj/item/weapon/gun) ? CLASH_UNLOCK_GUN : CLASH_UNLOCK_COSMETIC, clash_item_name(faction, rung[2]), source, rung[2])
+	for(var/title in GLOB.clash_role_levels)
+		if(GLOB.clash_role_levels[title] == level && clash_kit_faction_for_job(title) == faction)
+			found = TRUE
+			clash_notify_unlock(ckey, CLASH_UNLOCK_ROLE, title, source)
+	if(!found)
+		clash_notify_unlock(ckey, CLASH_UNLOCK_LEVEL, clash_insignia_name(faction, level), source)
+
+/datum/clash_progress/proc/notify_class_level(class, level, faction)
+	var/source = "[GLOB.clash_class_names[class]] level [level]"
+	var/found = FALSE
+	var/index = GLOB.clash_class_gear_levels.Find(level)
+	if(index)
+		var/gear = GLOB.clash_class_gear[class][index]
+		var/item_type = clash_gear_type_for(gear, faction)
+		if(item_type)
+			found = TRUE
+			clash_notify_unlock(ckey, CLASH_UNLOCK_GEAR, capitalize(GLOB.clash_gear_names[gear]), source, item_type)
+	if(class != CLASH_CLASS_SUPPORT && level > 1)
+		for(var/list/tier as anything in GLOB.clash_shop_tiers)
+			if(tier[1] == level)
+				found = TRUE
+				clash_notify_unlock(ckey, CLASH_UNLOCK_SHOP, tier[2] == INFINITY ? "Every Shop item" : "Shop items up to [tier[2]] points", source)
+	for(var/list/preset as anything in GLOB.clash_kit_presets[faction])
+		if(GLOB.clash_preset_levels[preset[1]] == level && level > 1)
+			found = TRUE
+			clash_notify_unlock(ckey, CLASH_UNLOCK_PRESET, preset[1], source)
+	if(level == CLASH_LEVEL_CAP)
+		found = TRUE
+		clash_notify_unlock(ckey, CLASH_UNLOCK_COSMETIC, "Veteran [GLOB.clash_class_names[class]]", source)
+	if(!found)
+		clash_notify_unlock(ckey, CLASH_UNLOCK_LEVEL, GLOB.clash_class_names[class], source)
+
+/datum/clash_progress/proc/notify_weapon_level(gun_type, level)
+	var/list/unlocks = GLOB.clash_weapon_tracks[gun_type]
+	if(level < 2 || level - 1 > length(unlocks))
+		return
+	var/list/unlock = unlocks[level - 1]
+	var/obj/item/weapon/gun/gun = gun_type
+	var/source = "[initial(gun.name)] level [level]"
+	var/list/names = list()
+	for(var/obj/item/attachable/attachment_type as anything in unlock["types"])
+		names |= initial(attachment_type.name)
+	if(!length(names))
+		clash_notify_unlock(ckey, CLASH_UNLOCK_COSMETIC, "Engraving", source, gun_type)
+		return
+	clash_notify_unlock(ckey, CLASH_UNLOCK_ATTACHMENT, capitalize(english_list(names)), source, unlock["types"][1])
+
+/datum/clash_progress/proc/notify_carrier_step(family, step, faction)
+	var/list/carrier_step = GLOB.clash_carrier_tracks[family][step]
+	if(!carrier_step[1])
+		return
+	for(var/index in 2 to length(carrier_step))
+		var/item_type = carrier_step[index]
+		if(clash_item_option(faction, item_type))
+			clash_notify_unlock(ckey, CLASH_UNLOCK_CARRIER, clash_item_name(faction, item_type), "[GLOB.clash_family_names[family]] step [step]", item_type)
+			return
 
 /proc/clash_progress_kill(mob/living/carbon/human/victim, mob/living/carbon/human/killer, cause, cause_object)
 	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
@@ -177,6 +252,10 @@
 		return
 	progress.side = spawned.faction
 	progress.class_id = GLOB.clash_job_classes[spawned.job]
+	if(!progress.start_levels[progress.side])
+		progress.start_levels[progress.side] = progress.faction_level(progress.side)
+	if(progress.class_id && !progress.start_levels[progress.class_id])
+		progress.start_levels[progress.class_id] = progress.class_level(progress.class_id)
 	var/own = 0
 	var/other = 0
 	for(var/mob/living/carbon/human/player as anything in GLOB.alive_human_list)

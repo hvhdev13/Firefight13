@@ -34,6 +34,18 @@
 #define CLASH_GATE_TWIN "twin"
 #define CLASH_GATE_CARRIER "carrier"
 
+#define CLASH_UNLOCK_GUN "gun"
+#define CLASH_UNLOCK_MASTERY "mastery"
+#define CLASH_UNLOCK_ROLE "role"
+#define CLASH_UNLOCK_ATTACHMENT "attachment"
+#define CLASH_UNLOCK_CARRIER "carrier"
+#define CLASH_UNLOCK_GEAR "gear"
+#define CLASH_UNLOCK_PRESET "preset"
+#define CLASH_UNLOCK_SHOP "shop"
+#define CLASH_UNLOCK_COSMETIC "cosmetic"
+#define CLASH_UNLOCK_LEVEL "level"
+#define CLASH_UNLOCK_MORE "more"
+
 #define CLASH_XP_SOURCE_KILL "Kill"
 #define CLASH_XP_SOURCE_ASSIST "Assist"
 #define CLASH_XP_SOURCE_REVIVE "Revive"
@@ -80,6 +92,20 @@ GLOBAL_LIST_INIT(clash_job_classes, list(
 ))
 
 GLOBAL_LIST_EMPTY(clash_grenade_names)
+
+GLOBAL_LIST_INIT(clash_unlock_styles, list(
+	CLASH_UNLOCK_GUN = list("order" = 1, "color" = "#E8B931", "header" = "NEW WEAPON", "sound" = 'sound/machines/chime.ogg', "banner" = TRUE),
+	CLASH_UNLOCK_MASTERY = list("order" = 2, "color" = "#E8B931", "header" = "WEAPON MASTERED", "sound" = 'sound/effects/dingding.ogg', "banner" = TRUE, "border" = TRUE),
+	CLASH_UNLOCK_ROLE = list("order" = 3, "color" = "#D9534F", "header" = "ROLE UNLOCKED", "sound" = 'sound/effects/dingding.ogg'),
+	CLASH_UNLOCK_ATTACHMENT = list("order" = 4, "color" = "#4A90E2", "header" = "NEW ATTACHMENT", "sound" = 'sound/machines/ping.ogg'),
+	CLASH_UNLOCK_CARRIER = list("order" = 5, "color" = "#2BB5A8", "header" = "NEW CARRIER", "sound" = 'sound/machines/ding_short.ogg'),
+	CLASH_UNLOCK_GEAR = list("order" = 6, "color" = "#5CB85C", "header" = "NEW GEAR", "sound" = 'sound/machines/ding_short.ogg'),
+	CLASH_UNLOCK_PRESET = list("order" = 7, "color" = "#8A939C", "header" = "NEW PRESET", "sound" = 'sound/machines/terminal_button01.ogg'),
+	CLASH_UNLOCK_SHOP = list("order" = 7, "color" = "#8A939C", "header" = "SHOP UPGRADE", "sound" = 'sound/machines/terminal_button01.ogg'),
+	CLASH_UNLOCK_COSMETIC = list("order" = 8, "color" = "#9B6BD6", "header" = "NEW COSMETIC", "sound" = 'sound/machines/pda_ping.ogg'),
+	CLASH_UNLOCK_LEVEL = list("order" = 9, "color" = "#E6E6E6", "header" = "LEVEL UP", "sound" = 'sound/machines/ding.ogg', "strip" = TRUE),
+	CLASH_UNLOCK_MORE = list("order" = 10, "color" = "#8A939C", "header" = "MORE UNLOCKS", "sound" = 'sound/machines/ding.ogg', "strip" = TRUE),
+))
 
 GLOBAL_LIST_INIT(clash_insignia_names, list(
 	FACTION_MARINE = list("Private", "Private First Class", "Lance Corporal", "Corporal", "Sergeant", "Staff Sergeant", "Gunnery Sergeant", "Master Sergeant", "First Sergeant", "Sergeant Major"),

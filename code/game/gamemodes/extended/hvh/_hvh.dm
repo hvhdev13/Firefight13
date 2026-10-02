@@ -406,6 +406,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		"finished" = !!round_finished,
 		"awards" = intermission_end_time || round_finished ? get_awards() : list(),
 		"kits" = clash_uses_kits(),
+		"progress" = clash_progress_report(viewer.ckey),
 	)
 
 /datum/game_mode/extended/faction_clash/hvh/proc/get_score_limit()
@@ -425,6 +426,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		"streak" = kill_streaks[name] || 0,
 		"is_viewer" = viewer.ckey && (entry ? entry["ckey"] == viewer.ckey : player?.ckey == viewer.ckey),
 		"mvp" = !!leader && name == leader,
+		"level" = clash_scoreboard_level(entry ? entry["ckey"] : player?.ckey, entry ? entry["faction"] : player?.faction),
 	)
 
 /datum/game_mode/extended/faction_clash/hvh/proc/get_killfeed_line(list/entry, mob/viewer)
@@ -593,7 +595,8 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		. += name
 
 /datum/game_mode/extended/faction_clash/hvh/proc/report_environment_death(mob/victim, cause)
-	set_clash_death_card(victim, "ELIMINATED", null, "#8a939c", cause ? "Killed by [html_encode(cause)]" : "Cause unknown", null, null, null, get_life_line(victim))
+	var/next_unlock = clash_next_unlock_text(victim.mind?.ckey || victim.ckey, victim.faction)
+	set_clash_death_card(victim, "ELIMINATED", null, "#8a939c", cause ? "Killed by [html_encode(cause)]" : "Cause unknown", next_unlock ? list(next_unlock) : null, null, null, get_life_line(victim))
 	if(!cause)
 		return
 	to_chat(victim, SPAN_WARNING("Killed by [cause]."))
@@ -625,6 +628,9 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		notes += "Assisted by [html_encode(english_list(assisters))]"
 	if(length(notes) > 3)
 		notes.Cut(4)
+	var/next_unlock = clash_next_unlock_text(victim.mind?.ckey || victim.ckey, victim.faction)
+	if(next_unlock)
+		notes += next_unlock
 	var/obj/item/weapon = isitem(cause_object) ? cause_object : null
 	if(!weapon && cause)
 		for(var/obj/item/held in list(killer.get_active_hand(), killer.get_inactive_hand()) + killer.contents)
