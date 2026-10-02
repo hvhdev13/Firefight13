@@ -145,7 +145,7 @@
 				found = TRUE
 				clash_notify_unlock(ckey, CLASH_UNLOCK_SHOP, tier[2] == INFINITY ? "Every Shop item" : "Shop items up to [tier[2]] points", source)
 	for(var/list/preset as anything in GLOB.clash_kit_presets[faction])
-		if(GLOB.clash_preset_levels[preset[1]] == level && level > 1)
+		if(GLOB.clash_preset_levels[preset[1]] == level && level > 1 && clash_class_has_preset(class, preset[1]))
 			found = TRUE
 			clash_notify_unlock(ckey, CLASH_UNLOCK_PRESET, preset[1], source)
 	if(level == CLASH_LEVEL_CAP)
