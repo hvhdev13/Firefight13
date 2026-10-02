@@ -143,16 +143,20 @@
 	for(var/family in GLOB.clash_carrier_tracks)
 		var/list/steps = GLOB.clash_carrier_tracks[family]
 		var/list/names = list()
+		var/offered = FALSE
 		for(var/list/carrier_step as anything in steps)
 			var/name
 			for(var/index in 2 to length(carrier_step))
 				var/datum/clash_kit_option/option = clash_item_option(faction, carrier_step[index])
+				if(!option)
+					continue
+				offered = TRUE
 				var/list/gate = GLOB.clash_option_gates[clash_gate_key(faction, carrier_step[index])]
-				if(option && !(gate?["level"] && progress.faction_level(faction) >= gate["level"]))
+				if(!(gate?["level"] && progress.faction_level(faction) >= gate["level"]))
 					name = option.name
 					break
 			names += list(name)
-		if(!length(names - null))
+		if(!offered)
 			continue
 		var/step = progress.carrier_step(family)
 		var/list/entry = progress.carriers[family]
