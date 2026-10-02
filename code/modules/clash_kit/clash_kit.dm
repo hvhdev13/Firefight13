@@ -463,8 +463,27 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 		if(cosmetic)
 			. += cosmetic.path
 
-/proc/reapply_clash_kit(mob/living/carbon/human/wearer, datum/clash_kit/kit)
-	apply_clash_kit(wearer, kit, CLASH_KIT_RESET)
+/proc/regear_clash_fighter(mob/living/carbon/human/fighter, datum/clash_kit/kit)
+	var/datum/job/role = GLOB.RoleAuthority.roles_by_name[fighter.job]
+	var/datum/equipment_preset/preset = role?.gear_preset && GLOB.equipment_presets.gear_path_presets_list[role.gear_preset]
+	if(!preset)
+		apply_clash_kit(fighter, kit, CLASH_KIT_RESET)
+		return
+	var/list/kept = list(fighter.wear_id, fighter.w_uniform, fighter.wear_l_ear, fighter.wear_r_ear)
+	for(var/obj/item/thing as anything in fighter.get_equipped_items() + list(fighter.l_hand, fighter.r_hand, fighter.l_store, fighter.r_store, fighter.s_store))
+		if(!thing || (thing in kept) || QDELETED(thing))
+			continue
+		fighter.temp_drop_inv_item(thing, TRUE)
+		qdel(thing)
+	try
+		preset.load_gear(fighter, fighter.client)
+	catch(var/exception/error)
+		stack_trace("Clash kit could not re-gear [fighter.job]: [error]")
+	for(var/gear_type in fighter.client?.prefs?.gear)
+		var/datum/gear/cosmetic = GLOB.gear_datums_by_type[gear_type]
+		cosmetic?.equip_to_user(fighter, FALSE, FALSE)
+	issue_clash_role_kit(fighter, fighter.job)
+	apply_clash_kit(fighter, kit, CLASH_KIT_SPAWN)
 
 /proc/describe_clash_kit_item(obj/item/item)
 	return item ? list("name" = item.name, "type" = "[item.type]", "icon" = "[item.icon]", "icon_state" = item.icon_state) : null

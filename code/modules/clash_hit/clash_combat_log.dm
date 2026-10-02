@@ -13,13 +13,14 @@
 	RegisterSignal(target, COMSIG_HUMAN_BULLET_ACT, PROC_REF(on_shot))
 	RegisterSignal(target, COMSIG_MOB_MELEE_ATTACK, PROC_REF(on_melee))
 	RegisterSignal(target, COMSIG_HUMAN_REVIVED, PROC_REF(on_revived))
+	RegisterSignal(target, COMSIG_MOB_DEATH, PROC_REF(on_death))
 	var/mob/living/carbon/human/fighter = target
 	for(var/obj/limb/limb as anything in fighter.limbs)
 		RegisterSignal(limb, COMSIG_LIMB_SURGERY_STEP_SUCCESS, PROC_REF(on_surgery_step))
 
 /datum/element/clash_combat_log/Detach(datum/source, force)
 	. = ..()
-	UnregisterSignal(source, list(COMSIG_HUMAN_BULLET_ACT, COMSIG_MOB_MELEE_ATTACK, COMSIG_HUMAN_REVIVED))
+	UnregisterSignal(source, list(COMSIG_HUMAN_BULLET_ACT, COMSIG_MOB_MELEE_ATTACK, COMSIG_HUMAN_REVIVED, COMSIG_MOB_DEATH))
 	var/mob/living/carbon/human/fighter = source
 	for(var/obj/limb/limb as anything in fighter.limbs)
 		UnregisterSignal(limb, COMSIG_LIMB_SURGERY_STEP_SUCCESS)
@@ -47,6 +48,11 @@
 	SIGNAL_HANDLER
 	if(surgery.status >= length(surgery.steps))
 		INVOKE_ASYNC(GLOBAL_PROC, GLOBAL_PROC_REF(clash_progress_surgery), limb.owner, user)
+
+/datum/element/clash_combat_log/proc/on_death(mob/living/carbon/human/source)
+	SIGNAL_HANDLER
+	if(source.mind)
+		clash_track_player_corpse(source)
 
 /datum/element/clash_combat_log/proc/on_revived(mob/living/carbon/human/source)
 	SIGNAL_HANDLER
