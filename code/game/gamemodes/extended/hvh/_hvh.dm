@@ -432,6 +432,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		return
 	for(var/i = 1 to length(lines))
 		var/atom/movable/screen/faction_killfeed/line = lines[i]
+		clash_place_killfeed_line(line, i)
 		var/entry_index = length(killfeed) - i + 1
 		if(entry_index < 1)
 			line.maptext = ""
