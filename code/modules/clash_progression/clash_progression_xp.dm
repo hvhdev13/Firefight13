@@ -266,11 +266,14 @@
 
 /mob/living/carbon/human/var/clash_heal_pool = 0
 /mob/living/carbon/human/var/clash_surgery_xp = 0
+/mob/living/carbon/human/var/clash_heal_carry = 0
+/mob/living/carbon/human/var/clash_repair_carry = 0
 /obj/limb/var/clash_splint_paid = FALSE
 /obj/structure/barricade/var/clash_builder_ckey
 /obj/structure/barricade/var/clash_builder_faction
 /obj/structure/barricade/var/clash_builder_class
 /obj/structure/barricade/var/clash_enemy_damage = 0
+/obj/structure/barricade/var/clash_cover_carry = 0
 
 /proc/clash_progress_match_start()
 	for(var/ckey in GLOB.clash_progress.players)
@@ -321,7 +324,10 @@
 	var/healed = min(before["damage"] - (patient.getBruteLoss() + patient.getFireLoss()), patient.clash_heal_pool)
 	if(healed > 0)
 		patient.clash_heal_pool -= healed
-		clash_award_support_xp(medic, healed / CLASH_XP_HEAL_HP, CLASH_XP_SOURCE_HEALING, CLASH_XP_SOURCE_HEALING, CLASH_XP_MEDICAL_CAP)
+		medic.clash_heal_carry += healed
+		var/xp = round(medic.clash_heal_carry / CLASH_XP_HEAL_HP)
+		medic.clash_heal_carry -= xp * CLASH_XP_HEAL_HP
+		clash_award_support_xp(medic, xp, CLASH_XP_SOURCE_HEALING, CLASH_XP_SOURCE_HEALING, CLASH_XP_MEDICAL_CAP)
 	var/list/splinted = before["splinted"]
 	for(var/obj/limb/limb as anything in patient.limbs)
 		if(!(limb.status & LIMB_SPLINTED) || !(limb.status & LIMB_BROKEN) || (limb in splinted) || limb.clash_splint_paid)
@@ -385,7 +391,10 @@
 	if(share <= 0)
 		return
 	clash_enemy_damage += share
-	clash_grant_support_xp(clash_builder_ckey, clash_builder_faction, clash_builder_class, share / CLASH_XP_COVER_DAMAGE, CLASH_XP_SOURCE_COVER, CLASH_XP_SOURCE_COVER, CLASH_XP_ENGINEERING_CAP)
+	clash_cover_carry += share
+	var/xp = round(clash_cover_carry / CLASH_XP_COVER_DAMAGE)
+	clash_cover_carry -= xp * CLASH_XP_COVER_DAMAGE
+	clash_grant_support_xp(clash_builder_ckey, clash_builder_faction, clash_builder_class, xp, CLASH_XP_SOURCE_COVER, CLASH_XP_SOURCE_COVER, CLASH_XP_ENGINEERING_CAP)
 
 /obj/structure/barricade/bullet_act(obj/projectile/bullet)
 	var/before = health
@@ -407,4 +416,7 @@
 	if(repaired <= 0)
 		return
 	clash_enemy_damage -= repaired
-	clash_award_support_xp(repairer, repaired / CLASH_XP_REPAIR_HP, CLASH_XP_SOURCE_REPAIR, CLASH_XP_SOURCE_COVER, CLASH_XP_ENGINEERING_CAP)
+	repairer.clash_repair_carry += repaired
+	var/xp = round(repairer.clash_repair_carry / CLASH_XP_REPAIR_HP)
+	repairer.clash_repair_carry -= xp * CLASH_XP_REPAIR_HP
+	clash_award_support_xp(repairer, xp, CLASH_XP_SOURCE_REPAIR, CLASH_XP_SOURCE_COVER, CLASH_XP_ENGINEERING_CAP)
