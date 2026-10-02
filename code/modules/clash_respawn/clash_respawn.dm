@@ -173,34 +173,45 @@ GLOBAL_LIST_EMPTY(clash_respawn_button_icons)
 #define DEATH_CARD_HEIGHT 132
 #define DEATH_CARD_BAND 16
 #define DEATH_CARD_ICON_BOX 64
-#define DEATH_CARD_GUN_STRIP 28
+#define DEATH_CARD_GUN_STRIP 26
+#define DEATH_CARD_HEADER 38
+#define DEATH_CARD_NAME_WIDTH 0.8
+#define DEATH_CARD_FOOTER 26
 
 /client/var/list/clash_death_card
 
 GLOBAL_LIST_EMPTY(clash_death_card_icons)
 
-/proc/get_clash_death_card_icon(accent, has_killer, health)
+/proc/clash_card_blend(color, alpha, base = rgb(8, 10, 13), base_alpha = 220)
+	var/list/top = rgb2num(color)
+	var/list/under = rgb2num(base)
+	var/mix = alpha / 255
+	return rgb(round(under[1] + (top[1] - under[1]) * mix), round(under[2] + (top[2] - under[2]) * mix), round(under[3] + (top[3] - under[3]) * mix), base_alpha)
+
+/proc/get_clash_death_card_icon(accent, has_killer, health, has_footer)
 	var/health_step = isnum(health) ? clamp(round(health / 5), 0, 20) : -1
-	var/key = "[accent]|[has_killer]|[health_step]"
+	var/key = "[accent]|[has_killer]|[health_step]|[has_footer]"
 	if(GLOB.clash_death_card_icons[key])
 		return GLOB.clash_death_card_icons[key]
 	var/icon/card = icon('icons/effects/effects.dmi', "nothing")
 	card.Scale(DEATH_CARD_WIDTH, DEATH_CARD_HEIGHT)
 	card.DrawBox(rgb(8, 10, 13, 220), 2, 1, DEATH_CARD_WIDTH - 1, DEATH_CARD_HEIGHT)
 	card.DrawBox(rgb(8, 10, 13, 220), 1, 2, DEATH_CARD_WIDTH, DEATH_CARD_HEIGHT - 1)
-	card.DrawBox(clash_tint(accent, 38), 2, DEATH_CARD_HEIGHT - 38, DEATH_CARD_WIDTH - 1, DEATH_CARD_HEIGHT - 1)
+	card.DrawBox(clash_card_blend(accent, 38), 2, DEATH_CARD_HEIGHT - DEATH_CARD_HEADER, DEATH_CARD_WIDTH - 1, DEATH_CARD_HEIGHT - 1)
+	card.DrawBox(clash_card_blend(accent, 90), has_killer ? 8 + DEATH_CARD_ICON_BOX + 8 : 10, DEATH_CARD_HEIGHT - DEATH_CARD_HEADER, DEATH_CARD_WIDTH - 8, DEATH_CARD_HEIGHT - DEATH_CARD_HEADER)
+	if(has_footer)
+		card.DrawBox(clash_card_blend(COLOR_WHITE, 40), has_killer ? 8 + DEATH_CARD_ICON_BOX + 8 : 10, DEATH_CARD_BAND + DEATH_CARD_FOOTER - 3, DEATH_CARD_WIDTH - 8, DEATH_CARD_BAND + DEATH_CARD_FOOTER - 3)
 	card.DrawBox(accent, 2, DEATH_CARD_HEIGHT - 3, DEATH_CARD_WIDTH - 1, DEATH_CARD_HEIGHT - 1)
-	card.DrawBox(rgb(255, 255, 255, 14), 2, 2, DEATH_CARD_WIDTH - 1, DEATH_CARD_BAND)
-	card.DrawBox(rgb(255, 255, 255, 36), 2, DEATH_CARD_BAND + 1, DEATH_CARD_WIDTH - 1, DEATH_CARD_BAND + 1)
+	card.DrawBox(clash_card_blend(COLOR_WHITE, 14), 2, 2, DEATH_CARD_WIDTH - 1, DEATH_CARD_BAND)
+	card.DrawBox(clash_card_blend(COLOR_WHITE, 36), 2, DEATH_CARD_BAND + 1, DEATH_CARD_WIDTH - 1, DEATH_CARD_BAND + 1)
 	if(has_killer)
 		var/box_top = DEATH_CARD_HEIGHT - 8
 		var/box_bottom = box_top - DEATH_CARD_ICON_BOX - DEATH_CARD_GUN_STRIP + 1
 		card.DrawBox(rgb(14, 17, 21, 250), 8, box_bottom, 8 + DEATH_CARD_ICON_BOX - 1, box_top)
-		card.DrawBox(rgb(255, 255, 255, 24), 10, box_bottom + DEATH_CARD_GUN_STRIP, 8 + DEATH_CARD_ICON_BOX - 3, box_bottom + DEATH_CARD_GUN_STRIP)
-		card.DrawBox(clash_tint(accent, 120), 8, box_bottom, 8 + DEATH_CARD_ICON_BOX - 1, box_bottom)
+		card.DrawBox(clash_card_blend(COLOR_WHITE, 24, rgb(14, 17, 21), 250), 10, box_bottom + DEATH_CARD_GUN_STRIP, 8 + DEATH_CARD_ICON_BOX - 3, box_bottom + DEATH_CARD_GUN_STRIP)
 		if(health_step >= 0)
-			var/bar_y = box_bottom - 5
-			card.DrawBox(rgb(255, 255, 255, 30), 8, bar_y, 8 + DEATH_CARD_ICON_BOX - 1, bar_y + 1)
+			var/bar_y = box_bottom - 4
+			card.DrawBox(clash_card_blend(COLOR_WHITE, 30), 8, bar_y, 8 + DEATH_CARD_ICON_BOX - 1, bar_y + 1)
 			var/filled = round(DEATH_CARD_ICON_BOX * health_step / 20)
 			if(filled > 0)
 				var/bar_color = health_step > 12 ? rgb(95, 211, 95) : (health_step > 6 ? rgb(230, 190, 70) : rgb(230, 80, 70))
@@ -231,7 +242,7 @@ GLOBAL_LIST_EMPTY(clash_death_card_icons)
 	if(shown == card)
 		return
 	shown = card
-	icon = get_clash_death_card_icon(card["color"], card["has_killer"], card["health"])
+	icon = get_clash_death_card_icon(card["color"], card["has_killer"], card["health"], card["has_footer"])
 	overlays = card["overlays"]
 	mouse_opacity = MOUSE_OPACITY_OPAQUE
 	pixel_y = 8
@@ -253,8 +264,8 @@ GLOBAL_LIST_EMPTY(clash_death_card_icons)
 	hide()
 	return TRUE
 
-/proc/clash_death_card_picture(appearance_source, width, height, center_x, center_y, max_scale, room)
-	var/scale = min(max_scale, room / max(width, height))
+/proc/clash_death_card_picture(appearance_source, width, height, center_x, center_y, max_scale, room, room_height = room)
+	var/scale = min(max_scale, room / width, room_height / height)
 	if(scale >= 1)
 		scale = floor(scale)
 	var/mutable_appearance/picture = new(appearance_source)
@@ -270,33 +281,54 @@ GLOBAL_LIST_EMPTY(clash_death_card_icons)
 	picture.filters = null
 	picture.transform = matrix(scale, 0, center_x - width / 2, 0, scale, center_y - height / 2)
 	picture.appearance_flags = RESET_ALPHA|KEEP_APART|PIXEL_SCALE
+	if(length(picture.overlays) || length(picture.underlays))
+		picture.appearance_flags |= KEEP_TOGETHER
 	return picture
 
-/proc/set_clash_death_card(mob/victim, headline, killer_name, color, detail, list/notes, obj/item/weapon, health, life_line, mutable_appearance/portrait)
+/proc/set_clash_death_card(mob/victim, headline, killer_name, color, detail, list/notes, obj/item/weapon, health, life_line, mutable_appearance/portrait, footer)
 	if(!victim?.client)
 		return
 	var/has_killer = !!killer_name
 	var/text_x = has_killer ? 8 + DEATH_CARD_ICON_BOX + 8 : 10
 	var/text_width = DEATH_CARD_WIDTH - text_x - 8
 	var/outline = "-dm-text-outline: 1px black"
-	var/list/lines = list()
-	lines += "<span style='font-family: \"Small Fonts\"; font-size: 6px; color: #aab2b9'>[headline]</span>"
 	var/shown_name = killer_name ? replacetext(killer_name, " \[BOT\]", "") : "YOU DIED"
-	var/name_size = length(shown_name) > 22 ? 10 : (length(shown_name) > 17 ? 12 : 14)
-	var/bot_tag = killer_name && shown_name != killer_name ? " <span style='font-family: \"Small Fonts\"; font-size: 6px; color: #8a939c'>BOT</span>" : ""
-	lines += "<span style='font-family: \"VCR OSD Mono\"; font-size: [name_size]px; color: [color]'>[html_encode(shown_name)]</span>[bot_tag]"
-	lines += "<span style='font-family: \"Small Fonts\"; font-size: 6px; color: #e2e6ea'>[detail]</span>"
+	var/name_size = clamp(floor(text_width / (max(1, length(shown_name)) * DEATH_CARD_NAME_WIDTH)), 6, 14)
+	var/bot_tag = killer_name && shown_name != killer_name ? "  ·  BOT" : ""
+	var/list/head = list()
+	head += "<span style='font-family: \"Small Fonts\"; font-size: 6px; color: #aab2b9'>[headline][bot_tag]</span>"
+	head += "<span style='font-family: \"VCR OSD Mono\"; font-size: [name_size]px; color: [color]'>[html_encode(shown_name)]</span>"
+	var/list/lines = list()
+	lines += "<span style='font-family: \"Small Fonts\"; font-size: 7px; color: #e2e6ea'>[detail]</span>"
 	for(var/note in notes)
-		lines += "<span style='font-family: \"Small Fonts\"; font-size: 6px; color: #d9bf7e'>[note]</span>"
+		lines += "<span style='font-family: \"Small Fonts\"; font-size: 6px; color: #c8ced3'>[note]</span>"
 	var/list/overlays = list()
+	var/mutable_appearance/header = mutable_appearance()
+	header.maptext = "<span style='[outline]; text-align: left; vertical-align: middle'>[head.Join("<br>")]</span>"
+	header.maptext_x = text_x
+	header.maptext_y = DEATH_CARD_HEIGHT - DEATH_CARD_HEADER + 1
+	header.maptext_width = text_width
+	header.maptext_height = DEATH_CARD_HEADER - 4
+	header.appearance_flags = RESET_COLOR|RESET_ALPHA|KEEP_APART
+	overlays += header
+	var/body_bottom = footer ? DEATH_CARD_BAND + DEATH_CARD_FOOTER + 10 : DEATH_CARD_BAND + 4
 	var/mutable_appearance/body = mutable_appearance()
 	body.maptext = "<span style='[outline]; text-align: left; vertical-align: top'>[lines.Join("<br>")]</span>"
 	body.maptext_x = text_x
-	body.maptext_y = DEATH_CARD_BAND + 4
+	body.maptext_y = body_bottom
 	body.maptext_width = text_width
-	body.maptext_height = DEATH_CARD_HEIGHT - DEATH_CARD_BAND - 10
+	body.maptext_height = DEATH_CARD_HEIGHT - DEATH_CARD_HEADER - body_bottom - 6
 	body.appearance_flags = RESET_COLOR|RESET_ALPHA|KEEP_APART
 	overlays += body
+	if(footer)
+		var/mutable_appearance/next_unlock = mutable_appearance()
+		next_unlock.maptext = "<span style='[outline]; font-family: \"Small Fonts\"; font-size: 6px; text-align: left; vertical-align: bottom; color: #e8b931'>[footer]</span>"
+		next_unlock.maptext_x = text_x
+		next_unlock.maptext_y = DEATH_CARD_BAND + 3
+		next_unlock.maptext_width = text_width
+		next_unlock.maptext_height = DEATH_CARD_FOOTER
+		next_unlock.appearance_flags = RESET_COLOR|RESET_ALPHA|KEEP_APART
+		overlays += next_unlock
 	if(life_line)
 		var/mutable_appearance/band = mutable_appearance()
 		band.maptext = "<span style='[outline]; font-family: \"Small Fonts\"; font-size: 6px; text-align: center; color: #aab2b9'>[life_line]</span>"
@@ -307,11 +339,11 @@ GLOBAL_LIST_EMPTY(clash_death_card_icons)
 		overlays += band
 	if(has_killer && isnum(health))
 		var/mutable_appearance/health_label = mutable_appearance()
-		health_label.maptext = "<span style='[outline]; font-family: \"Small Fonts\"; font-size: 6px; text-align: center; color: #8a939c'>THEIR HP [health]%</span>"
+		health_label.maptext = "<span style='[outline]; font-family: \"Small Fonts\"; font-size: 6px; text-align: center; vertical-align: middle; color: #8a939c'>THEIR HP [health]%</span>"
 		health_label.maptext_x = 8
 		health_label.maptext_y = DEATH_CARD_BAND + 2
 		health_label.maptext_width = DEATH_CARD_ICON_BOX
-		health_label.maptext_height = 10
+		health_label.maptext_height = 12
 		health_label.appearance_flags = RESET_COLOR|RESET_ALPHA|KEEP_APART
 		overlays += health_label
 	var/box_center_x = 8 + DEATH_CARD_ICON_BOX / 2
@@ -319,12 +351,13 @@ GLOBAL_LIST_EMPTY(clash_death_card_icons)
 	if(has_killer && portrait)
 		overlays += clash_death_card_picture(portrait, world.icon_size, world.icon_size, box_center_x, box_bottom + DEATH_CARD_GUN_STRIP + DEATH_CARD_ICON_BOX / 2, 2, DEATH_CARD_ICON_BOX)
 	if(has_killer && weapon)
-		var/icon/weapon_icon = icon(weapon.icon, weapon.icon_state)
-		overlays += clash_death_card_picture(weapon, weapon_icon.Width(), weapon_icon.Height(), box_center_x, box_bottom + DEATH_CARD_GUN_STRIP / 2, 2, DEATH_CARD_ICON_BOX)
+		var/icon/weapon_icon = clash_trim_icon(getFlatIcon(weapon))
+		overlays += clash_death_card_picture(mutable_appearance(weapon_icon), weapon_icon.Width(), weapon_icon.Height(), box_center_x, box_bottom + DEATH_CARD_GUN_STRIP / 2, 1, DEATH_CARD_ICON_BOX - 8, DEATH_CARD_GUN_STRIP - 6)
 	victim.client.clash_death_card = list(
 		"color" = color,
 		"has_killer" = has_killer,
 		"health" = health,
+		"has_footer" = !!footer,
 		"overlays" = overlays,
 	)
 	if(victim.stat == DEAD)
@@ -335,3 +368,6 @@ GLOBAL_LIST_EMPTY(clash_death_card_icons)
 #undef DEATH_CARD_BAND
 #undef DEATH_CARD_ICON_BOX
 #undef DEATH_CARD_GUN_STRIP
+#undef DEATH_CARD_HEADER
+#undef DEATH_CARD_NAME_WIDTH
+#undef DEATH_CARD_FOOTER

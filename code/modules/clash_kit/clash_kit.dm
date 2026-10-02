@@ -52,17 +52,13 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 		GLOB.clash_active_kits[ckey] = list()
 		load_clash_kits(ckey)
 	var/list/kits = by_job[job]
-	var/list/presets = kits ? list() : get_clash_kit_role_presets(job)
 	if(!kits)
 		kits = list()
 		by_job[job] = kits
 	while(length(kits) < CLASH_KIT_COUNT)
 		var/datum/clash_kit/kit = new
-		var/list/preset = length(presets) > length(kits) ? presets[length(kits) + 1] : null
-		if(preset)
-			var/list/preset_choices = preset[2]
-			kit.name = preset[1]
-			kit.choices = preset_choices.Copy()
+		if(!length(kits))
+			kit.name = "Default"
 		else
 			var/customs = 1
 			for(var/datum/clash_kit/other as anything in kits)
@@ -375,9 +371,12 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 	if(!sidearm_filled && sidearm_ammo)
 		clash_kit_spare_ammo(wearer, sidearm_ammo, CLASH_KIT_SPARE_SIDEARM)
 
-/proc/apply_clash_kit(mob/living/carbon/human/wearer, datum/clash_kit/kit, mode = CLASH_KIT_SPAWN, job, datum/preferences/prefs)
+/proc/apply_clash_kit(mob/living/carbon/human/wearer, datum/clash_kit/kit, mode = CLASH_KIT_SPAWN, job, datum/preferences/prefs, ckey)
 	if(!kit || QDELETED(wearer))
 		return
+	job = job || wearer.job
+	ckey = ckey || wearer.ckey
+	kit = clash_filter_kit(kit, ckey, job)
 	var/list/cosmetics = clash_cosmetic_paths(prefs || wearer.client?.prefs || GLOB.preferences_datums[wearer.ckey])
 	var/faction = wearer.faction
 	var/datum/clash_kit_option/primary = kit.get_option(KIT_SLOT_PRIMARY)
@@ -416,6 +415,7 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 	var/datum/clash_kit_option/webbing = kit.get_option(KIT_SLOT_WEBBING)
 	if(webbing?.faction == faction)
 		clash_kit_fit_webbing(wearer, webbing.item_type, cosmetics)
+	clash_downgrade_locked_gear(wearer, ckey, job, cosmetics)
 
 	var/obj/item/weapon/gun/main_gun
 	if(primary)
@@ -450,8 +450,10 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 			var/obj/item/grenade = new grenades.item_type(wearer)
 			if(!wearer.equip_to_appropriate_slot(grenade))
 				qdel(grenade)
+	clash_strip_locked_attachments(wearer, ckey)
+	clash_strip_locked_grenades(wearer, ckey, job)
 	clash_kit_fill_ammo(wearer, kit, mode)
-	. = stock_clash_kit(wearer, kit, job || wearer.job, mode)
+	. = stock_clash_kit(wearer, kit, job, mode, ckey)
 	wearer.regenerate_icons()
 
 /proc/clash_cosmetic_paths(datum/preferences/prefs)
@@ -461,8 +463,27 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 		if(cosmetic)
 			. += cosmetic.path
 
-/proc/reapply_clash_kit(mob/living/carbon/human/wearer, datum/clash_kit/kit)
-	apply_clash_kit(wearer, kit, CLASH_KIT_RESET)
+/proc/regear_clash_fighter(mob/living/carbon/human/fighter, datum/clash_kit/kit)
+	var/datum/job/role = GLOB.RoleAuthority.roles_by_name[fighter.job]
+	var/datum/equipment_preset/preset = role?.gear_preset && GLOB.equipment_presets.gear_path_presets_list[role.gear_preset]
+	if(!preset)
+		apply_clash_kit(fighter, kit, CLASH_KIT_RESET)
+		return
+	var/list/kept = list(fighter.wear_id, fighter.w_uniform, fighter.wear_l_ear, fighter.wear_r_ear)
+	for(var/obj/item/thing as anything in fighter.get_equipped_items() + list(fighter.l_hand, fighter.r_hand, fighter.l_store, fighter.r_store, fighter.s_store))
+		if(!thing || (thing in kept) || QDELETED(thing))
+			continue
+		fighter.temp_drop_inv_item(thing, TRUE)
+		qdel(thing)
+	try
+		preset.load_gear(fighter, fighter.client)
+	catch(var/exception/error)
+		stack_trace("Clash kit could not re-gear [fighter.job]: [error]")
+	for(var/gear_type in fighter.client?.prefs?.gear)
+		var/datum/gear/cosmetic = GLOB.gear_datums_by_type[gear_type]
+		cosmetic?.equip_to_user(fighter, FALSE, FALSE)
+	issue_clash_role_kit(fighter, fighter.job)
+	apply_clash_kit(fighter, kit, CLASH_KIT_SPAWN)
 
 /proc/describe_clash_kit_item(obj/item/item)
 	return item ? list("name" = item.name, "type" = "[item.type]", "icon" = "[item.icon]", "icon_state" = item.icon_state) : null
@@ -542,7 +563,8 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 			cosmetic?.equip_to_user(model, FALSE, FALSE)
 		issue_clash_role_kit(model, job)
 		GLOB.clash_kit_budgets[job] = list(model.vendor_points, model.vendor_snowflake_points)
-		var/list/statuses = apply_clash_kit(model, kit, CLASH_KIT_PREVIEW, job, viewer?.prefs)
+		clash_raise_vendor_points(model, viewer?.ckey, job)
+		var/list/statuses = apply_clash_kit(model, kit, CLASH_KIT_PREVIEW, job, viewer?.prefs, viewer?.ckey)
 		if(!draw)
 			qdel(model)
 			return list("statuses" = statuses)

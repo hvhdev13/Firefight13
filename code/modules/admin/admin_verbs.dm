@@ -152,6 +152,7 @@ GLOBAL_LIST_INIT(admin_verbs_minor_event, list(
 	/client/proc/setup_delayed_event_spawns,
 	/client/proc/hvh_control,
 	/client/proc/clash_bot_panel,
+	/client/proc/clash_progression_panel,
 ))
 
 GLOBAL_LIST_INIT(admin_verbs_major_event, list(

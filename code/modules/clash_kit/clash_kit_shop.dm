@@ -53,8 +53,15 @@ GLOBAL_LIST_EMPTY(clash_kit_budgets)
 	GLOB.clash_kit_shops[job] = list("sections" = sections, "by_id" = by_id)
 	return GLOB.clash_kit_shops[job]
 
-/proc/get_clash_kit_budget(job)
-	return GLOB.clash_kit_budgets[job] || list(MARINE_TOTAL_BUY_POINTS, MARINE_TOTAL_SNOWFLAKE_POINTS)
+/proc/get_clash_kit_budget(job, ckey)
+	var/list/budget = GLOB.clash_kit_budgets[job] || list(MARINE_TOTAL_BUY_POINTS, MARINE_TOTAL_SNOWFLAKE_POINTS)
+	var/list/limits = clash_shop_budget(ckey, job)
+	return limits ? list(budget[1] ? limits[1] : 0, min(budget[2], limits[2])) : budget
+
+/proc/clash_raise_vendor_points(mob/living/carbon/human/fighter, ckey, job)
+	var/list/limits = fighter.vendor_points ? clash_shop_budget(ckey, job) : null
+	if(limits)
+		fighter.vendor_points = max(fighter.vendor_points, limits[1])
 
 /proc/get_clash_kit_spent(datum/clash_kit/kit, job)
 	. = list(CLASH_SHOP_POINTS = 0, CLASH_SHOP_SNOWFLAKE = 0)
@@ -87,7 +94,7 @@ GLOBAL_LIST_EMPTY(clash_kit_budgets)
 		holder = holder.loc
 	return holder == wearer
 
-/proc/stock_clash_kit(mob/living/carbon/human/wearer, datum/clash_kit/kit, job, mode)
+/proc/stock_clash_kit(mob/living/carbon/human/wearer, datum/clash_kit/kit, job, mode, ckey)
 	for(var/datum/weakref/given_ref as anything in wearer.clash_kit_extras)
 		var/obj/item/given = given_ref.resolve()
 		if(!given || !clash_kit_carried(wearer, given))
@@ -112,13 +119,19 @@ GLOBAL_LIST_EMPTY(clash_kit_budgets)
 				qdel(thing)
 	. = list()
 	var/list/by_id = get_clash_shop(job)["by_id"]
+	var/list/limits = clash_shop_budget(ckey, job)
+	var/list/spent = list(CLASH_SHOP_POINTS = 0, CLASH_SHOP_SNOWFLAKE = 0)
+	var/obj/item/weapon/gun/primary = clash_kit_primary_of(wearer)
 	for(var/id in kit.extras)
 		var/list/item = by_id[id]
 		if(!item)
 			. += "gone"
 			continue
+		if(!clash_shop_item_unlocked(ckey, job, item["cost"], text2path(id), primary?.type))
+			. += "locked"
+			continue
 		var/snowflake = item["pool"] == CLASH_SHOP_SNOWFLAKE
-		if((snowflake ? wearer.vendor_snowflake_points : wearer.vendor_points) < item["cost"])
+		if((snowflake ? wearer.vendor_snowflake_points : wearer.vendor_points) < item["cost"] || (limits && spent[item["pool"]] + item["cost"] > limits[snowflake ? 2 : 1]))
 			. += "points"
 			continue
 		var/item_type = text2path(id)
@@ -136,6 +149,7 @@ GLOBAL_LIST_EMPTY(clash_kit_budgets)
 			wearer.vendor_snowflake_points -= item["cost"]
 		else
 			wearer.vendor_points -= item["cost"]
+		spent[item["pool"]] += item["cost"]
 		wearer.clash_kit_extras[WEAKREF(bought)] = item
 		. += "ok"
 

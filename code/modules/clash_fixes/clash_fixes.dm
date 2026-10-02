@@ -2,3 +2,6 @@
 	. = ..()
 	if(istype(user))
 		user.update_tint()
+
+/datum/game_decorator/halloween/pumpkins/is_active_decor()
+	return FALSE

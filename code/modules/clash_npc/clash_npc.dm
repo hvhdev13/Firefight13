@@ -165,6 +165,7 @@ GLOBAL_VAR(clash_bot_respawn_delay)
 /obj/effect/landmark/clash_npc/proc/bot_died(mob/living/carbon/human/body)
 	bot = null
 	if(body)
+		clash_award_bot_kill(body)
 		addtimer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(clear_clash_bot_corpse), WEAKREF(body)), CLASH_BOT_CORPSE_TIME)
 	if(temporary)
 		qdel(src)
@@ -182,6 +183,11 @@ GLOBAL_VAR(clash_bot_respawn_delay)
 	var/mob/living/carbon/human/body = body_ref?.resolve()
 	if(body && !body.client && body.stat == DEAD)
 		qdel(body)
+
+/proc/clash_track_player_corpse(mob/living/carbon/human/body)
+	for(var/obj/item/gear in body.get_contents())
+		track_clash_bot_gear(gear)
+	addtimer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(clear_clash_bot_corpse), WEAKREF(body)), CLASH_BOT_CORPSE_TIME)
 
 /proc/track_clash_bot_gear(obj/item/gear)
 	GLOB.clash_bot_gear[WEAKREF(gear)] = 0

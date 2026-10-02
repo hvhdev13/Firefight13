@@ -143,6 +143,7 @@ GLOBAL_DATUM_INIT(clash_career, /datum/clash_career, new)
 		"board" = board,
 		"kd_floor" = CLASH_CAREER_KD_FLOOR,
 		"board_size" = CLASH_CAREER_BOARD_SIZE,
+		"progress" = clash_career_progress(user.ckey),
 	)
 
 /mob/verb/clash_stats()

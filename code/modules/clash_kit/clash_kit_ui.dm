@@ -125,6 +125,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 /datum/clash_kit_screen/ui_data(mob/user)
 	var/list/kits = get_clash_kits(ckey, job)
 	var/datum/clash_kit/kit = get_kit()
+	clear_locked_attachments(kit)
 	var/wanted = get_doll_key(kit)
 	var/doll_pending = FALSE
 	if(doll_cache[wanted])
@@ -145,7 +146,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 	if(primary)
 		for(var/slot in GLOB.clash_kit_attachment_slots)
 			for(var/datum/clash_kit_option/option as anything in GLOB.clash_kit_menu[primary.faction][slot])
-				if(clash_kit_attachment_fits(option.item_type, primary.item_type))
+				if(clash_kit_attachment_fits(option.item_type, primary.item_type) && (!clash_progression_gating() || GLOB.clash_weapon_unlock_levels[clash_track_type(primary.item_type)]?[option.item_type]))
 					fits += option.id
 	var/mob/living/carbon/human/fighter = ishuman(user) && user.stat != DEAD ? user : null
 	var/area/clash_arena/here = fighter ? get_area(fighter) : null
@@ -158,6 +159,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 	var/list/issue = get_clash_issue_items(job)
 	if(isnull(issue))
 		queue_clash_issue_items(job, src)
+	var/gun_type = clash_effective_primary(kit, job)
 	var/hint
 	if(fighter)
 		if(fighter.job != job)
@@ -174,7 +176,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 		"kits" = kit_data,
 		"kit_index" = kit_index,
 		"choices" = kit?.choices || list(),
-		"issue" = issue || list(),
+		"issue" = clash_filter_issue(issue, ckey, job) || list(),
 		"fits" = fits,
 		"doll" = render?["doll"],
 		"gun" = render?["gun"],
@@ -183,7 +185,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 		"extras" = describe_extras(kit, doll_key == wanted ? render?["statuses"] : null),
 		"removed" = describe_removed(kit),
 		"shop" = get_clash_shop(job)["sections"],
-		"budget" = get_clash_kit_budget(job),
+		"budget" = get_clash_kit_budget(job, ckey),
 		"spent" = kit ? get_clash_kit_spent(kit, job) : list(),
 		"can_equip_now" = can_equip_now,
 		"live" = !!fighter,
@@ -192,7 +194,20 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 		"deploy_block" = deploy_state ? get_deploy_block(user) : null,
 		"revivable" = deploy_state == "dead" && !!user.get_revivable_body(),
 		"hint" = hint,
+		"progress" = clash_progress_ui_data(ckey, job, primary?.item_type, gun_type),
 	)
+
+/datum/clash_kit_screen/proc/clear_locked_attachments(datum/clash_kit/kit)
+	var/datum/clash_kit_option/primary = kit?.get_option(KIT_SLOT_PRIMARY)
+	if(!primary)
+		return
+	var/cleared = FALSE
+	for(var/slot in GLOB.clash_kit_attachment_slots)
+		if(kit.choices[slot] && clash_option_lock_text(ckey, kit.choices[slot], job, primary.item_type))
+			kit.choices -= slot
+			cleared = TRUE
+	if(cleared)
+		save_clash_kits(ckey)
 
 /datum/clash_kit_screen/proc/get_deploy_state(mob/user)
 	if(isnewplayer(user))
@@ -218,6 +233,9 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 		return "Your side is full. Even the teams by joining the other side"
 	if(get_held_job(user) == job)
 		return null
+	var/lock_text = clash_role_lock_text(user.client, job)
+	if(lock_text)
+		return lock_text
 	if(!GLOB.RoleAuthority.check_role_entry(user, role, TRUE))
 		return "That role is full or not open to you"
 	return null
@@ -230,7 +248,8 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 
 /datum/clash_kit_screen/proc/get_doll_key(datum/clash_kit/kit)
 	var/datum/preferences/prefs = GLOB.preferences_datums[ckey]
-	return json_encode(list(job, kit?.choices, kit?.extras, kit?.removed, kit?.fills, prefs?.gear))
+	var/datum/clash_kit/filtered = clash_filter_kit(kit, ckey, job)
+	return json_encode(list(job, filtered?.choices, kit?.extras, kit?.removed, kit?.fills, prefs?.gear))
 
 /datum/clash_kit_screen/proc/describe_extras(datum/clash_kit/kit, list/statuses)
 	. = list()
@@ -308,6 +327,11 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 			var/datum/clash_kit_option/option = get_clash_kit_option(params["id"])
 			if(!kit || !option || option.faction != clash_kit_faction_for_job(job) || option.slot != params["slot"])
 				return TRUE
+			var/datum/clash_kit_option/primary = option.slot == KIT_SLOT_PRIMARY ? option : kit.get_option(KIT_SLOT_PRIMARY)
+			var/lock_text = clash_option_lock_text(ckey, option.id, job, primary?.item_type)
+			if(lock_text)
+				to_chat(user, SPAN_WARNING("[option.name] is locked. [lock_text]."))
+				return TRUE
 			kit.choices[option.slot] = option.id
 			save_clash_kits(ckey)
 		if("clear")
@@ -327,8 +351,12 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 			var/list/item = get_clash_shop(job)["by_id"][params["id"]]
 			if(!kit || !item)
 				return TRUE
+			var/lock_text = clash_shop_item_lock_text(ckey, job, item["cost"], text2path(item["id"]), clash_effective_primary(kit, job))
+			if(lock_text)
+				to_chat(user, SPAN_WARNING("[item["name"]] is locked. [lock_text]."))
+				return TRUE
 			var/list/spent = get_clash_kit_spent(kit, job)
-			var/list/budget = get_clash_kit_budget(job)
+			var/list/budget = get_clash_kit_budget(job, ckey)
 			var/left = item["pool"] == CLASH_SHOP_SNOWFLAKE ? budget[2] - spent[CLASH_SHOP_SNOWFLAKE] : budget[1] - spent[CLASH_SHOP_POINTS]
 			if(left < item["cost"])
 				to_chat(user, SPAN_WARNING("Not enough points left for [item["name"]]."))
@@ -407,6 +435,14 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 		if("deploy")
 			deploy(user)
 			return TRUE
+		if("seen")
+			var/datum/clash_progress/progress = clash_progress_of(ckey)
+			if(!progress || !islist(params["ids"]))
+				return TRUE
+			for(var/id in params["ids"])
+				if(get_clash_kit_option(id) && !(id in progress.seen))
+					progress.seen += id
+					progress.dirty = TRUE
 	return TRUE
 
 /datum/clash_kit_screen/proc/name_new_kit(mob/user, datum/clash_kit/kit)

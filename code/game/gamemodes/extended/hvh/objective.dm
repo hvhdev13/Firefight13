@@ -116,6 +116,7 @@
 	for(var/datum/clash_zone/zone as anything in zones)
 		if(zone.owner && (persistent || !zone.contested))
 			objective_points[zone.owner] = (objective_points[zone.owner] || 0) + 1
+			clash_progress_zone(zone)
 	for(var/faction in list(FACTION_MARINE, FACTION_UPP))
 		var/points = objective_points[faction] || 0
 		if(points >= point_limit)
