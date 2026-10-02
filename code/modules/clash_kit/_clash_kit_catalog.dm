@@ -221,6 +221,7 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 	add_clash_kit_gun_attachments(FACTION_MARINE)
 	add_clash_kit_gun_attachments(FACTION_UPP)
 	build_clash_kit_presets()
+	build_clash_weapon_tracks()
 
 /proc/add_clash_kit_gun_attachments(faction)
 	var/list/fits_by_type = list()
@@ -265,21 +266,21 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 	))
 	add_clash_kit_preset(FACTION_MARINE, "Assault", list(
 		KIT_SLOT_HELMET = /obj/item/clothing/head/helmet/marine,
-		KIT_SLOT_PRIMARY = /obj/item/weapon/gun/smg/m39, KIT_SLOT_RAIL = /obj/item/attachable/reflex, KIT_SLOT_UNDER = /obj/item/attachable/verticalgrip,
+		KIT_SLOT_PRIMARY = /obj/item/weapon/gun/rifle/m41a, KIT_SLOT_RAIL = /obj/item/attachable/reflex, KIT_SLOT_UNDER = /obj/item/attachable/verticalgrip,
 		KIT_SLOT_ARMOR = /obj/item/clothing/suit/storage/marine/light, KIT_SLOT_BELT = /obj/item/storage/belt/gun/m4a3,
 		KIT_SLOT_SIDEARM = /obj/item/weapon/gun/pistol/m4a3, KIT_SLOT_POUCH_L = /obj/item/storage/pouch/firstaid/full,
 		KIT_SLOT_POUCH_R = /obj/item/storage/pouch/magazine, KIT_SLOT_GRENADE = /obj/item/explosive/grenade/smokebomb,
 	))
 	add_clash_kit_preset(FACTION_MARINE, "Breacher", list(
 		KIT_SLOT_HELMET = /obj/item/clothing/head/helmet/marine,
-		KIT_SLOT_PRIMARY = /obj/item/weapon/gun/shotgun/pump/m37a, KIT_SLOT_RAIL = /obj/item/attachable/flashlight,
+		KIT_SLOT_PRIMARY = /obj/item/weapon/gun/rifle/m41a, KIT_SLOT_RAIL = /obj/item/attachable/flashlight,
 		KIT_SLOT_ARMOR = /obj/item/clothing/suit/storage/marine/heavy, KIT_SLOT_BELT = /obj/item/storage/belt/shotgun,
 		KIT_SLOT_SIDEARM = /obj/item/weapon/gun/pistol/mod88, KIT_SLOT_POUCH_L = /obj/item/storage/pouch/firstaid/full,
 		KIT_SLOT_POUCH_R = /obj/item/storage/pouch/shotgun, KIT_SLOT_GRENADE = /obj/item/explosive/grenade/high_explosive,
 	))
 	add_clash_kit_preset(FACTION_MARINE, "Marksman", list(
 		KIT_SLOT_HELMET = /obj/item/clothing/head/helmet/marine,
-		KIT_SLOT_PRIMARY = /obj/item/weapon/gun/rifle/m4ra, KIT_SLOT_RAIL = /obj/item/attachable/scope/mini, KIT_SLOT_MUZZLE = /obj/item/attachable/extended_barrel,
+		KIT_SLOT_PRIMARY = /obj/item/weapon/gun/rifle/m41a, KIT_SLOT_RAIL = /obj/item/attachable/scope/mini, KIT_SLOT_MUZZLE = /obj/item/attachable/extended_barrel,
 		KIT_SLOT_ARMOR = /obj/item/clothing/suit/storage/marine/medium, KIT_SLOT_BELT = /obj/item/storage/belt/gun/m44,
 		KIT_SLOT_SIDEARM = /obj/item/weapon/gun/revolver/m44, KIT_SLOT_POUCH_L = /obj/item/storage/pouch/firstaid/full,
 		KIT_SLOT_POUCH_R = /obj/item/storage/pouch/magazine,
@@ -293,21 +294,21 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 	))
 	add_clash_kit_preset(FACTION_UPP, "Carbineer", list(
 		KIT_SLOT_HELMET = /obj/item/clothing/head/helmet/marine/veteran/UPP,
-		KIT_SLOT_PRIMARY = /obj/item/weapon/gun/rifle/type71/carbine, KIT_SLOT_RAIL = /obj/item/attachable/reflex, KIT_SLOT_UNDER = /obj/item/attachable/verticalgrip,
+		KIT_SLOT_PRIMARY = /obj/item/weapon/gun/rifle/type71, KIT_SLOT_RAIL = /obj/item/attachable/reflex, KIT_SLOT_UNDER = /obj/item/attachable/verticalgrip,
 		KIT_SLOT_ARMOR = /obj/item/clothing/suit/storage/marine/faction/UPP/support, KIT_SLOT_BELT = /obj/item/storage/belt/gun/type47,
 		KIT_SLOT_SIDEARM = /obj/item/weapon/gun/pistol/t73, KIT_SLOT_POUCH_L = /obj/item/storage/pouch/firstaid/full,
 		KIT_SLOT_POUCH_R = /obj/item/storage/pouch/magazine, KIT_SLOT_GRENADE = /obj/item/explosive/grenade/smokebomb,
 	))
 	add_clash_kit_preset(FACTION_UPP, "Breacher", list(
 		KIT_SLOT_HELMET = /obj/item/clothing/head/helmet/marine/veteran/UPP/heavy,
-		KIT_SLOT_PRIMARY = /obj/item/weapon/gun/shotgun/type23,
+		KIT_SLOT_PRIMARY = /obj/item/weapon/gun/rifle/type71,
 		KIT_SLOT_ARMOR = /obj/item/clothing/suit/storage/marine/faction/UPP/heavy, KIT_SLOT_BELT = /obj/item/storage/belt/shotgun/upp,
 		KIT_SLOT_SIDEARM = /obj/item/weapon/gun/pistol/np92, KIT_SLOT_POUCH_L = /obj/item/storage/pouch/firstaid/full,
 		KIT_SLOT_POUCH_R = /obj/item/storage/pouch/shotgun, KIT_SLOT_GRENADE = /obj/item/explosive/grenade/phosphorus/upp,
 	))
 	add_clash_kit_preset(FACTION_UPP, "Gunner", list(
 		KIT_SLOT_HELMET = /obj/item/clothing/head/helmet/marine/veteran/UPP,
-		KIT_SLOT_PRIMARY = /obj/item/weapon/gun/rifle/ak4047, KIT_SLOT_RAIL = /obj/item/attachable/reddot, KIT_SLOT_MUZZLE = /obj/item/attachable/compensator,
+		KIT_SLOT_PRIMARY = /obj/item/weapon/gun/rifle/type71, KIT_SLOT_RAIL = /obj/item/attachable/reddot, KIT_SLOT_MUZZLE = /obj/item/attachable/compensator,
 		KIT_SLOT_ARMOR = /obj/item/clothing/suit/storage/marine/faction/UPP, KIT_SLOT_BELT = /obj/item/storage/belt/marine/upp,
 		KIT_SLOT_POUCH_L = /obj/item/storage/pouch/firstaid/full, KIT_SLOT_POUCH_R = /obj/item/storage/pouch/magazine/large,
 		KIT_SLOT_GRENADE = /obj/item/explosive/grenade/high_explosive/upp,

@@ -217,6 +217,9 @@
 	for(var/i in GLOB.RoleAuthority.roles_for_mode)
 		var/datum/job/J = GLOB.RoleAuthority.roles_for_mode[i]
 		if(!GLOB.RoleAuthority.check_role_entry(src, J, latejoin = TRUE, faction = FACTION_NEUTRAL))
+			var/lock_text = clash_late_join_lock_text(src, J, FACTION_NEUTRAL)
+			if(lock_text)
+				dat += "<font color='grey'>[J.disp_title] ([lock_text])</font><br>"
 			continue
 		var/active = 0
 		// Only players with the job assigned and AFK for less than 10 minutes count as active
@@ -280,6 +283,9 @@
 	for(var/i in GLOB.RoleAuthority.roles_for_mode)
 		var/datum/job/J = GLOB.RoleAuthority.roles_for_mode[i]
 		if(!GLOB.RoleAuthority.check_role_entry(src, J, latejoin = TRUE, faction = FACTION_UPP))
+			var/lock_text = clash_late_join_lock_text(src, J, FACTION_UPP)
+			if(lock_text)
+				dat += "<font color='grey'>[J.disp_title] ([lock_text])</font><br>"
 			continue
 		var/active = 0
 		// Only players with the job assigned and AFK for less than 10 minutes count as active

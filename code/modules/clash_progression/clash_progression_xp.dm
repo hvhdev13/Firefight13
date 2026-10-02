@@ -68,13 +68,17 @@
 	if(ispath(gun_type, /obj/item/explosive/grenade))
 		entry = carrier_entry(CLASH_FAMILY_GRENADE)
 		entry["xp"] += amount
+		check_unlocks("carrier", CLASH_FAMILY_GRENADE)
 		return
 	if(!ispath(gun_type, /obj/item/weapon/gun))
 		return
 	entry = weapon_entry(gun_type)
 	entry["xp"] += amount
-	entry = carrier_entry(clash_gun_family(gun_type))
+	check_unlocks("weapon", gun_type)
+	var/family = clash_gun_family(gun_type)
+	entry = carrier_entry(family)
 	entry["xp"] += amount
+	check_unlocks("carrier", family)
 
 /datum/clash_progress/proc/check_unlocks(track, key)
 	switch(track)
@@ -84,6 +88,13 @@
 		if("class")
 			var/list/entry = class_entry(key)
 			entry["best"] = class_level(key)
+		if("weapon")
+			var/list/entry = weapon_entry(key)
+			entry["best"] = weapon_level(key)
+			entry["mastered"] = entry["mastered"] || entry["xp"] >= CLASH_WEAPON_MASTERY_XP
+		if("carrier")
+			var/list/entry = carrier_entry(key)
+			entry["best"] = carrier_step(key)
 
 /proc/clash_progress_kill(mob/living/carbon/human/victim, mob/living/carbon/human/killer, cause, cause_object)
 	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode

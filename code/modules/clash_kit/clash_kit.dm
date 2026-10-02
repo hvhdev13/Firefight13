@@ -375,9 +375,12 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 	if(!sidearm_filled && sidearm_ammo)
 		clash_kit_spare_ammo(wearer, sidearm_ammo, CLASH_KIT_SPARE_SIDEARM)
 
-/proc/apply_clash_kit(mob/living/carbon/human/wearer, datum/clash_kit/kit, mode = CLASH_KIT_SPAWN, job, datum/preferences/prefs)
+/proc/apply_clash_kit(mob/living/carbon/human/wearer, datum/clash_kit/kit, mode = CLASH_KIT_SPAWN, job, datum/preferences/prefs, ckey)
 	if(!kit || QDELETED(wearer))
 		return
+	job = job || wearer.job
+	ckey = ckey || wearer.ckey
+	kit = clash_filter_kit(kit, ckey, job)
 	var/list/cosmetics = clash_cosmetic_paths(prefs || wearer.client?.prefs || GLOB.preferences_datums[wearer.ckey])
 	var/faction = wearer.faction
 	var/datum/clash_kit_option/primary = kit.get_option(KIT_SLOT_PRIMARY)
@@ -451,7 +454,7 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 			if(!wearer.equip_to_appropriate_slot(grenade))
 				qdel(grenade)
 	clash_kit_fill_ammo(wearer, kit, mode)
-	. = stock_clash_kit(wearer, kit, job || wearer.job, mode)
+	. = stock_clash_kit(wearer, kit, job, mode, ckey)
 	wearer.regenerate_icons()
 
 /proc/clash_cosmetic_paths(datum/preferences/prefs)
@@ -542,7 +545,7 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 			cosmetic?.equip_to_user(model, FALSE, FALSE)
 		issue_clash_role_kit(model, job)
 		GLOB.clash_kit_budgets[job] = list(model.vendor_points, model.vendor_snowflake_points)
-		var/list/statuses = apply_clash_kit(model, kit, CLASH_KIT_PREVIEW, job, viewer?.prefs)
+		var/list/statuses = apply_clash_kit(model, kit, CLASH_KIT_PREVIEW, job, viewer?.prefs, viewer?.ckey)
 		if(!draw)
 			qdel(model)
 			return list("statuses" = statuses)

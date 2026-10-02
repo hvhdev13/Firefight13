@@ -140,9 +140,9 @@ GLOBAL_LIST_INIT(clash_progression_settings, list("enabled" = TRUE, "xp_multipli
 	return level
 
 /datum/clash_progress/proc/faction_level(faction)
-	var/list/entry = faction_entry(faction)
-	return max(entry["best"], level_from_xp(entry["xp"], CLASH_FACTION_XP_BASE))
+	var/list/entry = factions[faction]
+	return entry ? max(entry["best"], level_from_xp(entry["xp"], CLASH_FACTION_XP_BASE)) : 1
 
 /datum/clash_progress/proc/class_level(class)
-	var/list/entry = class_entry(class)
-	return max(entry["best"], level_from_xp(entry["xp"], CLASH_CLASS_XP_BASE))
+	var/list/entry = classes[class]
+	return entry ? max(entry["best"], level_from_xp(entry["xp"], CLASH_CLASS_XP_BASE)) : 1
