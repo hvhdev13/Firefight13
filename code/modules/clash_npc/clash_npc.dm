@@ -165,6 +165,7 @@ GLOBAL_VAR(clash_bot_respawn_delay)
 /obj/effect/landmark/clash_npc/proc/bot_died(mob/living/carbon/human/body)
 	bot = null
 	if(body)
+		clash_award_bot_kill(body)
 		addtimer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(clear_clash_bot_corpse), WEAKREF(body)), CLASH_BOT_CORPSE_TIME)
 	if(temporary)
 		qdel(src)

@@ -95,13 +95,18 @@ GLOBAL_DATUM(clash_zone_tile_icon, /icon)
 	progress = 0
 	contested = FALSE
 
-/datum/clash_zone/proc/get_occupants()
+/datum/clash_zone/proc/get_occupant_mobs()
 	. = list()
 	for(var/mob/living/carbon/human/fighter as anything in GLOB.alive_human_list)
 		if(!fighter.client || fighter.statistic_exempt || fighter.stat != CONSCIOUS || !covered[get_turf(fighter)])
 			continue
 		if(fighter.faction in list(FACTION_MARINE, FACTION_UPP))
-			.[fighter.faction] = (.[fighter.faction] || 0) + 1
+			. += fighter
+
+/datum/clash_zone/proc/get_occupants()
+	. = list()
+	for(var/mob/living/carbon/human/fighter as anything in get_occupant_mobs())
+		.[fighter.faction] = (.[fighter.faction] || 0) + 1
 
 /datum/clash_zone/proc/get_state_text(capture_time)
 	if(contested)

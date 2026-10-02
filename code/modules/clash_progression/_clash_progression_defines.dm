@@ -1,0 +1,70 @@
+#define CLASH_PROGRESS_FILE "clash_progress.json"
+#define CLASH_PROGRESS_VERSION 1
+
+#define CLASH_LEVEL_CAP 30
+#define CLASH_FACTION_XP_BASE 1500
+#define CLASH_CLASS_XP_BASE 1200
+#define CLASH_LEVEL_XP_STEP 75
+
+#define CLASH_XP_KILL 100
+#define CLASH_XP_ASSIST 50
+#define CLASH_XP_REVIVE 100
+#define CLASH_XP_CAPTURE 300
+#define CLASH_XP_ZONE 5
+#define CLASH_XP_MATCH_WIN 500
+#define CLASH_XP_ROUND 250
+#define CLASH_XP_BOT_KILL 25
+#define CLASH_XP_BOT_CAP 1000
+#define CLASH_SHORT_SIDE_BONUS 1.25
+
+#define CLASH_XP_SOURCE_KILL "Kill"
+#define CLASH_XP_SOURCE_ASSIST "Assist"
+#define CLASH_XP_SOURCE_REVIVE "Revive"
+#define CLASH_XP_SOURCE_CAPTURE "Capture"
+#define CLASH_XP_SOURCE_ZONE "Zone"
+#define CLASH_XP_SOURCE_MATCH_WIN "Match win"
+#define CLASH_XP_SOURCE_ROUND "Round"
+#define CLASH_XP_SOURCE_BOT_KILL "Bot kill"
+
+#define CLASH_CLASS_RIFLEMAN "rifleman"
+#define CLASH_CLASS_MEDIC "medic"
+#define CLASH_CLASS_ENGINEER "engineer"
+#define CLASH_CLASS_HEAVY "heavy"
+#define CLASH_CLASS_LEADER "leader"
+#define CLASH_CLASS_SUPPORT "support"
+
+#define CLASH_FAMILY_SHOTGUN "shotgun"
+#define CLASH_FAMILY_MAGAZINE "magazine"
+#define CLASH_FAMILY_SIDEARM "sidearm"
+#define CLASH_FAMILY_GRENADE "grenade"
+#define CLASH_FAMILY_FUEL "fuel"
+#define CLASH_FAMILY_LEVER "lever"
+
+GLOBAL_LIST_INIT(clash_job_classes, list(
+	JOB_SQUAD_MARINE = CLASH_CLASS_RIFLEMAN,
+	JOB_UPP = CLASH_CLASS_RIFLEMAN,
+	JOB_SQUAD_MEDIC = CLASH_CLASS_MEDIC,
+	JOB_UPP_MEDIC = CLASH_CLASS_MEDIC,
+	JOB_SQUAD_ENGI = CLASH_CLASS_ENGINEER,
+	JOB_UPP_ENGI = CLASH_CLASS_ENGINEER,
+	JOB_SQUAD_SMARTGUN = CLASH_CLASS_HEAVY,
+	JOB_SQUAD_SPECIALIST = CLASH_CLASS_HEAVY,
+	JOB_UPP_SPECIALIST = CLASH_CLASS_HEAVY,
+	JOB_SQUAD_TEAM_LEADER = CLASH_CLASS_LEADER,
+	JOB_SQUAD_LEADER = CLASH_CLASS_LEADER,
+	JOB_UPP_LEADER = CLASH_CLASS_LEADER,
+	JOB_DOCTOR = CLASH_CLASS_SUPPORT,
+	JOB_NURSE = CLASH_CLASS_SUPPORT,
+	JOB_FIELD_DOCTOR = CLASH_CLASS_SUPPORT,
+	JOB_CHIEF_REQUISITION = CLASH_CLASS_SUPPORT,
+	JOB_CARGO_TECH = CLASH_CLASS_SUPPORT,
+	JOB_UPP_LT_DOKTOR = CLASH_CLASS_SUPPORT,
+	JOB_UPP_SUPPLY = CLASH_CLASS_SUPPORT,
+))
+
+GLOBAL_LIST_EMPTY(clash_grenade_names)
+
+GLOBAL_LIST_INIT(clash_insignia_names, list(
+	FACTION_MARINE = list("Private", "Private First Class", "Lance Corporal", "Corporal", "Sergeant", "Staff Sergeant", "Gunnery Sergeant", "Master Sergeant", "First Sergeant", "Sergeant Major"),
+	FACTION_UPP = list("Ryadovoy", "Yefreytor", "Mladshiy Serzhant", "Serzhant", "Starshiy Serzhant", "Starshina", "Praporshchik", "Mladshiy Leytenant", "Leytenant", "Starshiy Leytenant"),
+))

@@ -87,6 +87,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	var/finish_reason = "Time"
 	var/score_label = "kills"
 	var/list/recent_damage = list()
+	var/list/last_attackers = list()
 	var/list/rivalries = list()
 	var/list/life_kills = list()
 	var/admin_tampered = FALSE
@@ -252,6 +253,8 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	countdown_end_time = null
 	intermission_end_time = null
 	bases_sealed = FALSE
+	last_attackers = list()
+	clash_progress_match_start()
 	if(holding_fire)
 		hold_fire(FALSE)
 		for(var/faction in list(FACTION_MARINE, FACTION_UPP))
@@ -561,19 +564,21 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	to_chat(killer, SPAN_NOTICE("You killed [victim.real_name]."))
 	if(killer.client)
 		playsound_client(killer.client, CLASH_KILL_SOUND, null, 50)
+	clash_progress_kill(victim, killer, cause, cause_object)
 
-/datum/game_mode/extended/faction_clash/hvh/proc/record_damage(mob/living/victim, mob/attacker)
+/datum/game_mode/extended/faction_clash/hvh/proc/record_damage(mob/living/victim, mob/attacker, weapon_type)
 	if(!match_live || round_finished || victim.statistic_exempt || attacker.statistic_exempt || attacker.faction == victim.faction)
 		return
 	var/list/attackers = recent_damage[victim.real_name]
 	if(!attackers)
 		attackers = list()
 		recent_damage[victim.real_name] = attackers
-	attackers[attacker.real_name] = list("time" = world.time, "faction" = attacker.faction, "ckey" = attacker.mind?.ckey || attacker.ckey)
+	attackers[attacker.real_name] = list("time" = world.time, "faction" = attacker.faction, "ckey" = attacker.mind?.ckey || attacker.ckey, "job" = attacker.job, "weapon" = weapon_type)
 
 /datum/game_mode/extended/faction_clash/hvh/proc/credit_assists(victim_name, killer_name)
 	. = list()
 	var/list/attackers = recent_damage[victim_name]
+	last_attackers[victim_name] = attackers
 	recent_damage -= victim_name
 	if(!match_live)
 		return
@@ -583,6 +588,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 			continue
 		var/list/entry = get_score_entry(name, hit["faction"], hit["ckey"])
 		entry["assists"] += 1
+		clash_progress_assist(hit)
 		. += name
 
 /datum/game_mode/extended/faction_clash/hvh/proc/report_environment_death(mob/victim, cause)
@@ -721,6 +727,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	var/winner = uscm > upp ? FACTION_MARINE : (upp > uscm ? FACTION_UPP : null)
 	if(winner)
 		match_wins[winner] = (match_wins[winner] || 0) + 1
+	clash_progress_match_end(winner)
 	var/mvp = pick_mvp(player_scores)
 	match_results += list(list("winner" = winner, "uscm" = uscm, "upp" = upp, "reason" = reason, "mvp" = mvp))
 	log_debug("HVH: match [match_number] ended, [reason], uscm=[uscm] upp=[upp] winner=[winner || "draw"]")
@@ -740,6 +747,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	roundend_ceasefire()
 
 /datum/game_mode/extended/faction_clash/hvh/proc/record_career()
+	clash_progress_round_end()
 	if(admin_tampered)
 		log_game("Clash career: round not recorded, an admin ended a match or set a score")
 		message_admins("HvH: this round was not saved to career stats because an admin ended a match or set a score.")
@@ -812,6 +820,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	rivalries = list()
 	life_kills = list()
 	limit_callouts_made = list()
+	GLOB.clash_progress.save_dirty()
 
 /datum/game_mode/extended/faction_clash/hvh/proc/begin_intermission()
 	hold_fire(TRUE)

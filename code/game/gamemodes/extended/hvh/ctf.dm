@@ -274,6 +274,7 @@
 	captures[runner.faction] = (captures[runner.faction] || 0) + 1
 	var/list/entry = get_score_entry(runner.real_name, runner.faction, runner.mind?.ckey || runner.ckey)
 	entry["captures"] = (entry["captures"] || 0) + 1
+	clash_progress_capture(runner)
 	announce_flag(flag, "captured", runner)
 	return_flag(flag, null, TRUE)
 	log_debug("HVH: [runner.real_name] captured the [flag.faction] flag, [runner.faction] at [captures[runner.faction]]")

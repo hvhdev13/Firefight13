@@ -51,6 +51,7 @@ SUBSYSTEM_DEF(clash_spawn)
 	if(clash_fed_spawns())
 		spawned.nutrition = NUTRITION_NORMAL
 	spawned.clash_spawn_points = list(spawned.vendor_points, spawned.vendor_snowflake_points)
+	clash_progress_join(spawned)
 	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
 	if(istype(clash_mode) && clash_mode.spawn_protection)
 		spawned.AddComponent(/datum/component/clash_spawn_guard, clash_mode.spawn_protection)
