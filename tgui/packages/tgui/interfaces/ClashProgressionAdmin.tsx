@@ -44,6 +44,25 @@ const LevelInput = (props: {
   );
 };
 
+const XpInput = (props: {
+  readonly track: string;
+  readonly id: string;
+  readonly value: number;
+}) => {
+  const { act } = useBackend<PanelData>();
+  const { track, id, value } = props;
+  return (
+    <NumberInput
+      width="6em"
+      step={100}
+      minValue={0}
+      maxValue={9999999}
+      value={value}
+      onChange={(xp) => act('set_xp', { track, key: id, xp })}
+    />
+  );
+};
+
 const PlayerProgress = (props: { readonly progress: CareerProgress }) => {
   const { data } = useBackend<PanelData>();
   const { progress } = props;
@@ -60,7 +79,8 @@ const PlayerProgress = (props: { readonly progress: CareerProgress }) => {
                 min={1}
                 max={data.level_cap}
               />{' '}
-              {faction.insignia}, {faction.xp.toLocaleString('en-US')} XP
+              {faction.insignia},{' '}
+              <XpInput track="faction" id={faction.id} value={faction.xp} /> XP
             </LabeledList.Item>
           ))}
           {progress.classes.map((entry) => (
@@ -72,7 +92,7 @@ const PlayerProgress = (props: { readonly progress: CareerProgress }) => {
                 min={1}
                 max={data.level_cap}
               />{' '}
-              {entry.xp.toLocaleString('en-US')} XP
+              <XpInput track="class" id={entry.id} value={entry.xp} /> XP
             </LabeledList.Item>
           ))}
         </LabeledList>
@@ -109,10 +129,11 @@ const PlayerProgress = (props: { readonly progress: CareerProgress }) => {
                 />
               </Table.Cell>
               <Table.Cell collapsing>of {weapon.max}</Table.Cell>
-              <Table.Cell collapsing textAlign="right">
-                {weapon.mastered
-                  ? 'Mastered'
-                  : `${weapon.xp.toLocaleString('en-US')} XP`}
+              <Table.Cell collapsing>
+                <XpInput track="weapon" id={weapon.type} value={weapon.xp} /> XP
+              </Table.Cell>
+              <Table.Cell collapsing>
+                {!!weapon.mastered && 'Mastered'}
               </Table.Cell>
             </Table.Row>
           ))}

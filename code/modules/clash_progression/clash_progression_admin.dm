@@ -4,7 +4,7 @@ GLOBAL_DATUM_INIT(clash_progression_admin, /datum/clash_progression_admin, new)
 
 /client/proc/clash_progression_panel()
 	set name = "Progression Panel"
-	set desc = "Look up and set player progression, the XP multiplier, bot XP and the locks."
+	set desc = "Look up and set player levels and XP, the XP multiplier, bot XP and the locks."
 	set category = "Admin.Events"
 
 	if(!check_rights(R_EVENT))
@@ -54,6 +54,12 @@ GLOBAL_DATUM_INIT(clash_progression_admin, /datum/clash_progression_admin, new)
 			var/level = text2num(params["level"])
 			if(!ckey || !clash_set_progress_level(ckey, params["track"], params["key"], level, user))
 				to_chat(user, SPAN_WARNING("That level could not be set."))
+			return TRUE
+		if("set_xp")
+			var/ckey = lookups[user.ckey]
+			var/xp = text2num(params["xp"])
+			if(!ckey || !clash_set_progress_xp(ckey, params["track"], params["key"], xp, user))
+				to_chat(user, SPAN_WARNING("That XP could not be set."))
 			return TRUE
 		if("multiplier")
 			var/value = text2num(params["value"])

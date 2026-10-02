@@ -256,10 +256,39 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 	return filtered
 
 /proc/clash_set_progress_level(ckey, track, key, level, mob/admin = usr)
-	var/datum/clash_progress/progress = clash_progress_of(ckey)
-	if(!progress || !isnum(level))
+	if(!isnum(level))
 		return FALSE
 	level = round(level)
+	var/xp
+	switch(track)
+		if("faction")
+			level = clamp(level, 1, CLASH_LEVEL_CAP)
+			xp = clash_faction_xp_for(level)
+		if("class")
+			level = clamp(level, 1, CLASH_LEVEL_CAP)
+			xp = clash_class_xp_for(level)
+		if("weapon")
+			build_clash_kit_catalog()
+			var/list/unlocks = GLOB.clash_weapon_tracks[ispath(key) ? key : text2path(key)]
+			if(!unlocks)
+				return FALSE
+			level = clamp(level, 1, length(unlocks) + 1)
+			xp = level > 1 ? unlocks[level - 1]["xp"] : 0
+		if("carrier")
+			var/list/steps = GLOB.clash_carrier_tracks[key]
+			if(!steps)
+				return FALSE
+			level = clamp(level, 0, length(steps))
+			xp = level ? steps[level][1] : 0
+		else
+			return FALSE
+	return clash_set_progress_xp(ckey, track, key, xp, admin, "level [level]")
+
+/proc/clash_set_progress_xp(ckey, track, key, xp, mob/admin = usr, shown)
+	var/datum/clash_progress/progress = clash_progress_of(ckey)
+	if(!progress || !isnum(xp))
+		return FALSE
+	xp = max(round(xp), 0)
 	var/faction = progress.side || FACTION_MARINE
 	var/old_level
 	var/list/entry
@@ -268,44 +297,36 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 			if(!(key in list(FACTION_MARINE, FACTION_UPP)))
 				return FALSE
 			faction = key
-			level = clamp(level, 1, CLASH_LEVEL_CAP)
 			old_level = progress.faction_level(key)
 			entry = progress.faction_entry(key)
-			entry["xp"] = clash_faction_xp_for(level)
 			entry["best"] = 1
 		if("class")
 			if(!GLOB.clash_class_names[key])
 				return FALSE
-			level = clamp(level, 1, CLASH_LEVEL_CAP)
 			old_level = progress.class_level(key)
 			entry = progress.class_entry(key)
-			entry["xp"] = clash_class_xp_for(level)
 			entry["best"] = 1
 		if("weapon")
 			build_clash_kit_catalog()
 			key = ispath(key) ? key : text2path(key)
-			var/list/unlocks = GLOB.clash_weapon_tracks[key]
-			if(!unlocks)
+			if(!GLOB.clash_weapon_tracks[key])
 				return FALSE
-			level = clamp(level, 1, length(unlocks) + 1)
 			old_level = progress.weapon_level(key)
 			entry = progress.weapon_entry(key)
-			entry["xp"] = level > 1 ? unlocks[level - 1]["xp"] : 0
 			entry["best"] = 1
 			entry["mastered"] = FALSE
 		if("carrier")
-			var/list/steps = GLOB.clash_carrier_tracks[key]
-			if(!steps)
+			if(!GLOB.clash_carrier_tracks[key])
 				return FALSE
-			level = clamp(level, 0, length(steps))
 			old_level = progress.carrier_step(key)
 			entry = progress.carrier_entry(key)
-			entry["xp"] = level ? steps[level][1] : 0
 			entry["best"] = 0
 		else
 			return FALSE
+	entry["xp"] = xp
 	progress.check_unlocks(track, key, old_level, faction)
 	progress.save()
-	log_admin("[key_name(admin)] set the [track] progression of [ckey] for [key] to [level].")
-	message_admins("[key_name_admin(admin)] set the [track] progression of [ckey] for [key] to [level].")
+	shown = shown || "[xp] XP"
+	log_admin("[key_name(admin)] set the [track] progression of [ckey] for [key] to [shown].")
+	message_admins("[key_name_admin(admin)] set the [track] progression of [ckey] for [key] to [shown].")
 	return TRUE
