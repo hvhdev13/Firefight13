@@ -255,6 +255,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	intermission_end_time = null
 	bases_sealed = FALSE
 	last_attackers = list()
+	clash_progress_match_start()
 	if(holding_fire)
 		hold_fire(FALSE)
 		for(var/faction in list(FACTION_MARINE, FACTION_UPP))
