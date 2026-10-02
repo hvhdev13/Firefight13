@@ -219,20 +219,7 @@
 	var/mob/living/carbon/human/killer = body.last_damage_data?.resolve_mob()
 	if(!ishuman(killer) || killer.faction == body.faction)
 		return
-	var/datum/clash_progress/progress = clash_progress_of(killer.mind?.ckey || killer.ckey)
-	if(!progress || progress.bot_xp_match >= CLASH_XP_BOT_CAP)
-		return
-	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
-	if(!istype(clash_mode) || !clash_mode.match_live || killer.statistic_exempt)
-		return
-	var/amount = min(CLASH_XP_BOT_KILL, CLASH_XP_BOT_CAP - progress.bot_xp_match)
-	progress.bot_xp_match += amount
-	clash_award_xp(killer, amount, CLASH_XP_SOURCE_BOT_KILL, clash_kill_weapon(killer, body.last_damage_data.cause_name, body.last_damage_data.resolve_cause()))
-
-/proc/clash_progress_match_start()
-	for(var/ckey in GLOB.clash_progress.players)
-		var/datum/clash_progress/progress = GLOB.clash_progress.players[ckey]
-		progress.bot_xp_match = 0
+	clash_award_xp(killer, CLASH_XP_BOT_KILL, CLASH_XP_SOURCE_BOT_KILL, clash_kill_weapon(killer, body.last_damage_data.cause_name, body.last_damage_data.resolve_cause()))
 
 /proc/clash_progress_match_end(winner)
 	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
