@@ -50,6 +50,9 @@ SUBSYSTEM_DEF(clash_spawn)
 		spawned.mind.clash_job = spawned.job
 	if(clash_fed_spawns())
 		spawned.nutrition = NUTRITION_NORMAL
+	var/list/limits = clash_uses_kits() && spawned.vendor_points ? clash_shop_budget(spawned.ckey, spawned.job) : null
+	if(limits)
+		spawned.vendor_points = max(spawned.vendor_points, limits[1])
 	spawned.clash_spawn_points = list(spawned.vendor_points, spawned.vendor_snowflake_points)
 	clash_progress_join(spawned)
 	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode

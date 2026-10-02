@@ -96,8 +96,19 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 	var/datum/clash_progress/progress = clash_gate_progress(ckey)
 	var/level = progress.weapon_level(track_type)
 	. = issue.Copy()
+	var/faction = clash_kit_faction_for_job(job)
+	var/list/starting = GLOB.clash_starting_kits[faction]
+	for(var/slot in GLOB.clash_kit_worn_slots + KIT_SLOT_WEBBING)
+		var/list/info = issue[slot]
+		if(!info || !clash_gate_lock_text(progress, faction, text2path(info["type"]), job))
+			continue
+		var/obj/item/basic = starting[slot]
+		if(basic)
+			.[slot] = list("name" = initial(basic.name), "type" = "[basic]", "icon" = "[initial(basic.icon)]", "icon_state" = initial(basic.icon_state))
+		else
+			. -= slot
 	var/list/grenade = issue[KIT_SLOT_GRENADE]
-	if(grenade && clash_option_lock_text(ckey, clash_kit_option_id(clash_kit_faction_for_job(job), KIT_SLOT_GRENADE, text2path(grenade["type"])), job))
+	if(grenade && clash_option_lock_text(ckey, clash_kit_option_id(faction, KIT_SLOT_GRENADE, text2path(grenade["type"])), job))
 		. -= KIT_SLOT_GRENADE
 	for(var/slot in GLOB.clash_kit_attachment_slots)
 		var/list/info = issue[slot]
@@ -117,25 +128,28 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 		if(!primary_type || !clash_kit_attachment_fits(option.item_type, primary_type))
 			return null
 		return clash_attachment_lock_text(progress, option.item_type, primary_type)
+	return clash_gate_lock_text(progress, option.faction, option.item_type, job)
+
+/proc/clash_gate_lock_text(datum/clash_progress/progress, faction, item_type, job)
 	build_clash_option_gates()
-	var/list/gate = GLOB.clash_option_gates[clash_gate_key(option.faction, option.item_type)]
+	var/list/gate = GLOB.clash_option_gates[clash_gate_key(faction, item_type)]
 	if(!gate)
 		return null
 	switch(gate["kind"])
 		if(CLASH_GATE_FACTION)
-			if(progress.faction_level(option.faction) < gate["level"])
-				return "Unlocks at [clash_side_name(option.faction)] level [gate["level"]]"
+			if(progress.faction_level(faction) < gate["level"])
+				return "Unlocks at [clash_side_name(faction)] level [gate["level"]]"
 		if(CLASH_GATE_CLASS)
 			return clash_gear_lock_text(progress, GLOB.clash_job_classes[job], gate["gear"])
 		if(CLASH_GATE_TWIN)
-			if(progress.faction_level(option.faction) < gate["level"])
-				return "Unlocks at [clash_side_name(option.faction)] level [gate["level"]]"
+			if(progress.faction_level(faction) < gate["level"])
+				return "Unlocks at [clash_side_name(faction)] level [gate["level"]]"
 			return clash_gear_lock_text(progress, GLOB.clash_job_classes[job], gate["gear"])
 		if(CLASH_GATE_CARRIER)
-			if(progress.carrier_step(gate["family"]) >= gate["step"] || (gate["level"] && progress.faction_level(option.faction) >= gate["level"]))
+			if(progress.carrier_step(gate["family"]) >= gate["step"] || (gate["level"] && progress.faction_level(faction) >= gate["level"]))
 				return null
 			var/xp_text = "[clash_number_text(gate["xp"])] [GLOB.clash_family_names[gate["family"]]] XP"
-			return gate["level"] ? "Unlocks at [clash_side_name(option.faction)] level [gate["level"]] or [xp_text]" : "Unlocks at [xp_text]"
+			return gate["level"] ? "Unlocks at [clash_side_name(faction)] level [gate["level"]] or [xp_text]" : "Unlocks at [xp_text]"
 	return null
 
 /proc/clash_gear_lock_text(datum/clash_progress/progress, class, gear)
@@ -189,6 +203,9 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 		return clash_attachment_lock_text(clash_gate_progress(ckey), item_type, primary_type)
 	var/class = GLOB.clash_job_classes[job]
 	var/datum/clash_progress/progress = clash_gate_progress(ckey)
+	var/gate_text = clash_gate_lock_text(progress, clash_kit_faction_for_job(job), item_type, job)
+	if(gate_text)
+		return gate_text
 	if(cost <= clash_shop_cost_limit(progress.class_level(class)))
 		return null
 	for(var/list/tier as anything in GLOB.clash_shop_tiers)
@@ -204,7 +221,7 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 		return null
 	var/datum/clash_progress/progress = clash_gate_progress(ckey)
 	var/level = progress.class_level(GLOB.clash_job_classes[job])
-	return list(min(CLASH_SHOP_BASE + level, CLASH_SHOP_CAP), CLASH_SHOP_SNOWFLAKE_BASE + CLASH_SHOP_SNOWFLAKE_STEP * level)
+	return list(min(CLASH_SHOP_BASE + round(CLASH_SHOP_LEVEL_STEP * level), CLASH_SHOP_CAP), CLASH_SHOP_SNOWFLAKE_BASE + CLASH_SHOP_SNOWFLAKE_STEP * level)
 
 /proc/clash_filter_kit(datum/clash_kit/kit, ckey, job)
 	if(!kit || !clash_progression_gating())
@@ -308,3 +325,23 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 	log_admin("[key_name(admin)] set the [track] progression of [ckey] for [key] to [shown].")
 	message_admins("[key_name_admin(admin)] set the [track] progression of [ckey] for [key] to [shown].")
 	return TRUE
+
+/proc/clash_downgrade_locked_gear(mob/living/carbon/human/wearer, ckey, job, list/cosmetics)
+	if(!clash_progression_gating())
+		return
+	var/faction = clash_kit_faction_for_job(job)
+	var/list/starting = GLOB.clash_starting_kits[faction]
+	var/datum/clash_progress/progress = clash_gate_progress(ckey)
+	for(var/slot in GLOB.clash_kit_worn_slots)
+		var/wear_slot = GLOB.clash_kit_slots[slot]["wear"]
+		var/obj/item/worn = wearer.get_item_by_slot(wear_slot)
+		if(!worn || (worn.type in cosmetics) || !clash_gate_lock_text(progress, faction, worn.type, job))
+			continue
+		if(starting[slot])
+			clash_kit_replace_worn(wearer, wear_slot, starting[slot])
+			continue
+		wearer.temp_drop_inv_item(worn, TRUE)
+		qdel(worn)
+	var/obj/item/clothing/accessory/storage/webbing = locate() in wearer.w_uniform?.accessories
+	if(webbing && clash_gate_lock_text(progress, faction, webbing.type, job))
+		clash_kit_fit_webbing(wearer, starting[KIT_SLOT_WEBBING], cosmetics)

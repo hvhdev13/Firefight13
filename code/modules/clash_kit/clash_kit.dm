@@ -415,6 +415,7 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 	var/datum/clash_kit_option/webbing = kit.get_option(KIT_SLOT_WEBBING)
 	if(webbing?.faction == faction)
 		clash_kit_fit_webbing(wearer, webbing.item_type, cosmetics)
+	clash_downgrade_locked_gear(wearer, ckey, job, cosmetics)
 
 	var/obj/item/weapon/gun/main_gun
 	if(primary)

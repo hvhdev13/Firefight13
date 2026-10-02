@@ -3,6 +3,7 @@ GLOBAL_LIST_INIT(clash_starting_kits, list(
 		KIT_SLOT_HELMET = /obj/item/clothing/head/helmet/marine,
 		KIT_SLOT_ARMOR = /obj/item/clothing/suit/storage/marine/medium,
 		KIT_SLOT_BACK = /obj/item/storage/backpack/marine,
+		KIT_SLOT_BELT = /obj/item/storage/belt/marine,
 		KIT_SLOT_POUCH_L = /obj/item/storage/pouch/firstaid/full,
 		KIT_SLOT_POUCH_R = /obj/item/storage/pouch/magazine,
 		KIT_SLOT_WEBBING = /obj/item/clothing/accessory/storage/webbing/black,
@@ -13,6 +14,7 @@ GLOBAL_LIST_INIT(clash_starting_kits, list(
 		KIT_SLOT_HELMET = /obj/item/clothing/head/helmet/marine/veteran/UPP,
 		KIT_SLOT_ARMOR = /obj/item/clothing/suit/storage/marine/faction/UPP,
 		KIT_SLOT_BACK = /obj/item/storage/backpack/lightpack/upp,
+		KIT_SLOT_BELT = /obj/item/storage/belt/marine/upp,
 		KIT_SLOT_POUCH_L = /obj/item/storage/pouch/firstaid/full,
 		KIT_SLOT_POUCH_R = /obj/item/storage/pouch/magazine,
 		KIT_SLOT_WEBBING = /obj/item/clothing/accessory/storage/webbing/black,
@@ -26,58 +28,54 @@ GLOBAL_LIST_INIT(clash_faction_ladders, list(
 		list(2, /obj/item/explosive/grenade/high_explosive),
 		list(2, /obj/item/clothing/head/helmet/marine/jungle),
 		list(3, /obj/item/weapon/gun/shotgun/pump/m37a),
-		list(3, /obj/item/storage/pouch/shotgun),
+		list(4, /obj/item/clothing/mask/rebreather),
 		list(5, /obj/item/weapon/gun/smg/m39),
 		list(5, /obj/item/storage/pouch/magazine/large),
-		list(6, /obj/item/clothing/mask/rebreather),
+		list(6, /obj/item/clothing/mask/rebreather/scarf),
 		list(7, /obj/item/weapon/gun/pistol/mod88),
-		list(7, /obj/item/storage/pouch/magazine/pistol),
-		list(9, /obj/item/clothing/accessory/storage/webbing),
+		list(8, /obj/item/clothing/accessory/storage/webbing),
+		list(9, /obj/item/clothing/head/helmet/marine/desert),
+		list(10, /obj/item/clothing/accessory/storage/black_vest, "webbing_vest"),
 		list(11, /obj/item/weapon/gun/rifle/lmg),
+		list(12, /obj/item/clothing/head/helmet/marine/urban),
 		list(13, /obj/item/weapon/gun/revolver/m44),
 		list(13, /obj/item/storage/belt/gun/m44),
-		list(14, /obj/item/clothing/head/helmet/marine/desert),
+		list(14, /obj/item/clothing/accessory/storage/droppouch/black, "drop_pouch"),
 		list(15, /obj/item/weapon/gun/flamer/m240),
 		list(15, /obj/item/storage/pouch/flamertank),
-		list(16, /obj/item/clothing/mask/rebreather/scarf),
-		list(18, /obj/item/weapon/gun/rifle/m4ra),
-		list(19, /obj/item/clothing/accessory/storage/black_vest, "webbing_vest"),
-		list(21, /obj/item/weapon/gun/pistol/m10),
-		list(22, /obj/item/clothing/head/helmet/marine/urban),
-		list(24, /obj/item/weapon/gun/lever_action/xm88),
-		list(25, /obj/item/clothing/accessory/storage/droppouch/black, "drop_pouch"),
-		list(27, /obj/item/weapon/gun/pistol/m1911),
-		list(28, /obj/item/clothing/accessory/storage/black_vest/black_leg_pouch, "leg_pouch"),
-		list(29, /obj/item/clothing/mask/gas),
-		list(30, /obj/item/weapon/gun/pistol/vp78),
+		list(16, /obj/item/weapon/gun/rifle/m4ra),
+		list(17, /obj/item/weapon/gun/pistol/m10),
+		list(17, /obj/item/clothing/accessory/storage/black_vest/black_leg_pouch, "leg_pouch"),
+		list(18, /obj/item/weapon/gun/lever_action/xm88),
+		list(19, /obj/item/weapon/gun/pistol/m1911),
+		list(19, /obj/item/clothing/mask/gas),
+		list(20, /obj/item/weapon/gun/pistol/vp78),
 	),
 	FACTION_UPP = list(
 		list(2, /obj/item/explosive/grenade/high_explosive/upp),
 		list(2, /obj/item/clothing/head/helmet/marine/veteran/UPP/army),
 		list(3, /obj/item/weapon/gun/shotgun/type23),
-		list(3, /obj/item/storage/pouch/shotgun),
+		list(4, /obj/item/clothing/mask/rebreather),
 		list(5, /obj/item/weapon/gun/smg/bizon),
 		list(5, /obj/item/storage/pouch/magazine/large),
-		list(6, /obj/item/clothing/mask/rebreather),
+		list(6, /obj/item/clothing/mask/rebreather/scarf/tacticalmask/green),
 		list(7, /obj/item/weapon/gun/pistol/np92),
-		list(7, /obj/item/storage/pouch/magazine/pistol),
-		list(9, /obj/item/clothing/accessory/storage/webbing),
+		list(8, /obj/item/clothing/accessory/storage/webbing),
+		list(9, /obj/item/clothing/mask/rebreather/scarf/tacticalmask/black),
+		list(10, /obj/item/clothing/accessory/storage/black_vest, "webbing_vest"),
 		list(11, /obj/item/weapon/gun/pkp),
+		list(12, /obj/item/clothing/mask/rebreather/scarf/tacticalmask/tan),
 		list(13, /obj/item/weapon/gun/revolver/upp),
 		list(13, /obj/item/storage/belt/gun/type47),
-		list(14, /obj/item/clothing/mask/rebreather/scarf/tacticalmask/green),
+		list(14, /obj/item/clothing/accessory/storage/droppouch/black, "drop_pouch"),
 		list(15, /obj/item/weapon/gun/flamer/m240),
 		list(15, /obj/item/storage/pouch/flamertank),
-		list(16, /obj/item/clothing/mask/rebreather/scarf/tacticalmask/black),
-		list(18, /obj/item/weapon/gun/rifle/type71/carbine),
-		list(19, /obj/item/clothing/accessory/storage/black_vest, "webbing_vest"),
-		list(21, /obj/item/weapon/gun/rifle/ak4047),
-		list(22, /obj/item/clothing/mask/rebreather/scarf/tacticalmask/tan),
-		list(24, /obj/item/weapon/gun/rifle/sniper/svd),
-		list(25, /obj/item/clothing/accessory/storage/droppouch/black, "drop_pouch"),
-		list(28, /obj/item/clothing/head/uppcap/beret),
-		list(29, /obj/item/clothing/head/uppcap/ushanka),
-		list(30, /obj/item/clothing/mask/gas),
+		list(16, /obj/item/weapon/gun/rifle/type71/carbine),
+		list(17, /obj/item/clothing/head/uppcap/beret),
+		list(18, /obj/item/weapon/gun/rifle/ak4047),
+		list(19, /obj/item/clothing/head/uppcap/ushanka),
+		list(19, /obj/item/clothing/mask/gas),
+		list(20, /obj/item/weapon/gun/rifle/sniper/svd),
 	),
 ))
 
@@ -110,7 +108,7 @@ GLOBAL_LIST_INIT(clash_class_names, list(
 	CLASH_CLASS_SUPPORT = "Support",
 ))
 
-GLOBAL_LIST_INIT(clash_class_gear_levels, list(2, 5, 7, 9, 10, 13, 15, 17, 18, 21, 22, 23, 25, 26, 28, 29))
+GLOBAL_LIST_INIT(clash_class_gear_levels, list(2, 3, 5, 6, 8, 9, 10, 11, 12, 14, 15, 16, 17, 18, 19, 20))
 
 GLOBAL_LIST_INIT(clash_class_gear, list(
 	CLASH_CLASS_RIFLEMAN = list("light_armor", "smoke_grenade", "webbing_vest", "heavy_armor", "satchel", "drop_pouch", "second_grenade", "general_pouch", "flare_pouch", "leg_pouch", "utility_belt", "bayonet_sheath", "shoulder_holster", "pistol_pouch", "shotgun_scabbard", "extra_helmet"),
@@ -159,26 +157,25 @@ GLOBAL_LIST_INIT(clash_gear_names, list(
 	"extra_helmet" = "extra helmet",
 ))
 
-GLOBAL_LIST_INIT(clash_shop_tiers, list(list(1, 5), list(4, 10), list(8, 15), list(12, 20), list(16, 25), list(20, INFINITY)))
+GLOBAL_LIST_INIT(clash_shop_tiers, list(list(1, 5), list(4, 10), list(7, 15), list(10, 20), list(13, 25), list(16, INFINITY)))
 
 GLOBAL_LIST_INIT(clash_carrier_tracks, list(
 	CLASH_FAMILY_SHOTGUN = list(
-		list(1500, /obj/item/storage/pouch/shotgun),
+		list(0, /obj/item/storage/pouch/shotgun),
 		list(5000, /obj/item/storage/pouch/shotgun/large),
 		list(10000, /obj/item/storage/belt/shotgun, /obj/item/storage/belt/shotgun/upp),
 	),
 	CLASH_FAMILY_MAGAZINE = list(
 		list(0, /obj/item/storage/pouch/magazine),
 		list(3000, /obj/item/storage/pouch/magazine/large),
-		list(8000, /obj/item/storage/belt/marine, /obj/item/storage/belt/marine/upp),
 	),
 	CLASH_FAMILY_SIDEARM = list(
-		list(1000, /obj/item/storage/pouch/magazine/pistol),
+		list(0, /obj/item/storage/pouch/magazine/pistol),
 		list(3000, /obj/item/storage/pouch/magazine/pistol/large),
 		list(6000, /obj/item/storage/belt/gun/m4a3, /obj/item/storage/belt/gun/m44, /obj/item/storage/belt/gun/m10, /obj/item/storage/belt/gun/type47),
 	),
 	CLASH_FAMILY_GRENADE = list(
-		list(500, /obj/item/storage/pouch/explosive),
+		list(0, /obj/item/storage/pouch/explosive),
 		list(2000, /obj/item/storage/belt/grenade, /obj/item/storage/belt/grenade/upp),
 		list(4000, /obj/item/storage/belt/grenade/large),
 	),
@@ -264,6 +261,5 @@ GLOBAL_LIST_EMPTY(clash_option_gates)
 /proc/clash_insignia_name(faction, level)
 	var/list/names = GLOB.clash_insignia_names[faction]
 	level = clamp(level, 1, CLASH_LEVEL_CAP)
-	var/rank = CEILING(level / 3, 1)
-	var/tier = level - (rank - 1) * 3
-	return "[names[rank]] [tier == 1 ? "I" : (tier == 2 ? "II" : "III")]"
+	var/rank = CEILING(level / 2, 1)
+	return "[names[rank]] [level % 2 ? "I" : "II"]"

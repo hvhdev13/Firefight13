@@ -83,8 +83,13 @@ GLOBAL_LIST_INIT(clash_progression_settings, list("enabled" = TRUE, "xp_multipli
 		var/list/target = vars[name]
 		for(var/key in saved)
 			var/list/entry = saved[key]
-			if(islist(entry))
-				target[key] = entry
+			if(!islist(entry))
+				continue
+			if(name == "factions" || name == "classes")
+				entry["best"] = min(entry["best"], CLASH_LEVEL_CAP)
+			else if(name == "carriers")
+				entry["best"] = min(entry["best"], length(GLOB.clash_carrier_tracks[key]))
+			target[key] = entry
 	if(islist(decoded["seen"]))
 		seen = decoded["seen"]
 	if(!isnull(decoded["toasts"]))

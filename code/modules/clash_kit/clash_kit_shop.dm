@@ -56,7 +56,7 @@ GLOBAL_LIST_EMPTY(clash_kit_budgets)
 /proc/get_clash_kit_budget(job, ckey)
 	var/list/budget = GLOB.clash_kit_budgets[job] || list(MARINE_TOTAL_BUY_POINTS, MARINE_TOTAL_SNOWFLAKE_POINTS)
 	var/list/limits = clash_shop_budget(ckey, job)
-	return limits ? list(min(budget[1], limits[1]), min(budget[2], limits[2])) : budget
+	return limits ? list(budget[1] ? limits[1] : 0, min(budget[2], limits[2])) : budget
 
 /proc/get_clash_kit_spent(datum/clash_kit/kit, job)
 	. = list(CLASH_SHOP_POINTS = 0, CLASH_SHOP_SNOWFLAKE = 0)
