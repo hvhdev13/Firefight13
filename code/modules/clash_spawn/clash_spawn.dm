@@ -25,7 +25,7 @@ SUBSYSTEM_DEF(clash_spawn)
 		if(length(GLOB.latejoin_by_squad[squad]))
 			uscm_base |= GLOB.latejoin_by_squad[squad]
 	var/list/bases = list(FACTION_MARINE = uscm_base, FACTION_UPP = GLOB.latejoin_by_job[JOB_UPP])
-	for(var/title in GLOB.ROLES_CM_VS_UPP)
+	for(var/title in clash_role_list())
 		var/datum/job/role = GLOB.RoleAuthority.roles_by_name[title]
 		if(!role || (role.flags_startup_parameters & ROLE_ADD_TO_SQUAD))
 			continue

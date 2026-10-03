@@ -112,7 +112,7 @@ GLOBAL_LIST_INIT(clash_loadout_skipped, list(
 				continue
 			if(!vendor.use_points && !vendor.use_snowflake_points && itemspec[2] <= 0)
 				continue
-			if(clash_vendor_lock_text(user, prod_type))
+			if(clash_vendor_laddered(prod_type))
 				continue
 			return list(vendor, itemspec)
 	return null

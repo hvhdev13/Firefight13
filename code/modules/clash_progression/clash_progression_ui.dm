@@ -13,7 +13,7 @@
 			if(rung[1] == next)
 				names += clash_item_name(faction, rung[2])
 		for(var/title in GLOB.clash_role_levels)
-			if(GLOB.clash_role_levels[title] == next && clash_kit_faction_for_job(title) == faction)
+			if(GLOB.clash_role_levels[title] == next && (title in GLOB.clash_arena_roles) && clash_kit_faction_for_job(title) == faction)
 				names += "[title] role"
 		if(length(names))
 			return "Your next unlock:[separator]Level [next], [clash_number_text(max(0, clash_faction_xp_for(next) - xp))] XP to go.[separator]Unlocks: [english_list(names)]"

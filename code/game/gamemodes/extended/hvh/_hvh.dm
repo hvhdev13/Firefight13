@@ -1049,7 +1049,7 @@ GLOBAL_VAR(clash_start_mode)
 	return GLOB.clash_start_mode
 
 /datum/game_mode/extended/faction_clash/hvh/get_roles_list()
-	return GLOB.ROLES_CM_VS_UPP
+	return arena_rules ? GLOB.clash_arena_roles : GLOB.ROLES_CM_VS_UPP
 
 /datum/game_mode/extended/faction_clash/hvh/post_setup()
 	. = ..()

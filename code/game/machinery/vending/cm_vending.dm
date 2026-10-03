@@ -664,7 +664,6 @@ GLOBAL_LIST_EMPTY(vending_products)
 					vend_fail()
 					return TRUE // one left and the player spam click during a lagspike.
 
-			clash_vendor_trial_taken(user, itemspec)
 			vendor_successful_vend(itemspec, user)
 			return TRUE
 	add_fingerprint(user)

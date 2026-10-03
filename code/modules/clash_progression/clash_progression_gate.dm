@@ -353,14 +353,28 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 	if(webbing && clash_gate_lock_text(progress, faction, webbing.type, job))
 		clash_kit_fit_webbing(wearer, starting[KIT_SLOT_WEBBING], cosmetics)
 
-GLOBAL_LIST_EMPTY(clash_trials_used)
 GLOBAL_LIST_EMPTY(clash_trial_packs)
+GLOBAL_LIST_EMPTY(clash_vendor_hidden)
 GLOBAL_VAR_INIT(clash_trial_packs_built, FALSE)
 
 /proc/clash_reset_trials()
-	GLOB.clash_trials_used = list()
 	for(var/datum/supply_packs/pack as anything in GLOB.clash_trial_packs)
 		GLOB.clash_trial_packs[pack] = FALSE
+
+/proc/clash_vendor_laddered(item_type)
+	if(!clash_progression_gating())
+		return FALSE
+	if(islist(item_type))
+		for(var/each_type in item_type)
+			if(clash_vendor_laddered(each_type))
+				return TRUE
+		return FALSE
+	if(!ispath(item_type, /obj/item))
+		return FALSE
+	var/key = "[item_type]"
+	if(isnull(GLOB.clash_vendor_hidden[key]))
+		GLOB.clash_vendor_hidden[key] = clash_trial_item(item_type)
+	return GLOB.clash_vendor_hidden[key]
 
 /proc/clash_attachment_unlock_text(datum/clash_progress/progress, attachment_type)
 	build_clash_kit_catalog()
@@ -375,8 +389,6 @@ GLOBAL_VAR_INIT(clash_trial_packs_built, FALSE)
 	return tracked ? "Unlock it on a gun first" : "Does not unlock on any gun"
 
 /proc/clash_vendor_lock_text(mob/living/carbon/human/user, item_type)
-	if(!ishuman(user) || !clash_progression_gating() || !(user.faction in list(FACTION_MARINE, FACTION_UPP)))
-		return null
 	if(islist(item_type))
 		for(var/each_type in item_type)
 			. = clash_vendor_lock_text(user, each_type)
@@ -390,29 +402,15 @@ GLOBAL_VAR_INIT(clash_trial_packs_built, FALSE)
 		return clash_attachment_unlock_text(progress, item_type)
 	return clash_gate_lock_text(progress, user.faction, item_type, user.job)
 
-/proc/clash_trial_key(faction, item_type)
-	return "[faction]|[islist(item_type) ? item_type[1] : item_type]"
-
-/proc/clash_trials_left(faction, item_type)
-	if(ispath(islist(item_type) ? item_type[1] : item_type, /obj/item/attachable))
-		return 0
-	return max(0, CLASH_TRIAL_STOCK - (GLOB.clash_trials_used[clash_trial_key(faction, item_type)] || 0))
-
 /proc/clash_vendor_label(mob/living/carbon/human/user, item_type)
-	var/lock_text = clash_vendor_lock_text(user, item_type)
-	if(!lock_text)
+	if(!ishuman(user) || !clash_vendor_laddered(item_type))
 		return null
-	var/left = clash_trials_left(user.faction, item_type)
-	return left ? "Trial, [left] left this match. [lock_text]" : lock_text
-
-/proc/clash_vendor_blocked(mob/living/carbon/human/user, item_type)
-	return clash_vendor_lock_text(user, item_type) && !clash_trials_left(user.faction, item_type)
+	return clash_vendor_lock_text(user, item_type) || "Unlocked, take it from your loadout"
 
 /proc/clash_vendor_refuses(mob/living/carbon/human/user, list/itemspec)
-	var/lock_text = clash_vendor_lock_text(user, itemspec[3])
-	if(!lock_text || clash_trials_left(user.faction, itemspec[3]))
+	if(!clash_vendor_laddered(itemspec[3]))
 		return FALSE
-	to_chat(user, SPAN_WARNING("[itemspec[1]] is locked. [lock_text]."))
+	to_chat(user, SPAN_WARNING("[itemspec[1]] is not sold here. [clash_vendor_label(user, itemspec[3]) || "Unlocked, take it from your loadout"]."))
 	return TRUE
 
 /proc/clash_label_vendor_products(obj/structure/machinery/cm_vending/vendor, mob/living/carbon/human/user, list/categories)
@@ -426,24 +424,15 @@ GLOBAL_VAR_INIT(clash_trial_packs_built, FALSE)
 			if(label)
 				display_item["prod_name"] = "[display_item["prod_name"]] ([label])"
 
-/proc/clash_block_vendor_listing(obj/structure/machinery/cm_vending/vendor, mob/living/carbon/human/user, list/data)
+/proc/clash_block_vendor_listing(obj/structure/machinery/cm_vending/vendor, mob/user, list/data)
 	var/list/listing = data["stock_listing"]
-	if(!listing || !ishuman(user) || !clash_progression_gating())
+	if(!listing || !clash_progression_gating())
 		return
 	var/list/products = vendor.get_available_products(user)
 	for(var/index in 1 to min(length(listing), length(products)))
 		var/list/itemspec = products[index]
-		if(clash_vendor_blocked(user, itemspec[3]))
+		if(clash_vendor_laddered(itemspec[3]))
 			listing[index] = (vendor.vend_flags & VEND_LIMITED_INVENTORY) ? 0 : FALSE
-
-/proc/clash_vendor_trial_taken(mob/living/carbon/human/user, list/itemspec)
-	if(!clash_vendor_lock_text(user, itemspec[3]))
-		return
-	var/key = clash_trial_key(user.faction, itemspec[3])
-	GLOB.clash_trials_used[key] = (GLOB.clash_trials_used[key] || 0) + 1
-	to_chat(user, SPAN_NOTICE("Trial [itemspec[1]] taken. [clash_trials_left(user.faction, itemspec[3])] left for your side this match."))
-	for(var/obj/structure/machinery/cm_vending/vendor in GLOB.machines)
-		vendor.update_static_data_for_all_viewers()
 
 /proc/clash_attachment_allowed(mob/user, obj/item/attachable/attachment, obj/item/weapon/gun/gun)
 	var/ckey = user?.mind?.ckey || user?.ckey

@@ -33,9 +33,15 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 /proc/clash_kit_faction_for_job(job)
 	return (job in UPP_JOB_LIST) ? FACTION_UPP : FACTION_MARINE
 
+/proc/clash_role_list()
+	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
+	if(istype(clash_mode))
+		return clash_mode.get_roles_list()
+	return (GLOB.master_mode in GLOB.clash_kit_mode_tags) ? GLOB.clash_arena_roles : GLOB.ROLES_CM_VS_UPP
+
 /proc/get_clash_kit_roles()
 	. = list(FACTION_MARINE = list(), FACTION_UPP = list())
-	for(var/title in GLOB.ROLES_CM_VS_UPP)
+	for(var/title in clash_role_list())
 		.[clash_kit_faction_for_job(title)] += title
 
 /proc/clash_kit_path(ckey)

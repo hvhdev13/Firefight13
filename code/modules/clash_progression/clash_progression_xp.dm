@@ -123,7 +123,7 @@
 			kind = CLASH_UNLOCK_CARRIER
 		clash_notify_unlock(ckey, kind, clash_item_name(faction, rung[2]), source, rung[2])
 	for(var/title in GLOB.clash_role_levels)
-		if(GLOB.clash_role_levels[title] == level && clash_kit_faction_for_job(title) == faction)
+		if(GLOB.clash_role_levels[title] == level && (title in GLOB.clash_arena_roles) && clash_kit_faction_for_job(title) == faction)
 			found = TRUE
 			clash_notify_unlock(ckey, CLASH_UNLOCK_ROLE, title, source)
 	if(!found)
