@@ -84,11 +84,23 @@
 
 /obj/item/clash_flag/equipped(mob/user, slot, silent)
 	. = ..()
+	if(ishuman(user))
+		var/mob/living/carbon/human/holder = user
+		RegisterSignal(holder, COMSIG_HUMAN_POST_MOVE_DELAY, PROC_REF(slow_carrier), override = TRUE)
+		holder.recalculate_move_delay = TRUE
 	queue_settle()
 
 /obj/item/clash_flag/dropped(mob/user)
 	. = ..()
+	if(ishuman(user))
+		var/mob/living/carbon/human/holder = user
+		UnregisterSignal(holder, COMSIG_HUMAN_POST_MOVE_DELAY)
+		holder.recalculate_move_delay = TRUE
 	queue_settle()
+
+/obj/item/clash_flag/proc/slow_carrier(mob/living/carbon/human/holder, list/movedata)
+	SIGNAL_HANDLER
+	movedata["move_delay"] *= 2
 
 /obj/item/clash_flag/proc/queue_settle()
 	addtimer(CALLBACK(src, PROC_REF(settle)), 1)

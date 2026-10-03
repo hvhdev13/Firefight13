@@ -32,18 +32,20 @@
 	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
 	return istype(clash_mode) && clash_mode.progression
 
-/proc/clash_award_xp(mob/living/carbon/human/earner, amount, source, gun_type)
+/proc/clash_award_xp(mob/living/carbon/human/earner, amount, source, gun_type, gear_amount)
 	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
 	if(!istype(clash_mode) || !clash_mode.match_live || earner.statistic_exempt)
 		return
-	clash_grant_xp(earner.mind?.ckey || earner.ckey, earner.faction, GLOB.clash_job_classes[earner.job || earner.mind?.clash_job], amount, source, gun_type)
+	clash_grant_xp(earner.mind?.ckey || earner.ckey, earner.faction, GLOB.clash_job_classes[earner.job || earner.mind?.clash_job], amount, source, gun_type, gear_amount)
 
-/proc/clash_grant_xp(ckey, faction, class, amount, source, gun_type)
+/proc/clash_grant_xp(ckey, faction, class, amount, source, gun_type, gear_amount)
 	if(!clash_progression_active() || !(faction in list(FACTION_MARINE, FACTION_UPP)))
 		return
 	var/datum/clash_progress/progress = clash_progress_of(ckey)
 	if(!progress)
 		return
+	var/multiplier = GLOB.clash_progression_settings["xp_multiplier"] * GLOB.clash_xp_boost.current() * (progress.short_side == faction ? CLASH_SHORT_SIDE_BONUS : 1)
+	gear_amount = round((isnull(gear_amount) ? amount : gear_amount) * multiplier, 1)
 	amount *= GLOB.clash_progression_settings["xp_multiplier"] * GLOB.clash_xp_boost.current()
 	var/bonus = progress.short_side == faction ? round(amount * (CLASH_SHORT_SIDE_BONUS - 1), 1) : 0
 	amount = round(amount, 1)
@@ -53,9 +55,9 @@
 	if(bonus)
 		progress.ledger["Short side bonus"] = (progress.ledger["Short side bonus"] || 0) + bonus
 	clash_score_feed(ckey, amount + bonus, source)
-	progress.add_xp(amount + bonus, faction, class, gun_type)
+	progress.add_xp(amount + bonus, faction, class, gun_type, gear_amount)
 
-/datum/clash_progress/proc/add_xp(amount, faction, class, gun_type)
+/datum/clash_progress/proc/add_xp(amount, faction, class, gun_type, gear_amount)
 	dirty = TRUE
 	var/old_level = faction_level(faction)
 	var/list/entry = faction_entry(faction)
@@ -73,12 +75,12 @@
 		gun_type = clash_track_type(gun_type)
 		old_level = weapon_level(gun_type)
 		entry = weapon_entry(gun_type)
-		entry["xp"] += amount
+		entry["xp"] += gear_amount
 		check_unlocks("weapon", gun_type, old_level, faction)
 		family = clash_gun_family(gun_type)
 	old_level = carrier_step(family)
 	entry = carrier_entry(family)
-	entry["xp"] += amount
+	entry["xp"] += gear_amount
 	check_unlocks("carrier", family, old_level, faction)
 
 /datum/clash_progress/proc/check_unlocks(track, key, old_level, faction)
@@ -220,7 +222,9 @@
 	var/mob/living/carbon/human/killer = body.last_damage_data?.resolve_mob()
 	if(!ishuman(killer) || killer.faction == body.faction)
 		return
-	clash_award_xp(killer, CLASH_XP_BOT_KILL, CLASH_XP_SOURCE_BOT_KILL, clash_kill_weapon(killer, body.last_damage_data.cause_name, body.last_damage_data.resolve_cause()))
+	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
+	var/list/hits = clash_mode.recent_damage[body.real_name] || clash_mode.last_attackers[body.real_name]
+	clash_award_xp(killer, CLASH_XP_BOT_KILL, CLASH_XP_SOURCE_BOT_KILL, clash_kill_weapon(killer, body.last_damage_data.cause_name, body.last_damage_data.resolve_cause(), hits?[killer.real_name]), CLASH_XP_KILL)
 
 /proc/clash_progress_match_end(winner)
 	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode

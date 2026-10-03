@@ -269,7 +269,8 @@ GLOBAL_LIST_EMPTY(clash_radar_marks)
 			radar.clear()
 			continue
 		var/mob/living/carbon/human/human_player = player
-		if(!human_player.w_uniform)
+		var/datum/clash_progress/progress = GLOB.clash_progress.players[player.ckey]
+		if(!human_player.w_uniform || (progress && !progress.radar))
 			radar.clear()
 			continue
 		radar.render(player)

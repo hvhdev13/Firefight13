@@ -277,6 +277,8 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 
 /datum/clash_bot/proc/start_volley(atom/aim, rounds)
 	firing = TRUE
+	if(prob(1))
+		INVOKE_ASYNC(body, TYPE_PROC_REF(/mob, emote), "warcry")
 	shots_left = rounds
 	gun.set_target(aim)
 	body.clash_aim_turf = get_turf(aim)

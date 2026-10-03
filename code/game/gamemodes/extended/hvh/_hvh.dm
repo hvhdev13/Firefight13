@@ -191,6 +191,9 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	round_end_time = world.time + round_time_limit
 	var/match = match_number
 	match_timer_id = addtimer(CALLBACK(src, PROC_REF(round_time_expired), match), round_time_limit, TIMER_STOPPABLE)
+	for(var/seconds_left in 1 to 3)
+		if(round_time_limit > seconds_left SECONDS)
+			addtimer(CALLBACK(src, PROC_REF(match_countdown_beep), match, FALSE), round_time_limit - seconds_left SECONDS)
 	if(could_be_final_match())
 		vote_timer_id = addtimer(CALLBACK(src, PROC_REF(start_round_votes)), max(1, round_time_limit - CLASH_VOTE_LEAD), TIMER_STOPPABLE)
 	if(!radar_timer_id)
@@ -644,8 +647,10 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	return "YOUR LIFE  ·  [parts.Join("  ·  ")]"
 
 /datum/game_mode/extended/faction_clash/hvh/proc/add_killfeed(killer, killer_faction, victim, victim_faction, cause, assists = 0)
-	var/list/attackers = recent_damage[victim] || last_attackers[victim]
-	recent_damage -= victim
+	if(recent_damage[victim])
+		last_attackers[victim] = recent_damage[victim]
+		recent_damage -= victim
+	var/list/attackers = last_attackers[victim]
 	var/top_assister
 	var/top_damage = 0
 	for(var/name in attackers)
@@ -718,7 +723,14 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 
 /datum/game_mode/extended/faction_clash/hvh/proc/round_time_expired(match)
 	if(match == match_number)
+		match_countdown_beep(match, TRUE)
 		finish_match("Time")
+
+/datum/game_mode/extended/faction_clash/hvh/proc/match_countdown_beep(match, final)
+	if(match != match_number || !match_live || round_finished)
+		return
+	for(var/client/player as anything in GLOB.clients)
+		playsound_client(player, final ? 'sound/machines/beepalert.ogg' : 'sound/effects/sebb_beep.ogg', null, 50)
 
 /datum/game_mode/extended/faction_clash/hvh/proc/finish_match(reason)
 	if(round_finished || !match_live)

@@ -369,7 +369,7 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 			qdel(ammo)
 			return
 
-/proc/clash_kit_fit_pouches(mob/living/carbon/human/wearer, faction)
+/proc/clash_kit_fit_pouches(mob/living/carbon/human/wearer, datum/clash_kit/kit, faction)
 	var/obj/item/weapon/gun/primary = clash_kit_primary_of(wearer)
 	var/obj/item/weapon/gun/sidearm = clash_kit_sidearm_of(wearer)
 	var/list/shells = primary && clash_kit_shells_for(primary)
@@ -399,6 +399,39 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 		var/replacement = slot == KIT_SLOT_BELT ? starting[slot] : (shells ? /obj/item/storage/pouch/shotgun : /obj/item/storage/pouch/magazine)
 		if(replacement && holder.type != replacement)
 			clash_kit_replace_worn(wearer, wear_slot, replacement)
+	if(!primary)
+		return
+	var/list/primary_ammo = list()
+	for(var/shell_name in shells)
+		primary_ammo += shells[shell_name]
+	if(!shells)
+		primary_ammo += clash_kit_magazine_for(primary)
+	primary_ammo -= null
+	for(var/obj/item/storage/holder as anything in clash_kit_containers(wearer))
+		if(!clash_kit_holds_ammo(holder))
+			continue
+		for(var/ammo_type in primary_ammo)
+			if(holder.can_hold_type(ammo_type, wearer))
+				return
+	var/replacement = shells ? /obj/item/storage/pouch/shotgun : /obj/item/storage/pouch/magazine
+	var/obj/item/storage/probe = new replacement
+	var/useful = FALSE
+	for(var/ammo_type in primary_ammo)
+		if(probe.can_hold_type(ammo_type, wearer))
+			useful = TRUE
+			break
+	qdel(probe)
+	if(!useful)
+		return
+	for(var/slot in list(KIT_SLOT_POUCH_R, KIT_SLOT_POUCH_L))
+		if(kit.get_option(slot))
+			continue
+		var/wear_slot = GLOB.clash_kit_slots[slot]["wear"]
+		var/obj/item/worn = wearer.get_item_by_slot(wear_slot)
+		if(istype(worn, /obj/item/storage/pouch/firstaid) || istype(worn, /obj/item/storage/pouch/medical))
+			continue
+		clash_kit_replace_worn(wearer, wear_slot, replacement)
+		return
 
 /proc/clash_kit_fill_ammo(mob/living/carbon/human/wearer, datum/clash_kit/kit, mode)
 	var/obj/item/weapon/gun/primary = clash_kit_primary_of(wearer)
@@ -500,7 +533,7 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 		if(istype(issued_medkit))
 			QDEL_LIST(issued_medkit.contents)
 			clash_kit_replace_worn(wearer, wear_slot, /obj/item/storage/pouch/firstaid/ert)
-	clash_kit_fit_pouches(wearer, faction)
+	clash_kit_fit_pouches(wearer, kit, faction)
 	var/datum/clash_kit_option/grenades = kit.get_option(KIT_SLOT_GRENADE)
 	if(grenades && grenades.faction == faction)
 		for(var/obj/item/explosive/grenade/issued in wearer.get_contents())

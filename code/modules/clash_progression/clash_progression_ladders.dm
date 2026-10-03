@@ -209,7 +209,7 @@ GLOBAL_LIST_INIT(clash_family_names, list(
 	CLASH_FAMILY_LEVER = "lever-action",
 ))
 
-GLOBAL_LIST_INIT(clash_free_role_gear, list(/obj/item/storage/backpack/marine/satchel/medic, /obj/item/storage/backpack/marine/satchel/tech))
+GLOBAL_LIST_INIT(clash_free_role_gear, list(/obj/item/storage/backpack/marine/satchel/medic, /obj/item/storage/backpack/marine/satchel/tech, /obj/item/storage/pouch/medical/clash_supplies))
 
 GLOBAL_LIST_EMPTY(clash_option_gates)
 

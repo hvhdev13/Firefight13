@@ -191,6 +191,17 @@ GLOBAL_LIST_EMPTY(clash_toast_icons)
 		texts += line["text"]
 	player.clash_score_feed.maptext = "<span style='font-family: \"Small Fonts\"; font-size: 7px; text-align: center; vertical-align: bottom; color: #f2d36b; -dm-text-outline: 1px black'>[texts.Join("<br>")]</span>"
 
+/mob/verb/clash_toggle_radar()
+	set name = "Toggle radar"
+	set category = "OOC"
+	var/datum/clash_progress/progress = clash_progress_of(ckey)
+	if(!progress)
+		to_chat(src, SPAN_WARNING("Settings are not saved for guest accounts."))
+		return
+	progress.radar = !progress.radar
+	progress.save()
+	to_chat(src, SPAN_NOTICE("The radar is now [progress.radar ? "shown" : "hidden"]."))
+
 /mob/verb/clash_toggle_unlock_popups()
 	set name = "Toggle unlock pop-ups"
 	set category = "OOC"

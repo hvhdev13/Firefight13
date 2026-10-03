@@ -40,6 +40,7 @@ GLOBAL_LIST_INIT(clash_progression_settings, list("enabled" = TRUE, "xp_multipli
 	var/list/carriers = list()
 	var/list/seen = list()
 	var/toasts = TRUE
+	var/radar = TRUE
 	var/prestige = 0
 	var/zone_seconds = 0
 	var/list/support_xp = list()
@@ -95,6 +96,8 @@ GLOBAL_LIST_INIT(clash_progression_settings, list("enabled" = TRUE, "xp_multipli
 		seen = decoded["seen"]
 	if(!isnull(decoded["toasts"]))
 		toasts = !!decoded["toasts"]
+	if(!isnull(decoded["radar"]))
+		radar = !!decoded["radar"]
 	prestige = decoded["prestige"] || 0
 
 /datum/clash_progress/proc/save()
@@ -110,6 +113,7 @@ GLOBAL_LIST_INIT(clash_progression_settings, list("enabled" = TRUE, "xp_multipli
 		"carriers" = carriers,
 		"seen" = seen,
 		"toasts" = toasts,
+		"radar" = radar,
 	)), temp_path)
 	if(!read_file(temp_path))
 		log_world("Clash progress: the new save for [ckey] did not read back, keeping the old file")

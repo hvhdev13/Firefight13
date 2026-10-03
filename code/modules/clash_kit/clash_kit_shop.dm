@@ -30,8 +30,20 @@ GLOBAL_LIST_EMPTY(clash_kit_budgets)
 /proc/get_clash_shop(job)
 	if(GLOB.clash_kit_shops[job])
 		return GLOB.clash_kit_shops[job]
+	build_clash_kit_catalog()
 	var/list/sections = list()
 	var/list/by_id = list()
+	var/list/ammo_items = list()
+	for(var/slot in list(KIT_SLOT_PRIMARY, KIT_SLOT_SIDEARM))
+		for(var/datum/clash_kit_option/option as anything in GLOB.clash_kit_menu[clash_kit_faction_for_job(job)]?[slot])
+			var/obj/item/ammo_type = option.ammo_type
+			if(!ammo_type || by_id["[ammo_type]"])
+				continue
+			var/list/item = list("id" = "[ammo_type]", "name" = capitalize(strip_improper(initial(ammo_type.name))), "cost" = CLASH_SHOP_AMMO_COST, "pool" = CLASH_SHOP_POINTS, "icon" = "[initial(ammo_type.icon)]", "icon_state" = initial(ammo_type.icon_state))
+			ammo_items += list(item)
+			by_id["[ammo_type]"] = item
+	if(length(ammo_items))
+		sections += list(list("name" = "Weapon ammo", "items" = ammo_items))
 	for(var/list/source in get_clash_shop_sources(job))
 		var/list/section
 		for(var/list/entry in source[1])
@@ -41,7 +53,7 @@ GLOBAL_LIST_EMPTY(clash_kit_budgets)
 				sections += list(section)
 				continue
 			var/id = "[entry_type]"
-			if(!section || entry[4] || entry[2] <= 0 || !ispath(entry_type, /obj/item) || by_id[id])
+			if(!section || entry[4] || entry[2] <= 0 || !ispath(entry_type, /obj/item) || by_id[id] || (ispath(entry_type, /obj/item/ammo_magazine) && findtext("[entry_type]/", "/ap/")))
 				continue
 			var/obj/item/sample = entry_type
 			var/list/item = list("id" = id, "name" = entry[1], "cost" = entry[2], "pool" = source[2], "icon" = "[initial(sample.icon)]", "icon_state" = initial(sample.icon_state))
