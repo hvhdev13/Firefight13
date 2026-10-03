@@ -32,7 +32,7 @@
 		return
 	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
 	if(istype(clash_mode))
-		clash_mode.record_damage(source, firer, bullet.shot_from?.type)
+		clash_mode.record_damage(source, firer, bullet.shot_from?.type, damage_result)
 		source.clash_heal_pool += clash_enemy_share(firer, source.faction, damage_result)
 	if(firer.client && firer.faction != source.faction && world.time >= firer.clash_next_hit_sound)
 		firer.clash_next_hit_sound = world.time + CLASH_HIT_SOUND_GAP
@@ -42,7 +42,7 @@
 	SIGNAL_HANDLER
 	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
 	if(istype(clash_mode) && ishuman(target) && target != source)
-		clash_mode.record_damage(target, source, weapon?.type)
+		clash_mode.record_damage(target, source, weapon?.type, weapon ? weapon.force : 5)
 
 /datum/element/clash_combat_log/proc/on_surgery_step(obj/limb/limb, mob/user, datum/surgery/surgery, obj/item/tool)
 	SIGNAL_HANDLER

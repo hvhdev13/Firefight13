@@ -415,7 +415,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	var/involved = viewer && (entry["killer"] == viewer.real_name || entry["victim"] == viewer.real_name)
 	var/outline = involved ? "-dm-text-outline: 1px #7a5a00" : "-dm-text-outline: 1px black"
 	var/weapon = entry["cause"] ? " <span style='color: #9aa3ab'>\[[html_encode(entry["cause"])]\]</span> " : " <span style='color: #9aa3ab'>&gt;</span> "
-	return "<span class='maptext' style='text-align: right; font-size: 6px; [outline]'><span style='color: [entry["killer_color"]]'>[clash_feed_name(entry["killer"])][entry["assists"] ? " <span style='color: #9aa3ab'>+[entry["assists"]]</span>" : ""]</span>[weapon]<span style='color: [entry["victim_color"]]'>[clash_feed_name(entry["victim"])]</span></span>"
+	return "<span class='maptext' style='text-align: right; font-size: 6px; [outline]'><span style='color: [entry["killer_color"]]'>[clash_feed_name(entry["killer"])][entry["assister"] ? " <span style='color: #9aa3ab'>+</span> [clash_feed_name(entry["assister"])]" : ""]</span>[weapon]<span style='color: [entry["victim_color"]]'>[clash_feed_name(entry["victim"])]</span></span>"
 
 /proc/clash_feed_name(name)
 	var/tag_start = findtext(name, " \[BOT\]")
@@ -561,14 +561,15 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	if(type == /datum/game_mode/extended/faction_clash/hvh/tdm && killer.statistic_exempt && !victim.statistic_exempt && killer.faction != victim.faction && (killer.faction in list(FACTION_MARINE, FACTION_UPP)))
 		score_kill(killer.faction)
 
-/datum/game_mode/extended/faction_clash/hvh/proc/record_damage(mob/living/victim, mob/attacker, weapon_type)
-	if(!match_live || round_finished || victim.statistic_exempt || attacker.statistic_exempt || attacker.faction == victim.faction)
+/datum/game_mode/extended/faction_clash/hvh/proc/record_damage(mob/living/victim, mob/attacker, weapon_type, damage = 0)
+	if(!match_live || round_finished || attacker.faction == victim.faction)
 		return
 	var/list/attackers = recent_damage[victim.real_name]
 	if(!attackers)
 		attackers = list()
 		recent_damage[victim.real_name] = attackers
-	attackers[attacker.real_name] = list("time" = world.time, "faction" = attacker.faction, "ckey" = attacker.mind?.ckey || attacker.ckey, "job" = attacker.job, "weapon" = weapon_type)
+	var/list/previous = attackers[attacker.real_name]
+	attackers[attacker.real_name] = list("time" = world.time, "faction" = attacker.faction, "ckey" = attacker.mind?.ckey || attacker.ckey, "job" = attacker.job, "weapon" = weapon_type, "bot" = attacker.statistic_exempt, "damage" = (previous?["damage"] || 0) + damage)
 
 /datum/game_mode/extended/faction_clash/hvh/proc/credit_assists(victim_name, killer_name)
 	. = list()
@@ -579,7 +580,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		return
 	for(var/name in attackers)
 		var/list/hit = attackers[name]
-		if(name == killer_name || world.time - hit["time"] > CLASH_ASSIST_WINDOW)
+		if(hit["bot"] || name == killer_name || world.time - hit["time"] > CLASH_ASSIST_WINDOW)
 			continue
 		var/list/entry = get_score_entry(name, hit["faction"], hit["ckey"])
 		entry["assists"] += 1
@@ -643,9 +644,19 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	return "YOUR LIFE  ·  [parts.Join("  ·  ")]"
 
 /datum/game_mode/extended/faction_clash/hvh/proc/add_killfeed(killer, killer_faction, victim, victim_faction, cause, assists = 0)
+	var/list/attackers = recent_damage[victim] || last_attackers[victim]
+	recent_damage -= victim
+	var/top_assister
+	var/top_damage = 0
+	for(var/name in attackers)
+		var/list/hit = attackers[name]
+		if(name == killer || world.time - hit["time"] > CLASH_ASSIST_WINDOW || hit["damage"] <= top_damage)
+			continue
+		top_assister = name
+		top_damage = hit["damage"]
 	killfeed += list(list(
 		"killer" = killer,
-		"assists" = assists,
+		"assister" = top_assister,
 		"victim" = victim,
 		"cause" = cause,
 		"killer_color" = faction_color(killer_faction),
