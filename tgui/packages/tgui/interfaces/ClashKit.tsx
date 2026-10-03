@@ -1167,7 +1167,7 @@ export const ClashKit = () => {
                 <Button.Confirm
                   icon="rotate-left"
                   color="transparent"
-                  confirmContent="Back to job issue?"
+                  confirmContent="Clear this kit?"
                   tooltip="Clear every pick in this kit"
                   onClick={() => act('reset')}
                 >

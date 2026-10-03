@@ -26,7 +26,7 @@
 	return max(target.clash_suppression - CLASH_SUPPRESSION_DECAY * faded / (1 SECONDS), 0)
 
 /proc/clash_suppression_alpha(value)
-	return value > 0 ? 90 + value * 1.65 : 0
+	return value > 0 ? min(value, 20) * 4.5 + value * 1.65 : 0
 
 /proc/clash_suppress(mob/living/carbon/human/target, amount)
 	if(!target.client || target.stat == DEAD || amount <= 0)

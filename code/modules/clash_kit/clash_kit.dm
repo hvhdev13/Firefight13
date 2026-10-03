@@ -47,6 +47,8 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 /proc/clash_kit_path(ckey)
 	return clash_player_save_path(ckey, "clash_kits.sav")
 
+GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer", "Breacher", "Marksman", "Gunner"))
+
 /proc/get_clash_kits(ckey, job)
 	if(!ckey || !job)
 		return null
@@ -66,13 +68,16 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 		if(!length(kits))
 			kit.name = "Default"
 		else
-			var/customs = 1
-			for(var/datum/clash_kit/other as anything in kits)
-				if(findtext(other.name, "Custom") == 1)
-					customs++
-			kit.name = customs > 1 ? "Custom [customs]" : "Custom"
+			kit.name = clash_kit_custom_name(kits)
 		kits += kit
 	return kits
+
+/proc/clash_kit_custom_name(list/kits)
+	var/customs = 1
+	for(var/datum/clash_kit/other as anything in kits)
+		if(findtext(other.name, "Custom") == 1)
+			customs++
+	return customs > 1 ? "Custom [customs]" : "Custom"
 
 /proc/get_clash_active_kit_index(ckey, job)
 	var/list/kits = get_clash_kits(ckey, job)
@@ -125,6 +130,10 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 			if(length(kits) >= CLASH_KIT_COUNT)
 				break
 			var/datum/clash_kit/kit = new
+			if(stored["name"] in GLOB.clash_kit_old_presets)
+				kit.name = "Custom"
+				kits += kit
+				continue
 			kit.name = stored["name"] == "Standard issue" ? "Default" : stored["name"]
 			for(var/slot in stored["choices"])
 				var/id = stored["choices"][slot]
@@ -142,6 +151,12 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 				if(ispath(text2path(container), /obj/item/storage) && (stored["fills"][container] in GLOB.clash_kit_shell_names))
 					kit.fills[container] = stored["fills"][container]
 			kits += kit
+		var/static/regex/default_name = regex(@"^Custom( \d+)?$")
+		var/customs = 0
+		for(var/datum/clash_kit/kit as anything in kits)
+			if(default_name.Find(kit.name))
+				customs++
+				kit.name = customs > 1 ? "Custom [customs]" : "Custom"
 		by_job[job] = kits
 
 /proc/issue_clash_role_kit(mob/living/carbon/human/fighter, job)
@@ -354,6 +369,37 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 			qdel(ammo)
 			return
 
+/proc/clash_kit_fit_pouches(mob/living/carbon/human/wearer, faction)
+	var/obj/item/weapon/gun/primary = clash_kit_primary_of(wearer)
+	var/obj/item/weapon/gun/sidearm = clash_kit_sidearm_of(wearer)
+	var/list/shells = primary && clash_kit_shells_for(primary)
+	var/list/ammo_types = list()
+	for(var/shell_name in shells)
+		ammo_types += shells[shell_name]
+	if(primary && !shells)
+		ammo_types += clash_kit_magazine_for(primary)
+	if(sidearm)
+		ammo_types += clash_kit_magazine_for(sidearm)
+	ammo_types -= null
+	if(!length(ammo_types))
+		return
+	var/list/starting = GLOB.clash_starting_kits[faction]
+	for(var/slot in list(KIT_SLOT_BELT, KIT_SLOT_POUCH_L, KIT_SLOT_POUCH_R))
+		var/wear_slot = GLOB.clash_kit_slots[slot]["wear"]
+		var/obj/item/storage/holder = clash_kit_storage_of(wearer.get_item_by_slot(wear_slot))
+		if(!holder || !clash_kit_holds_ammo(holder))
+			continue
+		var/fits = FALSE
+		for(var/ammo_type in ammo_types)
+			if(holder.can_hold_type(ammo_type, wearer))
+				fits = TRUE
+				break
+		if(fits)
+			continue
+		var/replacement = slot == KIT_SLOT_BELT ? starting[slot] : (shells ? /obj/item/storage/pouch/shotgun : /obj/item/storage/pouch/magazine)
+		if(replacement && holder.type != replacement)
+			clash_kit_replace_worn(wearer, wear_slot, replacement)
+
 /proc/clash_kit_fill_ammo(mob/living/carbon/human/wearer, datum/clash_kit/kit, mode)
 	var/obj/item/weapon/gun/primary = clash_kit_primary_of(wearer)
 	var/obj/item/weapon/gun/sidearm = clash_kit_sidearm_of(wearer)
@@ -449,6 +495,7 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 			clash_kit_hand_or_floor(wearer, side_gun)
 	if(primary || sidearm)
 		clash_kit_purge_stray_magazines(wearer)
+	clash_kit_fit_pouches(wearer, faction)
 	var/datum/clash_kit_option/grenades = kit.get_option(KIT_SLOT_GRENADE)
 	if(grenades && grenades.faction == faction)
 		for(var/obj/item/explosive/grenade/issued in wearer.get_contents())

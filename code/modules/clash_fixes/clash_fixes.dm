@@ -21,3 +21,10 @@
 		reload(user, attack_item)
 		return
 	return ..()
+
+/datum/player_action/kill/act(client/user, mob/target, list/params)
+	if(tgui_alert(user, "Kill [target.real_name || target.name]?", "Kill", list("Kill", "Cancel")) != "Kill" || QDELETED(target))
+		return TRUE
+	target.death(create_cause_data("an admin"))
+	message_admins("[key_name_admin(user)] killed [key_name_admin(target)].")
+	return TRUE
