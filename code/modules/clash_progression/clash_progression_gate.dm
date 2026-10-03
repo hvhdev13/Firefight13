@@ -505,6 +505,15 @@ GLOBAL_VAR_INIT(clash_trial_packs_built, FALSE)
 		return FALSE
 
 /datum/supply_order/buy(obj/structure/machinery/computer/supply/asrs/buyer, mob/user)
+	if(clash_progression_gating())
+		clash_build_trial_packs()
+		var/list/seen = list()
+		for(var/datum/supply_packs/pack as anything in objects.Copy())
+			if(!(pack in GLOB.clash_trial_packs))
+				continue
+			if(pack in seen)
+				objects -= pack
+			seen += pack
 	. = ..()
 	if(!clash_progression_gating() || !(src in buyer.linked_supply_controller.shoppinglist))
 		return
