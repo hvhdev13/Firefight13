@@ -352,3 +352,162 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 	var/obj/item/clothing/accessory/storage/webbing = locate() in wearer.w_uniform?.accessories
 	if(webbing && clash_gate_lock_text(progress, faction, webbing.type, job))
 		clash_kit_fit_webbing(wearer, starting[KIT_SLOT_WEBBING], cosmetics)
+
+GLOBAL_LIST_EMPTY(clash_trials_used)
+GLOBAL_LIST_EMPTY(clash_trial_packs)
+GLOBAL_VAR_INIT(clash_trial_packs_built, FALSE)
+
+/proc/clash_reset_trials()
+	GLOB.clash_trials_used = list()
+	for(var/datum/supply_packs/pack as anything in GLOB.clash_trial_packs)
+		GLOB.clash_trial_packs[pack] = FALSE
+
+/proc/clash_attachment_unlock_text(datum/clash_progress/progress, attachment_type)
+	build_clash_kit_catalog()
+	var/tracked = FALSE
+	for(var/gun_type in GLOB.clash_weapon_unlock_levels)
+		var/needed = GLOB.clash_weapon_unlock_levels[gun_type][attachment_type]
+		if(!needed)
+			continue
+		if(progress.weapon_level(gun_type) >= needed)
+			return null
+		tracked = TRUE
+	return tracked ? "Unlock it on a gun first" : "Does not unlock on any gun"
+
+/proc/clash_vendor_lock_text(mob/living/carbon/human/user, item_type)
+	if(!ishuman(user) || !clash_progression_gating() || !(user.faction in list(FACTION_MARINE, FACTION_UPP)))
+		return null
+	if(islist(item_type))
+		for(var/each_type in item_type)
+			. = clash_vendor_lock_text(user, each_type)
+			if(.)
+				return
+		return null
+	if(!ispath(item_type, /obj/item))
+		return null
+	var/datum/clash_progress/progress = clash_gate_progress(user.mind?.ckey || user.ckey)
+	if(ispath(item_type, /obj/item/attachable))
+		return clash_attachment_unlock_text(progress, item_type)
+	return clash_gate_lock_text(progress, user.faction, item_type, user.job)
+
+/proc/clash_trial_key(faction, item_type)
+	return "[faction]|[islist(item_type) ? item_type[1] : item_type]"
+
+/proc/clash_trials_left(faction, item_type)
+	if(ispath(islist(item_type) ? item_type[1] : item_type, /obj/item/attachable))
+		return 0
+	return max(0, CLASH_TRIAL_STOCK - (GLOB.clash_trials_used[clash_trial_key(faction, item_type)] || 0))
+
+/proc/clash_vendor_label(mob/living/carbon/human/user, item_type)
+	var/lock_text = clash_vendor_lock_text(user, item_type)
+	if(!lock_text)
+		return null
+	var/left = clash_trials_left(user.faction, item_type)
+	return left ? "Trial, [left] left this match. [lock_text]" : lock_text
+
+/proc/clash_vendor_blocked(mob/living/carbon/human/user, item_type)
+	return clash_vendor_lock_text(user, item_type) && !clash_trials_left(user.faction, item_type)
+
+/proc/clash_vendor_refuses(mob/living/carbon/human/user, list/itemspec)
+	var/lock_text = clash_vendor_lock_text(user, itemspec[3])
+	if(!lock_text || clash_trials_left(user.faction, itemspec[3]))
+		return FALSE
+	to_chat(user, SPAN_WARNING("[itemspec[1]] is locked. [lock_text]."))
+	return TRUE
+
+/obj/structure/machinery/cm_vending/vendor_user_inventory_list(mob/user, cost_index = 2, priority_index = 5)
+	. = ..()
+	if(!ishuman(user) || !clash_progression_gating())
+		return
+	var/list/products = get_available_products(user)
+	for(var/list/category as anything in .)
+		for(var/list/display_item as anything in category["items"])
+			var/list/itemspec = products[display_item["prod_index"]]
+			var/label = clash_vendor_label(user, itemspec[3])
+			if(label)
+				display_item["prod_name"] = "[display_item["prod_name"]] ([label])"
+
+/obj/structure/machinery/cm_vending/ui_data(mob/user)
+	. = ..()
+	var/list/listing = .["stock_listing"]
+	if(!listing || !ishuman(user) || !clash_progression_gating())
+		return
+	var/list/products = get_available_products(user)
+	for(var/index in 1 to min(length(listing), length(products)))
+		var/list/itemspec = products[index]
+		if(clash_vendor_blocked(user, itemspec[3]))
+			listing[index] = (vend_flags & VEND_LIMITED_INVENTORY) ? 0 : FALSE
+
+/obj/structure/machinery/cm_vending/vendor_successful_vend(list/itemspec, mob/living/carbon/human/user, turf/override_turf)
+	var/trial = !(stat & IN_USE) && LAZYLEN(itemspec) && clash_vendor_lock_text(user, itemspec[3])
+	. = ..()
+	if(!trial)
+		return
+	var/key = clash_trial_key(user.faction, itemspec[3])
+	GLOB.clash_trials_used[key] = (GLOB.clash_trials_used[key] || 0) + 1
+	to_chat(user, SPAN_NOTICE("Trial [itemspec[1]] taken. [clash_trials_left(user.faction, itemspec[3])] left for your side this match."))
+	for(var/obj/structure/machinery/cm_vending/vendor in GLOB.machines)
+		vendor.update_static_data_for_all_viewers()
+
+/proc/clash_attachment_allowed(mob/user, obj/item/attachable/attachment, obj/item/weapon/gun/gun)
+	var/ckey = user?.mind?.ckey || user?.ckey
+	if(!ishuman(user) || !ckey || !clash_progression_gating())
+		return TRUE
+	build_clash_kit_catalog()
+	if(!GLOB.clash_weapon_unlock_levels[clash_track_type(gun.type)])
+		return TRUE
+	var/lock_text = clash_attachment_lock_text(clash_gate_progress(ckey), attachment.type, gun.type)
+	if(!lock_text)
+		return TRUE
+	to_chat(user, SPAN_WARNING("[attachment] has not been unlocked on [gun] yet. [lock_text]."))
+	return FALSE
+
+/proc/clash_trial_item(item_type)
+	if(ispath(item_type, /obj/item/attachable))
+		build_clash_kit_catalog()
+		for(var/gun_type in GLOB.clash_weapon_unlock_levels)
+			if(GLOB.clash_weapon_unlock_levels[gun_type][item_type])
+				return TRUE
+		return FALSE
+	for(var/faction in list(FACTION_MARINE, FACTION_UPP))
+		var/list/gate = clash_gate_for(faction, item_type)
+		if(!gate || gate["kind"] == CLASH_GATE_FREE || (gate["kind"] == CLASH_GATE_CARRIER && !gate["xp"] && !gate["level"]))
+			continue
+		return TRUE
+	return FALSE
+
+/proc/clash_build_trial_packs()
+	if(GLOB.clash_trial_packs_built)
+		return
+	GLOB.clash_trial_packs_built = TRUE
+	for(var/pack_type in GLOB.supply_packs_datums)
+		var/datum/supply_packs/pack = GLOB.supply_packs_datums[pack_type]
+		var/list/counts = list()
+		var/list/kept = list()
+		var/trial = FALSE
+		for(var/item_type in pack.contains)
+			if(clash_trial_item(item_type))
+				trial = TRUE
+				counts[item_type] = (counts[item_type] || 0) + 1
+				if(counts[item_type] > CLASH_TRIAL_STOCK)
+					continue
+			kept += item_type
+		if(trial)
+			pack.contains = kept
+			GLOB.clash_trial_packs[pack] = FALSE
+
+/obj/structure/machinery/computer/supply/is_buyable(datum/supply_packs/supply_pack)
+	. = ..()
+	if(!. || !clash_progression_gating())
+		return
+	clash_build_trial_packs()
+	if(GLOB.clash_trial_packs[supply_pack])
+		return FALSE
+
+/datum/supply_order/buy(obj/structure/machinery/computer/supply/asrs/buyer, mob/user)
+	. = ..()
+	if(!clash_progression_gating() || !(src in buyer.linked_supply_controller.shoppinglist))
+		return
+	for(var/datum/supply_packs/pack as anything in objects)
+		if(pack in GLOB.clash_trial_packs)
+			GLOB.clash_trial_packs[pack] = TRUE

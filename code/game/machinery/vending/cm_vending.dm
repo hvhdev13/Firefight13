@@ -585,6 +585,9 @@ GLOBAL_LIST_EMPTY(vending_products)
 			var/index=params["prod_index"]
 			var/list/topic_listed_products = get_available_products(user)
 			var/list/itemspec = topic_listed_products[index]
+			if(clash_vendor_refuses(user, itemspec))
+				vend_fail()
+				return TRUE
 
 			var/turf/target_turf = get_appropriate_vend_turf(user)
 			if(vend_flags & VEND_CLUTTER_PROTECTION)

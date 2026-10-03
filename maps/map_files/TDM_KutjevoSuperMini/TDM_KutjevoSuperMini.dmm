@@ -6064,12 +6064,8 @@
 /turf/open/auto_turf/sand/layer1,
 /area/kutjevo/exterior/lz_dunes)
 "aqX" = (
-/obj/structure/flora/bush/ausbushes/var3/ppflowers{
-	desc = "Just like a real plant, but fake!";
-	name = "fake ppflowers"
-	},
-/obj/structure/flag/plantable/ua,
-/turf/open/gm/grass,
+/obj/effect/landmark/clash_npc/uscm,
+/turf/open/hybrisa/street/sidewalk/west,
 /area/kutjevo/exterior/stonyfields)
 "aqY" = (
 /obj/structure/surface/rack,
@@ -7174,11 +7170,8 @@
 /turf/open/hybrisa/street/cement1,
 /area/kutjevo/exterior/lz_river)
 "atp" = (
-/obj/structure/flag/plantable/ua{
-	pixel_x = -24;
-	pixel_y = 177
-	},
-/turf/open/hybrisa/street/roadlines,
+/obj/effect/landmark/clash_npc/uscm,
+/turf/open/hybrisa/street/cement1,
 /area/kutjevo/exterior/stonyfields)
 "atq" = (
 /obj/structure/flora/bush/ausbushes/var3/fullgrass,
@@ -13325,6 +13318,10 @@
 /obj/structure/machinery/cm_vending/sorted/tech/electronics_storage/antag,
 /turf/open/floor/strata/floor3/east,
 /area/clash_arena/tdm_kutjevo/upp_base)
+"jfS" = (
+/obj/effect/landmark/clash_npc/upp,
+/turf/open/floor/kutjevo/plate,
+/area/kutjevo/exterior/Northwest_Colony)
 "jhS" = (
 /turf/closed/wall/kutjevo/colony/reinforced/hull,
 /area/kutjevo/exterior/lz_dunes)
@@ -13469,6 +13466,10 @@
 	},
 /turf/open/floor/strata/floor3/east,
 /area/clash_arena/tdm_kutjevo/upp_base)
+"lJL" = (
+/obj/effect/landmark/clash_npc/upp,
+/turf/open/auto_turf/sand/layer1,
+/area/kutjevo/exterior/Northwest_Colony)
 "lKg" = (
 /obj/structure/sign/poster/clf{
 	pixel_x = -30
@@ -13476,6 +13477,10 @@
 /obj/structure/machinery/cm_vending/sorted/cargo_guns/upp_squad_guns,
 /turf/open/floor/corsat/spiralplate,
 /area/clash_arena/tdm_kutjevo/upp_base)
+"lKp" = (
+/obj/effect/landmark/clash_npc/uscm,
+/turf/open/hybrisa/street/asphalt,
+/area/kutjevo/exterior/stonyfields)
 "lLH" = (
 /obj/structure/flora/grass/desert/lightgrass_9,
 /obj/structure/flora/grass/desert/heavygrass_2,
@@ -13642,6 +13647,10 @@
 /obj/structure/flora/bush/desert{
 	icon_state = "tree_3"
 	},
+/turf/open/desert/rock/deep/rock3,
+/area/kutjevo/exterior/Northwest_Colony)
+"niy" = (
+/obj/effect/landmark/clash_npc/upp,
 /turf/open/desert/rock/deep/rock3,
 /area/kutjevo/exterior/Northwest_Colony)
 "niT" = (
@@ -14020,6 +14029,10 @@
 "seO" = (
 /turf/open/desert/rock/deep,
 /area/kutjevo/exterior/lz_dunes)
+"smU" = (
+/obj/structure/sign/banners/colonial_marines_flag,
+/turf/closed/wall/almayer/reinforced,
+/area/clash_arena/tdm_kutjevo/uscm_base)
 "soL" = (
 /obj/structure/flora/grass/desert/heavygrass_2,
 /turf/open/auto_turf/sand/layer1,
@@ -14136,7 +14149,6 @@
 /obj/structure/machinery/light{
 	dir = 1
 	},
-/obj/structure/flag/plantable/upp,
 /turf/open/floor/kutjevo/colors/orange,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "tDe" = (
@@ -14368,6 +14380,14 @@
 /obj/structure/platform/metal/kutjevo_smooth,
 /turf/open/floor/kutjevo/multi_tiles,
 /area/kutjevo/interior/power)
+"wlI" = (
+/obj/effect/landmark/clash_npc/upp,
+/turf/open/auto_turf/sand/layer1,
+/area/kutjevo/exterior/lz_dunes)
+"wmI" = (
+/obj/effect/landmark/clash_npc/uscm,
+/turf/open/floor/kutjevo/multi_tiles,
+/area/kutjevo/interior/power)
 "wqD" = (
 /turf/open/floor/kutjevo/tan/multi_tiles,
 /area/kutjevo/interior/power)
@@ -14553,6 +14573,10 @@
 /obj/structure/fence/slim,
 /turf/open/floor/grass,
 /area/kutjevo/exterior/stonyfields)
+"xPJ" = (
+/obj/effect/landmark/clash_npc/uscm,
+/turf/open/asphalt/cement_sunbleached,
+/area/kutjevo/exterior/lz_dunes)
 "xXe" = (
 /obj/structure/machinery/light{
 	dir = 1
@@ -29364,7 +29388,7 @@ afA
 afA
 afA
 agt
-sVF
+lJL
 aHg
 rkO
 gxb
@@ -30415,7 +30439,7 @@ agt
 sVF
 sVF
 sVF
-sVF
+lJL
 sVF
 sVF
 sVF
@@ -32552,7 +32576,7 @@ lRy
 lRy
 lRy
 lRy
-lRy
+jfS
 lRy
 aHg
 hrz
@@ -32569,7 +32593,7 @@ afA
 afA
 afA
 afA
-agt
+afA
 hrz
 afA
 afA
@@ -32585,7 +32609,7 @@ vei
 sDe
 sDe
 prJ
-wGH
+wlI
 arI
 wGH
 jiX
@@ -32835,8 +32859,8 @@ xrU
 afA
 afA
 afA
-agt
-agt
+afA
+afA
 afA
 afA
 afA
@@ -33103,7 +33127,7 @@ nzv
 afA
 afA
 iin
-agt
+afA
 afA
 afA
 afA
@@ -34435,7 +34459,7 @@ afA
 afA
 afA
 afA
-afA
+niy
 atd
 sVF
 sVF
@@ -35276,7 +35300,7 @@ ttq
 ttq
 ttq
 ttq
-ttq
+xPJ
 wGH
 wGH
 sDe
@@ -37142,7 +37166,7 @@ pyp
 nXX
 thu
 cvm
-hQj
+wmI
 hQj
 hQj
 cvm
@@ -39825,7 +39849,7 @@ lVo
 lVo
 avR
 ate
-ate
+atp
 ate
 lVo
 lVo
@@ -40881,7 +40905,7 @@ wqD
 ePZ
 xzY
 hQj
-hQj
+wmI
 hQj
 wkG
 xHm
@@ -44091,7 +44115,7 @@ olR
 olR
 naO
 olR
-atp
+naO
 olR
 olR
 olR
@@ -44621,7 +44645,7 @@ mjN
 olR
 olR
 olR
-olR
+lKp
 olR
 dQC
 atc
@@ -45164,7 +45188,7 @@ atc
 atc
 atc
 atc
-atc
+aqX
 foE
 ate
 fSK
@@ -47286,7 +47310,7 @@ lVo
 lVo
 lVo
 apr
-aor
+smU
 aBc
 ayj
 ayj
@@ -49142,7 +49166,7 @@ gsq
 gsq
 wkz
 atR
-aqX
+aog
 adL
 alG
 atK

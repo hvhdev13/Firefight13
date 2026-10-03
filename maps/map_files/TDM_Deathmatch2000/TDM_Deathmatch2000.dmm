@@ -459,9 +459,9 @@
 /turf/open/floor/almayer/orange/north,
 /area/clash_arena/tdm_jungle/uscm_base)
 "cI" = (
-/obj/item/flag/plantable/upp,
-/turf/open/floor/strata/floor3/east,
-/area/clash_arena/tdm_deathmatch2000/upp_base)
+/obj/effect/landmark/clash_npc/upp,
+/turf/open/asphalt/cement/cement9,
+/area/clash_arena/tdm_deathmatch2000/battlefield)
 "cK" = (
 /turf/open/floor/almayer/cargo_arrow/west,
 /area/clash_arena/tdm_jungle/uscm_base/req)
@@ -1372,10 +1372,6 @@
 /turf/open/floor/plating,
 /area/clash_arena/tdm_jungle/uscm_base/req)
 "oT" = (
-/obj/structure/flag/plantable/upp{
-	pixel_x = 9;
-	pixel_y = 16
-	},
 /turf/open/floor/strata/red2,
 /area/clash_arena/tdm_deathmatch2000/battlefield)
 "oW" = (
@@ -2069,7 +2065,10 @@
 /turf/open/floor/strata/floor3/east,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "ye" = (
-/obj/structure/sign/banners/colonial_marines_flag,
+/obj/structure/sign/banners/colonial_marines_flag{
+	pixel_x = 17;
+	pixel_y = -7
+	},
 /turf/closed/wall/almayer/outer,
 /area/clash_arena/tdm_jungle/uscm_base)
 "yl" = (
@@ -2102,11 +2101,8 @@
 /turf/open/floor/almayer/plating_striped/west,
 /area/clash_arena/tdm_jungle/uscm_base/req)
 "yt" = (
-/obj/structure/flag/plantable/ua{
-	pixel_x = 9;
-	pixel_y = 15
-	},
-/turf/open/organic/grass,
+/obj/effect/landmark/clash_npc/uscm,
+/turf/open/asphalt/cement/cement9,
 /area/clash_arena/tdm_deathmatch2000/battlefield)
 "yu" = (
 /obj/effect/decal/warning_stripes{
@@ -3561,12 +3557,13 @@
 /turf/open/floor/almayer/plate,
 /area/clash_arena/tdm_jungle/uscm_base/req)
 "RB" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "NW-out";
-	pixel_x = -1;
-	pixel_y = 1
+/obj/structure/flora/pottedplant{
+	desc = "It is made of Fiberbush(tm). It contains asbestos.";
+	icon_state = "pottedplant_22";
+	name = "synthetic potted plant";
+	pixel_y = 8
 	},
-/turf/open/floor/interior/wood,
+/turf/open/floor/almayer,
 /area/clash_arena/tdm_jungle/uscm_base)
 "RI" = (
 /turf/open/floor/plating/plating_catwalk,
@@ -3590,14 +3587,9 @@
 /turf/open/floor/almayer/plating/northeast,
 /area/clash_arena/tdm_jungle/uscm_base/req)
 "Sj" = (
-/obj/structure/flora/pottedplant{
-	desc = "It is made of Fiberbush(tm). It contains asbestos.";
-	icon_state = "pottedplant_22";
-	name = "synthetic potted plant";
-	pixel_y = 8
-	},
-/turf/open/floor/almayer/red,
-/area/clash_arena/tdm_jungle/uscm_base)
+/obj/effect/landmark/clash_npc/upp,
+/turf/open/asphalt/cementalt,
+/area/clash_arena/tdm_deathmatch2000/battlefield)
 "Sm" = (
 /turf/closed/wall/almayer/reinforced,
 /area/clash_arena/tdm_jungle/uscm_base)
@@ -3963,6 +3955,9 @@
 "Yx" = (
 /obj/effect/landmark/start/marine/smartgunner/alpha,
 /obj/effect/landmark/late_join/alpha,
+/obj/structure/machinery/light{
+	dir = 4
+	},
 /turf/open/floor/interior/wood,
 /area/clash_arena/tdm_jungle/uscm_base)
 "YB" = (
@@ -13490,7 +13485,7 @@ yS
 il
 zx
 aM
-cI
+jM
 eg
 Vm
 Vm
@@ -17031,13 +17026,13 @@ ES
 CF
 kV
 kV
+cI
 kV
 kV
 kV
 kV
 kV
-kV
-kV
+cI
 kV
 kV
 cZ
@@ -17185,7 +17180,7 @@ kV
 kV
 kV
 Pg
-Pg
+Sj
 kV
 kV
 kV
@@ -21575,7 +21570,7 @@ ES
 CF
 kV
 kV
-kV
+yt
 kV
 kV
 kV
@@ -21584,7 +21579,7 @@ kV
 kV
 Pg
 kV
-kV
+yt
 kV
 kV
 Pg
@@ -21592,7 +21587,7 @@ kV
 kV
 kV
 kV
-kV
+yt
 kV
 kV
 CF
@@ -23146,7 +23141,7 @@ aC
 yO
 yO
 yO
-yt
+yO
 yO
 yO
 yO
@@ -23567,15 +23562,15 @@ ES
 ES
 ES
 ES
-AF
-Xp
-Sj
+ye
+RB
+KA
 Xp
 Xp
 Xp
 cE
 Xp
-Xp
+RB
 AF
 ES
 ES
@@ -23709,7 +23704,7 @@ ES
 ES
 ES
 ES
-ye
+AF
 Xp
 KA
 Xp
@@ -23852,14 +23847,14 @@ ES
 ES
 ES
 AF
-Xp
+RB
 KA
 Xp
 Xp
 Xp
 cE
 Xp
-Xp
+RB
 AF
 ES
 ES
@@ -29665,15 +29660,15 @@ ES
 ES
 ES
 ES
+ES
+ES
+AF
 AF
 AF
 AF
 AF
 AF
 Iu
-za
-za
-RB
 za
 za
 za
@@ -29807,6 +29802,8 @@ ES
 ES
 ES
 ES
+ES
+ES
 AF
 cz
 cz
@@ -29814,8 +29811,6 @@ Aw
 cz
 cz
 Jl
-za
-za
 za
 za
 za
@@ -29949,14 +29944,14 @@ ES
 ES
 ES
 ES
+ES
+ES
 AF
 Qg
 Qg
 Fc
 pK
 FS
-za
-za
 za
 za
 za
@@ -30091,14 +30086,14 @@ ES
 ES
 ES
 ES
+ES
+ES
 AF
 FM
 vU
 vU
 FM
 FM
-za
-za
 za
 za
 za
@@ -30233,6 +30228,8 @@ ES
 ES
 ES
 ES
+ES
+ES
 AF
 cz
 cz
@@ -30240,8 +30237,6 @@ MQ
 cz
 cz
 Jl
-za
-za
 za
 mh
 ua
@@ -30375,6 +30370,8 @@ ES
 ES
 ES
 ES
+ES
+ES
 AF
 OP
 OP
@@ -30382,8 +30379,6 @@ OP
 OP
 OP
 hC
-za
-za
 za
 mh
 ua
@@ -30517,6 +30512,8 @@ ES
 ES
 ES
 ES
+ES
+ES
 AF
 cz
 cz
@@ -30524,8 +30521,6 @@ Aw
 cz
 cz
 Jl
-za
-za
 za
 za
 Gb
@@ -30659,6 +30654,8 @@ ES
 ES
 ES
 ES
+ES
+ES
 AF
 hk
 hk
@@ -30666,8 +30663,6 @@ LL
 LL
 Qg
 Iu
-za
-za
 za
 za
 za
@@ -30801,14 +30796,14 @@ ES
 ES
 ES
 ES
+ES
+ES
 AF
 LL
 hk
 hk
 LL
 LL
-za
-za
 za
 qQ
 za
@@ -30943,6 +30938,8 @@ ES
 ES
 ES
 ES
+ES
+ES
 AF
 cz
 cz
@@ -30950,8 +30947,6 @@ MQ
 cz
 cz
 qu
-za
-za
 wh
 Zq
 kW
@@ -31085,8 +31080,8 @@ ES
 ES
 ES
 ES
-AF
-AF
+ES
+ES
 AF
 AF
 AF

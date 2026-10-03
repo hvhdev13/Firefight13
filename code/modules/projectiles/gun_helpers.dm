@@ -405,6 +405,8 @@ DEFINES in setup.dm, referenced here.
 /obj/item/weapon/gun/proc/can_attach_to_gun(mob/user, obj/item/attachable/attachment)
 	if(!attachment.can_be_attached_to_gun(user, src))
 		return FALSE
+	if(!clash_attachment_allowed(user, attachment, src))
+		return FALSE
 
 	//Checks if they can attach the thing in the first place, like with fixed attachments.
 	if(attachments[attachment.slot])

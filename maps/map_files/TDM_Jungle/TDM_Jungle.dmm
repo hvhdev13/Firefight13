@@ -1448,10 +1448,6 @@
 /obj/structure/platform/metal/almayer_smooth/north,
 /turf/open/floor/grass,
 /area/space)
-"iB" = (
-/obj/item/flag/plantable/upp,
-/turf/open/floor/strata/floor3/east,
-/area/clash_arena/tdm_jungle/upp_base)
 "iG" = (
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
 	dir = 1
@@ -2393,16 +2389,6 @@
 /obj/structure/machinery/cm_vending/sorted/cargo_guns/cargo/blend,
 /turf/open/floor/almayer/green/southwest,
 /area/clash_arena/tdm_jungle/uscm_base/req)
-"oY" = (
-/obj/structure/machinery/light{
-	dir = 4
-	},
-/obj/effect/decal/warning_stripes{
-	icon_state = "N";
-	pixel_y = 1
-	},
-/turf/open/floor/interior/wood,
-/area/clash_arena/tdm_jungle/uscm_base)
 "oZ" = (
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
 	dir = 8
@@ -4195,17 +4181,6 @@
 	},
 /turf/open/floor/prison/floor_marked/west,
 /area/clash_arena/tdm_jungle/upp_base)
-"Av" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "NW-out";
-	pixel_x = -1;
-	pixel_y = 1
-	},
-/obj/structure/machinery/light{
-	dir = 1
-	},
-/turf/open/floor/interior/wood,
-/area/clash_arena/tdm_jungle/uscm_base)
 "AA" = (
 /obj/effect/decal/warning_stripes{
 	icon_state = "E";
@@ -4535,7 +4510,10 @@
 /turf/closed/wall/strata_ice/forest/rock,
 /area/space)
 "Cv" = (
-/obj/structure/sign/banners/colonial_marines_flag,
+/obj/structure/sign/banners/colonial_marines_flag{
+	pixel_x = -16;
+	pixel_y = -4
+	},
 /turf/closed/wall/almayer/outer,
 /area/clash_arena/tdm_jungle/uscm_base)
 "Cw" = (
@@ -25973,7 +25951,7 @@ sG
 eY
 sv
 XD
-iB
+Fc
 mt
 fU
 fU
@@ -43350,14 +43328,14 @@ Yq
 ZA
 Yq
 Ec
-kz
+wT
 ye
 kz
 kz
 kz
 wF
 kz
-kz
+wT
 Ec
 jJ
 jJ
@@ -47188,7 +47166,7 @@ Fg
 KS
 kL
 aP
-Ds
+wG
 ye
 fo
 fo
@@ -47390,7 +47368,7 @@ lf
 CI
 lf
 aP
-wG
+Ds
 ye
 ax
 CM
@@ -52027,14 +52005,14 @@ jJ
 jJ
 jJ
 jJ
+jJ
+jJ
 Ec
 Ec
 Ec
 Ec
 Ec
 Zb
-kM
-kM
 kM
 kM
 kM
@@ -52229,14 +52207,14 @@ jJ
 jJ
 jJ
 jJ
+jJ
+jJ
 Ec
 XN
 XN
 la
 XN
 XN
-GX
-kM
 kM
 kM
 kM
@@ -52431,14 +52409,14 @@ jJ
 jJ
 jJ
 jJ
+jJ
+jJ
 Ec
 CC
 CC
 yM
 Pl
 hg
-kM
-kM
 kM
 kM
 kM
@@ -52633,14 +52611,14 @@ jJ
 jJ
 jJ
 jJ
+jJ
+jJ
 Ec
 TO
 ir
 ir
 TO
 TO
-kM
-kM
 kM
 kM
 kM
@@ -52835,14 +52813,14 @@ jJ
 jJ
 jJ
 jJ
+jJ
+jJ
 Ec
 XN
 XN
 Li
 XN
 XN
-GX
-kM
 kM
 kM
 bC
@@ -53037,14 +53015,14 @@ jJ
 jJ
 jJ
 jJ
+jJ
+jJ
 Ec
 Jt
 Jt
 Jt
 Jt
 Jt
-Av
-kM
 kM
 kM
 bC
@@ -53239,14 +53217,14 @@ jJ
 jJ
 jJ
 jJ
+jJ
+jJ
 Ec
 XN
 XN
 la
 XN
 XN
-GX
-kM
 kM
 kM
 kM
@@ -53441,14 +53419,14 @@ jJ
 jJ
 jJ
 jJ
+jJ
+jJ
 Ec
 pm
 pm
 MK
 MK
 CC
-kM
-kM
 kM
 kM
 kM
@@ -53643,14 +53621,14 @@ jJ
 jJ
 jJ
 jJ
+jJ
+jJ
 Ec
 MK
 pm
 pm
 MK
 MK
-kM
-kM
 kM
 IS
 kM
@@ -53845,14 +53823,14 @@ jJ
 jJ
 jJ
 jJ
+jJ
+jJ
 Ec
 XN
 XN
 Li
 XN
 XN
-oY
-kM
 kM
 xo
 Mh
@@ -54047,8 +54025,8 @@ jJ
 jJ
 jJ
 jJ
-Ec
-Ec
+jJ
+jJ
 Ec
 Ec
 Ec

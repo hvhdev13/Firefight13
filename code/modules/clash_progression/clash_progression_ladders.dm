@@ -196,6 +196,8 @@ GLOBAL_LIST_INIT(clash_family_names, list(
 	CLASH_FAMILY_LEVER = "lever-action",
 ))
 
+GLOBAL_LIST_INIT(clash_free_role_gear, list(/obj/item/storage/backpack/marine/satchel/medic, /obj/item/storage/backpack/marine/satchel/tech))
+
 GLOBAL_LIST_EMPTY(clash_option_gates)
 
 /proc/clash_gate_key(faction, item_type)
@@ -208,6 +210,8 @@ GLOBAL_LIST_EMPTY(clash_option_gates)
 	for(var/faction in list(FACTION_MARINE, FACTION_UPP))
 		for(var/slot in GLOB.clash_starting_kits[faction])
 			gates[clash_gate_key(faction, GLOB.clash_starting_kits[faction][slot])] = list("kind" = CLASH_GATE_FREE)
+		for(var/item_type in GLOB.clash_free_role_gear)
+			gates[clash_gate_key(faction, item_type)] = list("kind" = CLASH_GATE_FREE)
 		for(var/gear in GLOB.clash_gear_types)
 			for(var/item_type in GLOB.clash_gear_types[gear])
 				gates[clash_gate_key(faction, item_type)] = list("kind" = CLASH_GATE_CLASS, "gear" = gear)
