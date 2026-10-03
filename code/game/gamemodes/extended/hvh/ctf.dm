@@ -81,9 +81,13 @@
 	return flag
 
 /datum/game_mode/extended/faction_clash/hvh/tdm/ctf/get_welcome_rules()
-	. = ..()
-	var/unit = matches_per_round > 1 ? "Matches" : "Rounds"
-	.[1] = "[unit] last [round_time_limit / 600] minutes. Each flag stands just outside its base. Carry the enemy flag to your own flag's stand while yours is home to score. Touch your own flag where it lies to send it home, and a dropped flag goes home by itself after [flag_return_time / 10] seconds. First to [capture_limit] captures wins, otherwise the most captures when time runs out. Flag carriers cannot enter their own base."
+	return list(
+		"Each flag stands outside its base.",
+		"Carry the enemy flag to your own flag's stand while yours is home to score.",
+		"Touch your own flag where it lies to send it home. Dropped flag returns home by itself after [flag_return_time / 10] seconds.",
+		"First team to [capture_limit] captures wins, otherwise the most captures when time runs out.",
+		"Flag carriers cannot enter their own base.",
+	)
 
 /datum/game_mode/extended/faction_clash/hvh/tdm/ctf/get_win_condition()
 	var/unit = matches_per_round > 1 ? "Each match" : "The round"

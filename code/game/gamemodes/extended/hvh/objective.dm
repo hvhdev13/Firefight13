@@ -47,11 +47,10 @@
 	update_score_huds()
 
 /datum/game_mode/extended/faction_clash/hvh/tdm/objective/get_welcome_rules()
-	. = ..()
-	.[1] = get_objective_rule()
+	return get_objective_rules()
 
-/datum/game_mode/extended/faction_clash/hvh/tdm/objective/proc/get_objective_rule()
-	return ""
+/datum/game_mode/extended/faction_clash/hvh/tdm/objective/proc/get_objective_rules()
+	return list()
 
 /datum/game_mode/extended/faction_clash/hvh/tdm/objective/get_win_condition()
 	var/unit = matches_per_round > 1 ? "Each match" : "The round"
@@ -179,9 +178,12 @@
 		point_limit = ground.tdm_koth_point_limit
 	return ..()
 
-/datum/game_mode/extended/faction_clash/hvh/tdm/objective/koth/get_objective_rule()
-	var/unit = matches_per_round > 1 ? "Matches" : "Rounds"
-	return "[unit] last [round_time_limit / 600] minutes. Stand on the hill with no enemies on it to score a point every second. First to [point_limit] points wins, otherwise the most points when time runs out. Bots fight over the hill but cannot hold or contest it."
+/datum/game_mode/extended/faction_clash/hvh/tdm/objective/koth/get_objective_rules()
+	return list(
+		"Occupy the \"hill\" with no enemies on it to score points.",
+		"First team to [point_limit] points wins, otherwise the most points when time runs out.",
+		"Bots fight over the hill but cannot hold or contest it.",
+	)
 
 /datum/game_mode/extended/faction_clash/hvh/tdm/objective/domination
 	name = GAMEMODE_DOMINATION
@@ -198,6 +200,10 @@
 		point_limit = ground.tdm_domination_point_limit
 	return ..()
 
-/datum/game_mode/extended/faction_clash/hvh/tdm/objective/domination/get_objective_rule()
-	var/unit = matches_per_round > 1 ? "Matches" : "Rounds"
-	return "[unit] last [round_time_limit / 600] minutes. Take a zone by standing on it with no enemies for [capture_time / 10] seconds. Every zone you hold scores a point each second, even after you leave it. First to [point_limit] points wins, otherwise the most points when time runs out. Bots fight over the zones but cannot take or contest them."
+/datum/game_mode/extended/faction_clash/hvh/tdm/objective/domination/get_objective_rules()
+	return list(
+		"Take a zone by standing on it with no enemies for [capture_time / 10] seconds.",
+		"Every zone your team holds scores points even after you leave them.",
+		"First team to [point_limit] points wins, otherwise the most points when time runs out.",
+		"Bots fight over the zones but cannot take or contest them.",
+	)

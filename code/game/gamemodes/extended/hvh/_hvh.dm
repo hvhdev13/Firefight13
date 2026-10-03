@@ -143,20 +143,11 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		. += "[unit] last [round_time_limit / 600] minutes. The first team to [kill_limit] kills wins, otherwise the most kills when time runs out."
 	else
 		. += "[unit] last [round_time_limit / 600] minutes. The team with the most kills wins."
-	if(matches_per_round > 1)
-		. += "A round is the best of [matches_per_round] matches, with a [CLASH_INTERMISSION / 10] second break and a fresh start between them. The votes for the next mode and map open during the deciding match."
-	else
+	if(matches_per_round == 1)
 		. += "The votes for the next mode and map open with [CLASH_VOTE_LEAD / 600] minutes left, or as soon as a team wins."
-	if(countdown_time)
-		. += "Each match starts after a [countdown_time / 10] second countdown. Until then you are held in your base."
-	. += "You can respawn [respawn_cooldown / 10] seconds after dying, using the Respawn button in the centre of the screen."
-	if(spawn_protection)
-		. += "For [spawn_protection / 10] seconds after spawning you cannot be hurt. Firing, melee attacks or using an item end it early."
-	if(idle_limit)
-		. += "Fighters idle for [idle_limit / 600] minutes are moved to observer so the slot frees up."
-	if(arena_rules)
-		. += "The enemy base is locked. Enemies cannot walk or throw grenades into it."
-		. += "Players named \[BOT\] are bots. Kills on bots and by bots never count toward the score."
+
+/datum/game_mode/extended/faction_clash/hvh/proc/get_welcome_tagline()
+	return null
 
 /datum/game_mode/extended/faction_clash/hvh/pre_setup()
 	. = ..()
@@ -424,7 +415,13 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	var/involved = viewer && (entry["killer"] == viewer.real_name || entry["victim"] == viewer.real_name)
 	var/outline = involved ? "-dm-text-outline: 1px #7a5a00" : "-dm-text-outline: 1px black"
 	var/weapon = entry["cause"] ? " <span style='color: #9aa3ab'>\[[html_encode(entry["cause"])]\]</span> " : " <span style='color: #9aa3ab'>&gt;</span> "
-	return "<span class='maptext' style='text-align: right; font-size: 6px; [outline]'><span style='color: [entry["killer_color"]]'>[html_encode(entry["killer"])][entry["assists"] ? " <span style='color: #9aa3ab'>+[entry["assists"]]</span>" : ""]</span>[weapon]<span style='color: [entry["victim_color"]]'>[html_encode(entry["victim"])]</span></span>"
+	return "<span class='maptext' style='text-align: right; font-size: 6px; [outline]'><span style='color: [entry["killer_color"]]'>[clash_feed_name(entry["killer"])][entry["assists"] ? " <span style='color: #9aa3ab'>+[entry["assists"]]</span>" : ""]</span>[weapon]<span style='color: [entry["victim_color"]]'>[clash_feed_name(entry["victim"])]</span></span>"
+
+/proc/clash_feed_name(name)
+	var/tag_start = findtext(name, " \[BOT\]")
+	if(!tag_start)
+		return html_encode(name)
+	return "[html_encode(copytext(name, 1, tag_start))] <span style='color: #9aa3ab'>\[BOT\]</span>"
 
 /datum/game_mode/extended/faction_clash/hvh/proc/render_killfeed_for(mob/player)
 	var/list/lines = player.hud_used?.faction_killfeed

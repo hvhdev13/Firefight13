@@ -34,10 +34,15 @@
 		return ..()
 	return list(
 		"[matches_per_round] match\s per round.",
-		"First team to [kill_limit] kills wins or with the most kills when time runs out wins.",
-		"You can respawn [respawn_cooldown / 10] seconds after dying using the Respawn button in the center of your screen.",
-		"Players named \[BOT\] are bots. Kills on bots and by bots do not count toward the score.",
+		"First team to [kill_limit] kills wins, otherwise the team with the most kills when time runs out wins.",
+		"Respawn enabled.",
+		"Bots fill lowpop and have a grey \[BOT\] tag. Kills on bots and by bots do not count toward the score but provide 25% of regular XP.",
 	)
+
+/datum/game_mode/extended/faction_clash/hvh/tdm/get_welcome_tagline()
+	if(type == /datum/game_mode/extended/faction_clash/hvh/tdm)
+		return "Kill. Respawn. Repeat."
+	return ..()
 
 /datum/game_mode/extended/faction_clash/hvh/tdm/roundend_ceasefire()
 	var/result = get_round_result_line()

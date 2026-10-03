@@ -108,16 +108,21 @@ SUBSYSTEM_DEF(clash_spawn)
 	page += ".foot{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-top:1px solid #2a3038;background:#12161b}"
 	page += "button{background:#2d5a9e;color:#fff;border:0;padding:6px 18px;font-weight:bold;letter-spacing:1px;cursor:pointer}"
 	page += "button:hover{background:#3a6fc0}input.contact{width:100%;background:#1a1f25;color:#fff;border:1px solid #4a525c;padding:3px}"
+	page += ".tagline{margin:0 0 6px;color:#fff;font-weight:bold;letter-spacing:1px}"
 	page += "</style>"
-	page += "<div class='head'><h1>[istype(clash_mode) ? uppertext(clash_mode.name) : "WELCOME"]</h1><div class='sub'>Firefight13: USCM vs UPP. The server is being playtested and updated continuously.</div></div>"
+	page += "<div class='head'><h1>Welcome to Firefight13.</h1><div class='sub'>\[The server is actively being playtested and updated. Everything is subject to change without notice.\]</div></div>"
 	page += "<div class='body'>"
-	page += "<h2>This round</h2><ul>"
 	if(istype(clash_mode))
+		page += "<h2>[clash_mode.name]</h2>"
+		var/tagline = clash_mode.get_welcome_tagline()
+		if(tagline)
+			page += "<p class='tagline'>[tagline]</p>"
+		page += "<ul>"
 		for(var/line in clash_mode.get_welcome_rules())
 			page += "<li>[line]</li>"
-	page += "</ul>"
+		page += "</ul>"
 	page += "<h2>Controls/Verbs</h2><table class='keys'>"
-	page += "<tr><td><span class='key'>Tab</span></td><td>Show or hide the scoreboard.</td></tr>"
+	page += "<tr><td><span class='key'>Tab</span></td><td>Show/hide the scoreboard.</td></tr>"
 	if(kits)
 		page += "<tr><td><span class='key'>Loadout</span></td><td>Build custom kits. The selected kit is on you every time you spawn as that role. Open it from the lobby, the Deploy button when you are down, or the Loadout verb.</td></tr>"
 	else
@@ -125,10 +130,13 @@ SUBSYSTEM_DEF(clash_spawn)
 		page += "<tr><td><span class='key'>Vendors</span></td><td>Save your loadout with Save current in the Saved Loadouts section, 3 slots per role.</td></tr>"
 	page += "<tr><td><span class='key'>Stats</span></td><td>The Career Stats verb, or the button on the scoreboard, shows your career and the leaderboard.</td></tr>"
 	page += "</table>"
-	page += "<h2>Good to know</h2><ul>"
+	page += "<h2>Other notes</h2><ul>"
 	page += "<li>Friendly fire is on and explosions have a high chance of taking off limbs.</li>"
 	page += "<li>Two end-of-round votes: one for the next mode and then one for the map that can run it.</li>"
 	page += "<li>Only rounds that finish on their own count toward career stats.</li>"
+	page += "</ul>"
+	page += "<h2>Playtest notes</h2><ul>"
+	page += "<li>This is a playtest, <i>everything</i> is subject to change and accrued player unlocks, levels, and ranks will be changed and reset eventually because mechanics are being worked and reworked.</li>"
 	page += "</ul>"
 	if(GLOB.clash_feedback_contact)
 		page += "<h2>Feedback</h2><input class='contact' type='text' readonly value='[GLOB.clash_feedback_contact]' onclick='this.select()'>"
