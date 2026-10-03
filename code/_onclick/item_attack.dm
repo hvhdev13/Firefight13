@@ -40,7 +40,9 @@
 	if(HAS_TRAIT(user, TRAIT_HAULED))
 		return
 	if(istype(I) && ismob(user))
-		return I.attack(src, user)
+		var/list/clash_care = clash_care_snapshot(src, user, I)
+		. = I.attack(src, user)
+		clash_care_settle(src, user, clash_care, .)
 
 
 // Proximity_flag is 1 if this afterattack was called on something adjacent, in your square, or on your person.

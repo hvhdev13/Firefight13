@@ -372,6 +372,9 @@ GLOBAL_DATUM_INIT(supply_controller, /datum/controller/supply, new())
 	if(isnull(supply_pack.contains) && isnull(supply_pack.containertype))
 		return FALSE
 
+	if(!clash_supply_pack_allowed(supply_pack))
+		return FALSE
+
 	return TRUE
 
 /obj/structure/machinery/computer/supply/proc/contraband_buyable()
@@ -685,6 +688,7 @@ GLOBAL_DATUM_INIT(supply_controller, /datum/controller/supply, new())
 	)
 
 /datum/supply_order/proc/buy(obj/structure/machinery/computer/supply/asrs/buyer, mob/user)
+	clash_trim_trial_order(src)
 	var/ordered = list()
 
 	for(var/datum/supply_packs/pack as anything in objects)
@@ -717,6 +721,7 @@ GLOBAL_DATUM_INIT(supply_controller, /datum/controller/supply, new())
 		objects = ordered
 		buyer.linked_supply_controller.requestlist -= src
 		buyer.linked_supply_controller.shoppinglist += src
+		clash_mark_trial_packs(ordered)
 		var/counter = 0
 		for(var/datum/supply_packs/pack as anything in ordered)
 			counter++

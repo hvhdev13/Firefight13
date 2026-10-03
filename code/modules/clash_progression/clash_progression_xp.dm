@@ -310,17 +310,22 @@
 		if(leader != killer && leader.stat == CONSCIOUS && leader.faction == killer.faction && GLOB.clash_job_classes[leader.job] == CLASH_CLASS_LEADER)
 			clash_award_xp(leader, CLASH_XP_LEADER_ASSIST, CLASH_XP_SOURCE_LEADER)
 
-/proc/clash_care_snapshot(mob/living/carbon/human/patient, mob/living/carbon/human/medic)
+/proc/clash_care_snapshot(mob/living/carbon/human/patient, mob/living/carbon/human/medic, obj/item/tool)
 	if(!ishuman(patient) || !ishuman(medic) || patient == medic || patient.faction != medic.faction || patient.clash_heal_pool <= 0)
 		return null
 	var/list/splinted = list()
 	for(var/obj/limb/limb as anything in patient.limbs)
 		if(limb.status & LIMB_SPLINTED)
 			splinted += limb
-	return list("damage" = patient.getBruteLoss() + patient.getFireLoss(), "splinted" = splinted)
+	var/injector = istype(tool, /obj/item/reagent_container/hypospray) && patient.clash_heal_pool >= CLASH_HEAL_INJECT_POOL && tool.reagents && (tool.reagents.has_reagent("bicaridine") || tool.reagents.has_reagent("kelotane") || tool.reagents.has_reagent("tricordrazine") || tool.reagents.has_reagent("meralyne") || tool.reagents.has_reagent("dermaline"))
+	return list("damage" = patient.getBruteLoss() + patient.getFireLoss(), "splinted" = splinted, "injector" = injector)
 
-/proc/clash_care_settle(mob/living/carbon/human/patient, mob/living/carbon/human/medic, list/before)
+/proc/clash_care_settle(mob/living/carbon/human/patient, mob/living/carbon/human/medic, list/before, result)
 	if(!before || QDELETED(patient) || QDELETED(medic))
+		return
+	if(before["injector"] && result)
+		patient.clash_heal_pool -= CLASH_HEAL_INJECT_POOL
+		clash_award_support_xp(medic, CLASH_XP_INJECT, CLASH_XP_SOURCE_HEALING, CLASH_XP_SOURCE_HEALING, CLASH_XP_MEDICAL_CAP)
 		return
 	var/healed = min(before["damage"] - (patient.getBruteLoss() + patient.getFireLoss()), patient.clash_heal_pool)
 	if(healed > 0)
@@ -336,86 +341,42 @@
 		limb.clash_splint_paid = TRUE
 		clash_award_support_xp(medic, CLASH_XP_SPLINT, CLASH_XP_SOURCE_SPLINT, CLASH_XP_SOURCE_HEALING, CLASH_XP_MEDICAL_CAP)
 
-/obj/item/stack/medical/bruise_pack/attack(mob/living/carbon/M, mob/user)
-	var/list/before = clash_care_snapshot(M, user)
-	. = ..()
-	clash_care_settle(M, user, before)
-
-/obj/item/stack/medical/ointment/attack(mob/living/carbon/M, mob/user)
-	var/list/before = clash_care_snapshot(M, user)
-	. = ..()
-	clash_care_settle(M, user, before)
-
-/obj/item/stack/medical/advanced/bruise_pack/attack(mob/living/carbon/M, mob/user)
-	var/list/before = clash_care_snapshot(M, user)
-	. = ..()
-	clash_care_settle(M, user, before)
-
-/obj/item/stack/medical/advanced/ointment/attack(mob/living/carbon/M, mob/user)
-	var/list/before = clash_care_snapshot(M, user)
-	. = ..()
-	clash_care_settle(M, user, before)
-
-/obj/item/stack/medical/splint/attack(mob/living/carbon/M, mob/user)
-	var/list/before = clash_care_snapshot(M, user)
-	. = ..()
-	clash_care_settle(M, user, before)
-
-/obj/item/reagent_container/hypospray/attack(mob/living/M, mob/living/user)
-	var/mob/living/carbon/human/patient = M
-	var/healing = clash_care_snapshot(patient, user) && patient.clash_heal_pool >= CLASH_HEAL_INJECT_POOL && reagents && (reagents.has_reagent("bicaridine") || reagents.has_reagent("kelotane") || reagents.has_reagent("tricordrazine") || reagents.has_reagent("meralyne") || reagents.has_reagent("dermaline"))
-	. = ..()
-	if(!. || !healing || QDELETED(patient))
-		return
-	patient.clash_heal_pool -= CLASH_HEAL_INJECT_POOL
-	clash_award_support_xp(user, CLASH_XP_INJECT, CLASH_XP_SOURCE_HEALING, CLASH_XP_SOURCE_HEALING, CLASH_XP_MEDICAL_CAP)
-
 /proc/clash_progress_surgery(mob/living/carbon/human/patient, mob/living/carbon/human/user)
 	if(!clash_care_snapshot(patient, user) || patient.clash_surgery_xp >= CLASH_XP_SURGERY_PATIENT_CAP)
 		return
 	patient.clash_surgery_xp += CLASH_XP_SURGERY
 	clash_award_support_xp(user, CLASH_XP_SURGERY, CLASH_XP_SOURCE_SURGERY, CLASH_XP_SOURCE_HEALING, CLASH_XP_MEDICAL_CAP)
 
-/obj/structure/barricade/Initialize(mapload, mob/user)
-	. = ..()
-	var/mob/living/carbon/human/builder = user
+/proc/clash_note_barricade_builder(obj/structure/barricade/barricade, mob/living/carbon/human/builder)
 	if(!ishuman(builder) || builder.statistic_exempt || !(builder.mind?.ckey || builder.ckey) || GLOB.clash_job_classes[builder.job] != CLASH_CLASS_ENGINEER)
 		return
-	clash_builder_ckey = builder.mind?.ckey || builder.ckey
-	clash_builder_faction = builder.faction
+	barricade.clash_builder_ckey = builder.mind?.ckey || builder.ckey
+	barricade.clash_builder_faction = builder.faction
 
-/obj/structure/barricade/proc/clash_absorbed(mob/attacker, damage)
-	if(!clash_builder_ckey || damage <= 0)
+/proc/clash_barricade_absorbed(obj/structure/barricade/barricade, attacker, damage)
+	if(istype(attacker, /datum/cause_data))
+		var/datum/cause_data/cause = attacker
+		attacker = cause.resolve_mob()
+	damage = min(damage, barricade.health)
+	if(!barricade.clash_builder_ckey || damage <= 0)
 		return
-	var/share = clash_enemy_share(attacker, clash_builder_faction, damage)
+	var/share = clash_enemy_share(attacker, barricade.clash_builder_faction, damage)
 	if(share <= 0)
 		return
-	clash_enemy_damage += share
-	clash_cover_carry += share
-	var/xp = round(clash_cover_carry / CLASH_XP_COVER_DAMAGE)
-	clash_cover_carry -= xp * CLASH_XP_COVER_DAMAGE
-	clash_grant_support_xp(clash_builder_ckey, clash_builder_faction, CLASH_CLASS_ENGINEER, xp, CLASH_XP_SOURCE_COVER, CLASH_XP_SOURCE_COVER, CLASH_XP_ENGINEERING_CAP)
+	barricade.clash_enemy_damage += share
+	barricade.clash_cover_carry += share
+	var/xp = round(barricade.clash_cover_carry / CLASH_XP_COVER_DAMAGE)
+	barricade.clash_cover_carry -= xp * CLASH_XP_COVER_DAMAGE
+	clash_grant_support_xp(barricade.clash_builder_ckey, barricade.clash_builder_faction, CLASH_CLASS_ENGINEER, xp, CLASH_XP_SOURCE_COVER, CLASH_XP_SOURCE_COVER, CLASH_XP_ENGINEERING_CAP)
 
-/obj/structure/barricade/bullet_act(obj/projectile/bullet)
-	var/before = health
-	. = ..()
-	clash_absorbed(bullet.firer, before - max(health, 0))
-
-/obj/structure/barricade/ex_act(severity, direction, datum/cause_data/cause_data)
-	var/before = health
-	. = ..()
-	clash_absorbed(cause_data?.resolve_mob(), before - max(health, 0))
-
-/obj/structure/barricade/update_health(damage, nomessage)
+/proc/clash_barricade_repaired(obj/structure/barricade/barricade, damage)
 	var/mob/living/carbon/human/repairer = usr
-	var/before = health
-	. = ..()
-	if(damage >= 0 || clash_enemy_damage <= 0 || !ishuman(repairer) || repairer.faction != clash_builder_faction || GLOB.clash_job_classes[repairer.job] != CLASH_CLASS_ENGINEER)
+	if(damage >= 0 || barricade.clash_enemy_damage <= 0 || !ishuman(repairer) || repairer.faction != barricade.clash_builder_faction || GLOB.clash_job_classes[repairer.job] != CLASH_CLASS_ENGINEER)
 		return
-	var/repaired = min(health - before, clash_enemy_damage)
+	var/repaired = min(-damage, barricade.maxhealth - barricade.health, barricade.clash_enemy_damage)
 	if(repaired <= 0)
 		return
-	clash_enemy_damage -= repaired
+	barricade.clash_enemy_damage -= repaired
 	repairer.clash_repair_carry += repaired
 	var/xp = round(repairer.clash_repair_carry / CLASH_XP_REPAIR_HP)
 	repairer.clash_repair_carry -= xp * CLASH_XP_REPAIR_HP

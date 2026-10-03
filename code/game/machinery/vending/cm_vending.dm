@@ -503,7 +503,9 @@ GLOBAL_LIST_EMPTY(vending_products)
 
 /obj/structure/machinery/cm_vending/ui_data(mob/user)
 	if(vend_flags & VEND_LIMITED_INVENTORY)
-		return vendor_inventory_ui_data(user)
+		. = vendor_inventory_ui_data(user)
+		clash_block_vendor_listing(src, user, .)
+		return
 
 	. = list()
 	var/list/ui_listed_products = get_available_products(user)
@@ -541,6 +543,7 @@ GLOBAL_LIST_EMPTY(vending_products)
 	.["stock_listing"] = stock_values
 	.["current_m_points"] = points
 	add_clash_vendor_data(user, .)
+	clash_block_vendor_listing(src, user, .)
 
 /obj/structure/machinery/cm_vending/ui_act(action, list/params, datum/tgui/ui, datum/ui_state/state)
 	. = ..()
@@ -661,6 +664,7 @@ GLOBAL_LIST_EMPTY(vending_products)
 					vend_fail()
 					return TRUE // one left and the player spam click during a lagspike.
 
+			clash_vendor_trial_taken(user, itemspec)
 			vendor_successful_vend(itemspec, user)
 			return TRUE
 	add_fingerprint(user)
@@ -1406,6 +1410,7 @@ GLOBAL_LIST_INIT(cm_vending_gear_corresponding_types_list, list(
 		var/last_index = LAZYLEN(.)
 		var/last_category = .[last_index]
 		last_category["items"] += list(display_item)
+	clash_label_vendor_products(src, user, .)
 
 /obj/structure/machinery/cm_vending/proc/vendor_inventory_ui_data(mob/user)
 	. = list()

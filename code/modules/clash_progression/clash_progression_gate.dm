@@ -415,33 +415,29 @@ GLOBAL_VAR_INIT(clash_trial_packs_built, FALSE)
 	to_chat(user, SPAN_WARNING("[itemspec[1]] is locked. [lock_text]."))
 	return TRUE
 
-/obj/structure/machinery/cm_vending/vendor_user_inventory_list(mob/user, cost_index = 2, priority_index = 5)
-	. = ..()
+/proc/clash_label_vendor_products(obj/structure/machinery/cm_vending/vendor, mob/living/carbon/human/user, list/categories)
 	if(!ishuman(user) || !clash_progression_gating())
 		return
-	var/list/products = get_available_products(user)
-	for(var/list/category as anything in .)
+	var/list/products = vendor.get_available_products(user)
+	for(var/list/category as anything in categories)
 		for(var/list/display_item as anything in category["items"])
 			var/list/itemspec = products[display_item["prod_index"]]
 			var/label = clash_vendor_label(user, itemspec[3])
 			if(label)
 				display_item["prod_name"] = "[display_item["prod_name"]] ([label])"
 
-/obj/structure/machinery/cm_vending/ui_data(mob/user)
-	. = ..()
-	var/list/listing = .["stock_listing"]
+/proc/clash_block_vendor_listing(obj/structure/machinery/cm_vending/vendor, mob/living/carbon/human/user, list/data)
+	var/list/listing = data["stock_listing"]
 	if(!listing || !ishuman(user) || !clash_progression_gating())
 		return
-	var/list/products = get_available_products(user)
+	var/list/products = vendor.get_available_products(user)
 	for(var/index in 1 to min(length(listing), length(products)))
 		var/list/itemspec = products[index]
 		if(clash_vendor_blocked(user, itemspec[3]))
-			listing[index] = (vend_flags & VEND_LIMITED_INVENTORY) ? 0 : FALSE
+			listing[index] = (vendor.vend_flags & VEND_LIMITED_INVENTORY) ? 0 : FALSE
 
-/obj/structure/machinery/cm_vending/vendor_successful_vend(list/itemspec, mob/living/carbon/human/user, turf/override_turf)
-	var/trial = !(stat & IN_USE) && LAZYLEN(itemspec) && clash_vendor_lock_text(user, itemspec[3])
-	. = ..()
-	if(!trial)
+/proc/clash_vendor_trial_taken(mob/living/carbon/human/user, list/itemspec)
+	if(!clash_vendor_lock_text(user, itemspec[3]))
 		return
 	var/key = clash_trial_key(user.faction, itemspec[3])
 	GLOB.clash_trials_used[key] = (GLOB.clash_trials_used[key] || 0) + 1
@@ -496,27 +492,27 @@ GLOBAL_VAR_INIT(clash_trial_packs_built, FALSE)
 			pack.contains = kept
 			GLOB.clash_trial_packs[pack] = FALSE
 
-/obj/structure/machinery/computer/supply/is_buyable(datum/supply_packs/supply_pack)
-	. = ..()
-	if(!. || !clash_progression_gating())
+/proc/clash_supply_pack_allowed(datum/supply_packs/supply_pack)
+	if(!clash_progression_gating())
+		return TRUE
+	clash_build_trial_packs()
+	return !GLOB.clash_trial_packs[supply_pack]
+
+/proc/clash_trim_trial_order(datum/supply_order/order)
+	if(!clash_progression_gating())
 		return
 	clash_build_trial_packs()
-	if(GLOB.clash_trial_packs[supply_pack])
-		return FALSE
+	var/list/seen = list()
+	for(var/datum/supply_packs/pack as anything in order.objects.Copy())
+		if(!(pack in GLOB.clash_trial_packs))
+			continue
+		if(pack in seen)
+			order.objects -= pack
+		seen += pack
 
-/datum/supply_order/buy(obj/structure/machinery/computer/supply/asrs/buyer, mob/user)
-	if(clash_progression_gating())
-		clash_build_trial_packs()
-		var/list/seen = list()
-		for(var/datum/supply_packs/pack as anything in objects.Copy())
-			if(!(pack in GLOB.clash_trial_packs))
-				continue
-			if(pack in seen)
-				objects -= pack
-			seen += pack
-	. = ..()
-	if(!clash_progression_gating() || !(src in buyer.linked_supply_controller.shoppinglist))
+/proc/clash_mark_trial_packs(list/ordered)
+	if(!clash_progression_gating())
 		return
-	for(var/datum/supply_packs/pack as anything in objects)
+	for(var/datum/supply_packs/pack as anything in ordered)
 		if(pack in GLOB.clash_trial_packs)
 			GLOB.clash_trial_packs[pack] = TRUE

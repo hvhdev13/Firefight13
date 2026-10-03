@@ -47,6 +47,7 @@
 
 /obj/structure/barricade/Initialize(mapload, mob/user)
 	. = ..()
+	clash_note_barricade_builder(src, user)
 	if(health != maxhealth) //Update cades mapped with a custom health
 		update_health(0, TRUE)
 	if(user)
@@ -317,6 +318,7 @@
 	else if(bullet.ammo.flags_ammo_behavior & AMMO_ANTISTRUCT)
 		take_damage(bullet.damage * ANTISTRUCT_DMG_MULT_BARRICADES)
 
+	clash_barricade_absorbed(src, bullet.firer, bullet.damage)
 	take_damage(bullet.damage)
 
 	return TRUE
@@ -352,6 +354,7 @@
 		deconstruct(FALSE)
 		create_shrapnel(location, rand(2,5), direction, , /datum/ammo/bullet/shrapnel/light, cause_data)
 	else
+		clash_barricade_absorbed(src, cause_data, floor(severity * explosive_multiplier))
 		update_health(floor(severity * explosive_multiplier))
 
 /obj/structure/barricade/get_explosion_resistance(direction)
@@ -398,6 +401,7 @@
 	take_damage(damage * burn_multiplier)
 
 /obj/structure/barricade/update_health(damage, nomessage)
+	clash_barricade_repaired(src, damage)
 	health -= damage
 	health = clamp(health, 0, maxhealth)
 

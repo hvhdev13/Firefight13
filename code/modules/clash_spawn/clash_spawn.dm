@@ -13,6 +13,7 @@ SUBSYSTEM_DEF(clash_spawn)
 	flags = SS_NO_FIRE
 
 /datum/controller/subsystem/clash_spawn/Initialize()
+	GLOB.join_motd = file2text("strings/hvh_motd.txt")
 	RegisterSignal(SSdcs, COMSIG_GLOB_MOB_LOGGED_IN, PROC_REF(on_mob_logged_in))
 	RegisterSignal(SSdcs, COMSIG_GLOB_MODE_PREGAME_LOBBY, PROC_REF(fill_missing_spawns))
 	return SS_INIT_SUCCESS
