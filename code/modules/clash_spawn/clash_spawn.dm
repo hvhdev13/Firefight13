@@ -57,6 +57,7 @@ SUBSYSTEM_DEF(clash_spawn)
 		clash_raise_vendor_points(spawned, spawned.ckey, spawned.job)
 	spawned.clash_spawn_points = list(spawned.vendor_points, spawned.vendor_snowflake_points)
 	clash_progress_join(spawned)
+	spawned.AddElement(/datum/element/clash_iff)
 	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
 	if(istype(clash_mode) && clash_mode.spawn_protection)
 		spawned.AddComponent(/datum/component/clash_spawn_guard, clash_mode.spawn_protection)

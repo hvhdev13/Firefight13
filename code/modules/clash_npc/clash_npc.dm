@@ -129,6 +129,7 @@ GLOBAL_VAR(clash_bot_respawn_delay)
 	npc.AddElement(/datum/element/clash_hit_flinch)
 	npc.AddElement(/datum/element/clash_combat_log)
 	npc.AddElement(/datum/element/clash_suppression)
+	npc.AddElement(/datum/element/clash_iff)
 	npc.setDir(dir)
 	npc.real_name = "[npc.real_name] \[BOT\]"
 	npc.name = npc.real_name

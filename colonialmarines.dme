@@ -1729,6 +1729,7 @@
 #include "code\modules\clash_hit\clash_combat_log.dm"
 #include "code\modules\clash_hit\clash_hit_effects.dm"
 #include "code\modules\clash_hit\clash_hit_flinch.dm"
+#include "code\modules\clash_hit\clash_iff.dm"
 #include "code\modules\clash_hit\clash_suppression.dm"
 #include "code\modules\clash_kit\_clash_kit_catalog.dm"
 #include "code\modules\clash_kit\clash_kit.dm"
