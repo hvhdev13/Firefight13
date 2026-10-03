@@ -69,6 +69,15 @@ GLOBAL_LIST_EMPTY(clash_respawn_button_icons)
 	var/shown_seconds
 	var/shown_step
 	var/counted_down = FALSE
+	var/shown_revivable
+
+/proc/clash_revivable_body(mob/viewer)
+	if(isobserver(viewer))
+		return viewer.get_revivable_body()
+	var/mob/living/carbon/human/body = viewer
+	if(istype(body) && body.stat == DEAD && body.check_tod() && body.is_revivable())
+		return body
+	return null
 
 /proc/clash_can_redeploy(mob/viewer)
 	if(isobserver(viewer))
@@ -87,11 +96,21 @@ GLOBAL_LIST_EMPTY(clash_respawn_button_icons)
 		state = null
 		hovered = FALSE
 		counted_down = FALSE
+		shown_revivable = null
+		overlays.Cut()
 		return
 	if(!alpha)
 		pixel_y = -8
 		animate(src, alpha = 255, pixel_y = 0, time = 3, easing = CUBIC_EASING|EASE_OUT)
 	mouse_opacity = MOUSE_OPACITY_OPAQUE
+	var/revivable = !!clash_revivable_body(viewer)
+	if(revivable != shown_revivable)
+		shown_revivable = revivable
+		overlays.Cut()
+		if(revivable)
+			var/mutable_appearance/status = clash_score_text("<span style='font-family: \"Small Fonts\"; font-size: 6px; text-align: center; color: #9fc9a4; -dm-text-outline: 1px black'>STATUS: REVIVABLE</span>", 0, -14, RESPAWN_BUTTON_WIDTH, 12)
+			status.appearance_flags &= ~RESET_ALPHA
+			overlays += status
 	var/cooldown = clash_respawn_cooldown()
 	var/remaining = clash_respawn_wait(viewer)
 	if(remaining > 0)

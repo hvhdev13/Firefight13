@@ -1,8 +1,7 @@
 #define CLASH_TOAST_QUEUE_MAX 3
 #define CLASH_TOAST_IN (3 DECISECONDS)
 #define CLASH_TOAST_OUT (5 DECISECONDS)
-#define CLASH_TOAST_HOLD (4 SECONDS)
-#define CLASH_BANNER_HOLD (6 SECONDS)
+#define CLASH_TOAST_HOLD (4.2 SECONDS)
 #define CLASH_FEED_LIFETIME (2 SECONDS)
 #define CLASH_FEED_LINES 4
 
@@ -75,12 +74,16 @@ GLOBAL_LIST_EMPTY(clash_toast_icons)
 	else
 		lines += "<span style='font-family: \"Small Fonts\"; font-size: 6px; color: #e8ecef'>[html_encode(entry["name"])]</span>"
 		lines += "<span style='font-family: \"Small Fonts\"; font-size: 6px; color: #aab2b9'>[html_encode(entry["source"])]</span>"
-	overlays += clash_score_text("<span style='[outline]; text-align: left; vertical-align: middle'>[lines.Join("<br>")]</span>", text_x, 2, width - text_x - 4, height - 4)
+	var/mutable_appearance/text = clash_score_text("<span style='[outline]; text-align: left; vertical-align: middle'>[lines.Join("<br>")]</span>", text_x, 2, width - text_x - 4, height - 4)
+	text.appearance_flags &= ~RESET_ALPHA
+	overlays += text
 	var/item_type = entry["icon"]
 	if(!style["strip"] && ispath(item_type, /atom))
 		var/atom/sprite_type = item_type
 		var/mutable_appearance/sprite = mutable_appearance(initial(sprite_type.icon), initial(sprite_type.icon_state))
-		overlays += clash_death_card_picture(sprite, world.icon_size, world.icon_size, 7 + (height - 8) / 2, height / 2, style["banner"] ? 2 : 1, height - 8)
+		var/mutable_appearance/picture = clash_death_card_picture(sprite, world.icon_size, world.icon_size, 7 + (height - 8) / 2, height / 2, style["banner"] ? 2 : 1, height - 8)
+		picture.appearance_flags &= ~RESET_ALPHA
+		overlays += picture
 	animate(src)
 	pixel_y = 16
 	alpha = 0
@@ -136,9 +139,8 @@ GLOBAL_LIST_EMPTY(clash_toast_icons)
 	if(!(player.clash_toast in player.screen))
 		player.screen += player.clash_toast
 	player.clash_toast.show(entry)
-	var/list/style = GLOB.clash_unlock_styles[entry["kind"]]
-	playsound_client(player, style["sound"], null, 50)
-	addtimer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(clash_hide_toast), ckey), CLASH_TOAST_IN + (style["banner"] ? CLASH_BANNER_HOLD : CLASH_TOAST_HOLD))
+	playsound_client(player, GLOB.clash_unlock_styles[entry["kind"]]["sound"], null, 50)
+	addtimer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(clash_hide_toast), ckey), CLASH_TOAST_IN + CLASH_TOAST_HOLD)
 
 /proc/clash_hide_toast(ckey)
 	var/client/player = GLOB.directory[ckey]
@@ -200,6 +202,5 @@ GLOBAL_LIST_EMPTY(clash_toast_icons)
 #undef CLASH_TOAST_IN
 #undef CLASH_TOAST_OUT
 #undef CLASH_TOAST_HOLD
-#undef CLASH_BANNER_HOLD
 #undef CLASH_FEED_LIFETIME
 #undef CLASH_FEED_LINES

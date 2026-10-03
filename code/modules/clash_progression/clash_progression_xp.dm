@@ -117,7 +117,7 @@
 		var/kind = CLASH_UNLOCK_COSMETIC
 		if(ispath(rung[2], /obj/item/weapon/gun))
 			kind = CLASH_UNLOCK_GUN
-		else if(ispath(rung[2], /obj/item/explosive/grenade))
+		else if(ispath(rung[2], /obj/item/explosive/grenade) || ispath(rung[2], /obj/item/clothing/head/helmet) || ispath(rung[2], /obj/item/clothing/suit) || ispath(rung[2], /obj/item/clothing/accessory/storage) || ispath(rung[2], /obj/item/clothing/mask/gas))
 			kind = CLASH_UNLOCK_GEAR
 		else if(ispath(rung[2], /obj/item/storage))
 			kind = CLASH_UNLOCK_CARRIER
@@ -268,6 +268,7 @@
 		progress.short_side = spawned.faction
 
 /mob/living/carbon/human/var/clash_heal_pool = 0
+/mob/living/carbon/human/var/clash_enemy_hurt = FALSE
 /mob/living/carbon/human/var/clash_surgery_xp = 0
 /mob/living/carbon/human/var/clash_heal_carry = 0
 /mob/living/carbon/human/var/clash_repair_carry = 0
@@ -313,23 +314,31 @@
 		if(leader != killer && leader.stat == CONSCIOUS && leader.faction == killer.faction && GLOB.clash_job_classes[leader.job] == CLASH_CLASS_LEADER)
 			clash_award_xp(leader, CLASH_XP_LEADER_ASSIST, CLASH_XP_SOURCE_LEADER)
 
+/proc/clash_hurt_by_enemy(mob/living/carbon/human/patient)
+	if(!patient.clash_enemy_hurt && (patient.clash_heal_pool > 0 || clash_enemy_share(patient.last_damage_data?.resolve_mob(), patient.faction, 1)))
+		patient.clash_enemy_hurt = TRUE
+	return patient.clash_enemy_hurt
+
 /proc/clash_care_snapshot(mob/living/carbon/human/patient, mob/living/carbon/human/medic, obj/item/tool)
-	if(!ishuman(patient) || !ishuman(medic) || patient == medic || patient.faction != medic.faction || patient.clash_heal_pool <= 0)
+	if(!ishuman(patient) || !ishuman(medic) || patient == medic || patient.faction != medic.faction || !clash_hurt_by_enemy(patient))
 		return null
 	var/list/splinted = list()
 	for(var/obj/limb/limb as anything in patient.limbs)
 		if(limb.status & LIMB_SPLINTED)
 			splinted += limb
-	var/injector = istype(tool, /obj/item/reagent_container/hypospray) && patient.clash_heal_pool >= CLASH_HEAL_INJECT_POOL && tool.reagents && (tool.reagents.has_reagent("bicaridine") || tool.reagents.has_reagent("kelotane") || tool.reagents.has_reagent("tricordrazine") || tool.reagents.has_reagent("meralyne") || tool.reagents.has_reagent("dermaline"))
-	return list("damage" = patient.getBruteLoss() + patient.getFireLoss(), "splinted" = splinted, "injector" = injector)
+	var/obj/item/stack/medical/kit = istype(tool, /obj/item/stack/medical) && !istype(tool, /obj/item/stack/medical/splint) ? tool : null
+	var/injector = istype(tool, /obj/item/reagent_container/hypospray) && patient.health < patient.maxHealth
+	return list("damage" = patient.getBruteLoss() + patient.getFireLoss(), "splinted" = splinted, "injector" = injector, "kit" = kit, "kit_amount" = kit?.amount)
 
 /proc/clash_care_settle(mob/living/carbon/human/patient, mob/living/carbon/human/medic, list/before, result)
 	if(!before || QDELETED(patient) || QDELETED(medic))
 		return
 	if(before["injector"] && result)
-		patient.clash_heal_pool -= CLASH_HEAL_INJECT_POOL
 		clash_award_support_xp(medic, CLASH_XP_INJECT, CLASH_XP_SOURCE_HEALING, CLASH_XP_SOURCE_HEALING, CLASH_XP_MEDICAL_CAP)
 		return
+	var/obj/item/stack/medical/kit = before["kit"]
+	if(kit && (QDELETED(kit) || kit.amount < before["kit_amount"]))
+		clash_award_support_xp(medic, CLASH_XP_TREAT, CLASH_XP_SOURCE_HEALING, CLASH_XP_SOURCE_HEALING, CLASH_XP_MEDICAL_CAP)
 	var/healed = min(before["damage"] - (patient.getBruteLoss() + patient.getFireLoss()), patient.clash_heal_pool)
 	if(healed > 0)
 		patient.clash_heal_pool -= healed
