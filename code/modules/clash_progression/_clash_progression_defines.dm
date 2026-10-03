@@ -14,6 +14,7 @@
 #define CLASH_XP_ZONE_SECONDS 5
 #define CLASH_XP_MATCH_WIN 500
 #define CLASH_XP_ROUND 250
+#define CLASH_XP_ROUND_WIN 1000
 #define CLASH_XP_BOT_KILL 25
 #define CLASH_SHORT_SIDE_BONUS 1.25
 
@@ -68,6 +69,7 @@
 #define CLASH_XP_SOURCE_ZONE "Zone"
 #define CLASH_XP_SOURCE_MATCH_WIN "Match win"
 #define CLASH_XP_SOURCE_ROUND "Round"
+#define CLASH_XP_SOURCE_ROUND_WIN "Round win"
 #define CLASH_XP_SOURCE_BOT_KILL "Bot kill"
 #define CLASH_XP_SOURCE_HEALING "Healing"
 #define CLASH_XP_SOURCE_SPLINT "Splint"

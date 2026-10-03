@@ -234,10 +234,18 @@
 /proc/clash_progress_round_end()
 	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
 	if(!clash_mode.admin_tampered)
+		var/winner
+		switch(clash_mode.round_finished)
+			if(MODE_INFESTATION_M_MAJOR, MODE_INFESTATION_M_MINOR)
+				winner = FACTION_MARINE
+			if(MODE_FACTION_CLASH_UPP_MAJOR, MODE_FACTION_CLASH_UPP_MINOR)
+				winner = FACTION_UPP
 		for(var/ckey in GLOB.clash_progress.players)
 			var/datum/clash_progress/progress = GLOB.clash_progress.players[ckey]
 			if(progress.side && GLOB.directory[ckey])
 				clash_grant_xp(ckey, progress.side, progress.class_id, CLASH_XP_ROUND, CLASH_XP_SOURCE_ROUND)
+				if(progress.side == winner)
+					clash_grant_xp(ckey, winner, progress.class_id, CLASH_XP_ROUND_WIN, CLASH_XP_SOURCE_ROUND_WIN)
 	GLOB.clash_progress.save_dirty()
 	if(clash_progression_active())
 		GLOB.clash_xp_boost.round_ended()
