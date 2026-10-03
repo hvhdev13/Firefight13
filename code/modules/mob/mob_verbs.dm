@@ -167,7 +167,8 @@
 	if(MODE_HAS_FLAG(MODE_FACTION_CLASH))
 		log_debug("HVH: respawn allowed for [key_name(usr)]")
 
-	to_chat(usr, SPAN_NOTICE("<B>Make sure to play a different character, and please roleplay correctly!</B>"))
+	if(!MODE_HAS_FLAG(MODE_FACTION_CLASH))
+		to_chat(usr, SPAN_NOTICE("<B>Make sure to play a different character, and please roleplay correctly!</B>"))
 
 	if(!client)
 		log_game("[usr.key] AM failed due to disconnect.")
