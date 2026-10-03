@@ -44,7 +44,7 @@
 	var/datum/clash_progress/progress = clash_progress_of(ckey)
 	if(!progress)
 		return
-	amount *= GLOB.clash_progression_settings["xp_multiplier"]
+	amount *= GLOB.clash_progression_settings["xp_multiplier"] * GLOB.clash_xp_boost.current()
 	var/bonus = progress.short_side == faction ? round(amount * (CLASH_SHORT_SIDE_BONUS - 1), 1) : 0
 	amount = round(amount, 1)
 	if(amount + bonus <= 0)
@@ -239,6 +239,8 @@
 			if(progress.side && GLOB.directory[ckey])
 				clash_grant_xp(ckey, progress.side, progress.class_id, CLASH_XP_ROUND, CLASH_XP_SOURCE_ROUND)
 	GLOB.clash_progress.save_dirty()
+	if(clash_progression_active())
+		GLOB.clash_xp_boost.round_ended()
 
 /proc/clash_progress_join(mob/living/carbon/human/spawned)
 	if(!clash_progression_active())
@@ -248,6 +250,7 @@
 		return
 	progress.side = spawned.faction
 	progress.class_id = GLOB.clash_job_classes[spawned.job]
+	GLOB.clash_xp_boost.greet(spawned)
 	if(!progress.start_levels[progress.side])
 		progress.start_levels[progress.side] = progress.faction_level(progress.side)
 	if(progress.class_id && !progress.start_levels[progress.class_id])

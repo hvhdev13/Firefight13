@@ -1,7 +1,9 @@
 import type { BooleanLike } from 'common/react';
+import { useState } from 'react';
 import { useBackend } from 'tgui/backend';
 import {
   Button,
+  Dropdown,
   Input,
   LabeledList,
   NoticeBox,
@@ -13,10 +15,21 @@ import { Window } from 'tgui/layouts';
 
 import type { CareerProgress } from './ClashStats';
 
+interface BoostData {
+  active: BooleanLike;
+  multiplier: number;
+  left: string | null;
+  started_by: string | null;
+  max: number;
+  max_hours: number;
+  max_rounds: number;
+}
+
 interface PanelData {
   enabled: BooleanLike;
   multiplier: number;
   bot_xp: BooleanLike;
+  boost: BoostData;
   ckey: string | null;
   progress: CareerProgress | null;
   max_multiplier: number;
@@ -143,6 +156,76 @@ const PlayerProgress = (props: { readonly progress: CareerProgress }) => {
   );
 };
 
+const XpBoost = () => {
+  const { act, data } = useBackend<PanelData>();
+  const { boost } = data;
+  const [multiplier, setMultiplier] = useState(2);
+  const [amount, setAmount] = useState(48);
+  const [unit, setUnit] = useState('hours');
+  return (
+    <Section
+      title="XP boost"
+      buttons={
+        !!boost.active && (
+          <Button color="bad" onClick={() => act('boost_end')}>
+            End boost
+          </Button>
+        )
+      }
+    >
+      {boost.active ? (
+        <NoticeBox success>
+          {boost.multiplier}x XP {boost.left}, started by {boost.started_by}.
+          Starting a new boost replaces it.
+        </NoticeBox>
+      ) : (
+        <NoticeBox>No boost is running.</NoticeBox>
+      )}
+      <LabeledList>
+        <LabeledList.Item label="Multiplier">
+          <NumberInput
+            width="4em"
+            step={0.25}
+            minValue={1.25}
+            maxValue={boost.max}
+            value={multiplier}
+            onChange={setMultiplier}
+          />
+          x
+        </LabeledList.Item>
+        <LabeledList.Item label="Runs for">
+          <NumberInput
+            width="4em"
+            step={1}
+            minValue={1}
+            maxValue={unit === 'rounds' ? boost.max_rounds : boost.max_hours}
+            value={amount}
+            onChange={setAmount}
+          />{' '}
+          <Dropdown
+            width="7em"
+            options={['hours', 'rounds']}
+            selected={unit}
+            onSelected={setUnit}
+          />
+        </LabeledList.Item>
+      </LabeledList>
+      <Button
+        mt={1}
+        icon="bolt"
+        onClick={() => act('boost_start', { multiplier, amount, unit })}
+      >
+        Start boost
+      </Button>
+      <NoticeBox mt={1} info>
+        Hours count real time, server restarts included. Rounds count arena
+        rounds that reach the end screen. The boost stacks with the XP
+        multiplier above and survives restarts.
+      </NoticeBox>
+    </Section>
+  );
+};
+
 export const ClashProgressionAdmin = () => {
   const { act, data } = useBackend<PanelData>();
   return (
@@ -181,6 +264,7 @@ export const ClashProgressionAdmin = () => {
           </LabeledList>
           <NoticeBox mt={1}>Settings reset when the server restarts.</NoticeBox>
         </Section>
+        <XpBoost />
         <Section title="Player">
           <Input
             fluid

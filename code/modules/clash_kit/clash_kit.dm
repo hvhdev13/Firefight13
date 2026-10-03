@@ -185,6 +185,9 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 		fresh = null
 	var/obj/item/storage/holder = clash_kit_storage_of(fresh)
 	for(var/obj/item/thing as anything in carried)
+		if(istype(thing, /obj/item/device/flashlight/flare) && !istype(holder, /obj/item/storage/pouch/flare))
+			qdel(thing)
+			continue
 		if(holder?.can_be_inserted(thing, wearer, TRUE) && holder.handle_item_insertion(thing, TRUE, wearer))
 			continue
 		if(!wearer.equip_to_appropriate_slot(thing))

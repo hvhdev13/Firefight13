@@ -4,7 +4,7 @@ GLOBAL_DATUM_INIT(clash_progression_admin, /datum/clash_progression_admin, new)
 
 /client/proc/clash_progression_panel()
 	set name = "Progression Panel"
-	set desc = "Look up and set player levels and XP, the XP multiplier, bot XP and the locks."
+	set desc = "Look up and set player levels and XP, the XP multiplier, XP boosts, bot XP and the locks."
 	set category = "Admin.Events"
 
 	if(!check_rights(R_EVENT))
@@ -32,6 +32,7 @@ GLOBAL_DATUM_INIT(clash_progression_admin, /datum/clash_progression_admin, new)
 		"enabled" = GLOB.clash_progression_settings["enabled"],
 		"multiplier" = GLOB.clash_progression_settings["xp_multiplier"],
 		"bot_xp" = GLOB.clash_progression_settings["bot_xp"],
+		"boost" = GLOB.clash_xp_boost.panel_data(),
 		"ckey" = ckey,
 		"progress" = ckey ? clash_career_progress(ckey) : null,
 	)
@@ -43,7 +44,7 @@ GLOBAL_DATUM_INIT(clash_progression_admin, /datum/clash_progression_admin, new)
 	var/mob/user = ui.user
 	if(!CLIENT_HAS_RIGHTS(user.client, R_EVENT))
 		return
-	var/note
+	var/note = GLOB.clash_xp_boost.admin_act(action, params, user)
 	switch(action)
 		if("lookup")
 			var/wanted = ckey(params["ckey"])

@@ -1745,6 +1745,7 @@
 #include "code\modules\clash_progression\_clash_progression_defines.dm"
 #include "code\modules\clash_progression\clash_progression.dm"
 #include "code\modules\clash_progression\clash_progression_admin.dm"
+#include "code\modules\clash_progression\clash_progression_boost.dm"
 #include "code\modules\clash_progression\clash_progression_gate.dm"
 #include "code\modules\clash_progression\clash_progression_ladders.dm"
 #include "code\modules\clash_progression\clash_progression_toast.dm"
