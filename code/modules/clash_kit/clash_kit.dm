@@ -222,7 +222,7 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 	var/obj/item/clothing/under/uniform = wearer.w_uniform
 	if(!uniform)
 		return
-	usr = null
+	usr = get_turf(wearer) ? null : wearer
 	var/obj/item/clothing/accessory/storage/wanted = item_type
 	var/wanted_slot = initial(wanted.worn_accessory_slot)
 	var/list/carried = list()
@@ -386,7 +386,6 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 	job = job || wearer.job
 	ckey = ckey || wearer.ckey
 	kit = clash_filter_kit(kit, ckey, job)
-	log_world("DBGAPPLY filtered primary=[kit.choices[KIT_SLOT_PRIMARY]] s_store=[wearer.s_store?.type] guns=[jointext(clash_dbg_guns(wearer), ",")]")
 	var/list/cosmetics = clash_cosmetic_paths(prefs || wearer.client?.prefs || GLOB.preferences_datums[wearer.ckey])
 	var/faction = wearer.faction
 	var/datum/clash_kit_option/primary = kit.get_option(KIT_SLOT_PRIMARY)
@@ -395,7 +394,6 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 		primary = null
 	if(sidearm?.faction != faction)
 		sidearm = null
-	log_world("DBGAPPLY faction primary=[primary?.item_type] s_store=[wearer.s_store?.type] guns=[jointext(clash_dbg_guns(wearer), ",")]")
 
 	var/list/base_outfit = GLOB.clash_kit_base_outfits[faction]
 	for(var/wear_slot in base_outfit)
@@ -427,7 +425,6 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 	if(webbing?.faction == faction)
 		clash_kit_fit_webbing(wearer, webbing.item_type, cosmetics)
 	clash_downgrade_locked_gear(wearer, ckey, job, cosmetics)
-	log_world("DBGAPPLY downgrade primary=[primary?.item_type] s_store=[wearer.s_store?.type] guns=[jointext(clash_dbg_guns(wearer), ",")]")
 
 	var/obj/item/weapon/gun/main_gun
 	if(primary)
@@ -452,7 +449,6 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 			clash_kit_hand_or_floor(wearer, side_gun)
 	if(primary || sidearm)
 		clash_kit_purge_stray_magazines(wearer)
-	log_world("DBGAPPLY guns primary=[primary?.item_type] s_store=[wearer.s_store?.type] guns=[jointext(clash_dbg_guns(wearer), ",")]")
 	var/datum/clash_kit_option/grenades = kit.get_option(KIT_SLOT_GRENADE)
 	if(grenades && grenades.faction == faction)
 		for(var/obj/item/explosive/grenade/issued in wearer.get_contents())
@@ -466,7 +462,6 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 	clash_strip_locked_attachments(wearer, ckey)
 	clash_strip_locked_grenades(wearer, ckey, job)
 	clash_kit_fill_ammo(wearer, kit, mode)
-	log_world("DBGAPPLY ammo primary=[primary?.item_type] s_store=[wearer.s_store?.type] guns=[jointext(clash_dbg_guns(wearer), ",")]")
 	. = stock_clash_kit(wearer, kit, job, mode, ckey)
 	wearer.regenerate_icons()
 
@@ -590,11 +585,5 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 		var/icon/gun_flat = primary && clash_trim_icon(getFlatIcon(primary))
 		. = list("doll" = flat ? icon2base64(flat) : null, "gun" = gun_flat ? icon2base64(gun_flat) : null, "pack" = describe_clash_kit_pack(model, kit, primary), "statuses" = statuses)
 	catch(var/exception/error)
-		stack_trace("Clash kit could not draw a [job] doll: [error] at [error.file]:[error.line]")
+		stack_trace("Clash kit could not draw a [job] doll: [error]")
 	qdel(model)
-
-
-/proc/clash_dbg_guns(mob/wearer)
-	. = list()
-	for(var/obj/item/weapon/gun/gun in wearer.get_contents())
-		. += "[gun.type]@[gun.loc]"

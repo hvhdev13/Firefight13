@@ -11,6 +11,7 @@ SUBSYSTEM_DEF(clash_hit_flinch)
 	if(ishuman(new_mob) && SSticker.mode && MODE_HAS_FLAG(MODE_FACTION_CLASH))
 		new_mob.AddElement(/datum/element/clash_hit_flinch)
 		new_mob.AddElement(/datum/element/clash_combat_log)
+		new_mob.AddElement(/datum/element/clash_suppression)
 
 /datum/element/clash_hit_flinch
 

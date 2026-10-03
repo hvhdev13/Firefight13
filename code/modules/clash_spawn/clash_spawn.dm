@@ -51,6 +51,8 @@ SUBSYSTEM_DEF(clash_spawn)
 		spawned.mind.clash_job = spawned.job
 	if(clash_fed_spawns())
 		spawned.nutrition = NUTRITION_NORMAL
+	if(spawned.faction == FACTION_UPP && !(spawned.job in list(JOB_UPP_MEDIC, JOB_UPP_LT_DOKTOR)))
+		spawned.skills?.set_skill(SKILL_MEDICAL, SKILL_MEDICAL_DEFAULT)
 	if(clash_uses_kits())
 		clash_raise_vendor_points(spawned, spawned.ckey, spawned.job)
 	spawned.clash_spawn_points = list(spawned.vendor_points, spawned.vendor_snowflake_points)

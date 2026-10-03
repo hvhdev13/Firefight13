@@ -95,6 +95,9 @@ GLOBAL_LIST_EMPTY(clash_toast_icons)
 		return
 	var/list/style = GLOB.clash_unlock_styles[kind]
 	progress.unlocked_round += list(list("header" = style["header"], "name" = name, "source" = source_text, "color" = style["color"]))
+	var/datum/clash_kit_screen/screen = GLOB.clash_kit_screens[ckey]
+	if(screen)
+		SStgui.update_uis(screen)
 	var/client/player = GLOB.directory[ckey]
 	if(!player)
 		return
@@ -161,6 +164,7 @@ GLOBAL_LIST_EMPTY(clash_toast_icons)
 	var/client/player = GLOB.directory[ckey]
 	if(!player)
 		return
+	to_chat(player, "<span style='color: #f2d36b'>+[amount] XP: [source]</span>")
 	player.clash_feed_lines += list(list("text" = "+[amount] [source]", "expiry" = world.time + CLASH_FEED_LIFETIME))
 	if(length(player.clash_feed_lines) > CLASH_FEED_LINES)
 		player.clash_feed_lines.Cut(1, 2)
