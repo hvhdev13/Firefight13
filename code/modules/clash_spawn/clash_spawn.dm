@@ -109,7 +109,7 @@ SUBSYSTEM_DEF(clash_spawn)
 	page += "button{background:#2d5a9e;color:#fff;border:0;padding:6px 18px;font-weight:bold;letter-spacing:1px;cursor:pointer}"
 	page += "button:hover{background:#3a6fc0}input.contact{width:100%;background:#1a1f25;color:#fff;border:1px solid #4a525c;padding:3px}"
 	page += "</style>"
-	page += "<div class='head'><h1>[istype(clash_mode) ? uppertext(clash_mode.name) : "WELCOME"]</h1><div class='sub'>USCM vs UPP. The server is being playtested and updated continuously.</div></div>"
+	page += "<div class='head'><h1>[istype(clash_mode) ? uppertext(clash_mode.name) : "WELCOME"]</h1><div class='sub'>Firefight13: USCM vs UPP. The server is being playtested and updated continuously.</div></div>"
 	page += "<div class='body'>"
 	page += "<h2>This round</h2><ul>"
 	if(istype(clash_mode))
@@ -135,7 +135,7 @@ SUBSYSTEM_DEF(clash_spawn)
 	page += "</div>"
 	page += "<div class='foot'><label><input type='checkbox' id='hide'> Do not show again</label>"
 	page += "<button onclick=\"location.href='byond://?src=[REF(src)];clash_welcome=1;hide=' + (document.getElementById('hide').checked ? 1 : 0)\">GOT IT</button></div>"
-	show_browser(viewer, page.Join(), "Welcome", "clash_welcome", width = 500, height = 560)
+	show_browser(viewer, page.Join(), "Welcome to Firefight13", "clash_welcome", width = 500, height = 560)
 
 /datum/controller/subsystem/clash_spawn/Topic(href, list/href_list)
 	if(!href_list["clash_welcome"] || !usr?.client)

@@ -1,0 +1,6 @@
+<h1>Welcome to Firefight13</h1>
+Human vs Human: USCM against UPP.
+<br>Arena modes: Team Deathmatch, King of the Hill, Domination and Capture the Flag. Best of 3 matches, pick a kit and deploy.
+<br>Faction Clash on the colony maps: 200 tickets a side, vendor loadouts.
+<br>Earn XP to unlock guns, roles, gear and attachments. Respawn is on a 40 second cooldown.
+<br>Vote the next mode and map at the end of each round.

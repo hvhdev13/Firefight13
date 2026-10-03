@@ -1,4 +1,4 @@
-<h1>Welcome to HvH Faction Clash.</h1>
+<h1>Welcome to Firefight13.</h1>
 
 Human vs Human Faction Clash. USCM against UPP.
 <br>Kills score for your side. 30 minute rounds, with a map vote at 25 minutes.
