@@ -25,6 +25,8 @@ SUBSYSTEM_DEF(clash_spawn)
 		if(length(GLOB.latejoin_by_squad[squad]))
 			uscm_base |= GLOB.latejoin_by_squad[squad]
 	var/list/bases = list(FACTION_MARINE = uscm_base, FACTION_UPP = GLOB.latejoin_by_job[JOB_UPP])
+	if(length(uscm_base) && !length(GLOB.latejoin_by_squad[SQUAD_MARINE_CRYO]))
+		GLOB.latejoin_by_squad[SQUAD_MARINE_CRYO] = uscm_base.Copy()
 	for(var/title in clash_role_list())
 		var/datum/job/role = GLOB.RoleAuthority.roles_by_name[title]
 		if(!role || (role.flags_startup_parameters & ROLE_ADD_TO_SQUAD))
@@ -57,6 +59,8 @@ SUBSYSTEM_DEF(clash_spawn)
 		clash_raise_vendor_points(spawned, spawned.ckey, spawned.job)
 	spawned.clash_spawn_points = list(spawned.vendor_points, spawned.vendor_snowflake_points)
 	clash_progress_join(spawned)
+	if(istype(SSticker.mode, /datum/game_mode/extended/faction_clash/hvh) && spawned.faction == FACTION_MARINE && spawned.assigned_squad && !(spawned.assigned_squad.name in list(SQUAD_MARINE_1, SQUAD_MARINE_2)))
+		INVOKE_ASYNC(GLOBAL_PROC, GLOBAL_PROC_REF(clash_move_to_arena_squad), spawned)
 	spawned.AddElement(/datum/element/clash_iff)
 	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
 	if(istype(clash_mode) && clash_mode.spawn_protection)
@@ -156,3 +160,14 @@ SUBSYSTEM_DEF(clash_spawn)
 	if(href_list["hide"] == "1" && usr.ckey)
 		var/savefile/save = new(clash_welcome_path(usr.ckey))
 		save["hide"] << TRUE
+
+/proc/clash_move_to_arena_squad(mob/living/carbon/human/fighter)
+	var/datum/squad/target
+	for(var/squad_name in list(SQUAD_MARINE_1, SQUAD_MARINE_2))
+		var/datum/squad/squad = get_squad_by_name(squad_name)
+		if(squad && (!target || length(squad.marines_list) < length(target.marines_list)))
+			target = squad
+	if(!target || QDELETED(fighter))
+		return
+	fighter.assigned_squad.remove_marine_from_squad(fighter)
+	target.put_marine_in_squad(fighter)

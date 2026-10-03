@@ -9,11 +9,23 @@
 #define RADAR_COLOR_BEVEL rgb(77, 86, 94)
 #define RADAR_COLOR_SHADOW rgb(21, 24, 27)
 #define RADAR_COLOR_TICK rgb(106, 116, 124)
+#define RADAR_TOGGLE_SIZE 11
 
 GLOBAL_VAR(clash_turn_sign)
 GLOBAL_DATUM(clash_radar_backdrop, /icon)
 GLOBAL_DATUM(clash_radar_sweep, /icon)
 GLOBAL_LIST_EMPTY(clash_radar_marks)
+GLOBAL_LIST_EMPTY(clash_radar_toggle_icons)
+
+/client/var/atom/movable/screen/clash_radar_toggle/clash_radar_toggle
+
+/atom/movable/screen/clash_radar_toggle
+	name = "Toggle radar"
+	icon = null
+	screen_loc = "LEFT:6,TOP:-134"
+	pixel_y = RADAR_SIZE - RADAR_TOGGLE_SIZE
+	mouse_opacity = MOUSE_OPACITY_OPAQUE
+	var/shown_on
 
 /proc/get_clash_turn_sign()
 	if(isnull(GLOB.clash_turn_sign))
@@ -263,17 +275,63 @@ GLOBAL_LIST_EMPTY(clash_radar_marks)
 /datum/game_mode/extended/faction_clash/hvh/proc/update_clash_radars()
 	for(var/mob/player as anything in GLOB.player_list)
 		var/atom/movable/screen/clash_radar/radar = player.hud_used?.clash_radar
+		var/mob/living/carbon/human/human_player = player
+		var/equipped = radar && ishuman(player) && player.stat != DEAD && human_player.w_uniform
+		var/datum/clash_progress/progress = GLOB.clash_progress.players[player.ckey]
+		var/radar_on = !progress || progress.radar
+		show_clash_radar_toggle(player.client, equipped, radar_on)
 		if(!radar)
 			continue
-		if(player.stat == DEAD || !ishuman(player))
-			radar.clear()
-			continue
-		var/mob/living/carbon/human/human_player = player
-		var/datum/clash_progress/progress = GLOB.clash_progress.players[player.ckey]
-		if(!human_player.w_uniform || (progress && !progress.radar))
+		if(!equipped || !radar_on)
 			radar.clear()
 			continue
 		radar.render(player)
+
+/proc/get_clash_radar_toggle_icon(radar_on)
+	var/key = radar_on ? "on" : "off"
+	if(GLOB.clash_radar_toggle_icons[key])
+		return GLOB.clash_radar_toggle_icons[key]
+	var/fill = rgb(14, 17, 21)
+	var/icon/button = icon('icons/effects/effects.dmi', "nothing")
+	button.Scale(RADAR_TOGGLE_SIZE, RADAR_TOGGLE_SIZE)
+	button.DrawBox(RADAR_COLOR_SHADOW, 1, 1, RADAR_TOGGLE_SIZE, RADAR_TOGGLE_SIZE)
+	button.DrawBox(fill, 2, 2, RADAR_TOGGLE_SIZE - 1, RADAR_TOGGLE_SIZE - 1)
+	button.DrawBox(RADAR_COLOR_BEVEL, 2, RADAR_TOGGLE_SIZE - 1, RADAR_TOGGLE_SIZE - 1, RADAR_TOGGLE_SIZE - 1)
+	if(radar_on)
+		button.DrawBox(RADAR_COLOR_TICK, 4, 4, RADAR_TOGGLE_SIZE - 3, 4)
+	else
+		button.DrawBox(RADAR_COLOR_TICK, 4, 4, RADAR_TOGGLE_SIZE - 3, RADAR_TOGGLE_SIZE - 3)
+		button.DrawBox(fill, 5, 5, RADAR_TOGGLE_SIZE - 4, RADAR_TOGGLE_SIZE - 4)
+	GLOB.clash_radar_toggle_icons[key] = button
+	return button
+
+/proc/show_clash_radar_toggle(client/player, shown, radar_on)
+	if(!player)
+		return
+	var/atom/movable/screen/clash_radar_toggle/button = player.clash_radar_toggle
+	if(!shown)
+		if(button)
+			player.remove_from_screen(button)
+		return
+	if(!button)
+		button = new
+		player.clash_radar_toggle = button
+	if(!(button in player.screen))
+		player.add_to_screen(button)
+	button.update(radar_on)
+
+/atom/movable/screen/clash_radar_toggle/proc/update(radar_on)
+	if(shown_on == radar_on)
+		return
+	shown_on = radar_on
+	icon = get_clash_radar_toggle_icon(radar_on)
+
+/atom/movable/screen/clash_radar_toggle/clicked(mob/user, list/mods)
+	user.clash_toggle_radar()
+	var/datum/clash_progress/progress = clash_progress_of(user.ckey)
+	if(progress)
+		update(progress.radar)
+	return TRUE
 
 #undef RADAR_SIZE
 #undef RADAR_RANGE
@@ -285,3 +343,4 @@ GLOBAL_LIST_EMPTY(clash_radar_marks)
 #undef RADAR_COLOR_BEVEL
 #undef RADAR_COLOR_SHADOW
 #undef RADAR_COLOR_TICK
+#undef RADAR_TOGGLE_SIZE

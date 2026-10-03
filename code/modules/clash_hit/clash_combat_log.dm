@@ -3,6 +3,7 @@
 
 /mob/var/clash_next_hit_sound = 0
 /mob/var/clash_revives_seen = 0
+/mob/living/carbon/human/var/datum/squad/clash_dead_squad
 
 /datum/element/clash_combat_log
 
@@ -53,10 +54,27 @@
 	SIGNAL_HANDLER
 	if(source.mind)
 		clash_track_player_corpse(source)
+	if(source.assigned_squad && istype(SSticker.mode, /datum/game_mode/extended/faction_clash/hvh))
+		INVOKE_ASYNC(GLOBAL_PROC, GLOBAL_PROC_REF(clash_free_squad_slot), source)
 
 /datum/element/clash_combat_log/proc/on_revived(mob/living/carbon/human/source)
 	SIGNAL_HANDLER
 	INVOKE_ASYNC(GLOBAL_PROC, GLOBAL_PROC_REF(clash_progress_revive), source)
+	if(source.clash_dead_squad)
+		INVOKE_ASYNC(GLOBAL_PROC, GLOBAL_PROC_REF(clash_restore_squad_slot), source)
+
+/proc/clash_free_squad_slot(mob/living/carbon/human/body)
+	var/datum/squad/squad = body.assigned_squad
+	if(!squad || body.stat != DEAD)
+		return
+	body.clash_dead_squad = squad
+	squad.forget_marine_in_squad(body)
+
+/proc/clash_restore_squad_slot(mob/living/carbon/human/body)
+	var/datum/squad/squad = body.clash_dead_squad
+	body.clash_dead_squad = null
+	if(!QDELETED(squad) && !body.assigned_squad && body.stat != DEAD)
+		squad.put_marine_in_squad(body)
 
 #undef CLASH_HIT_SOUND
 #undef CLASH_HIT_SOUND_GAP

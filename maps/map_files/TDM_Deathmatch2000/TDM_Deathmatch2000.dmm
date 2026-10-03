@@ -71,9 +71,13 @@
 /turf/open/floor/almayer,
 /area/clash_arena/tdm_jungle/uscm_base/req)
 "ax" = (
-/obj/effect/landmark/clash_npc/uscm,
-/turf/open/asphalt/cement/cement9,
-/area/clash_arena/tdm_deathmatch2000/battlefield)
+/obj/effect/landmark/start/marine/alpha,
+/obj/effect/landmark/late_join/alpha,
+/obj/structure/machinery/light{
+	dir = 1
+	},
+/turf/open/floor/interior/wood,
+/area/clash_arena/tdm_jungle/uscm_base)
 "az" = (
 /turf/closed/wall/almayer/outer,
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
@@ -460,9 +464,14 @@
 /turf/open/floor/almayer/orange/north,
 /area/clash_arena/tdm_jungle/uscm_base)
 "cI" = (
-/obj/effect/landmark/clash_npc/upp,
-/turf/open/asphalt/cementalt,
-/area/clash_arena/tdm_deathmatch2000/battlefield)
+/obj/structure/flora/pottedplant{
+	desc = "It is made of Fiberbush(tm). It contains asbestos.";
+	icon_state = "pottedplant_22";
+	name = "synthetic potted plant";
+	pixel_y = 8
+	},
+/turf/open/floor/almayer,
+/area/clash_arena/tdm_jungle/uscm_base)
 "cK" = (
 /turf/open/floor/almayer/cargo_arrow/west,
 /area/clash_arena/tdm_jungle/uscm_base/req)
@@ -2065,6 +2074,10 @@
 /obj/item/tool/pen,
 /turf/open/floor/strata/floor3/east,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
+"ye" = (
+/obj/effect/landmark/clash_npc/upp,
+/turf/open/asphalt/cement/cement9,
+/area/clash_arena/tdm_deathmatch2000/battlefield)
 "yl" = (
 /obj/structure/machinery/light,
 /turf/open/floor/almayer/cargo,
@@ -2095,11 +2108,12 @@
 /turf/open/floor/almayer/plating_striped/west,
 /area/clash_arena/tdm_jungle/uscm_base/req)
 "yt" = (
-/obj/structure/sign/banners/colonial_marines_flag{
-	pixel_x = 17;
-	pixel_y = -7
+/obj/effect/landmark/start/marine/engineer/alpha,
+/obj/effect/landmark/late_join/alpha,
+/obj/structure/machinery/light{
+	dir = 1
 	},
-/turf/closed/wall/almayer/outer,
+/turf/open/floor/interior/wood,
 /area/clash_arena/tdm_jungle/uscm_base)
 "yu" = (
 /obj/effect/decal/warning_stripes{
@@ -2694,6 +2708,10 @@
 /obj/structure/machinery/cm_vending/sorted/cargo_guns/upp_squad,
 /turf/open/floor/strata/red3/south,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
+"FJ" = (
+/obj/effect/landmark/clash_npc/uscm,
+/turf/open/asphalt/cement/cement9,
+/area/clash_arena/tdm_deathmatch2000/battlefield)
 "FM" = (
 /obj/effect/landmark/start/marine/engineer/alpha,
 /obj/effect/landmark/late_join/alpha,
@@ -3551,13 +3569,11 @@
 /turf/open/floor/almayer/plate,
 /area/clash_arena/tdm_jungle/uscm_base/req)
 "RB" = (
-/obj/structure/flora/pottedplant{
-	desc = "It is made of Fiberbush(tm). It contains asbestos.";
-	icon_state = "pottedplant_22";
-	name = "synthetic potted plant";
-	pixel_y = 8
+/obj/structure/sign/banners/colonial_marines_flag{
+	pixel_x = 17;
+	pixel_y = -7
 	},
-/turf/open/floor/almayer,
+/turf/closed/wall/almayer/outer,
 /area/clash_arena/tdm_jungle/uscm_base)
 "RI" = (
 /turf/open/floor/plating/plating_catwalk,
@@ -3582,7 +3598,7 @@
 /area/clash_arena/tdm_jungle/uscm_base/req)
 "Sj" = (
 /obj/effect/landmark/clash_npc/upp,
-/turf/open/asphalt/cement/cement9,
+/turf/open/asphalt/cementalt,
 /area/clash_arena/tdm_deathmatch2000/battlefield)
 "Sm" = (
 /turf/closed/wall/almayer/reinforced,
@@ -17020,13 +17036,13 @@ ES
 CF
 kV
 kV
-Sj
+ye
 kV
 kV
 kV
 kV
 kV
-Sj
+ye
 kV
 kV
 cZ
@@ -17174,7 +17190,7 @@ kV
 kV
 kV
 Pg
-cI
+Sj
 kV
 kV
 kV
@@ -21564,7 +21580,7 @@ ES
 CF
 kV
 kV
-ax
+FJ
 kV
 kV
 kV
@@ -21573,7 +21589,7 @@ kV
 kV
 Pg
 kV
-ax
+FJ
 kV
 kV
 Pg
@@ -21581,7 +21597,7 @@ kV
 kV
 kV
 kV
-ax
+FJ
 kV
 kV
 CF
@@ -23556,15 +23572,15 @@ ES
 ES
 ES
 ES
-yt
 RB
+cI
 KA
 Xp
 Xp
 Xp
 cE
 Xp
-RB
+cI
 AF
 ES
 ES
@@ -23841,14 +23857,14 @@ ES
 ES
 ES
 AF
-RB
+cI
 KA
 Xp
 Xp
 Xp
 cE
 Xp
-RB
+cI
 AF
 ES
 ES
@@ -29951,7 +29967,7 @@ za
 za
 za
 AF
-za
+Iu
 oy
 za
 VO
@@ -30083,7 +30099,7 @@ ES
 ES
 ES
 AF
-FM
+yt
 vU
 vU
 FM
@@ -30093,7 +30109,7 @@ za
 za
 mN
 AF
-Aw
+cz
 Jl
 za
 za
@@ -30656,7 +30672,7 @@ hk
 LL
 LL
 Qg
-Iu
+za
 za
 za
 za
@@ -30793,7 +30809,7 @@ ES
 ES
 ES
 AF
-LL
+ax
 hk
 hk
 LL
