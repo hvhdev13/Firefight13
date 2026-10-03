@@ -1439,7 +1439,7 @@ This is the proc mobs get to turn into a ghost. Forked from ghostize due to comp
 		if(SShijack.sd_unlocked)
 			. += "Self Destruct Goal: [SShijack.get_sd_eta()]"
 
-	if(client.prefs?.be_special & BE_ALIEN)
+	if(client.prefs?.be_special & BE_ALIEN && !(SSticker.mode && MODE_HAS_FLAG(MODE_FACTION_CLASH)))
 		if(!larva_pool_cached_message)
 			// Try to refresh now
 			message_alien_candidate_observer(src, cache_only=TRUE)

@@ -558,6 +558,8 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	if(killer.client)
 		playsound_client(killer.client, CLASH_KILL_SOUND, null, 50)
 	clash_progress_kill(victim, killer, cause, cause_object)
+	if(type == /datum/game_mode/extended/faction_clash/hvh/tdm && killer.statistic_exempt && !victim.statistic_exempt && killer.faction != victim.faction && (killer.faction in list(FACTION_MARINE, FACTION_UPP)))
+		score_kill(killer.faction)
 
 /datum/game_mode/extended/faction_clash/hvh/proc/record_damage(mob/living/victim, mob/attacker, weapon_type)
 	if(!match_live || round_finished || victim.statistic_exempt || attacker.statistic_exempt || attacker.faction == victim.faction)

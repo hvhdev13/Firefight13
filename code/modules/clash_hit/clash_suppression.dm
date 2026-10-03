@@ -14,6 +14,7 @@
 
 /mob/living/carbon/human/var/clash_suppression = 0
 /mob/living/carbon/human/var/clash_suppression_hold = 0
+/mob/living/carbon/human/var/turf/clash_aim_turf
 
 /atom/movable/screen/fullscreen/clash_suppression
 	icon_state = "brutedamageoverlay"
@@ -93,11 +94,13 @@
 		return ELEMENT_INCOMPATIBLE
 	RegisterSignal(target, COMSIG_HUMAN_BULLET_ACT, PROC_REF(on_shot))
 	RegisterSignal(target, COMSIG_MOB_FIRED_GUN, PROC_REF(on_fired))
+	RegisterSignal(target, COMSIG_MOB_MOUSEDOWN, PROC_REF(on_mouse_down))
+	RegisterSignal(target, COMSIG_MOB_MOUSEDRAG, PROC_REF(on_mouse_drag))
 	RegisterSignal(target, list(COMSIG_LIVING_FLAMER_CROSSED, COMSIG_LIVING_FLAMER_FLAMED), PROC_REF(on_flamed))
 
 /datum/element/clash_suppression/Detach(datum/source, force)
 	. = ..()
-	UnregisterSignal(source, list(COMSIG_HUMAN_BULLET_ACT, COMSIG_MOB_FIRED_GUN, COMSIG_LIVING_FLAMER_CROSSED, COMSIG_LIVING_FLAMER_FLAMED))
+	UnregisterSignal(source, list(COMSIG_HUMAN_BULLET_ACT, COMSIG_MOB_FIRED_GUN, COMSIG_MOB_MOUSEDOWN, COMSIG_MOB_MOUSEDRAG, COMSIG_LIVING_FLAMER_CROSSED, COMSIG_LIVING_FLAMER_FLAMED))
 
 /datum/element/clash_suppression/proc/on_shot(mob/living/carbon/human/source, damage_result, ammo_flags, obj/projectile/bullet)
 	SIGNAL_HANDLER
@@ -105,10 +108,18 @@
 	if(ismob(shooter) && shooter.faction != source.faction)
 		clash_suppress(source, CLASH_SUPPRESSION_HIT)
 
+/datum/element/clash_suppression/proc/on_mouse_down(mob/living/carbon/human/source, atom/object, turf/location, control, params)
+	SIGNAL_HANDLER
+	source.clash_aim_turf = get_turf_on_clickcatcher(object, source, params)
+
+/datum/element/clash_suppression/proc/on_mouse_drag(mob/living/carbon/human/source, atom/src_object, atom/over_object, turf/src_location, turf/over_location, src_control, over_control, params)
+	SIGNAL_HANDLER
+	source.clash_aim_turf = get_turf_on_clickcatcher(over_object, source, params)
+
 /datum/element/clash_suppression/proc/on_fired(mob/living/carbon/human/source, obj/item/weapon/gun/gun)
 	SIGNAL_HANDLER
 	var/turf/start = get_turf(source)
-	var/turf/aim = get_turf(gun.target)
+	var/turf/aim = source.clash_aim_turf
 	if(start && aim && aim.z == start.z)
 		clash_suppress_line(source, start, aim)
 

@@ -96,7 +96,7 @@
 		new_death.player_id = player_entity.id
 
 	if(SSperf_logging)
-		new_death.round_id = SSperf_logging.round.id
+		new_death.round_id = SSperf_logging.round?.id
 
 	new_death.role_name = get_role_name()
 	new_death.mob_name = real_name

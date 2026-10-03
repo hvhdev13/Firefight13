@@ -254,6 +254,7 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 	if(firing)
 		if(has_ammo() && clear_shot(get_turf(target), target))
 			gun.set_target(target)
+			body.clash_aim_turf = get_turf(target)
 		else
 			stop_volley()
 		return
@@ -278,6 +279,7 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 	firing = TRUE
 	shots_left = rounds
 	gun.set_target(aim)
+	body.clash_aim_turf = get_turf(aim)
 	gun.start_fire(body, aim, get_turf(aim), null, null, TRUE)
 	if(gun.gun_firemode == GUN_FIREMODE_AUTOMATIC)
 		return
