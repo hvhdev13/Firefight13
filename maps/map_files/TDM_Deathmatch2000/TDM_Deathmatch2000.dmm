@@ -71,7 +71,8 @@
 /turf/open/floor/almayer,
 /area/clash_arena/tdm_jungle/uscm_base/req)
 "ax" = (
-/turf/open/floor/strata/multi_tiles,
+/obj/effect/landmark/clash_npc/uscm,
+/turf/open/asphalt/cement/cement9,
 /area/clash_arena/tdm_deathmatch2000/battlefield)
 "az" = (
 /turf/closed/wall/almayer/outer,
@@ -460,7 +461,7 @@
 /area/clash_arena/tdm_jungle/uscm_base)
 "cI" = (
 /obj/effect/landmark/clash_npc/upp,
-/turf/open/asphalt/cement/cement9,
+/turf/open/asphalt/cementalt,
 /area/clash_arena/tdm_deathmatch2000/battlefield)
 "cK" = (
 /turf/open/floor/almayer/cargo_arrow/west,
@@ -835,7 +836,7 @@
 	},
 /obj/structure/blocker/clash_gate/upp,
 /turf/open/floor/strata/multi_tiles,
-/area/clash_arena/tdm_deathmatch2000/battlefield)
+/area/clash_arena/tdm_deathmatch2000/upp_base)
 "he" = (
 /obj/structure/machinery/cm_vending/clothing/smartgun/alpha,
 /turf/open/floor/almayer/plate,
@@ -1158,7 +1159,7 @@
 	no_panel = 1
 	},
 /turf/open/floor/strata/multi_tiles,
-/area/clash_arena/tdm_deathmatch2000/battlefield)
+/area/clash_arena/tdm_deathmatch2000/upp_base)
 "lL" = (
 /turf/open/floor/strata/orange_edge/northeast,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
@@ -2064,13 +2065,6 @@
 /obj/item/tool/pen,
 /turf/open/floor/strata/floor3/east,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
-"ye" = (
-/obj/structure/sign/banners/colonial_marines_flag{
-	pixel_x = 17;
-	pixel_y = -7
-	},
-/turf/closed/wall/almayer/outer,
-/area/clash_arena/tdm_jungle/uscm_base)
 "yl" = (
 /obj/structure/machinery/light,
 /turf/open/floor/almayer/cargo,
@@ -2101,9 +2095,12 @@
 /turf/open/floor/almayer/plating_striped/west,
 /area/clash_arena/tdm_jungle/uscm_base/req)
 "yt" = (
-/obj/effect/landmark/clash_npc/uscm,
-/turf/open/asphalt/cement/cement9,
-/area/clash_arena/tdm_deathmatch2000/battlefield)
+/obj/structure/sign/banners/colonial_marines_flag{
+	pixel_x = 17;
+	pixel_y = -7
+	},
+/turf/closed/wall/almayer/outer,
+/area/clash_arena/tdm_jungle/uscm_base)
 "yu" = (
 /obj/effect/decal/warning_stripes{
 	icon_state = "W";
@@ -2697,9 +2694,6 @@
 /obj/structure/machinery/cm_vending/sorted/cargo_guns/upp_squad,
 /turf/open/floor/strata/red3/south,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
-"FJ" = (
-/turf/open/floor/strata/floor3/east,
-/area/clash_arena/tdm_deathmatch2000/battlefield)
 "FM" = (
 /obj/effect/landmark/start/marine/engineer/alpha,
 /obj/effect/landmark/late_join/alpha,
@@ -2741,7 +2735,7 @@
 	pixel_x = -17
 	},
 /turf/open/floor/strata/floor3/east,
-/area/clash_arena/tdm_deathmatch2000/battlefield)
+/area/clash_arena/tdm_deathmatch2000/upp_base)
 "GI" = (
 /turf/open/floor/almayer/plating,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
@@ -3588,7 +3582,7 @@
 /area/clash_arena/tdm_jungle/uscm_base/req)
 "Sj" = (
 /obj/effect/landmark/clash_npc/upp,
-/turf/open/asphalt/cementalt,
+/turf/open/asphalt/cement/cement9,
 /area/clash_arena/tdm_deathmatch2000/battlefield)
 "Sm" = (
 /turf/closed/wall/almayer/reinforced,
@@ -15753,15 +15747,15 @@ PG
 PG
 PG
 PG
-PG
+Vm
 Gj
-ax
-FJ
-ax
-FJ
-ax
-FJ
-PG
+Hk
+jM
+Hk
+jM
+Hk
+jM
+Vm
 PG
 PG
 PG
@@ -15895,15 +15889,15 @@ at
 at
 at
 at
-PG
+Vm
 hb
-PG
+Vm
 hb
-PG
+Vm
 lK
-PG
+Vm
 hb
-PG
+Vm
 at
 at
 at
@@ -17026,13 +17020,13 @@ ES
 CF
 kV
 kV
-cI
+Sj
 kV
 kV
 kV
 kV
 kV
-cI
+Sj
 kV
 kV
 cZ
@@ -17180,7 +17174,7 @@ kV
 kV
 kV
 Pg
-Sj
+cI
 kV
 kV
 kV
@@ -21570,7 +21564,7 @@ ES
 CF
 kV
 kV
-yt
+ax
 kV
 kV
 kV
@@ -21579,7 +21573,7 @@ kV
 kV
 Pg
 kV
-yt
+ax
 kV
 kV
 Pg
@@ -21587,7 +21581,7 @@ kV
 kV
 kV
 kV
-yt
+ax
 kV
 kV
 CF
@@ -23562,7 +23556,7 @@ ES
 ES
 ES
 ES
-ye
+yt
 RB
 KA
 Xp
