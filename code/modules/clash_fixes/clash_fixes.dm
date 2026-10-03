@@ -15,6 +15,7 @@
 
 /datum/config_entry/flag/respawn
 	config_entry_value = TRUE
+	protection = CONFIG_ENTRY_LOCKED
 
 /datum/config_entry/flag/respawn/ValidateAndSet(str_val)
 	config_entry_value = TRUE

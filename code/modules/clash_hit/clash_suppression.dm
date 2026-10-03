@@ -110,11 +110,11 @@
 
 /datum/element/clash_suppression/proc/on_mouse_down(mob/living/carbon/human/source, atom/object, turf/location, control, params)
 	SIGNAL_HANDLER
-	source.clash_aim_turf = get_turf_on_clickcatcher(object, source, params)
+	source.clash_aim_turf = get_turf(get_turf_on_clickcatcher(object, source, params))
 
 /datum/element/clash_suppression/proc/on_mouse_drag(mob/living/carbon/human/source, atom/src_object, atom/over_object, turf/src_location, turf/over_location, src_control, over_control, params)
 	SIGNAL_HANDLER
-	source.clash_aim_turf = get_turf_on_clickcatcher(over_object, source, params)
+	source.clash_aim_turf = get_turf(get_turf_on_clickcatcher(over_object, source, params))
 
 /datum/element/clash_suppression/proc/on_fired(mob/living/carbon/human/source, obj/item/weapon/gun/gun)
 	SIGNAL_HANDLER
