@@ -113,7 +113,7 @@ GLOBAL_LIST_EMPTY(clash_radar_toggle_icons)
 				"oGGGo",
 				"oGGGo",
 				".ooo.",
-			), list("o" = rgb(10, 12, 15, 220), "G" = rgb(76, 175, 80)))
+			), list("o" = rgb(10, 12, 15, 220), "G" = rgb(80, 150, 240)))
 		if("leader")
 			mark = clash_pattern_icon(list(
 				"...o...",
@@ -144,6 +144,30 @@ GLOBAL_LIST_EMPTY(clash_radar_toggle_icons)
 				"..oRo..",
 				"..ooo..",
 			), list("o" = rgb(10, 12, 15, 220), "R" = rgb(230, 80, 70)))
+		if("bot")
+			mark = clash_pattern_icon(list(
+				".ooo.",
+				"oBBBo",
+				"oBBBo",
+				"oBBBo",
+				".ooo.",
+			), list("o" = rgb(10, 12, 15, 220), "B" = rgb(76, 175, 80)))
+		if("sentry")
+			mark = clash_pattern_icon(list(
+				".www.",
+				"wKKKw",
+				"wKKKw",
+				"wKKKw",
+				".www.",
+			), list("w" = rgb(170, 178, 186), "K" = rgb(0, 0, 0)))
+		if("crate")
+			mark = clash_pattern_icon(list(
+				"wwwww",
+				"wKKKw",
+				"wKKKw",
+				"wKKKw",
+				"wwwww",
+			), list("w" = rgb(170, 178, 186), "K" = rgb(0, 0, 0)))
 	GLOB.clash_radar_marks[kind] = mark
 	return mark
 
@@ -248,6 +272,17 @@ GLOBAL_LIST_EMPTY(clash_radar_toggle_icons)
 	place_mark(blip, dx, dy, kind)
 	fade_blip(blip, (sweep_angle - angle + 720) % 360)
 
+/atom/movable/screen/clash_radar/proc/clash_paint_build(mob/living/carbon/human/viewer, atom/build, kind, list/seen, from, arc, sweep_angle)
+	if(build.z != viewer.z)
+		return
+	var/dx = build.x - viewer.x
+	var/dy = build.y - viewer.y
+	if(sqrt(dx * dx + dy * dy) > RADAR_RANGE)
+		return
+	var/contact = "[kind][REF(build)]"
+	seen[contact] = TRUE
+	paint(contact, dx, dy, kind, from, arc, sweep_angle)
+
 /atom/movable/screen/clash_radar/proc/render(mob/living/carbon/human/viewer)
 	alpha = 255
 	var/sweep_angle = get_sweep_angle()
@@ -264,7 +299,12 @@ GLOBAL_LIST_EMPTY(clash_radar_toggle_icons)
 			continue
 		var/contact = REF(ally)
 		seen[contact] = TRUE
-		paint(contact, dx, dy, ally.assigned_squad?.squad_leader == ally ? "leader" : "ally", from, arc, sweep_angle)
+		var/kind = "ally"
+		if(ally.statistic_exempt)
+			kind = "bot"
+		else if(ally.assigned_squad?.squad_leader == ally)
+			kind = "leader"
+		paint(contact, dx, dy, kind, from, arc, sweep_angle)
 	if(clash_fast_medicine() && clash_is_medic(viewer))
 		for(var/mob/living/carbon/human/body in GLOB.dead_mob_list)
 			if(body.faction != viewer.faction || body.z != viewer.z || body.statistic_exempt || !body.check_tod() || !body.is_revivable())
@@ -280,6 +320,16 @@ GLOBAL_LIST_EMPTY(clash_radar_toggle_icons)
 			var/contact = "downed[REF(body)]"
 			seen[contact] = TRUE
 			paint(contact, dx, dy, "downed", from, arc, sweep_angle)
+	if(clash_fast_medicine())
+		for(var/ckey in GLOB.clash_engineer_sentries)
+			for(var/obj/structure/machinery/defenses/sentry/turret as anything in GLOB.clash_engineer_sentries[ckey])
+				if(turret.placed && turret.clash_faction == viewer.faction)
+					clash_paint_build(viewer, turret, "sentry", seen, from, arc, sweep_angle)
+		for(var/ckey in GLOB.clash_engineer_crates)
+			for(var/obj/item/clash_ammo_crate/crate as anything in GLOB.clash_engineer_crates[ckey])
+				var/obj/structure/clash_ammo_crate/deployed = crate.loc
+				if(istype(deployed) && deployed.faction == viewer.faction)
+					clash_paint_build(viewer, deployed, "crate", seen, from, arc, sweep_angle)
 	for(var/contact in painted.Copy())
 		var/atom/movable/clash_radar_blip/gone = painted[contact]
 		if(seen[contact] || !swept(gone.angle, from, arc))

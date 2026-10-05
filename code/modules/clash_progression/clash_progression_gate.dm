@@ -124,6 +124,9 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 	if(!option || !clash_progression_gating())
 		return null
 	var/datum/clash_progress/progress = clash_gate_progress(ckey)
+	if(option.slot == KIT_SLOT_SENTRY)
+		var/level = GLOB.clash_sentry_tiers[clash_sentry_tier_of(option.item_type)]["level"]
+		return progress.class_level(CLASH_CLASS_ENGINEER) < level ? "Unlocks at Engineer level [level]" : null
 	if(option.slot in GLOB.clash_kit_attachment_slots)
 		if(!primary_type || !clash_kit_attachment_fits(option.item_type, primary_type))
 			return null
@@ -397,6 +400,10 @@ GLOBAL_VAR_INIT(clash_trial_packs_built, FALSE)
 		return null
 	if(!ispath(item_type, /obj/item))
 		return null
+	var/tier = clash_sentry_tier_of(item_type)
+	if(tier)
+		var/level = GLOB.clash_sentry_tiers[tier]["level"]
+		return clash_engineer_level(user.mind?.ckey || user.ckey) < level ? "Unlocks at Engineer level [level]" : null
 	var/datum/clash_progress/progress = clash_gate_progress(user.mind?.ckey || user.ckey)
 	if(ispath(item_type, /obj/item/attachable))
 		return clash_attachment_unlock_text(progress, item_type)
@@ -408,6 +415,10 @@ GLOBAL_VAR_INIT(clash_trial_packs_built, FALSE)
 	return clash_vendor_lock_text(user, item_type) || "Unlocked, take it from your loadout"
 
 /proc/clash_vendor_refuses(mob/living/carbon/human/user, list/itemspec)
+	var/build_refusal = clash_build_refusal(user, itemspec[3])
+	if(build_refusal)
+		to_chat(user, SPAN_WARNING(build_refusal))
+		return TRUE
 	if(!clash_vendor_laddered(itemspec[3]))
 		return FALSE
 	to_chat(user, SPAN_WARNING("[itemspec[1]] is not sold here. [clash_vendor_label(user, itemspec[3]) || "Unlocked, take it from your loadout"]."))

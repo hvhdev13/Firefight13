@@ -146,12 +146,11 @@ interface Data extends StaticData {
   doll: string | null;
   gun: string | null;
   doll_pending: BooleanLike;
-  can_equip_now: BooleanLike;
-  live: BooleanLike;
   deploy_state: 'lobby' | 'dead' | null;
   respawn_in: number;
   deploy_block: string | null;
   revivable: BooleanLike;
+  sentry_slot: BooleanLike;
   hint: string | null;
   pack: PackContainer[];
   extras: Extra[];
@@ -725,12 +724,11 @@ export const ClashKit = () => {
     fits,
     doll,
     doll_pending,
-    can_equip_now,
-    live,
     deploy_state,
     respawn_in,
     deploy_block,
     revivable,
+    sentry_slot,
     hint,
     progress,
   } = data;
@@ -974,8 +972,14 @@ export const ClashKit = () => {
                         />
                       )}
                     </Box>
-                    <Box className="ClashKit__pouchRow">
+                    <Box
+                      className={classes([
+                        'ClashKit__pouchRow',
+                        sentry_slot && 'ClashKit__pouchRow--wide',
+                      ])}
+                    >
                       {POUCH_SLOTS.map((id) => tile(id, true))}
+                      {!!sentry_slot && tile('sentry', true)}
                     </Box>
                   </Box>
                   <Box className="ClashKit__slotColumn">
@@ -1112,22 +1116,6 @@ export const ClashKit = () => {
             <Stack align="center">
               <Stack.Item grow basis={0}>
                 <Stack align="center">
-                  {!!live && (
-                    <Stack.Item>
-                      <Button
-                        icon="shirt"
-                        disabled={!can_equip_now}
-                        tooltip={
-                          can_equip_now
-                            ? 'Swap your gear for this kit now'
-                            : 'Only inside your own base, as this role'
-                        }
-                        onClick={() => act('equip_now')}
-                      >
-                        Equip now
-                      </Button>
-                    </Stack.Item>
-                  )}
                   <Stack.Item grow className="ClashKit__hint">
                     {hint}
                   </Stack.Item>

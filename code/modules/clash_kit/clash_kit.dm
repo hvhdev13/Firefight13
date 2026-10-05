@@ -579,6 +579,7 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 	issue_clash_role_kit(fighter, fighter.job)
 	apply_clash_kit(fighter, kit, CLASH_KIT_SPAWN)
 	clash_issue_medic_gear(fighter)
+	clash_issue_engineer_gear(fighter)
 
 /proc/describe_clash_kit_item(obj/item/item)
 	return item ? list("name" = item.name, "type" = "[item.type]", "icon" = "[item.icon]", "icon_state" = item.icon_state) : null

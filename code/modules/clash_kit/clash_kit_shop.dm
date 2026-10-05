@@ -114,12 +114,6 @@ GLOBAL_LIST_EMPTY(clash_kit_budgets)
 		var/obj/item/given = given_ref.resolve()
 		if(!given || !clash_kit_carried(wearer, given))
 			continue
-		if(mode == CLASH_KIT_EQUIP)
-			var/list/paid = wearer.clash_kit_extras[given_ref]
-			if(paid["pool"] == CLASH_SHOP_SNOWFLAKE)
-				wearer.vendor_snowflake_points += paid["cost"]
-			else
-				wearer.vendor_points += paid["cost"]
 		qdel(given)
 	wearer.clash_kit_extras = list()
 	var/list/containers = clash_kit_containers(wearer)

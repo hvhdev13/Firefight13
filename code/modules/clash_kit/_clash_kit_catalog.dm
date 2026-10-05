@@ -18,7 +18,6 @@ GLOBAL_LIST_INIT(clash_kit_attachment_slots, list(KIT_SLOT_RAIL, KIT_SLOT_MUZZLE
 #define CLASH_KIT_COUNT 7
 #define CLASH_KIT_SPAWN "spawn"
 #define CLASH_KIT_RESET "reset"
-#define CLASH_KIT_EQUIP "equip"
 #define CLASH_KIT_PREVIEW "preview"
 #define CLASH_KIT_FILL_LIMIT 30
 #define CLASH_KIT_SPARE_PRIMARY 4
@@ -43,6 +42,7 @@ GLOBAL_LIST_INIT(clash_kit_slots, list(
 	KIT_SLOT_UNDER = list("name" = "Underbarrel", "image" = null, "wear" = null),
 	KIT_SLOT_STOCK = list("name" = "Stock", "image" = null, "wear" = null),
 	KIT_SLOT_WEBBING = list("name" = "Accessory", "image" = "inventory-uniform.png", "wear" = null),
+	KIT_SLOT_SENTRY = list("name" = "Sentry", "image" = null, "wear" = null),
 ))
 
 GLOBAL_LIST_INIT(clash_kit_shells, list(
@@ -193,6 +193,8 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 	build_clash_kit_shared(FACTION_UPP)
 	build_clash_kit_uscm()
 	build_clash_kit_upp()
+	add_clash_sentry_options(FACTION_MARINE)
+	add_clash_sentry_options(FACTION_UPP)
 	add_clash_kit_gun_attachments(FACTION_MARINE)
 	add_clash_kit_gun_attachments(FACTION_UPP)
 	build_clash_weapon_tracks()
