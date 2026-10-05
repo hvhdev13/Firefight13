@@ -97,7 +97,7 @@
 		redeemer.skills?.set_skill(SKILL_SPEC_WEAPONS, skill_to_give)
 
 	if(kit)
-		redeemer.put_in_any_hand_if_possible(new kit_typepath, FALSE)
+		redeemer.put_in_hands(new kit_typepath)
 		for(var/path in incompatible_sets)
 			GLOB.specialist_set_datums[path].available_kit_num--
 		ADD_TRAIT(redeemer, TRAIT_SPEC_KIT, TRAIT_SOURCE_INHERENT)
