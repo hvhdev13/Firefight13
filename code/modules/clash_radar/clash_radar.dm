@@ -17,6 +17,18 @@ GLOBAL_DATUM(clash_radar_backdrop, /icon)
 GLOBAL_DATUM(clash_radar_sweep, /icon)
 GLOBAL_LIST_EMPTY(clash_radar_marks)
 GLOBAL_LIST_EMPTY(clash_radar_toggle_icons)
+GLOBAL_LIST_INIT(clash_radar_glyphs, list(
+	"A" = list(".X.", "X.X", "XXX", "X.X", "X.X"),
+	"B" = list("XX.", "X.X", "XX.", "X.X", "XX."),
+	"C" = list(".XX", "X..", "X..", "X..", ".XX"),
+	"F" = list("XXX", "X..", "XX.", "X..", "X.."),
+	"H" = list("X.X", "X.X", "XXX", "X.X", "X.X"),
+))
+GLOBAL_LIST_INIT(clash_radar_tones, list(
+	"open" = rgb(190, 194, 198),
+	"ours" = rgb(80, 150, 240),
+	"theirs" = rgb(230, 60, 50),
+))
 
 /client/var/atom/movable/screen/clash_radar_toggle/clash_radar_toggle
 
@@ -102,10 +114,52 @@ GLOBAL_LIST_EMPTY(clash_radar_toggle_icons)
 	GLOB.clash_radar_sweep = sweep
 	return sweep
 
+/proc/clash_radar_tone(owner, mob/viewer)
+	if(!owner)
+		return "open"
+	return owner == viewer.faction ? "ours" : "theirs"
+
+/proc/clash_radar_pin_icon(letter, tone, hollow)
+	var/list/glyph = GLOB.clash_radar_glyphs[letter] || GLOB.clash_radar_glyphs["H"]
+	var/fill = hollow ? "." : "C"
+	var/ink = hollow ? "C" : "o"
+	var/list/rows = list("ooooooooo", "o[fill][fill][fill][fill][fill][fill][fill]o")
+	for(var/line in glyph)
+		rows += "o[fill][fill][replacetext(replacetext(line, ".", fill), "X", ink)][fill][fill]o"
+	rows += "o[fill][fill][fill][fill][fill][fill][fill]o"
+	rows += "ooooooooo"
+	var/colour = GLOB.clash_radar_tones[tone]
+	return clash_pattern_icon(rows, list("o" = hollow ? colour : rgb(10, 12, 15, 220), "C" = colour))
+
+/proc/clash_medic_badge_icon(size, canvas)
+	var/icon/badge = icon('icons/effects/effects.dmi', "nothing")
+	badge.Scale(canvas, canvas)
+	var/offset = floor((canvas - size) / 2)
+	var/centre = (size + 1) / 2
+	var/radius = size / 2
+	var/large = size >= 13
+	var/arm = large ? round(size * 0.3) : 2
+	var/thick = large ? 1 : 0
+	for(var/x in 1 to size)
+		for(var/y in 1 to size)
+			var/dx = x - centre
+			var/dy = y - centre
+			var/distance = sqrt(dx * dx + dy * dy)
+			if(distance > radius)
+				continue
+			var/colour = distance > radius - 1.2 ? rgb(10, 12, 15, 230) : rgb(240, 244, 246)
+			if((abs(dx) <= thick && abs(dy) <= arm) || (abs(dy) <= thick && abs(dx) <= arm))
+				colour = rgb(220, 40, 40)
+			badge.DrawBox(colour, x + offset, y + offset)
+	return badge
+
 /proc/get_clash_radar_mark(kind)
 	if(GLOB.clash_radar_marks[kind])
 		return GLOB.clash_radar_marks[kind]
 	var/icon/mark
+	var/list/pin = splittext(kind, "_")
+	if(pin[1] == "pin")
+		mark = clash_radar_pin_icon(pin[2], pin[3], pin[4] == "1")
 	switch(kind)
 		if("ally")
 			mark = clash_pattern_icon(list(
@@ -136,15 +190,9 @@ GLOBAL_LIST_EMPTY(clash_radar_toggle_icons)
 				".o...o.",
 			), list("o" = rgb(10, 12, 15, 220), "W" = rgb(240, 244, 246)))
 		if("downed")
-			mark = clash_pattern_icon(list(
-				"..ooo..",
-				"..oRo..",
-				"oooRooo",
-				"oRRRRRo",
-				"oooRooo",
-				"..oRo..",
-				"..ooo..",
-			), list("o" = rgb(10, 12, 15, 220), "R" = rgb(230, 80, 70)))
+			mark = clash_medic_badge_icon(9, 9)
+		if("medic_badge")
+			mark = clash_medic_badge_icon(15, 32)
 		if("hurt")
 			mark = clash_pattern_icon(list(
 				".ooo.",
@@ -366,6 +414,21 @@ GLOBAL_LIST_EMPTY(clash_radar_toggle_icons)
 				var/obj/structure/clash_ammo_crate/deployed = crate.loc
 				if(istype(deployed) && deployed.faction == viewer.faction)
 					clash_paint_build(viewer, deployed, "crate", seen, from, arc, sweep_angle)
+	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
+	if(istype(clash_mode))
+		for(var/list/pin in clash_mode.get_radar_pins(viewer))
+			var/turf/spot = pin["turf"]
+			if(spot?.z != viewer.z)
+				continue
+			var/dx = spot.x - viewer.x
+			var/dy = spot.y - viewer.y
+			var/distance = sqrt(dx * dx + dy * dy)
+			if(distance > RADAR_RANGE)
+				dx *= RADAR_RANGE / distance
+				dy *= RADAR_RANGE / distance
+			var/contact = "pin[pin["key"]]"
+			seen[contact] = TRUE
+			paint(contact, dx, dy, "pin_[pin["letter"]]_[pin["tone"]]_[pin["hollow"] ? 1 : 0]", from, arc, sweep_angle)
 	for(var/contact in painted.Copy())
 		var/atom/movable/clash_radar_blip/gone = painted[contact]
 		if(seen[contact] || !swept(gone.angle, from, arc))

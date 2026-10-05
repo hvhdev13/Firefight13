@@ -233,8 +233,7 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 		add_clash_kit_option(faction, slot, "Shotgun shell pouch", /obj/item/storage/pouch/shotgun, "Shells and slugs")
 		add_clash_kit_option(faction, slot, "Large shotgun shell pouch", /obj/item/storage/pouch/shotgun/large, "More shells and slugs")
 		add_clash_kit_option(faction, slot, "Fuel tank strap pouch", /obj/item/storage/pouch/flamertank, "Two spare flamer tanks")
-		add_clash_kit_option(faction, slot, "First aid pouch", /obj/item/storage/pouch/firstaid/clash, "Healing injector, tramadol injector, field dressings and splints")
-		add_clash_kit_option(faction, slot, "Medical supplies pouch", /obj/item/storage/pouch/medical/clash_supplies, "Field dressings and splints for wounds")
+		add_clash_kit_option(faction, slot, "First-aid pouch", /obj/item/storage/pouch/firstaid/clash, "Healing injector, tramadol injector, field dressing and splint")
 		add_clash_kit_option(faction, slot, "Flare pouch", /obj/item/storage/pouch/flare/full, "Light up a lane")
 		add_clash_kit_option(faction, slot, "Explosive pouch", /obj/item/storage/pouch/explosive, "Carries your grenades")
 		add_clash_kit_option(faction, slot, "Medium general pouch", /obj/item/storage/pouch/general/medium, "Tools, flares, whatever fits")
@@ -347,12 +346,3 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 	add_clash_kit_option(faction, KIT_SLOT_SIDEARM, "Type 73 pistol", /obj/item/weapon/gun/pistol/t73, "Standard sidearm", /obj/item/ammo_magazine/pistol/t73, 3)
 	add_clash_kit_option(faction, KIT_SLOT_SIDEARM, "NP92 pistol", /obj/item/weapon/gun/pistol/np92, "Bigger magazine", /obj/item/ammo_magazine/pistol/np92, 3)
 	add_clash_kit_option(faction, KIT_SLOT_SIDEARM, "Type 44 revolver", /obj/item/weapon/gun/revolver/upp, "Six heavy rounds", /obj/item/ammo_magazine/revolver/upp, 3)
-
-/obj/item/storage/pouch/medical/clash_supplies
-	name = "medical supplies pouch"
-	desc = "A medical pouch packed with field dressings and splints for treating wounds."
-
-/obj/item/storage/pouch/medical/clash_supplies/fill_preset_inventory()
-	new /obj/item/stack/medical/bruise_pack/field_dressing(src)
-	new /obj/item/stack/medical/bruise_pack/field_dressing(src)
-	new /obj/item/stack/medical/splint(src)

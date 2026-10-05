@@ -9,14 +9,20 @@
 		return
 	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
 	if(!istype(clash_mode))
+		var/list/outside = list("Progression Panel")
 		if(!SSticker.mode && (GLOB.master_mode in HVH_MODE_TAGS))
+			outside += "Change game mode"
+		var/picked = tgui_input_list(usr, "This is not an HvH round. What should happen?", "HvH Control", outside)
+		if(picked == "Progression Panel")
+			clash_progression_panel()
+		else if(picked == "Change game mode")
 			hvh_change_mode()
-			return
-		to_chat(usr, SPAN_WARNING("This is not an HvH round."))
 		return
 	var/list/actions = list("End match now", "Skip countdown or break", "Set a team's score", "Bot Control Panel", "Progression Panel")
 	if(clash_mode.can_rebuild_objectives())
 		actions += list("Re-place objectives", "Jump to an objective")
+	var/list/objective_actions = clash_mode.get_admin_objective_actions()
+	actions += objective_actions
 	actions += "Change game mode"
 	var/choice = tgui_input_list(usr, "What should happen?", "HvH Control", actions)
 	if(choice == "Change game mode")
@@ -29,6 +35,13 @@
 		clash_progression_panel()
 		return
 	if(!choice || SSticker.mode != clash_mode || clash_mode.round_finished)
+		return
+	if(choice in objective_actions)
+		choice = clash_mode.do_admin_objective_action(choice, usr)
+		if(!choice)
+			return
+		message_admins("[key_name_admin(usr)] used HvH Control: [choice].")
+		log_admin("[key_name(usr)] used HvH Control: [choice].")
 		return
 	switch(choice)
 		if("End match now")

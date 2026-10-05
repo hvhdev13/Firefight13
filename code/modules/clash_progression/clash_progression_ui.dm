@@ -160,7 +160,7 @@
 	var/list/names = list()
 	for(var/obj/item/attachable/attachment_type as anything in unlock["types"])
 		names |= initial(attachment_type.name)
-	.["next"] = length(names) ? capitalize(english_list(names)) : "Engraving"
+	.["next"] = length(names) ? capitalize(english_list(names)) : "Your name engraved on it"
 	.["kills_to_go"] = CEILING(max(0, unlock["xp"] - xp) / CLASH_XP_PER_KILL_ESTIMATE, 1)
 
 /proc/clash_carrier_progress(datum/clash_progress/progress, faction)

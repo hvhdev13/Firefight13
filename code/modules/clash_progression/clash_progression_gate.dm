@@ -256,12 +256,12 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 			id = starting[slot] ? clash_kit_option_id(faction, slot, starting[slot]) : null
 		if(id)
 			filtered.choices[slot] = id
-	var/datum/clash_kit_option/primary = filtered.get_option(KIT_SLOT_PRIMARY)
-	if(!primary)
+	var/gun_type = clash_effective_primary(filtered, job)
+	if(!gun_type)
 		return filtered
 	for(var/slot in GLOB.clash_kit_attachment_slots)
 		var/id = kit.choices[slot]
-		if(id && !clash_option_lock_text(ckey, id, job, primary.item_type))
+		if(id && !clash_option_lock_text(ckey, id, job, gun_type))
 			filtered.choices[slot] = id
 	return filtered
 
@@ -302,6 +302,7 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 	var/faction = progress.side || FACTION_MARINE
 	var/old_level
 	var/list/entry
+	var/track_name
 	switch(track)
 		if("faction")
 			if(!(key in list(FACTION_MARINE, FACTION_UPP)))
@@ -310,12 +311,14 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 			old_level = progress.faction_level(key)
 			entry = progress.faction_entry(key)
 			entry["best"] = 1
+			track_name = clash_side_name(key)
 		if("class")
 			if(!GLOB.clash_class_names[key])
 				return FALSE
 			old_level = progress.class_level(key)
 			entry = progress.class_entry(key)
 			entry["best"] = 1
+			track_name = GLOB.clash_class_names[key]
 		if("weapon")
 			build_clash_kit_catalog()
 			key = ispath(key) ? key : text2path(key)
@@ -325,17 +328,24 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 			entry = progress.weapon_entry(key)
 			entry["best"] = 1
 			entry["mastered"] = FALSE
+			var/obj/item/weapon/gun/gun = key
+			track_name = initial(gun.name)
 		if("carrier")
 			if(!GLOB.clash_carrier_tracks[key])
 				return FALSE
 			old_level = progress.carrier_step(key)
 			entry = progress.carrier_entry(key)
 			entry["best"] = 0
+			track_name = "[capitalize(GLOB.clash_family_names[key])] ammo carrier"
 		else
 			return FALSE
 	entry["xp"] = xp
 	progress.check_unlocks(track, key, old_level, faction)
 	progress.save()
+	var/new_level = entry["best"]
+	var/client/target = GLOB.directory[ckey]
+	if(target && new_level < old_level)
+		to_chat(target, SPAN_NOTICE("An admin set your [track_name] level to [new_level] (from [old_level]). Locked gear in your loadout falls back next spawn."))
 	shown = shown || "[xp] XP"
 	log_admin("[key_name(admin)] set the [track] progression of [ckey] for [key] to [shown].")
 	message_admins("[key_name_admin(admin)] set the [track] progression of [ckey] for [key] to [shown].")
@@ -521,3 +531,8 @@ GLOBAL_VAR_INIT(clash_trial_packs_built, FALSE)
 	for(var/datum/supply_packs/pack as anything in ordered)
 		if(pack in GLOB.clash_trial_packs)
 			GLOB.clash_trial_packs[pack] = TRUE
+
+/proc/clash_arena_remove_attachment_vendors()
+	for(var/obj/structure/machinery/cm_vending/sorted/attachments/vendor in GLOB.machines)
+		if(is_ground_level(vendor.z))
+			qdel(vendor)

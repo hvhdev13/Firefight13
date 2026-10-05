@@ -1,3 +1,5 @@
+#define CLASH_FLAG_STAND_MIN_GAP 10
+
 /datum/game_mode/extended/faction_clash/hvh/tdm/ctf
 	name = GAMEMODE_CTF
 	config_tag = GAMEMODE_CTF
@@ -23,13 +25,16 @@
 	return ..()
 
 /datum/game_mode/extended/faction_clash/hvh/tdm/ctf/proc/build_stands()
-	stands = get_clash_flag_spots()
+	var/list/notes = list()
+	stands = get_clash_flag_spots(notes)
 	var/turf/uscm_home = stands[FACTION_MARINE]
 	var/turf/upp_home = stands[FACTION_UPP]
-	if(!uscm_home || !upp_home || get_dist(uscm_home, upp_home) < 10)
+	if(!uscm_home || !upp_home || get_dist(uscm_home, upp_home) < CLASH_FLAG_STAND_MIN_GAP)
 		message_admins("HVH: [name] could not place two flag stands far enough apart on this map. Matches will be decided on time as draws.")
 		stands = list()
 		return
+	message_admins("HVH: [name]: [notes.Join(" ")]")
+	log_game("HVH: [name]: [notes.Join(" ")]")
 	for(var/faction in stands)
 		var/turf/home = stands[faction]
 		stand_tiles += place_clash_flag_stand(home, faction_color(faction))
@@ -59,6 +64,15 @@
 	for(var/datum/clash_bot/bot as anything in GLOB.clash_bots)
 		if(bot.post && !bot.post.rally_id)
 			bot.anchor = bot.post.get_hold_turf()
+
+/datum/game_mode/extended/faction_clash/hvh/tdm/ctf/get_radar_pins(mob/viewer)
+	. = list()
+	for(var/faction in stands)
+		var/tone = clash_radar_tone(faction, viewer)
+		. += list(list("key" = "stand[faction]", "turf" = stands[faction], "letter" = "F", "tone" = tone, "hollow" = FALSE))
+		var/obj/item/clash_flag/flag = flags[faction]
+		if(!QDELETED(flag) && flag.state != CLASH_FLAG_HOME)
+			. += list(list("key" = REF(flag), "turf" = get_turf(flag), "letter" = "F", "tone" = tone, "hollow" = TRUE))
 
 /datum/game_mode/extended/faction_clash/hvh/tdm/ctf/get_objective_turfs()
 	. = list()

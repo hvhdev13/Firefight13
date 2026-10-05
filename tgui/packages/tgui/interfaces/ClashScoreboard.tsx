@@ -477,12 +477,29 @@ export const ClashScoreboard = () => {
             </div>
             {awards.length > 0 && (
               <div className="ClashScoreboard__awards">
-                <Icon name="medal" mr={1} />
-                {awards.map((award) => (
-                  <span key={award} className="ClashScoreboard__award">
-                    {award}
-                  </span>
-                ))}
+                <div className="ClashScoreboard__awardsHead">
+                  <Icon name="medal" mr={1} />
+                  Awards
+                </div>
+                <div className="ClashScoreboard__awardsList">
+                  {awards.map((award) => {
+                    const split = award.indexOf(': ');
+                    return (
+                      <div key={award} className="ClashScoreboard__award">
+                        {split > 0 ? (
+                          <>
+                            <span className="ClashScoreboard__awardTitle">
+                              {award.slice(0, split)}
+                            </span>{' '}
+                            {award.slice(split + 2)}
+                          </>
+                        ) : (
+                          award
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             )}
             {(!!data.finished || !!data.intermission) && data.progress && (

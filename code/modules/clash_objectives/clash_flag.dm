@@ -1,15 +1,17 @@
 #define CLASH_FLAG_STAND_OFFSET 4
 
-/obj/effect/landmark/clash_flag_stand
-	name = "Clash flag stand"
+/obj/effect/landmark/clash_objective/clash_flag
+	name = "CTF flag stand"
 	var/faction
 
-/obj/effect/landmark/clash_flag_stand/uscm
-	name = "Clash flag stand (USCM)"
+/obj/effect/landmark/clash_objective/clash_flag/uscm
+	name = "CTF flag stand (USCM)"
+	icon_state = "o_blue"
 	faction = FACTION_MARINE
 
-/obj/effect/landmark/clash_flag_stand/upp
-	name = "Clash flag stand (UPP)"
+/obj/effect/landmark/clash_objective/clash_flag/upp
+	name = "CTF flag stand (UPP)"
+	icon_state = "o_red"
 	faction = FACTION_UPP
 
 /obj/item/clash_flag
@@ -128,17 +130,35 @@
 			return TRUE
 	return FALSE
 
-/proc/get_clash_flag_spots()
-	. = list()
-	var/list/levels = SSmapping.levels_by_trait(ZTRAIT_GROUND)
-	if(!length(levels))
-		return
-	var/z = levels[1]
-	for(var/obj/effect/landmark/clash_flag_stand/mark as anything in GLOB.landmarks_list)
-		if(istype(mark) && mark.z == z && mark.faction)
-			.[mark.faction] = get_turf(mark)
-	if(.[FACTION_MARINE] && .[FACTION_UPP])
-		return
+/proc/get_clash_flag_spots(list/notes)
+	var/z = get_clash_ground_z()
+	if(!z)
+		return list()
+	var/list/marked = list()
+	for(var/obj/effect/landmark/clash_objective/clash_flag/mark in GLOB.clash_objective_landmarks)
+		if(mark.z == z && mark.faction)
+			marked[mark.faction] = get_turf(mark)
+	if(!length(marked))
+		notes += "No flag stand markers on this map, the stands were placed automatically."
+		return get_clash_auto_flag_spots(z)
+	var/list/problems = list()
+	for(var/faction in list(FACTION_MARINE, FACTION_UPP))
+		var/side = faction == FACTION_MARINE ? "USCM" : "UPP"
+		if(!marked[faction])
+			problems += "the [side] stand is missing"
+			continue
+		var/problem = clash_marker_problem(marked[faction])
+		if(problem)
+			problems += "the [side] stand [problem]"
+	if(!length(problems) && get_dist(marked[FACTION_MARINE], marked[FACTION_UPP]) < CLASH_FLAG_STAND_MIN_GAP)
+		problems += "the stands are under [CLASH_FLAG_STAND_MIN_GAP] tiles apart"
+	if(!length(problems))
+		notes += "Flag stands come from the map's markers."
+		return marked
+	notes += "Flag stands were placed automatically because [english_list(problems)]."
+	return get_clash_auto_flag_spots(z)
+
+/proc/get_clash_auto_flag_spots(z)
 	. = list()
 	var/list/centres = get_clash_base_centres(z)
 	var/list/uscm = centres[FACTION_MARINE]

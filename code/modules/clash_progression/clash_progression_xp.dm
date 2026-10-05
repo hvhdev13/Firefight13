@@ -181,7 +181,7 @@
 	for(var/obj/item/attachable/attachment_type as anything in unlock["types"])
 		names |= initial(attachment_type.name)
 	if(!length(names))
-		clash_notify_unlock(ckey, CLASH_UNLOCK_COSMETIC, "Engraving", source, gun_type)
+		clash_notify_unlock(ckey, CLASH_UNLOCK_COSMETIC, "Your name engraved on every [strip_improper(initial(gun.name))] you spawn with", source, gun_type)
 		return
 	clash_notify_unlock(ckey, CLASH_UNLOCK_ATTACHMENT, capitalize(english_list(names)), source, unlock["types"][1])
 

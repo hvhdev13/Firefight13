@@ -370,7 +370,7 @@ GLOBAL_LIST_EMPTY(clash_death_card_icons)
 	if(has_killer && portrait)
 		overlays += clash_death_card_picture(portrait, world.icon_size, world.icon_size, box_center_x, box_bottom + DEATH_CARD_GUN_STRIP + DEATH_CARD_ICON_BOX / 2, 2, DEATH_CARD_ICON_BOX)
 	if(has_killer && weapon)
-		var/icon/weapon_icon = clash_trim_icon(getFlatIcon(weapon))
+		var/icon/weapon_icon = clash_trim_icon(getFlatIcon(weapon, no_anim = TRUE))
 		overlays += clash_death_card_picture(mutable_appearance(weapon_icon), weapon_icon.Width(), weapon_icon.Height(), box_center_x, box_bottom + DEATH_CARD_GUN_STRIP / 2, 1, DEATH_CARD_ICON_BOX - 8, DEATH_CARD_GUN_STRIP - 6)
 	victim.client.clash_death_card = list(
 		"color" = color,
