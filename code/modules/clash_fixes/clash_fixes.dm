@@ -91,3 +91,26 @@ GLOBAL_VAR_INIT(clash_global_say, TRUE)
 	if(statistic_exempt && !client && ((message_flags & (CHAT_TYPE_COMBAT_ACTION|CHAT_TYPE_WEAPON_USE|CHAT_TYPE_FLUFF_ACTION)) || (message_flags == CHAT_TYPE_TAKING_HIT && findtext(message, " misses "))))
 		return
 	return ..()
+
+/mob/say_verb(message as text)
+	if(copytext(message, 1, 2) != ";" || isnewplayer(src) || !istype(SSticker.mode, /datum/game_mode/extended/faction_clash/hvh))
+		return ..()
+	clash_all_chat(copytext(message, 2))
+
+/mob/proc/clash_all_chat(message)
+	message = trim(strip_html(message, MAX_MESSAGE_LEN))
+	if(!length(message) || !client)
+		return
+	if(client.prefs.muted & MUTE_IC)
+		to_chat(src, SPAN_DANGER("You cannot speak in IC (Muted)."))
+		return
+	if(isliving(src) && stat == UNCONSCIOUS)
+		to_chat(src, SPAN_WARNING("You can't talk while unconscious."))
+		return
+	if(!client.attempt_talking(message) || !filter_message(client, message))
+		return
+	log_say("ALL/[key_name(src)] : [message]")
+	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
+	var/line = "<span class='game say'><b>\[ALL\]</b> <span style='color: [clash_mode.faction_color(faction)]'><b>[html_encode(real_name)]</b></span>: [message]</span>"
+	for(var/client/listener as anything in GLOB.clients)
+		to_chat(listener, line)
