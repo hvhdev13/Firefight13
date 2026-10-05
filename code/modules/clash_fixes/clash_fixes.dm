@@ -87,10 +87,21 @@ GLOBAL_VAR_INIT(clash_global_say, TRUE)
 	if(length(langchat_listeners))
 		langchat_speech(message, langchat_listeners, GLOB.all_languages, skip_language_check = TRUE)
 
+/proc/clash_is_bot(mob/living/carbon/human/fighter)
+	return fighter.statistic_exempt && !fighter.client && istype(SSticker.mode, /datum/game_mode/extended/faction_clash/hvh)
+
 /mob/living/carbon/human/visible_message(message, self_message, blind_message, max_distance, message_flags = CHAT_TYPE_OTHER)
-	if(statistic_exempt && !client && ((message_flags & (CHAT_TYPE_COMBAT_ACTION|CHAT_TYPE_WEAPON_USE|CHAT_TYPE_FLUFF_ACTION)) || (message_flags == CHAT_TYPE_TAKING_HIT && findtext(message, " misses "))))
+	if(clash_is_bot(src))
 		return
 	return ..()
+
+/mob/living/carbon/human/audible_message(message, deaf_message, max_distance, message_flags = CHAT_TYPE_OTHER)
+	if(clash_is_bot(src))
+		return
+	return ..()
+
+/obj/structure/barricade/update_health(damage, nomessage)
+	return ..(damage, nomessage || istype(SSticker.mode, /datum/game_mode/extended/faction_clash/hvh))
 
 /mob/say_verb(message as text)
 	if(copytext(message, 1, 2) != ";" || isnewplayer(src) || !istype(SSticker.mode, /datum/game_mode/extended/faction_clash/hvh))

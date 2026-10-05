@@ -30,7 +30,7 @@ interface Option {
   icon_state: string;
   ammo: number;
   stats: [string, number][];
-  perk_class: string | null;
+  only_class: string | null;
 }
 
 interface RoleGroup {
@@ -153,7 +153,7 @@ interface Data extends StaticData {
   deploy_block: string | null;
   revivable: BooleanLike;
   sentry_slot: BooleanLike;
-  perk_class: string;
+  job_class: string;
   hint: string | null;
   pack: PackContainer[];
   extras: Extra[];
@@ -516,7 +516,7 @@ const ShopView = () => {
   );
 };
 
-const LEFT_SLOTS = ['helmet', 'mask', 'armor', 'back'];
+const LEFT_SLOTS = ['helmet', 'eyes', 'mask', 'armor', 'back'];
 const RIGHT_SLOTS = ['primary', 'sidearm', 'grenade', 'belt'];
 const POUCH_SLOTS = ['pouch_l', 'webbing', 'pouch_r'];
 const ATTACHMENT_SLOTS = ['rail', 'muzzle', 'under', 'stock'];
@@ -722,7 +722,7 @@ export const ClashKit = () => {
     deploy_block,
     revivable,
     sentry_slot,
-    perk_class,
+    job_class,
     hint,
     progress,
   } = data;
@@ -758,7 +758,7 @@ export const ClashKit = () => {
   const ranks = progress?.ranks ?? {};
   const slotOptions = (id: string) =>
     (menus[faction]?.[id] ?? []).filter(
-      (option) => id !== 'class_perk' || option.perk_class === perk_class,
+      (option) => !option.only_class || option.only_class === job_class,
     );
   const hasClassPerks = slotOptions('class_perk').length > 0;
   useEffect(() => {
@@ -946,7 +946,7 @@ export const ClashKit = () => {
                 </Box>
 
                 <Box className="ClashKit__dollGrid">
-                  <Box className="ClashKit__slotColumn">
+                  <Box className="ClashKit__slotColumn ClashKit__slotColumn--dense">
                     {LEFT_SLOTS.map((id) => tile(id))}
                   </Box>
                   <Box className="ClashKit__dollStage">

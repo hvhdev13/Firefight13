@@ -63,6 +63,9 @@ GLOBAL_LIST_INIT(clash_arena_eng_removed, list(
 		clash_give_engineer_item(engineer, new /obj/item/tool/wrench(engineer))
 	if(!(locate(/obj/item/tool/weldingtool) in carried))
 		clash_give_engineer_item(engineer, new /obj/item/tool/weldingtool(engineer))
+	var/obj/item/clothing/glasses/welding/goggles = locate() in carried
+	if(goggles)
+		clash_goggles_up(goggles, engineer)
 	clash_remove_engineer_builds(ckey, FALSE)
 	var/list/sentries = GLOB.clash_engineer_sentries[ckey]
 	for(var/obj/structure/machinery/defenses/sentry/turret as anything in sentries?.Copy())
@@ -76,6 +79,20 @@ GLOBAL_LIST_INIT(clash_arena_eng_removed, list(
 			qdel(old_crate)
 	clash_give_engineer_item(engineer, clash_new_sentry(engineer, clash_engineer_sentry_choice(engineer)))
 	clash_give_engineer_item(engineer, clash_new_crate(engineer))
+
+/proc/clash_goggles_up(obj/item/clothing/glasses/welding/goggles, mob/living/carbon/human/wearer)
+	if(!goggles.active)
+		return
+	goggles.active = FALSE
+	goggles.vision_impair = goggles.vision_impair_off
+	goggles.flags_inventory &= ~COVEREYES
+	goggles.flags_inv_hide &= ~HIDEEYES
+	goggles.flags_armor_protection &= ~BODY_FLAG_EYES
+	goggles.eye_protection = EYE_PROTECTION_NONE
+	goggles.update_icon()
+	if(wearer.glasses == goggles)
+		wearer.update_tint()
+	goggles.update_clothing_icon()
 
 /proc/clash_new_sentry(mob/living/carbon/human/engineer, tier)
 	var/kit_type = clash_sentry_kit_for(engineer.faction, tier)

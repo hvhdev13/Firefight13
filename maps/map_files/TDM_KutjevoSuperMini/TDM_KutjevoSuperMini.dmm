@@ -665,6 +665,8 @@
 /turf/open/floor/strata/red4,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "acc" = (
+/obj/effect/landmark/clash_objective/domination_zone/a,
+/obj/effect/landmark/clash_objective/koth_primary,
 /turf/open/gm/river/desert/deep/covered,
 /area/kutjevo/exterior/lz_dunes)
 "acd" = (
@@ -6011,7 +6013,7 @@
 /turf/open/auto_turf/sand/layer1,
 /area/kutjevo/exterior/lz_dunes)
 "aqX" = (
-/obj/effect/landmark/clash_npc/uscm,
+/obj/effect/landmark/clash_npc/uscm/fill,
 /turf/open/hybrisa/street/sidewalk/west,
 /area/kutjevo/exterior/stonyfields)
 "aqY" = (
@@ -7064,7 +7066,7 @@
 /turf/open/hybrisa/street/cement1,
 /area/kutjevo/exterior/lz_river)
 "atp" = (
-/obj/effect/landmark/clash_npc/uscm,
+/obj/effect/landmark/clash_npc/uscm/fill,
 /turf/open/hybrisa/street/cement1,
 /area/kutjevo/exterior/stonyfields)
 "atq" = (
@@ -12983,6 +12985,14 @@
 /obj/structure/platform/stone/kutjevo/west,
 /turf/open/auto_turf/sand/layer1,
 /area/kutjevo/exterior/lz_dunes)
+"fJp" = (
+/obj/structure/prop/hybrisa/misc/floorprops/grate2{
+	explo_proof = 1
+	},
+/obj/effect/landmark/clash_objective/domination_zone/c,
+/obj/effect/landmark/clash_objective/koth_secondary,
+/turf/open/gm/river/desert/deep,
+/area/kutjevo/exterior/lz_river)
 "fMB" = (
 /obj/structure/flora/grass/desert/lightgrass_12,
 /turf/open/desert/rock/deep/rock3,
@@ -13085,6 +13095,10 @@
 /obj/structure/blocker/invisible_wall,
 /turf/open/asphalt/cement_sunbleached,
 /area/kutjevo/exterior/lz_dunes)
+"gPj" = (
+/obj/effect/landmark/clash_objective/clash_flag/upp,
+/turf/open/auto_turf/sand/layer0,
+/area/kutjevo/exterior/Northwest_Colony)
 "gRX" = (
 /turf/open/floor/strata/orange_icorner/north,
 /area/clash_arena/tdm_kutjevo/upp_base)
@@ -13116,6 +13130,11 @@
 "hrz" = (
 /turf/open/auto_turf/sand/layer0,
 /area/kutjevo/exterior/Northwest_Colony)
+"hsk" = (
+/obj/effect/landmark/clash_objective/domination_zone/b,
+/obj/effect/landmark/clash_objective/koth_tertiary,
+/turf/open/floor/kutjevo/plate,
+/area/kutjevo/exterior/telecomm/lz2_south)
 "hvr" = (
 /obj/structure/platform_decoration/stone/kutjevo/west,
 /turf/open/auto_turf/sand/layer0,
@@ -13200,7 +13219,7 @@
 /turf/open/floor/strata/floor3/east,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "jfS" = (
-/obj/effect/landmark/clash_npc/upp,
+/obj/effect/landmark/clash_npc/upp/fill,
 /turf/open/floor/kutjevo/plate,
 /area/kutjevo/exterior/Northwest_Colony)
 "jhS" = (
@@ -13348,7 +13367,7 @@
 /turf/open/floor/strata/floor3/east,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "lJL" = (
-/obj/effect/landmark/clash_npc/upp,
+/obj/effect/landmark/clash_npc/upp/fill,
 /turf/open/auto_turf/sand/layer1,
 /area/kutjevo/exterior/Northwest_Colony)
 "lKg" = (
@@ -13359,7 +13378,7 @@
 /turf/open/floor/corsat/spiralplate,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "lKp" = (
-/obj/effect/landmark/clash_npc/uscm,
+/obj/effect/landmark/clash_npc/uscm/fill,
 /turf/open/hybrisa/street/asphalt,
 /area/kutjevo/exterior/stonyfields)
 "lLH" = (
@@ -13526,7 +13545,7 @@
 /turf/open/desert/rock/deep/rock3,
 /area/kutjevo/exterior/Northwest_Colony)
 "niy" = (
-/obj/effect/landmark/clash_npc/upp,
+/obj/effect/landmark/clash_npc/upp/fill,
 /turf/open/desert/rock/deep/rock3,
 /area/kutjevo/exterior/Northwest_Colony)
 "niT" = (
@@ -14257,11 +14276,11 @@
 /turf/open/floor/kutjevo/multi_tiles,
 /area/kutjevo/interior/power)
 "wlI" = (
-/obj/effect/landmark/clash_npc/upp,
+/obj/effect/landmark/clash_npc/upp/fill,
 /turf/open/auto_turf/sand/layer1,
 /area/kutjevo/exterior/lz_dunes)
 "wmI" = (
-/obj/effect/landmark/clash_npc/uscm,
+/obj/effect/landmark/clash_npc/uscm/fill,
 /turf/open/floor/kutjevo/multi_tiles,
 /area/kutjevo/interior/power)
 "wqD" = (
@@ -14450,7 +14469,7 @@
 /turf/open/floor/grass,
 /area/kutjevo/exterior/stonyfields)
 "xPJ" = (
-/obj/effect/landmark/clash_npc/uscm,
+/obj/effect/landmark/clash_npc/uscm/fill,
 /turf/open/asphalt/cement_sunbleached,
 /area/kutjevo/exterior/lz_dunes)
 "xXe" = (
@@ -31916,7 +31935,7 @@ twn
 cvV
 bGg
 sVF
-afp
+gPj
 sVF
 bGg
 sVF
@@ -36208,7 +36227,7 @@ hrz
 afm
 afi
 mgn
-pci
+hsk
 mEb
 jFf
 rIn
@@ -37589,7 +37608,7 @@ qzd
 ddq
 ahW
 xzI
-axe
+fJp
 awB
 sDG
 sDG

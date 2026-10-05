@@ -1,21 +1,21 @@
 GLOBAL_LIST_EMPTY(clash_welcomed)
 GLOBAL_VAR_INIT(clash_feedback_contact, "")
 
-GLOBAL_LIST_INIT(clash_arena_rations, list(/obj/item/storage/box/mre, /obj/item/ammo_box/magazine/misc/mre))
+GLOBAL_LIST_INIT(clash_arena_removed_items, list(/obj/item/storage/box/mre, /obj/item/ammo_box/magazine/misc/mre, /obj/item/storage/box/attachments))
 
 /proc/clash_fed_spawns()
 	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
 	return istype(clash_mode) && clash_mode.fed_spawns
 
-/proc/clash_is_ration(item_type)
-	for(var/ration_type in GLOB.clash_arena_rations)
-		if(ispath(item_type, ration_type))
+/proc/clash_is_arena_removed(item_type)
+	for(var/removed_type in GLOB.clash_arena_removed_items)
+		if(ispath(item_type, removed_type))
 			return TRUE
 	return FALSE
 
-/proc/clash_remove_rations(mob/living/carbon/human/wearer)
+/proc/clash_remove_arena_items(mob/living/carbon/human/wearer)
 	for(var/obj/item/carried in wearer.get_contents())
-		if(clash_is_ration(carried.type))
+		if(clash_is_arena_removed(carried.type))
 			qdel(carried)
 
 /proc/clash_keep_fed()

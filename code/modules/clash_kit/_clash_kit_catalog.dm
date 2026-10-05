@@ -1,4 +1,5 @@
 #define KIT_SLOT_HELMET "helmet"
+#define KIT_SLOT_EYES "eyes"
 #define KIT_SLOT_ARMOR "armor"
 #define KIT_SLOT_MASK "mask"
 #define KIT_SLOT_BACK "back"
@@ -15,7 +16,7 @@
 #define KIT_SLOT_WEBBING "webbing"
 #define KIT_SLOT_CLASS_PERK "class_perk"
 #define KIT_SLOT_GENERAL_PERK "general_perk"
-GLOBAL_LIST_INIT(clash_kit_worn_slots, list(KIT_SLOT_HELMET, KIT_SLOT_ARMOR, KIT_SLOT_MASK, KIT_SLOT_BACK, KIT_SLOT_BELT, KIT_SLOT_POUCH_L, KIT_SLOT_POUCH_R))
+GLOBAL_LIST_INIT(clash_kit_worn_slots, list(KIT_SLOT_HELMET, KIT_SLOT_EYES, KIT_SLOT_ARMOR, KIT_SLOT_MASK, KIT_SLOT_BACK, KIT_SLOT_BELT, KIT_SLOT_POUCH_L, KIT_SLOT_POUCH_R))
 GLOBAL_LIST_INIT(clash_kit_attachment_slots, list(KIT_SLOT_RAIL, KIT_SLOT_MUZZLE, KIT_SLOT_UNDER, KIT_SLOT_STOCK))
 #define CLASH_KIT_COUNT 7
 #define CLASH_KIT_SPAWN "spawn"
@@ -30,6 +31,7 @@ GLOBAL_LIST_INIT(clash_kit_attachment_slots, list(KIT_SLOT_RAIL, KIT_SLOT_MUZZLE
 
 GLOBAL_LIST_INIT(clash_kit_slots, list(
 	KIT_SLOT_HELMET = list("name" = "Helmet", "image" = "inventory-head.png", "wear" = WEAR_HEAD),
+	KIT_SLOT_EYES = list("name" = "Eyes", "image" = "inventory-glasses.png", "wear" = WEAR_EYES),
 	KIT_SLOT_ARMOR = list("name" = "Armor", "image" = "inventory-suit.png", "wear" = WEAR_JACKET),
 	KIT_SLOT_MASK = list("name" = "Mask", "image" = "inventory-mask.png", "wear" = WEAR_FACE),
 	KIT_SLOT_BACK = list("name" = "Back", "image" = "inventory-back.png", "wear" = WEAR_BACK),
@@ -115,6 +117,7 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 	var/ammo_type
 	var/ammo_count = 0
 	var/list/stats = list()
+	var/only_class
 
 /proc/clash_kit_option_id(faction, slot, item_type)
 	return "[faction]|[slot]|[item_type]"
@@ -234,10 +237,16 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 		add_clash_kit_option(faction, slot, "Large shotgun shell pouch", /obj/item/storage/pouch/shotgun/large, "More shells and slugs")
 		add_clash_kit_option(faction, slot, "Fuel tank strap pouch", /obj/item/storage/pouch/flamertank, "Two spare flamer tanks")
 		add_clash_kit_option(faction, slot, "First-aid pouch", /obj/item/storage/pouch/firstaid/clash, "Healing injector, tramadol injector, field dressing and splint")
+		var/datum/clash_kit_option/canister = add_clash_kit_option(faction, slot, "Reagent canister pouch (empty)", /obj/item/storage/pouch/pressurized_reagent_canister, "Holds an injector and a canister to refill it. Fill the canister at a chem dispenser")
+		canister.only_class = GLOB.clash_job_classes[JOB_SQUAD_MEDIC]
+		var/datum/clash_kit_option/unga_canister = add_clash_kit_option(faction, slot, "Reagent canister pouch (UNGA)", /obj/item/storage/pouch/pressurized_reagent_canister/clash_unga, "Holds an injector and a canister of UNGA mix to refill it")
+		unga_canister.only_class = GLOB.clash_job_classes[JOB_SQUAD_MEDIC]
 		add_clash_kit_option(faction, slot, "Flare pouch", /obj/item/storage/pouch/flare/full, "Light up a lane")
 		add_clash_kit_option(faction, slot, "Explosive pouch", /obj/item/storage/pouch/explosive, "Carries your grenades")
 		add_clash_kit_option(faction, slot, "Medium general pouch", /obj/item/storage/pouch/general/medium, "Tools, flares, whatever fits")
 		add_clash_kit_option(faction, slot, "Bayonet sheath", faction == FACTION_UPP ? /obj/item/storage/pouch/bayonet/upp : /obj/item/storage/pouch/bayonet, "Spare blade on the hip")
+	var/datum/clash_kit_option/goggles = add_clash_kit_option(faction, KIT_SLOT_EYES, "Welding goggles", /obj/item/clothing/glasses/welding, "Flip them down to weld without hurting your eyes")
+	goggles.only_class = GLOB.clash_job_classes[JOB_SQUAD_ENGI]
 	add_clash_kit_option(faction, KIT_SLOT_WEBBING, "Webbing", /obj/item/clothing/accessory/storage/webbing, "Chest rig for small gear")
 	add_clash_kit_option(faction, KIT_SLOT_WEBBING, "Black webbing", /obj/item/clothing/accessory/storage/webbing/black, "Chest rig for small gear")
 	add_clash_kit_option(faction, KIT_SLOT_WEBBING, "Brown webbing vest", /obj/item/clothing/accessory/storage/black_vest/brown_vest, "Vest with pockets")

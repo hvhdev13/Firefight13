@@ -162,6 +162,10 @@ $panel: rgba(0, 0, 0, 0.3);
     gap: 6px;
   }
 
+  &__slotColumn--dense &__slot {
+    height: 52px;
+  }
+
   &__dollStage {
     display: flex;
     flex-direction: column;
