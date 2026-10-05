@@ -88,6 +88,6 @@ GLOBAL_VAR_INIT(clash_global_say, TRUE)
 		langchat_speech(message, langchat_listeners, GLOB.all_languages, skip_language_check = TRUE)
 
 /mob/living/carbon/human/visible_message(message, self_message, blind_message, max_distance, message_flags = CHAT_TYPE_OTHER)
-	if(statistic_exempt && !client && message_flags == CHAT_TYPE_TAKING_HIT && findtext(message, " misses "))
+	if(statistic_exempt && !client && ((message_flags & (CHAT_TYPE_COMBAT_ACTION|CHAT_TYPE_WEAPON_USE|CHAT_TYPE_FLUFF_ACTION)) || (message_flags == CHAT_TYPE_TAKING_HIT && findtext(message, " misses "))))
 		return
 	return ..()
