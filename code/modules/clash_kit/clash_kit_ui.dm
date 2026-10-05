@@ -48,7 +48,6 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 	var/render_queued = FALSE
 	var/list/side_jobs = list()
 	var/list/named_kits = list()
-	COOLDOWN_DECLARE(equip_cooldown)
 
 /datum/clash_kit_screen/New(ckey)
 	. = ..()
@@ -151,9 +150,6 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 				if(clash_kit_attachment_fits(option.item_type, primary.item_type) && (!clash_progression_gating() || GLOB.clash_weapon_unlock_levels[clash_track_type(primary.item_type)]?[option.item_type]))
 					fits += option.id
 	var/mob/living/carbon/human/fighter = ishuman(user) && user.stat != DEAD ? user : null
-	var/area/clash_arena/here = fighter ? get_area(fighter) : null
-	var/in_base = istype(here) && here.clash_faction == fighter?.faction
-	var/can_equip_now = fighter && fighter.stat == CONSCIOUS && fighter.job == job && in_base
 	var/deploy_state = get_deploy_state(user)
 	var/respawn_in = deploy_state == "dead" ? clash_respawn_wait(user) : 0
 	if(respawn_in)
@@ -166,10 +162,8 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 	if(fighter)
 		if(fighter.job != job)
 			hint = "Editing [job]. You are playing [fighter.job]."
-		else if(in_base)
-			hint = "Equip now to swap into this kit, or it goes on at your next spawn."
 		else
-			hint = "Goes on at your next spawn. Head back to base to swap now."
+			hint = "Changes go on at your next spawn."
 	else if(deploy_state)
 		hint = "Choose a role and a kit, then deploy."
 	return list(
@@ -178,7 +172,8 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 		"kits" = kit_data,
 		"kit_index" = kit_index,
 		"choices" = kit?.choices || list(),
-		"issue" = clash_filter_issue(issue, ckey, job) || list(),
+		"issue" = clash_sentry_issue(clash_filter_issue(issue, ckey, job) || list(), job),
+		"sentry_slot" = clash_job_is_engineer(job),
 		"fits" = fits,
 		"doll" = render?["doll"],
 		"gun" = render?["gun"],
@@ -189,8 +184,6 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 		"shop" = get_clash_shop(job)["sections"],
 		"budget" = get_clash_kit_budget(job, ckey),
 		"spent" = kit ? get_clash_kit_spent(kit, job) : list(),
-		"can_equip_now" = can_equip_now,
-		"live" = !!fighter,
 		"deploy_state" = deploy_state,
 		"respawn_in" = CEILING(respawn_in / 10, 1),
 		"deploy_block" = deploy_state ? get_deploy_block(user) : null,
@@ -422,18 +415,6 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 				return TRUE
 			kit.name = new_name
 			save_clash_kits(ckey)
-		if("equip_now")
-			var/mob/living/carbon/human/fighter = user
-			var/area/clash_arena/here = ishuman(fighter) ? get_area(fighter) : null
-			if(!ishuman(fighter) || fighter.stat != CONSCIOUS || fighter.job != job || !istype(here) || here.clash_faction != fighter.faction)
-				to_chat(user, SPAN_WARNING("You can only re-kit inside your own base, as the role the kit is for."))
-				return TRUE
-			if(!COOLDOWN_FINISHED(src, equip_cooldown))
-				to_chat(user, SPAN_WARNING("Give it a moment before re-kitting again."))
-				return TRUE
-			COOLDOWN_START(src, equip_cooldown, 10 SECONDS)
-			apply_clash_kit(fighter, kit, CLASH_KIT_EQUIP)
-			to_chat(user, SPAN_NOTICE("Re-kitted as [kit.name]."))
 		if("deploy")
 			deploy(user)
 			return TRUE

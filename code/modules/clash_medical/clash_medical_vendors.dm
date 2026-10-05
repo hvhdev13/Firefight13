@@ -79,7 +79,7 @@ GLOBAL_LIST_INIT(clash_arena_crate_removed, list(
 				if(ispath(item_type, family))
 					removed = TRUE
 					break
-			if(!removed)
+			if(!removed && !clash_arena_eng_removed(item_type))
 				contents += GLOB.clash_arena_crate_swaps[item_type] || item_type
 		pack.contains = contents
 
@@ -92,6 +92,8 @@ GLOBAL_LIST_INIT(clash_arena_crate_removed, list(
 	for(var/family in GLOB.clash_arena_med_removed_families)
 		if(ispath(item_type, family))
 			return null
+	if(clash_arena_eng_removed(item_type))
+		return null
 	var/list/swap = GLOB.clash_arena_med_swaps[item_type]
 	if(swap)
 		if(sorted && ispath(swap[2], /obj/item/storage))
@@ -128,6 +130,8 @@ GLOBAL_LIST_INIT(clash_arena_crate_removed, list(
 	if(clash_fast_medicine())
 		var/mob/living/carbon/human/shopper = user
 		. = clash_arena_med_products(., istype(src, /obj/structure/machinery/cm_vending/sorted/medical) || (ishuman(shopper) && clash_is_medic(shopper)), istype(src, /obj/structure/machinery/cm_vending/sorted), vend_flags & VEND_LIMITED_INVENTORY)
+		if(ishuman(shopper) && clash_is_engineer(shopper) && istype(src, /obj/structure/machinery/cm_vending/gear))
+			. += clash_engineer_vendor_entries(shopper.faction)
 
 /proc/clash_medic_vendor_access(obj/structure/machinery/cm_vending/vendor, mob/user, display)
 	if(!ishuman(user) || skillcheck(user, SKILL_MEDICAL, SKILL_MEDICAL_MEDIC))

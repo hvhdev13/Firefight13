@@ -151,6 +151,16 @@
 			if(perk[1] == level)
 				found = TRUE
 				clash_notify_unlock(ckey, CLASH_UNLOCK_PERK, perk[2], source)
+	if(class == CLASH_CLASS_ENGINEER)
+		for(var/list/perk as anything in GLOB.clash_engineer_perks)
+			if(perk[1] == level)
+				found = TRUE
+				clash_notify_unlock(ckey, CLASH_UNLOCK_PERK, perk[2], source)
+		for(var/tier in GLOB.clash_sentry_tiers)
+			var/list/stats = GLOB.clash_sentry_tiers[tier]
+			if(stats["level"] == level)
+				found = TRUE
+				clash_notify_unlock(ckey, CLASH_UNLOCK_SENTRY, stats["name"], source)
 	if(level == CLASH_LEVEL_CAP)
 		found = TRUE
 		clash_notify_unlock(ckey, CLASH_UNLOCK_COSMETIC, "Veteran [GLOB.clash_class_names[class]]", source)
@@ -206,6 +216,21 @@
 		return TRUE
 	var/datum/clash_progress/progress = clash_progress_of(medic.mind?.ckey || medic.ckey)
 	return progress?.class_level(CLASH_CLASS_MEDIC) >= level
+
+/proc/clash_is_engineer(mob/living/carbon/human/fighter)
+	return clash_job_is_engineer(fighter.job)
+
+/proc/clash_job_is_engineer(job)
+	return GLOB.clash_job_classes[job] == CLASH_CLASS_ENGINEER
+
+/proc/clash_engineer_level(ckey)
+	if(!clash_progression_gating())
+		return CLASH_LEVEL_CAP
+	var/datum/clash_progress/progress = clash_progress_of(ckey)
+	return progress ? progress.class_level(CLASH_CLASS_ENGINEER) : 1
+
+/proc/clash_engineer_perk(mob/living/carbon/human/engineer, level)
+	return clash_engineer_level(engineer.mind?.ckey || engineer.ckey) >= level
 
 /proc/clash_progress_payback(mob/living/carbon/human/killer, amount)
 	var/mob/living/carbon/human/medic = killer.clash_revived_by?.resolve()
@@ -411,6 +436,9 @@
 		return
 	barricade.clash_builder_ckey = builder.mind?.ckey || builder.ckey
 	barricade.clash_builder_faction = builder.faction
+	if(clash_fast_medicine() && clash_engineer_perk(builder, CLASH_PERK_HARDENED))
+		barricade.maxhealth = round(barricade.maxhealth * CLASH_HARDENED_MULT)
+		barricade.health = barricade.maxhealth
 
 /proc/clash_barricade_absorbed(obj/structure/barricade/barricade, attacker, damage)
 	if(istype(attacker, /datum/cause_data))
@@ -436,7 +464,13 @@
 	if(repaired <= 0)
 		return
 	barricade.clash_enemy_damage -= repaired
+	clash_progress_repair(repairer, repaired)
+
+/proc/clash_progress_repair(mob/living/carbon/human/repairer, repaired)
 	repairer.clash_repair_carry += repaired
 	var/xp = round(repairer.clash_repair_carry / CLASH_XP_REPAIR_HP)
 	repairer.clash_repair_carry -= xp * CLASH_XP_REPAIR_HP
 	clash_award_support_xp(repairer, xp, CLASH_XP_SOURCE_REPAIR, CLASH_XP_SOURCE_COVER, CLASH_XP_ENGINEERING_CAP)
+
+/proc/clash_progress_resupply(owner_ckey, faction)
+	clash_grant_support_xp(owner_ckey, faction, CLASH_CLASS_ENGINEER, CLASH_XP_RESUPPLY, CLASH_XP_SOURCE_RESUPPLY, CLASH_XP_SOURCE_COVER, CLASH_XP_ENGINEERING_CAP)

@@ -70,8 +70,9 @@ SUBSYSTEM_DEF(clash_spawn)
 		var/datum/clash_kit/kit = get_clash_active_kit(spawned.ckey, spawned.job)
 		if(kit)
 			apply_clash_kit(spawned, kit)
-			to_chat(spawned, SPAN_NOTICE("Kitted out as [kit.name]. Use the Loadout verb to change it."))
+			to_chat(spawned, SPAN_NOTICE("Kitted out as [kit.name]. Use the Loadout verb to change it for your next spawn."))
 		clash_issue_medic_gear(spawned)
+		clash_issue_engineer_gear(spawned)
 	else
 		addtimer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(clash_equip_spawn_loadout), spawned), 1 SECONDS)
 	var/ckey = spawned.ckey
@@ -144,6 +145,12 @@ SUBSYSTEM_DEF(clash_spawn)
 		page += "<li>Click a teammate or yourself with a dressing, kit or splint. It treats the worst injury, no need to aim at body parts.</li>"
 		page += "<li>Hurt? Shout <b>*medic</b>. Down but revivable? Press <b>Call Medic</b>. A red cross shows over you for your team.</li>"
 		page += "<li>Medics revive teammates with a quick defibrillator zap.</li>"
+		page += "</ul>"
+		page += "<h2>Engineering</h2><ul>"
+		page += "<li>Engineers carry a sentry and an ammo crate. Use either in hand to set it down in front of you. Once one is destroyed, the engineer vendor in your base gives you a new one.</li>"
+		page += "<li>Out of ammo? Click a friendly ammo crate with your gun or an empty hand to take a magazine for that gun.</li>"
+		page += "<li>On a sentry, a wrench packs it up, a welder repairs it, metal reloads it and a flamer fuel tank refuels the Flamer Sentry. Stronger sentries unlock with Engineer level.</li>"
+		page += "<li>Sentries cannot see through smoke and grenades wreck them. Only engineers can build barricades.</li>"
 		page += "</ul>"
 	page += "<h2>Other notes</h2><ul>"
 	page += "<li>Friendly fire is on and explosions have a high chance of taking off limbs.</li>"

@@ -214,6 +214,11 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 		next_fire = max(next_fire, world.time + rand(3, 8))
 
 /datum/clash_bot/proc/can_engage(mob/living/carbon/human/candidate)
+	if(istype(candidate, /obj/structure/machinery/defenses/sentry))
+		var/obj/structure/machinery/defenses/sentry/turret = candidate
+		if(QDELETED(turret) || !turret.placed || !turret.clash_faction || turret.clash_faction == body.faction || turret.z != body.z || get_dist(body, turret) > CLASH_BOT_SIGHT)
+			return FALSE
+		return clear_shot(get_turf(turret), null)
 	if(QDELETED(candidate) || candidate.stat == DEAD || candidate.faction == body.faction)
 		return FALSE
 	if(candidate.z != body.z || get_dist(body, candidate) > CLASH_BOT_SIGHT)
@@ -242,6 +247,14 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 		if(distance >= closest_distance || !can_engage(candidate))
 			continue
 		closest = candidate
+		closest_distance = distance
+	if(closest)
+		return closest
+	for(var/obj/structure/machinery/defenses/sentry/turret in oview(CLASH_BOT_SIGHT, body))
+		var/distance = get_dist(body, turret)
+		if(distance >= closest_distance || !can_engage(turret))
+			continue
+		closest = turret
 		closest_distance = distance
 	return closest
 

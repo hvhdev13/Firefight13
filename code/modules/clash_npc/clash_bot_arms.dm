@@ -142,7 +142,7 @@
 		body.put_in_inactive_hand(held)
 
 /datum/clash_bot/proc/should_charge(obj/item/weapon/gun/weapon)
-	if(!target || HAS_TRAIT(body, TRAIT_FLOORED) || !reachable(knife) || get_dist(body, target) > CLASH_BOT_CHARGE_RANGE)
+	if(!ismob(target) || HAS_TRAIT(body, TRAIT_FLOORED) || !reachable(knife) || get_dist(body, target) > CLASH_BOT_CHARGE_RANGE)
 		return FALSE
 	return !(weapon && gun_ready(weapon))
 

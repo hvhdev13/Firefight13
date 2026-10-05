@@ -566,6 +566,8 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	if(killer.client)
 		playsound_client(killer.client, CLASH_KILL_SOUND, null, 50)
 	clash_progress_kill(victim, killer, cause, cause_object)
+	if(istype(cause_object, /obj/structure/machinery/defenses))
+		score_sentry_kill(killer)
 	if(type == /datum/game_mode/extended/faction_clash/hvh/tdm && killer.statistic_exempt && !victim.statistic_exempt && killer.faction != victim.faction && (killer.faction in list(FACTION_MARINE, FACTION_UPP)))
 		score_kill(killer.faction)
 
@@ -848,7 +850,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		if(!total)
 			round_scores[name] = entry.Copy()
 			continue
-		for(var/stat in list("kills", "assists", "deaths", "shots", "hits", "captures", "revives"))
+		for(var/stat in list("kills", "assists", "deaths", "shots", "hits", "captures", "revives", "sentry_kills"))
 			total[stat] = (total[stat] || 0) + (entry[stat] || 0)
 		total["best_streak"] = max(total["best_streak"], entry["best_streak"])
 		if(!total["ckey"])
@@ -896,6 +898,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	begin_countdown()
 
 /datum/game_mode/extended/faction_clash/hvh/proc/reset_arena()
+	clash_clear_engineer_builds()
 	for(var/mob/living/carbon/human/fighter as anything in GLOB.human_mob_list.Copy())
 		if(QDELETED(fighter) || !is_ground_level(fighter.z) || !(fighter.faction in list(FACTION_MARINE, FACTION_UPP)))
 			continue
@@ -1116,6 +1119,7 @@ GLOBAL_VAR(clash_start_mode)
 	open_first_match()
 	if(arena_rules)
 		clash_arena_med_supply()
+		clash_arena_engineering_setup()
 	for(var/obj/structure/machinery/cm_vending/vendor in GLOB.machines)
 		vendor.vend_delay = 0
 	SSweather.force_weather_holder(/datum/weather_ss_map_holder/faction_clash)
@@ -1290,6 +1294,8 @@ GLOBAL_VAR(clash_start_mode)
 	var/best_captures = 0
 	var/best_revives_name
 	var/best_revives = 0
+	var/best_sentry_name
+	var/best_sentry = 0
 	for(var/name in player_scores)
 		var/list/entry = player_scores[name]
 		if(!entry["ckey"])
@@ -1316,6 +1322,9 @@ GLOBAL_VAR(clash_start_mode)
 		if((entry["revives"] || 0) > best_revives)
 			best_revives = entry["revives"]
 			best_revives_name = name
+		if((entry["sentry_kills"] || 0) > best_sentry)
+			best_sentry = entry["sentry_kills"]
+			best_sentry_name = name
 	if(best_kd_name)
 		. += "Deadliest: [best_kd_name], [round(best_kd, 0.01)] K/D"
 	if(best_streak_name)
@@ -1328,6 +1337,8 @@ GLOBAL_VAR(clash_start_mode)
 		. += "Flag runner: [best_captures_name], [best_captures] captures"
 	if(best_revives_name)
 		. += "Guardian Angel: [best_revives_name], [best_revives] revive\s"
+	if(best_sentry_name)
+		. += "Sentry Master: [best_sentry_name], [best_sentry] sentry kill\s"
 
 /datum/game_mode/extended/faction_clash/hvh/proc/announce_personal_stats()
 	for(var/mob/player as anything in GLOB.player_list)
