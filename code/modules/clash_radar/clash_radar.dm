@@ -113,7 +113,7 @@ GLOBAL_LIST_EMPTY(clash_radar_toggle_icons)
 				"oGGGo",
 				"oGGGo",
 				".ooo.",
-			), list("o" = rgb(10, 12, 15, 220), "G" = rgb(76, 175, 80)))
+			), list("o" = rgb(10, 12, 15, 220), "G" = rgb(80, 150, 240)))
 		if("leader")
 			mark = clash_pattern_icon(list(
 				"...o...",
@@ -151,7 +151,7 @@ GLOBAL_LIST_EMPTY(clash_radar_toggle_icons)
 				"oBBBo",
 				"oBBBo",
 				".ooo.",
-			), list("o" = rgb(10, 12, 15, 220), "B" = rgb(80, 150, 240)))
+			), list("o" = rgb(10, 12, 15, 220), "B" = rgb(76, 175, 80)))
 		if("sentry")
 			mark = clash_pattern_icon(list(
 				".www.",
