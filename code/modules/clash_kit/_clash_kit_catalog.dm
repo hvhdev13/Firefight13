@@ -13,6 +13,8 @@
 #define KIT_SLOT_UNDER "under"
 #define KIT_SLOT_STOCK "stock"
 #define KIT_SLOT_WEBBING "webbing"
+#define KIT_SLOT_CLASS_PERK "class_perk"
+#define KIT_SLOT_GENERAL_PERK "general_perk"
 GLOBAL_LIST_INIT(clash_kit_worn_slots, list(KIT_SLOT_HELMET, KIT_SLOT_ARMOR, KIT_SLOT_MASK, KIT_SLOT_BACK, KIT_SLOT_BELT, KIT_SLOT_POUCH_L, KIT_SLOT_POUCH_R))
 GLOBAL_LIST_INIT(clash_kit_attachment_slots, list(KIT_SLOT_RAIL, KIT_SLOT_MUZZLE, KIT_SLOT_UNDER, KIT_SLOT_STOCK))
 #define CLASH_KIT_COUNT 7
@@ -43,6 +45,8 @@ GLOBAL_LIST_INIT(clash_kit_slots, list(
 	KIT_SLOT_STOCK = list("name" = "Stock", "image" = null, "wear" = null),
 	KIT_SLOT_WEBBING = list("name" = "Accessory", "image" = "inventory-uniform.png", "wear" = null),
 	KIT_SLOT_SENTRY = list("name" = "Sentry", "image" = null, "wear" = null),
+	KIT_SLOT_CLASS_PERK = list("name" = "Class perk", "image" = null, "wear" = null),
+	KIT_SLOT_GENERAL_PERK = list("name" = "General perk", "image" = null, "wear" = null),
 ))
 
 GLOBAL_LIST_INIT(clash_kit_shells, list(
@@ -140,6 +144,8 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 
 /proc/read_clash_kit_stats(datum/clash_kit_option/option)
 	. = list()
+	if(!ispath(option.item_type, /obj/item))
+		return
 	var/obj/item/sample = new option.item_type
 	if(istype(sample, /obj/item/clothing/accessory/storage))
 		var/obj/item/clothing/accessory/storage/webbing = sample
@@ -195,6 +201,8 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 	build_clash_kit_upp()
 	add_clash_sentry_options(FACTION_MARINE)
 	add_clash_sentry_options(FACTION_UPP)
+	add_clash_perk_options(FACTION_MARINE)
+	add_clash_perk_options(FACTION_UPP)
 	add_clash_kit_gun_attachments(FACTION_MARINE)
 	add_clash_kit_gun_attachments(FACTION_UPP)
 	build_clash_weapon_tracks()
@@ -247,7 +255,7 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 	add_clash_kit_option(faction, KIT_SLOT_RAIL, "Magnetic harness", /obj/item/attachable/magnetic_harness, "The gun returns to you when dropped")
 	add_clash_kit_option(faction, KIT_SLOT_RAIL, "S4 2x mini scope", /obj/item/attachable/scope/mini, "Short zoom on aim")
 	add_clash_kit_option(faction, KIT_SLOT_MUZZLE, "Extended barrel", /obj/item/attachable/extended_barrel, "Damage and accuracy up, recoil up")
-	add_clash_kit_option(faction, KIT_SLOT_MUZZLE, "Suppressor", /obj/item/attachable/suppressor, "Quiet, less recoil, less damage")
+	add_clash_kit_option(faction, KIT_SLOT_MUZZLE, "Suppressor", /obj/item/attachable/suppressor, "Quiet, hides you from Keen Ears, less recoil, less damage")
 	add_clash_kit_option(faction, KIT_SLOT_MUZZLE, "Recoil compensator", /obj/item/attachable/compensator, "Recoil and scatter down")
 	add_clash_kit_option(faction, KIT_SLOT_MUZZLE, faction == FACTION_UPP ? "Type 80 bayonet" : "M5 bayonet", faction == FACTION_UPP ? /obj/item/attachable/bayonet/upp : /obj/item/attachable/bayonet, "Melee with the gun")
 	add_clash_kit_option(faction, KIT_SLOT_UNDER, "Vertical grip", /obj/item/attachable/verticalgrip, "Recoil and scatter down, wield slower")

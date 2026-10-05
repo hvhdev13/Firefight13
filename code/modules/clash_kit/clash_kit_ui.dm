@@ -102,7 +102,8 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 		for(var/slot in GLOB.clash_kit_menu[faction])
 			var/list/options = list()
 			for(var/datum/clash_kit_option/option as anything in GLOB.clash_kit_menu[faction][slot])
-				var/atom/item = option.item_type
+				var/datum/clash_perk/perk = GLOB.clash_perks[option.item_type]
+				var/atom/item = perk ? perk.icon_type : option.item_type
 				options += list(list(
 					"id" = option.id,
 					"name" = option.name,
@@ -112,6 +113,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 					"type" = "[option.item_type]",
 					"ammo" = option.ammo_count,
 					"stats" = option.stats,
+					"perk_class" = perk?.class,
 				))
 			by_slot[slot] = options
 		menus[faction] = by_slot
@@ -174,6 +176,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 		"choices" = kit?.choices || list(),
 		"issue" = clash_sentry_issue(clash_filter_issue(issue, ckey, job) || list(), job),
 		"sentry_slot" = clash_job_is_engineer(job),
+		"perk_class" = GLOB.clash_job_classes[job],
 		"fits" = fits,
 		"doll" = render?["doll"],
 		"gun" = render?["gun"],

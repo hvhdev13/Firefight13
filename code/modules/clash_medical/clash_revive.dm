@@ -41,7 +41,7 @@ GLOBAL_LIST_INIT(clash_revive_health, list(50, 35, 20))
 	user.visible_message(SPAN_NOTICE("[user] starts setting up the [fluff_tool] on [target]'s [fluff_target_part]"),
 		SPAN_HELPFUL("You start <b>setting up</b> the [fluff_tool] on <b>[target]</b>'s [fluff_target_part]."))
 	playsound(get_turf(src), 'sound/items/defib_ready.ogg', 25, 0)
-	var/zap = clash_medic_perk(user, CLASH_PERK_QUICK_ZAP) ? CLASH_REVIVE_ZAP_FAST : CLASH_REVIVE_ZAP
+	var/zap = clash_has_perk(user, /datum/clash_perk/quick_zap) ? CLASH_REVIVE_ZAP_FAST : CLASH_REVIVE_ZAP
 	if(!do_after(user, zap, INTERRUPT_NO_NEEDHAND|BEHAVIOR_IMMOBILE, BUSY_ICON_FRIENDLY, target, INTERRUPT_MOVED, BUSY_ICON_MEDICAL))
 		user.visible_message(SPAN_WARNING("[user] stops setting up the [fluff_tool] on [target]'s [fluff_target_part]."),
 			SPAN_WARNING("You stop setting up the [fluff_tool] on [target]'s [fluff_target_part]."))
@@ -79,8 +79,8 @@ GLOBAL_LIST_INIT(clash_revive_health, list(50, 35, 20))
 /mob/living/carbon/human/proc/clash_zap_revive(mob/living/carbon/human/medic)
 	clash_revive_chain = world.time < clash_last_revive + CLASH_REVIVE_SICKNESS ? clash_revive_chain + 1 : 1
 	clash_last_revive = world.time
-	var/revive_health = GLOB.clash_revive_health[min(clash_revive_chain, length(GLOB.clash_revive_health))]
-	if(clash_medic_perk(medic, CLASH_PERK_SECOND_WIND))
+	var/revive_health = GLOB.clash_revive_health[clash_has_perk(medic, /datum/clash_perk/field_surgeon) ? 1 : min(clash_revive_chain, length(GLOB.clash_revive_health))]
+	if(clash_has_perk(medic, /datum/clash_perk/second_wind))
 		revive_health += CLASH_SECOND_WIND_HEALTH
 	for(var/datum/internal_organ/organ as anything in internal_organs)
 		organ.rejuvenate()
@@ -102,6 +102,8 @@ GLOBAL_LIST_INIT(clash_revive_health, list(50, 35, 20))
 	hud_used?.clash_respawn?.update(src)
 	hud_used?.clash_death_card?.update(src)
 	clash_show_call_medic(src)
+	if(clash_has_perk(medic, /datum/clash_perk/adrenaline))
+		clash_adrenaline()
 
 /proc/clash_reward_revive(mob/living/carbon/human/medic, mob/living/carbon/human/patient)
 	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode

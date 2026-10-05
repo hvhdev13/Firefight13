@@ -15,6 +15,10 @@
 		for(var/title in GLOB.clash_role_levels)
 			if(GLOB.clash_role_levels[title] == next && (title in GLOB.clash_arena_roles) && clash_kit_faction_for_job(title) == faction)
 				names += "[title] role"
+		for(var/perk_type in GLOB.clash_perks)
+			var/datum/clash_perk/perk = GLOB.clash_perks[perk_type]
+			if(!perk.class && perk.level == next)
+				names += "[perk.name] perk"
 		if(length(names))
 			return "Your next unlock:[separator]Level [next], [clash_number_text(max(0, clash_faction_xp_for(next) - xp))] XP to go.[separator]Unlocks: [english_list(names)]"
 	return null
@@ -83,7 +87,7 @@
 				locks[option.id] = lock_text
 				continue
 			var/list/gate = GLOB.clash_option_gates[clash_gate_key(faction, option.item_type)]
-			if((attachment ? primary_type && clash_kit_attachment_fits(option.item_type, primary_type) : gate && gate["kind"] != CLASH_GATE_FREE) && !(option.id in progress.seen))
+			if((GLOB.clash_perks[option.item_type] || (attachment ? primary_type && clash_kit_attachment_fits(option.item_type, primary_type) : gate && gate["kind"] != CLASH_GATE_FREE)) && !(option.id in progress.seen))
 				fresh += option.id
 	var/list/role_locks = list()
 	var/client/player = GLOB.directory[ckey]
@@ -117,6 +121,9 @@
 	)
 
 /proc/clash_option_rank(datum/clash_progress/progress, datum/clash_kit_option/option, class, primary_type)
+	var/datum/clash_perk/perk = GLOB.clash_perks[option.item_type]
+	if(perk)
+		return perk.level
 	if(option.slot in GLOB.clash_kit_attachment_slots)
 		return GLOB.clash_weapon_unlock_levels[clash_track_type(primary_type)]?[option.item_type] || 1
 	var/list/gate = clash_gate_for(option.faction, option.item_type)

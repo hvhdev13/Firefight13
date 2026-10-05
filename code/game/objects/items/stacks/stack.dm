@@ -205,7 +205,7 @@ Also change the icon to reflect the amount of sheets, if possible.*/
 		var/time_mult = skillcheck(user, SKILL_CONSTRUCTION, 2) ? 1 : 2
 		user.visible_message(SPAN_NOTICE("[user] starts assembling \a [recipe.title]."),
 			SPAN_NOTICE("You start assembling \a [recipe.title]."))
-		if(!do_after(user, max(recipe.time * time_mult, recipe.min_time), INTERRUPT_NO_NEEDHAND|BEHAVIOR_IMMOBILE, BUSY_ICON_BUILD))
+		if(!do_after(user, max(recipe.time * time_mult, recipe.min_time) * clash_cover_build_mult(user, recipe.result_type), INTERRUPT_NO_NEEDHAND|BEHAVIOR_IMMOBILE, BUSY_ICON_BUILD))
 			return FALSE
 
 		//the user is no longer with us

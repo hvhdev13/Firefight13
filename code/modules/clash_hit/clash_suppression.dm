@@ -11,10 +11,13 @@
 #define CLASH_SUPPRESSION_RAMP (2 DECISECONDS)
 #define CLASH_SUPPRESSION_MISS_RADIUS 1.5
 #define CLASH_SUPPRESSION_OVERSHOOT 3
+#define CLASH_SUPPRESSION_STEADY 0.5
+#define CLASH_LOUD_TIME (3 SECONDS)
 
 /mob/living/carbon/human/var/clash_suppression = 0
 /mob/living/carbon/human/var/clash_suppression_hold = 0
 /mob/living/carbon/human/var/turf/clash_aim_turf
+/mob/living/carbon/human/var/clash_loud_until = 0
 
 /atom/movable/screen/fullscreen/clash_suppression
 	icon_state = "brutedamageoverlay"
@@ -32,6 +35,8 @@
 /proc/clash_suppress(mob/living/carbon/human/target, amount)
 	if(!target.client || target.stat == DEAD || amount <= 0)
 		return
+	if(clash_has_perk(target, /datum/clash_perk/steady_nerves))
+		amount *= CLASH_SUPPRESSION_STEADY
 	var/previous = clash_suppression_now(target)
 	var/value = min(previous + amount, CLASH_SUPPRESSION_MAX)
 	var/fade = value / CLASH_SUPPRESSION_DECAY * (1 SECONDS)
@@ -94,13 +99,14 @@
 		return ELEMENT_INCOMPATIBLE
 	RegisterSignal(target, COMSIG_HUMAN_BULLET_ACT, PROC_REF(on_shot))
 	RegisterSignal(target, COMSIG_MOB_FIRED_GUN, PROC_REF(on_fired))
+	RegisterSignal(target, COMSIG_MOB_FIRED_GUN_ATTACHMENT, PROC_REF(on_fired_attachment))
 	RegisterSignal(target, COMSIG_MOB_MOUSEDOWN, PROC_REF(on_mouse_down))
 	RegisterSignal(target, COMSIG_MOB_MOUSEDRAG, PROC_REF(on_mouse_drag))
 	RegisterSignal(target, list(COMSIG_LIVING_FLAMER_CROSSED, COMSIG_LIVING_FLAMER_FLAMED), PROC_REF(on_flamed))
 
 /datum/element/clash_suppression/Detach(datum/source, force)
 	. = ..()
-	UnregisterSignal(source, list(COMSIG_HUMAN_BULLET_ACT, COMSIG_MOB_FIRED_GUN, COMSIG_MOB_MOUSEDOWN, COMSIG_MOB_MOUSEDRAG, COMSIG_LIVING_FLAMER_CROSSED, COMSIG_LIVING_FLAMER_FLAMED))
+	UnregisterSignal(source, list(COMSIG_HUMAN_BULLET_ACT, COMSIG_MOB_FIRED_GUN, COMSIG_MOB_FIRED_GUN_ATTACHMENT, COMSIG_MOB_MOUSEDOWN, COMSIG_MOB_MOUSEDRAG, COMSIG_LIVING_FLAMER_CROSSED, COMSIG_LIVING_FLAMER_FLAMED))
 
 /datum/element/clash_suppression/proc/on_shot(mob/living/carbon/human/source, damage_result, ammo_flags, obj/projectile/bullet)
 	SIGNAL_HANDLER
@@ -118,10 +124,21 @@
 
 /datum/element/clash_suppression/proc/on_fired(mob/living/carbon/human/source, obj/item/weapon/gun/gun)
 	SIGNAL_HANDLER
+	if(!(gun.flags_gun_features & GUN_SILENCED) || gun.active_attachable)
+		clash_mark_loud(source)
+	clash_bandolier_shot(source, gun)
 	var/turf/start = get_turf(source)
 	var/turf/aim = source.clash_aim_turf
 	if(start && aim && aim.z == start.z)
 		clash_suppress_line(source, start, aim)
+
+/datum/element/clash_suppression/proc/on_fired_attachment(mob/living/carbon/human/source, obj/item/attachable/attachment)
+	SIGNAL_HANDLER
+	clash_mark_loud(source)
+
+/proc/clash_mark_loud(mob/living/carbon/human/shooter)
+	if(ishuman(shooter))
+		shooter.clash_loud_until = world.time + CLASH_LOUD_TIME
 
 /datum/element/clash_suppression/proc/on_flamed(mob/living/carbon/human/source)
 	SIGNAL_HANDLER
@@ -140,3 +157,5 @@
 #undef CLASH_SUPPRESSION_RAMP
 #undef CLASH_SUPPRESSION_MISS_RADIUS
 #undef CLASH_SUPPRESSION_OVERSHOOT
+#undef CLASH_SUPPRESSION_STEADY
+#undef CLASH_LOUD_TIME

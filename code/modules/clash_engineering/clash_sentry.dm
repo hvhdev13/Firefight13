@@ -145,7 +145,7 @@ GLOBAL_LIST_INIT(clash_sentry_kits, list(
 	if(clash_tier == CLASH_SENTRY_FLAMER)
 		. += SPAN_HELPFUL("Click it with a flamer fuel tank to refuel it. A welder repairs it and a wrench packs it up.")
 	else
-		. += SPAN_HELPFUL("Click it with metal to reload it, 10 sheets for a full load. A welder repairs it and a wrench packs it up.")
+		. += SPAN_HELPFUL("Click it with metal to reload it, [clash_has_perk(user, /datum/clash_perk/efficient_reload) ? 5 : 10] sheets for a full load. A welder repairs it and a wrench packs it up.")
 
 /obj/structure/machinery/defenses/sentry/proc/clash_activate(mob/living/carbon/human/engineer)
 	faction_group = LAZYCOPY(engineer.faction_group)
@@ -153,7 +153,7 @@ GLOBAL_LIST_INIT(clash_sentry_kits, list(
 	clash_owner_ckey = engineer.ckey
 	owner_mob = engineer
 	clash_deployed_at = world.time
-	var/limit = clash_engineer_perk(engineer, CLASH_PERK_TWIN_SENTRIES) ? 2 : 1
+	var/limit = clash_has_perk(engineer, /datum/clash_perk/twin_sentries) ? 2 : 1
 	var/list/standing = list()
 	for(var/obj/structure/machinery/defenses/sentry/other as anything in GLOB.clash_engineer_sentries[engineer.ckey])
 		if(other != src && other.placed)
@@ -167,7 +167,7 @@ GLOBAL_LIST_INIT(clash_sentry_kits, list(
 		to_chat(engineer, SPAN_NOTICE("Your older [oldest.name] shuts down."))
 		qdel(oldest)
 	var/ratio = health / health_max
-	health_max = GLOB.clash_sentry_tiers[clash_tier]["health"] * (clash_engineer_perk(engineer, CLASH_PERK_HARDENED) ? CLASH_HARDENED_MULT : 1)
+	health_max = GLOB.clash_sentry_tiers[clash_tier]["health"] * (clash_has_perk(engineer, /datum/clash_perk/hardened) ? CLASH_HARDENED_MULT : 1)
 	health = round(health_max * ratio)
 	power_on()
 
@@ -189,7 +189,7 @@ GLOBAL_LIST_INIT(clash_sentry_kits, list(
 	if(clash_near_enemy_base(spot, user.faction))
 		to_chat(user, SPAN_WARNING("Too close to the enemy base."))
 		return
-	deployment_time = GLOB.clash_sentry_tiers[turret.clash_tier]["deploy"] * (clash_engineer_perk(user, CLASH_PERK_QUICK_BUILD) ? 0.5 : 1)
+	deployment_time = GLOB.clash_sentry_tiers[turret.clash_tier]["deploy"] * (clash_has_perk(user, /datum/clash_perk/quick_build) ? 0.5 : 1)
 	..()
 	if(turret.placed)
 		turret.clash_activate(user)
@@ -250,7 +250,7 @@ GLOBAL_LIST_INIT(clash_sentry_kits, list(
 	if(health < health_max * 0.25)
 		to_chat(user, SPAN_WARNING("[src] is too damaged to pack up. Repair it first."))
 		return
-	var/pack_time = CLASH_SENTRY_PACK_TIME * (clash_engineer_perk(user, CLASH_PERK_QUICK_BUILD) ? 0.5 : 1)
+	var/pack_time = CLASH_SENTRY_PACK_TIME * (clash_has_perk(user, /datum/clash_perk/quick_build) ? 0.5 : 1)
 	if(!do_after(user, pack_time, INTERRUPT_ALL|BEHAVIOR_IMMOBILE, BUSY_ICON_BUILD, src) || QDELETED(src) || !placed)
 		return
 	power_off()
@@ -268,10 +268,11 @@ GLOBAL_LIST_INIT(clash_sentry_kits, list(
 	if(missing <= 0)
 		to_chat(user, SPAN_WARNING("[src] is fully loaded."))
 		return
-	var/used = min(CEILING(missing * CLASH_SENTRY_RELOAD_METAL / ammo.max_rounds, 1), sheets.amount)
+	var/full_load = CLASH_SENTRY_RELOAD_METAL * (clash_has_perk(user, /datum/clash_perk/efficient_reload) ? 0.5 : 1)
+	var/used = min(CEILING(missing * full_load / ammo.max_rounds, 1), sheets.amount)
 	if(!do_after(user, CLASH_SENTRY_RELOAD_TIME, INTERRUPT_ALL|BEHAVIOR_IMMOBILE, BUSY_ICON_BUILD, src) || QDELETED(src) || !sheets.use(used))
 		return
-	ammo.current_rounds = min(ammo.max_rounds, ammo.current_rounds + CEILING(used * ammo.max_rounds / CLASH_SENTRY_RELOAD_METAL, 1))
+	ammo.current_rounds = min(ammo.max_rounds, ammo.current_rounds + CEILING(used * ammo.max_rounds / full_load, 1))
 	update_icon()
 	playsound(loc, 'sound/weapons/handling/gun_m16_reload.ogg', 25, 1)
 	to_chat(user, SPAN_NOTICE("You reload [src]: [ammo.current_rounds]/[ammo.max_rounds] ammo."))
@@ -301,7 +302,7 @@ GLOBAL_LIST_INIT(clash_sentry_kits, list(
 	if(!welder.isOn())
 		to_chat(user, SPAN_WARNING("Turn the welder on first."))
 		return
-	if(!do_after(user, CLASH_SENTRY_REPAIR_TIME, INTERRUPT_ALL|BEHAVIOR_IMMOBILE, BUSY_ICON_FRIENDLY, src) || QDELETED(src) || !welder.remove_fuel(1, user))
+	if(!do_after(user, CLASH_SENTRY_REPAIR_TIME * clash_repair_mult(user), INTERRUPT_ALL|BEHAVIOR_IMMOBILE, BUSY_ICON_FRIENDLY, src) || QDELETED(src) || !welder.remove_fuel(1, user))
 		return
 	var/repaired = min(CLASH_SENTRY_REPAIR_HP, health_max - health)
 	update_health(-repaired)

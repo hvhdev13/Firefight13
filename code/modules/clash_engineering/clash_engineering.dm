@@ -121,7 +121,7 @@ GLOBAL_LIST_INIT(clash_arena_eng_removed, list(
 	var/level = GLOB.clash_sentry_tiers[tier]["level"]
 	if(clash_engineer_level(engineer.ckey) < level)
 		return "Unlocks at Engineer level [level]."
-	var/limit = clash_engineer_perk(engineer, CLASH_PERK_TWIN_SENTRIES) ? 2 : 1
+	var/limit = clash_has_perk(engineer, /datum/clash_perk/twin_sentries) ? 2 : 1
 	var/list/sentries = GLOB.clash_engineer_sentries[engineer.ckey]
 	return length(sentries) >= limit ? clash_build_owned_text(engineer, sentries, "sentry") : null
 

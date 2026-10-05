@@ -70,7 +70,7 @@ SUBSYSTEM_DEF(clash_spawn)
 		var/datum/clash_kit/kit = get_clash_active_kit(spawned.ckey, spawned.job)
 		if(kit)
 			apply_clash_kit(spawned, kit)
-			to_chat(spawned, SPAN_NOTICE("Kitted out as [kit.name]. Use the Loadout verb to change it for your next spawn."))
+			to_chat(spawned, SPAN_NOTICE("Kitted out as [kit.name]. [clash_perk_spawn_text(spawned)]Use the Loadout verb to change it for your next spawn."))
 		clash_issue_medic_gear(spawned)
 		clash_issue_engineer_gear(spawned)
 	else
@@ -151,6 +151,10 @@ SUBSYSTEM_DEF(clash_spawn)
 		page += "<li>Out of ammo? Click a friendly ammo crate with your gun or an empty hand to take a magazine for that gun.</li>"
 		page += "<li>On a sentry, a wrench packs it up, a welder repairs it, metal reloads it and a flamer fuel tank refuels the Flamer Sentry. Stronger sentries unlock with Engineer level.</li>"
 		page += "<li>Sentries cannot see through smoke and grenades wreck them. Only engineers can build barricades.</li>"
+		page += "</ul>"
+		page += "<h2>Perks</h2><ul>"
+		page += "<li>Pick one class perk and one general perk in your loadout. Class perks unlock with class level, general perks with faction level. Your killer's perks show on your death card.</li>"
+		page += "<li>Firing without a suppressor, or firing a flamer or underbarrel weapon, shows you as a red mark on the radar of enemies with the Keen Ears perk.</li>"
 		page += "</ul>"
 	page += "<h2>Other notes</h2><ul>"
 	page += "<li>Friendly fire is on and explosions have a high chance of taking off limbs.</li>"
