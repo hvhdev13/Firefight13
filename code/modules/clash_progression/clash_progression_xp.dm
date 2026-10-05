@@ -439,7 +439,7 @@
 		var/datum/cause_data/cause = attacker
 		attacker = cause.resolve_mob()
 	damage = min(damage, barricade.health)
-	if(!barricade.clash_builder_ckey || damage <= 0)
+	if(!barricade.clash_builder_ckey || damage <= 0 || !clash_still_engineer(barricade.clash_builder_ckey, barricade.clash_builder_faction))
 		return
 	var/share = clash_enemy_share(attacker, barricade.clash_builder_faction, damage)
 	if(share <= 0)
@@ -466,5 +466,11 @@
 	repairer.clash_repair_carry -= xp * CLASH_XP_REPAIR_HP
 	clash_award_support_xp(repairer, xp, CLASH_XP_SOURCE_REPAIR, CLASH_XP_SOURCE_COVER, CLASH_XP_ENGINEERING_CAP)
 
+/proc/clash_still_engineer(ckey, faction)
+	var/datum/clash_progress/progress = clash_progress_of(ckey)
+	return progress?.side == faction && progress.class_id == CLASH_CLASS_ENGINEER
+
 /proc/clash_progress_resupply(owner_ckey, faction)
+	if(!clash_still_engineer(owner_ckey, faction))
+		return
 	clash_grant_support_xp(owner_ckey, faction, CLASH_CLASS_ENGINEER, CLASH_XP_RESUPPLY, CLASH_XP_SOURCE_RESUPPLY, CLASH_XP_SOURCE_COVER, CLASH_XP_ENGINEERING_CAP)

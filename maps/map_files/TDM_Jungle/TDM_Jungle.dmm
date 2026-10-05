@@ -222,6 +222,10 @@
 /obj/effect/landmark/survivor_spawner/us_army_sl,
 /turf/open/auto_turf/snow/brown_base/layer3,
 /area/clash_arena/tdm_jungle/battlefield)
+"bj" = (
+/obj/effect/landmark/clash_objective/clash_flag/upp,
+/turf/open/auto_turf/snow/brown_base,
+/area/clash_arena/tdm_jungle/battlefield)
 "bk" = (
 /obj/effect/decal/cleanable/dirt,
 /obj/structure/machinery/light{
@@ -623,6 +627,11 @@
 	},
 /turf/open/floor/strata/green3,
 /area/clash_arena/tdm_jungle/upp_base)
+"ds" = (
+/obj/structure/prop/tyrargo/boards/boards_2,
+/obj/effect/landmark/clash_objective/domination_zone/a,
+/turf/open/auto_turf/tyrargo_grass/layer1,
+/area/clash_arena/tdm_jungle/battlefield)
 "dv" = (
 /turf/open/hybrisa/street/cement3,
 /area/space)
@@ -674,7 +683,7 @@
 /turf/open/floor/strata/green3/west,
 /area/clash_arena/tdm_jungle/upp_base)
 "dP" = (
-/obj/effect/landmark/clash_npc/upp,
+/obj/effect/landmark/clash_npc/upp/fill,
 /turf/open/auto_turf/tyrargo_grass,
 /area/clash_arena/tdm_jungle/battlefield)
 "dT" = (
@@ -1323,7 +1332,7 @@
 /turf/open/floor/plating/plating_catwalk,
 /area/clash_arena/tdm_jungle/uscm_base/req)
 "hs" = (
-/obj/effect/landmark/clash_npc/uscm,
+/obj/effect/landmark/clash_npc/uscm/fill,
 /turf/open/auto_turf/snow/brown_base/layer3,
 /area/clash_arena/tdm_jungle/battlefield)
 "hu" = (
@@ -1698,7 +1707,7 @@
 /turf/open/auto_turf/tyrargo_grass,
 /area/clash_arena/tdm_jungle/battlefield)
 "jV" = (
-/obj/effect/landmark/clash_npc/uscm,
+/obj/effect/landmark/clash_npc/uscm/fill,
 /turf/open/auto_turf/tyrargo_grass,
 /area/clash_arena/tdm_jungle/battlefield)
 "jX" = (
@@ -1716,7 +1725,7 @@
 /turf/open/floor/almayer/cargo,
 /area/clash_arena/tdm_jungle/uscm_base/req)
 "kg" = (
-/obj/effect/landmark/clash_npc/upp,
+/obj/effect/landmark/clash_npc/upp/fill,
 /turf/open/auto_turf/tyrargo_grass/layer1,
 /area/clash_arena/tdm_jungle/battlefield)
 "kj" = (
@@ -2127,7 +2136,7 @@
 	pixel_x = -1;
 	pixel_y = -7
 	},
-/obj/effect/landmark/clash_npc/uscm,
+/obj/effect/landmark/clash_npc/uscm/fill,
 /turf/open/auto_turf/tyrargo_grass/layer0_mud,
 /area/clash_arena/tdm_jungle/battlefield)
 "ne" = (
@@ -3729,7 +3738,7 @@
 /turf/open/floor/almayer/test_floor4,
 /area/clash_arena/tdm_jungle/uscm_base/req)
 "xS" = (
-/obj/effect/landmark/clash_npc/uscm,
+/obj/effect/landmark/clash_npc/uscm/fill,
 /turf/open/auto_turf/snow/layer2,
 /area/clash_arena/tdm_jungle/battlefield)
 "xU" = (
@@ -4495,7 +4504,7 @@
 /turf/open/auto_turf/tyrargo_grass/layer0_mud,
 /area/clash_arena/tdm_jungle/battlefield)
 "Co" = (
-/obj/effect/landmark/clash_npc/uscm,
+/obj/effect/landmark/clash_npc/uscm/fill,
 /turf/open/auto_turf/tyrargo_grass/layer0_mud,
 /area/clash_arena/tdm_jungle/battlefield)
 "Cs" = (
@@ -4956,7 +4965,7 @@
 	pixel_x = 0;
 	pixel_y = 5
 	},
-/obj/effect/landmark/clash_npc/upp,
+/obj/effect/landmark/clash_npc/upp/fill,
 /turf/open/auto_turf/snow/brown_base,
 /area/clash_arena/tdm_jungle/battlefield)
 "FX" = (
@@ -5351,6 +5360,14 @@
 "IF" = (
 /turf/open/floor/strata/orange_edge,
 /area/clash_arena/tdm_jungle/upp_base)
+"IG" = (
+/obj/effect/landmark/clash_objective/domination_zone/b,
+/obj/effect/landmark/clash_objective/koth_primary,
+/turf/open/floor/strata/fake_wood{
+	explo_proof = 1;
+	turf_flags = 16
+	},
+/area/clash_arena/tdm_jungle/battlefield)
 "II" = (
 /obj/effect/decal/strata_decals/grasses,
 /obj/structure/flora/bush/ausbushes/var3/fullgrass,
@@ -5395,7 +5412,7 @@
 /area/clash_arena/tdm_jungle/uscm_base)
 "IV" = (
 /obj/effect/decal/strata_decals/grasses,
-/obj/effect/landmark/clash_npc/upp,
+/obj/effect/landmark/clash_npc/upp/fill,
 /turf/open/auto_turf/tyrargo_grass/layer0_mud_alt,
 /area/clash_arena/tdm_jungle/battlefield)
 "IW" = (
@@ -5459,7 +5476,7 @@
 /area/clash_arena/tdm_jungle/battlefield)
 "Js" = (
 /obj/effect/decal/strata_decals/grasses,
-/obj/effect/landmark/clash_npc/uscm,
+/obj/effect/landmark/clash_npc/uscm/fill,
 /turf/open/auto_turf/tyrargo_grass/layer0_mud,
 /area/clash_arena/tdm_jungle/battlefield)
 "Jt" = (
@@ -5668,7 +5685,7 @@
 	pixel_y = -9
 	},
 /obj/structure/prop/tyrargo/boards/boards_2,
-/obj/effect/landmark/clash_npc/upp,
+/obj/effect/landmark/clash_npc/upp/fill,
 /turf/open/auto_turf/snow/brown_base,
 /area/clash_arena/tdm_jungle/battlefield)
 "KI" = (
@@ -5678,7 +5695,7 @@
 /turf/open/auto_turf/tyrargo_grass/layer0_mud_alt,
 /area/clash_arena/tdm_jungle/battlefield)
 "KK" = (
-/obj/effect/landmark/clash_npc/upp,
+/obj/effect/landmark/clash_npc/upp/fill,
 /turf/open/auto_turf/strata_grass/layer1,
 /area/clash_arena/tdm_jungle/battlefield)
 "KL" = (
@@ -5998,6 +6015,21 @@
 	},
 /turf/open/floor/plating/plating_catwalk,
 /area/clash_arena/tdm_jungle/uscm_base/req)
+"Mr" = (
+/obj/effect/landmark/clash_objective/koth_secondary,
+/turf/open/floor/strata/fake_wood{
+	explo_proof = 1;
+	turf_flags = 16
+	},
+/area/clash_arena/tdm_jungle/battlefield)
+"MA" = (
+/obj/effect/decal/strata_decals/tyrargo_mud_corner{
+	dir = 0
+	},
+/obj/effect/decal/strata_decals/grasses,
+/obj/effect/landmark/clash_objective/clash_flag/uscm,
+/turf/open/auto_turf/tyrargo_grass,
+/area/clash_arena/tdm_jungle/battlefield)
 "MH" = (
 /obj/structure/blocker/clash_gate/uscm,
 /obj/structure/machinery/door/airlock/multi_tile/almayer/glass{
@@ -7131,6 +7163,10 @@
 	},
 /turf/open/gm/dirt/dark_brown,
 /area/clash_arena/tdm_jungle/battlefield)
+"UP" = (
+/obj/effect/landmark/clash_objective/domination_zone/c,
+/turf/open/auto_turf/tyrargo_grass,
+/area/clash_arena/tdm_jungle/battlefield)
 "US" = (
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
 	dir = 8
@@ -7405,7 +7441,7 @@
 /area/clash_arena/tdm_jungle/battlefield)
 "Xb" = (
 /obj/effect/decal/strata_decals/grasses,
-/obj/effect/landmark/clash_npc/uscm,
+/obj/effect/landmark/clash_npc/uscm/fill,
 /turf/open/auto_turf/tyrargo_grass,
 /area/clash_arena/tdm_jungle/battlefield)
 "Xg" = (
@@ -29987,7 +30023,7 @@ tJ
 TF
 TF
 Up
-TF
+bj
 tJ
 TF
 yt
@@ -35232,7 +35268,7 @@ aS
 XQ
 FR
 Fu
-HI
+ds
 Fz
 Sb
 cW
@@ -35648,7 +35684,7 @@ bd
 bd
 Tk
 nG
-Jq
+IG
 qd
 qy
 bd
@@ -36265,7 +36301,7 @@ bd
 cW
 GD
 mX
-vD
+UP
 Zx
 vD
 WF
@@ -38875,7 +38911,7 @@ DJ
 Vl
 qZ
 Jw
-Jq
+Mr
 qd
 Zl
 Bp
@@ -42722,7 +42758,7 @@ vD
 iG
 Fz
 Fz
-wp
+MA
 Fz
 Fz
 kU

@@ -194,7 +194,7 @@
 /turf/open/floor/almayer/green/northeast,
 /area/clash_arena/tdm_jungle/uscm_base/req)
 "bq" = (
-/obj/effect/landmark/clash_npc/uscm,
+/obj/effect/landmark/clash_npc/uscm/fill,
 /turf/open/hybrisa/street/cement1,
 /area/clash_arena/tdm_deathmatch2000/battlefield)
 "bs" = (
@@ -1380,6 +1380,7 @@
 /turf/open/floor/plating,
 /area/clash_arena/tdm_jungle/uscm_base/req)
 "oT" = (
+/obj/effect/landmark/clash_objective/clash_flag/upp,
 /turf/open/floor/strata/red2,
 /area/clash_arena/tdm_deathmatch2000/battlefield)
 "oW" = (
@@ -1571,6 +1572,10 @@
 /obj/structure/window/framed/almayer/hull/hijack_bustable,
 /turf/open/floor/plating,
 /area/clash_arena/tdm_jungle/uscm_base/req)
+"rd" = (
+/obj/effect/landmark/clash_objective/clash_flag/uscm,
+/turf/open/hybrisa/street/cement1,
+/area/clash_arena/tdm_deathmatch2000/battlefield)
 "rj" = (
 /obj/structure/machinery/light{
 	dir = 4
@@ -1821,6 +1826,10 @@
 	},
 /turf/open/floor/strata/purp2,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
+"uq" = (
+/obj/effect/landmark/clash_objective/koth_primary,
+/turf/open/asphalt/cement/cement9,
+/area/clash_arena/tdm_deathmatch2000/battlefield)
 "ur" = (
 /obj/structure/machinery/cm_vending/sorted/cargo_guns/squad_prep{
 	pixel_y = -29;
@@ -2073,7 +2082,7 @@
 /turf/open/floor/strata/floor3/east,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "ye" = (
-/obj/effect/landmark/clash_npc/upp,
+/obj/effect/landmark/clash_npc/upp/fill,
 /turf/open/asphalt/cement/cement9,
 /area/clash_arena/tdm_deathmatch2000/battlefield)
 "yl" = (
@@ -2473,7 +2482,7 @@
 /turf/open/floor/strata/green3,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "Cn" = (
-/obj/effect/landmark/clash_npc/upp,
+/obj/effect/landmark/clash_npc/upp/fill,
 /turf/open/hybrisa/street/cement2,
 /area/clash_arena/tdm_deathmatch2000/battlefield)
 "Cp" = (
@@ -2707,7 +2716,7 @@
 /turf/open/floor/strata/red3/south,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "FJ" = (
-/obj/effect/landmark/clash_npc/uscm,
+/obj/effect/landmark/clash_npc/uscm/fill,
 /turf/open/asphalt/cement/cement9,
 /area/clash_arena/tdm_deathmatch2000/battlefield)
 "FM" = (
@@ -3048,6 +3057,10 @@
 	},
 /turf/open/floor/strata/green3/southeast,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
+"Kn" = (
+/obj/effect/landmark/clash_objective/domination_zone/c,
+/turf/open/asphalt/cement/cement9,
+/area/clash_arena/tdm_deathmatch2000/battlefield)
 "Kw" = (
 /turf/open/floor/almayer/orange,
 /area/clash_arena/tdm_jungle/uscm_base)
@@ -3355,6 +3368,10 @@
 /obj/structure/platform/metal/strata/north,
 /turf/open/floor/strata/floor2,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
+"OF" = (
+/obj/effect/landmark/clash_objective/domination_zone/a,
+/turf/open/asphalt/cement/cement9,
+/area/clash_arena/tdm_deathmatch2000/battlefield)
 "OP" = (
 /turf/closed/wall/almayer,
 /area/clash_arena/tdm_jungle/uscm_base)
@@ -3593,7 +3610,7 @@
 /turf/open/floor/almayer/plating/northeast,
 /area/clash_arena/tdm_jungle/uscm_base/req)
 "Sj" = (
-/obj/effect/landmark/clash_npc/upp,
+/obj/effect/landmark/clash_npc/upp/fill,
 /turf/open/asphalt/cementalt,
 /area/clash_arena/tdm_deathmatch2000/battlefield)
 "Sm" = (
@@ -3946,6 +3963,10 @@
 /obj/structure/surface/rack,
 /turf/open/floor/prison/floor_marked/west,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
+"Yl" = (
+/obj/effect/landmark/clash_objective/domination_zone/b,
+/turf/open/asphalt/cement/cement9,
+/area/clash_arena/tdm_deathmatch2000/battlefield)
 "Yt" = (
 /obj/structure/surface/table/reinforced/rostock_table,
 /obj/item/storage/belt/utility/full,
@@ -19311,8 +19332,8 @@ kV
 kV
 kV
 kV
-kV
-kV
+uq
+Yl
 kV
 kV
 kV
@@ -19446,7 +19467,7 @@ ES
 CF
 cZ
 kV
-kV
+OF
 kV
 kV
 kV
@@ -19605,7 +19626,7 @@ kV
 kV
 kV
 kV
-kV
+Kn
 kV
 kV
 CF
@@ -23147,7 +23168,7 @@ aC
 yO
 yO
 yO
-yO
+rd
 yO
 yO
 yO

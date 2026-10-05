@@ -123,6 +123,8 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 	var/datum/clash_kit_option/option = get_clash_kit_option(option_id)
 	if(!option)
 		return null
+	if(option.only_class && option.only_class != GLOB.clash_job_classes[job])
+		return "Only for [GLOB.clash_class_names[option.only_class]]s"
 	var/datum/clash_perk/perk = GLOB.clash_perks[option.item_type]
 	if(perk)
 		return perk.lock_text(ckey, job)
@@ -147,6 +149,8 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 	return null
 
 /proc/clash_gate_lock_text(datum/clash_progress/progress, faction, item_type, job)
+	if(item_type in GLOB.clash_role_free_gear[job])
+		return null
 	var/list/gate = clash_gate_for(faction, item_type)
 	if(!gate)
 		return null
