@@ -46,7 +46,10 @@ GLOBAL_LIST_EMPTY(clash_kit_budgets)
 		sections += list(list("name" = "Weapon ammo", "items" = ammo_items))
 	for(var/list/source in get_clash_shop_sources(job))
 		var/list/section
-		for(var/list/entry in source[1])
+		for(var/list/listed in source[1])
+			var/list/entry = clash_arena_med_entry(listed, clash_job_is_medic(job), FALSE)
+			if(!entry)
+				continue
 			var/entry_type = entry[3]
 			if(!entry_type)
 				section = list("name" = entry[1], "items" = list())

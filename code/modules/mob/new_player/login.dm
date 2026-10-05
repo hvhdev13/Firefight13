@@ -15,6 +15,9 @@
 
 	..()
 
+	if(client?.clash_deploying)
+		return
+
 	initialize_lobby_screen() // This has winsets that can sleep, so all variables must be set prior in the event Logout occurs during sleep
 
 	addtimer(CALLBACK(src, PROC_REF(lobby)), 4 SECONDS)

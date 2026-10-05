@@ -103,12 +103,12 @@ GLOBAL_LIST_EMPTY(clash_respawn_button_icons)
 		pixel_y = -8
 		animate(src, alpha = 255, pixel_y = 0, time = 3, easing = CUBIC_EASING|EASE_OUT)
 	mouse_opacity = MOUSE_OPACITY_OPAQUE
-	var/revivable = !!clash_revivable_body(viewer)
+	var/revivable = clash_revive_status(viewer)
 	if(revivable != shown_revivable)
 		shown_revivable = revivable
 		overlays.Cut()
 		if(revivable)
-			var/mutable_appearance/status = clash_score_text("<span style='font-family: \"Small Fonts\"; font-size: 6px; text-align: center; color: #9fc9a4; -dm-text-outline: 1px black'>STATUS: REVIVABLE</span>", 0, -14, RESPAWN_BUTTON_WIDTH, 12)
+			var/mutable_appearance/status = clash_score_text("<span style='font-family: \"Small Fonts\"; font-size: 6px; text-align: center; color: #9fc9a4; -dm-text-outline: 1px black'>[revivable]</span>", 0, -14, RESPAWN_BUTTON_WIDTH, 12)
 			status.appearance_flags &= ~RESET_ALPHA
 			overlays += status
 	var/cooldown = clash_respawn_cooldown()

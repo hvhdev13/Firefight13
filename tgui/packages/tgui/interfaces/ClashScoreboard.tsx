@@ -13,6 +13,7 @@ interface Row {
   assists: number;
   deaths: number;
   captures: number;
+  revives: number;
   best_streak: number;
   streak: number;
   is_viewer: BooleanLike;
@@ -257,8 +258,9 @@ const TeamScore = (props: {
 const TeamTable = (props: {
   readonly team: Team;
   readonly showCaptures: boolean;
+  readonly showRevives: boolean;
 }) => {
-  const { team, showCaptures } = props;
+  const { team, showCaptures, showRevives } = props;
   const rows = [...team.players].sort(byScore);
   return (
     <div
@@ -277,6 +279,7 @@ const TeamTable = (props: {
             <th title="Assists">A</th>
             <th title="Deaths">D</th>
             {showCaptures && <th title="Flag captures">CAP</th>}
+            {showRevives && <th title="Revives">REV</th>}
             <th title="Kills per death">K/D</th>
             <th title="Current streak (best)">STK</th>
           </tr>
@@ -322,6 +325,7 @@ const TeamTable = (props: {
               <td>{row.assists}</td>
               <td>{row.deaths}</td>
               {showCaptures && <td>{row.captures}</td>}
+              {showRevives && <td>{row.revives}</td>}
               <td className="ClashScoreboard__dim">{ratio(row)}</td>
               <td>
                 {row.streak >= 3 ? (
@@ -399,6 +403,9 @@ export const ClashScoreboard = () => {
   const [left, right] = teams;
   const showCaptures = teams.some((team) =>
     team.players.some((row) => row.captures > 0),
+  );
+  const showRevives = teams.some((team) =>
+    team.players.some((row) => row.revives > 0),
   );
 
   return (
@@ -482,8 +489,16 @@ export const ClashScoreboard = () => {
               <ProgressReport progress={data.progress} />
             )}
             <div className="ClashScoreboard__teams">
-              <TeamTable team={left} showCaptures={showCaptures} />
-              <TeamTable team={right} showCaptures={showCaptures} />
+              <TeamTable
+                team={left}
+                showCaptures={showCaptures}
+                showRevives={showRevives}
+              />
+              <TeamTable
+                team={right}
+                showCaptures={showCaptures}
+                showRevives={showRevives}
+              />
             </div>
             <div className="ClashScoreboard__footer">
               <Box color="label">

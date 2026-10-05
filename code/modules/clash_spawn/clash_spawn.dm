@@ -71,6 +71,7 @@ SUBSYSTEM_DEF(clash_spawn)
 		if(kit)
 			apply_clash_kit(spawned, kit)
 			to_chat(spawned, SPAN_NOTICE("Kitted out as [kit.name]. Use the Loadout verb to change it."))
+		clash_issue_medic_gear(spawned)
 	else
 		addtimer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(clash_equip_spawn_loadout), spawned), 1 SECONDS)
 	var/ckey = spawned.ckey
@@ -138,6 +139,12 @@ SUBSYSTEM_DEF(clash_spawn)
 		page += "<tr><td><span class='key'>Vendors</span></td><td>Save your loadout with Save current in the Saved Loadouts section, 3 slots per role.</td></tr>"
 	page += "<tr><td><span class='key'>Stats</span></td><td>The Career Stats verb, or the button on the scoreboard, shows your career and the leaderboard.</td></tr>"
 	page += "</table>"
+	if(clash_fast_medicine())
+		page += "<h2>Medical</h2><ul>"
+		page += "<li>Click a teammate or yourself with a dressing, kit or splint. It treats the worst injury, no need to aim at body parts.</li>"
+		page += "<li>Hurt? Shout <b>*medic</b>. Down but revivable? Press <b>Call Medic</b>. A red cross shows over you for your team.</li>"
+		page += "<li>Medics revive teammates with a quick defibrillator zap.</li>"
+		page += "</ul>"
 	page += "<h2>Other notes</h2><ul>"
 	page += "<li>Friendly fire is on and explosions have a high chance of taking off limbs.</li>"
 	page += "<li>Two end-of-round votes: one for the next mode and then one for the map that can run it.</li>"

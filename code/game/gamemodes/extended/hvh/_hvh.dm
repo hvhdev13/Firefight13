@@ -407,6 +407,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		"assists" = entry?["assists"] || 0,
 		"deaths" = entry?["deaths"] || 0,
 		"captures" = entry?["captures"] || 0,
+		"revives" = entry?["revives"] || 0,
 		"best_streak" = entry?["best_streak"] || 0,
 		"streak" = kill_streaks[name] || 0,
 		"is_viewer" = viewer.ckey && (entry ? entry["ckey"] == viewer.ckey : player?.ckey == viewer.ckey),
@@ -418,6 +419,8 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	var/involved = viewer && (entry["killer"] == viewer.real_name || entry["victim"] == viewer.real_name)
 	var/outline = involved ? "-dm-text-outline: 1px #7a5a00" : "-dm-text-outline: 1px black"
 	var/weapon = entry["cause"] ? " <span style='color: #9aa3ab'>\[[html_encode(entry["cause"])]\]</span> " : " <span style='color: #9aa3ab'>&gt;</span> "
+	if(entry["revive"])
+		weapon = " <span style='color: #7fd67f'>revived</span> "
 	return "<span class='maptext' style='text-align: right; font-size: 6px; [outline]'><span style='color: [entry["killer_color"]]'>[clash_feed_name(entry["killer"])][entry["assister"] ? " <span style='color: #9aa3ab'>+</span> [clash_feed_name(entry["assister"])]" : ""]</span>[weapon]<span style='color: [entry["victim_color"]]'>[clash_feed_name(entry["victim"])]</span></span>"
 
 /proc/clash_feed_name(name)
@@ -479,9 +482,11 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		return
 	var/base = get_score_maptext()
 	var/list/panel = build_score_panel()
+	clash_refresh_medic_marks()
 	for(var/mob/player as anything in GLOB.player_list)
 		player.hud_used?.clash_respawn?.update(player)
 		player.hud_used?.clash_death_card?.update(player)
+		clash_show_call_medic(player)
 		var/atom/movable/screen/faction_score/display = player.hud_used?.faction_score
 		if(!display)
 			continue
@@ -659,22 +664,46 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 			continue
 		top_assister = name
 		top_damage = hit["damage"]
-	killfeed += list(list(
+	push_killfeed(list(
 		"killer" = killer,
 		"assister" = top_assister,
 		"victim" = victim,
 		"cause" = cause,
 		"killer_color" = faction_color(killer_faction),
 		"victim_color" = faction_color(victim_faction),
-		"expiry" = world.time + KILLFEED_LIFETIME,
-		"fading" = FALSE,
 	))
+
+/datum/game_mode/extended/faction_clash/hvh/proc/push_killfeed(list/entry)
+	entry["expiry"] = world.time + KILLFEED_LIFETIME
+	entry["fading"] = FALSE
+	killfeed += list(entry)
 	if(length(killfeed) > CLASH_KILLFEED_LINES)
 		fade_killfeed_line(1, KILLFEED_PUSH_FADE)
 		addtimer(CALLBACK(src, PROC_REF(drop_oldest_killfeed)), KILLFEED_PUSH_FADE)
 	else
 		render_killfeed()
 	addtimer(CALLBACK(src, PROC_REF(prune_killfeed)), KILLFEED_LIFETIME + 1)
+
+/datum/game_mode/extended/faction_clash/hvh/proc/score_revive(mob/living/carbon/human/medic, mob/living/carbon/human/patient)
+	if(!match_live)
+		return
+	if(patient.clash_enemy_death)
+		var/list/entry = get_score_entry(medic.real_name, medic.faction, medic.mind?.ckey || medic.ckey)
+		entry["revives"] = (entry["revives"] || 0) + 1
+	if(patient.clash_died_in_match == match_number)
+		patient.clash_died_in_match = null
+		var/list/patient_entry = player_scores[patient.real_name]
+		if(patient_entry)
+			patient_entry["deaths"] = max(0, patient_entry["deaths"] - 1)
+		faction_deaths[patient.faction] = max(0, (faction_deaths[patient.faction] || 0) - 1)
+	push_killfeed(list(
+		"killer" = medic.real_name,
+		"victim" = patient.real_name,
+		"revive" = TRUE,
+		"killer_color" = faction_color(medic.faction),
+		"victim_color" = faction_color(patient.faction),
+	))
+	update_score_huds()
 
 /datum/game_mode/extended/faction_clash/hvh/proc/drop_oldest_killfeed()
 	if(length(killfeed) > CLASH_KILLFEED_LINES)
@@ -801,11 +830,11 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	var/list/best_entry
 	for(var/name in scores)
 		var/list/entry = scores[name]
-		if(!entry["ckey"] || (!entry["kills"] && !entry["assists"] && !entry["captures"]))
+		if(!entry["ckey"] || (!entry["kills"] && !entry["assists"] && !entry["captures"] && !entry["revives"]))
 			continue
 		if(best_entry)
-			var/score = entry["kills"] + entry["assists"] * 0.5 + (entry["captures"] || 0) * 3
-			var/best_score = best_entry["kills"] + best_entry["assists"] * 0.5 + (best_entry["captures"] || 0) * 3
+			var/score = entry["kills"] + entry["assists"] * 0.5 + (entry["captures"] || 0) * 3 + (entry["revives"] || 0) * 0.5
+			var/best_score = best_entry["kills"] + best_entry["assists"] * 0.5 + (best_entry["captures"] || 0) * 3 + (best_entry["revives"] || 0) * 0.5
 			if(score < best_score || (score == best_score && entry["deaths"] >= best_entry["deaths"]))
 				continue
 		best = name
@@ -819,7 +848,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		if(!total)
 			round_scores[name] = entry.Copy()
 			continue
-		for(var/stat in list("kills", "assists", "deaths", "shots", "hits", "captures"))
+		for(var/stat in list("kills", "assists", "deaths", "shots", "hits", "captures", "revives"))
 			total[stat] = (total[stat] || 0) + (entry[stat] || 0)
 		total["best_streak"] = max(total["best_streak"], entry["best_streak"])
 		if(!total["ckey"])
@@ -1085,6 +1114,8 @@ GLOBAL_VAR(clash_start_mode)
 	if(idle_limit)
 		idle_timer_id = addtimer(CALLBACK(src, PROC_REF(check_idle)), 30 SECONDS, TIMER_LOOP|TIMER_STOPPABLE)
 	open_first_match()
+	if(arena_rules)
+		clash_arena_med_supply()
 	for(var/obj/structure/machinery/cm_vending/vendor in GLOB.machines)
 		vendor.vend_delay = 0
 	SSweather.force_weather_holder(/datum/weather_ss_map_holder/faction_clash)
@@ -1257,6 +1288,8 @@ GLOBAL_VAR(clash_start_mode)
 	var/best_assists = 0
 	var/best_captures_name
 	var/best_captures = 0
+	var/best_revives_name
+	var/best_revives = 0
 	for(var/name in player_scores)
 		var/list/entry = player_scores[name]
 		if(!entry["ckey"])
@@ -1280,6 +1313,9 @@ GLOBAL_VAR(clash_start_mode)
 		if((entry["captures"] || 0) > best_captures)
 			best_captures = entry["captures"]
 			best_captures_name = name
+		if((entry["revives"] || 0) > best_revives)
+			best_revives = entry["revives"]
+			best_revives_name = name
 	if(best_kd_name)
 		. += "Deadliest: [best_kd_name], [round(best_kd, 0.01)] K/D"
 	if(best_streak_name)
@@ -1290,6 +1326,8 @@ GLOBAL_VAR(clash_start_mode)
 		. += "Team player: [best_assists_name], [best_assists] assists"
 	if(best_captures_name)
 		. += "Flag runner: [best_captures_name], [best_captures] captures"
+	if(best_revives_name)
+		. += "Guardian Angel: [best_revives_name], [best_revives] revive\s"
 
 /datum/game_mode/extended/faction_clash/hvh/proc/announce_personal_stats()
 	for(var/mob/player as anything in GLOB.player_list)

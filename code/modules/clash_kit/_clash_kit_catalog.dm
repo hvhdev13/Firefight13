@@ -223,8 +223,8 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 		add_clash_kit_option(faction, slot, "Shotgun shell pouch", /obj/item/storage/pouch/shotgun, "Shells and slugs")
 		add_clash_kit_option(faction, slot, "Large shotgun shell pouch", /obj/item/storage/pouch/shotgun/large, "More shells and slugs")
 		add_clash_kit_option(faction, slot, "Fuel tank strap pouch", /obj/item/storage/pouch/flamertank, "Two spare flamer tanks")
-		add_clash_kit_option(faction, slot, "First aid pouch", /obj/item/storage/pouch/firstaid/ert, "Autoinjectors, refillable")
-		add_clash_kit_option(faction, slot, "Medical supplies pouch", /obj/item/storage/pouch/medical/clash_supplies, "Gauze, ointment and a splint for wounds")
+		add_clash_kit_option(faction, slot, "First aid pouch", /obj/item/storage/pouch/firstaid/clash, "Healing injector, tramadol injector, field dressings and splints")
+		add_clash_kit_option(faction, slot, "Medical supplies pouch", /obj/item/storage/pouch/medical/clash_supplies, "Field dressings and splints for wounds")
 		add_clash_kit_option(faction, slot, "Flare pouch", /obj/item/storage/pouch/flare/full, "Light up a lane")
 		add_clash_kit_option(faction, slot, "Explosive pouch", /obj/item/storage/pouch/explosive, "Carries your grenades")
 		add_clash_kit_option(faction, slot, "Medium general pouch", /obj/item/storage/pouch/general/medium, "Tools, flares, whatever fits")
@@ -340,9 +340,9 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 
 /obj/item/storage/pouch/medical/clash_supplies
 	name = "medical supplies pouch"
-	desc = "A medical pouch packed with gauze, ointment and a splint for treating wounds."
+	desc = "A medical pouch packed with field dressings and splints for treating wounds."
 
 /obj/item/storage/pouch/medical/clash_supplies/fill_preset_inventory()
-	new /obj/item/stack/medical/bruise_pack(src)
-	new /obj/item/stack/medical/ointment(src)
+	new /obj/item/stack/medical/bruise_pack/field_dressing(src)
+	new /obj/item/stack/medical/bruise_pack/field_dressing(src)
 	new /obj/item/stack/medical/splint(src)

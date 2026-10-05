@@ -591,7 +591,7 @@
 /area/space)
 "dl" = (
 /obj/structure/medical_supply_link,
-/obj/structure/machinery/cm_vending/sorted/medical/upp,
+/obj/structure/machinery/cm_vending/sorted/medical/upp/arena,
 /turf/open/floor/strata/cyan3,
 /area/clash_arena/tdm_jungle/upp_base)
 "dm" = (
@@ -1384,7 +1384,7 @@
 /area/clash_arena/tdm_jungle/upp_base)
 "hV" = (
 /obj/structure/medical_supply_link,
-/obj/structure/machinery/cm_vending/sorted/medical/upp,
+/obj/structure/machinery/cm_vending/sorted/medical/upp/arena,
 /turf/open/floor/strata/cyan3/north,
 /area/clash_arena/tdm_jungle/upp_base)
 "ia" = (
@@ -1850,7 +1850,7 @@
 /turf/open/floor/almayer/plate,
 /area/clash_arena/tdm_jungle/uscm_base)
 "lf" = (
-/obj/structure/machinery/cm_vending/sorted/medical,
+/obj/structure/machinery/cm_vending/sorted/medical/arena,
 /turf/open/floor/almayer/plate,
 /area/clash_arena/tdm_jungle/uscm_base)
 "li" = (
@@ -5205,7 +5205,7 @@
 /turf/open/floor/strata/floor2,
 /area/clash_arena/tdm_jungle/upp_base)
 "HH" = (
-/obj/structure/machinery/chem_dispenser/corpsman{
+/obj/structure/machinery/chem_dispenser/corpsman/arena{
 	pixel_y = 3
 	},
 /turf/open/floor/almayer/orange,
@@ -6450,7 +6450,7 @@
 /turf/open/auto_turf/tyrargo_grass/layer0_mud_alt,
 /area/clash_arena/tdm_jungle/battlefield)
 "Px" = (
-/obj/structure/machinery/chem_dispenser/corpsman{
+/obj/structure/machinery/chem_dispenser/corpsman/arena{
 	pixel_y = 3
 	},
 /turf/open/floor/strata/cyan4,
@@ -6567,8 +6567,6 @@
 /turf/open/floor/plating,
 /area/clash_arena/tdm_jungle/upp_base)
 "Qu" = (
-/obj/structure/medical_supply_link,
-/obj/structure/machinery/cm_vending/sorted/medical/marinemed/upp,
 /turf/open/floor/corsat/spiralplate,
 /area/clash_arena/tdm_jungle/upp_base)
 "Qw" = (
@@ -7076,7 +7074,7 @@
 /turf/open/floor/almayer/plate,
 /area/clash_arena/tdm_jungle/uscm_base)
 "Ux" = (
-/obj/structure/machinery/chem_dispenser/corpsman{
+/obj/structure/machinery/chem_dispenser/corpsman/arena{
 	pixel_y = 3
 	},
 /turf/open/floor/almayer/red/north,
@@ -7588,8 +7586,6 @@
 /turf/open/gm/river/desert/tyrargo/deep,
 /area/clash_arena/tdm_jungle/battlefield)
 "XV" = (
-/obj/structure/medical_supply_link,
-/obj/structure/machinery/cm_vending/sorted/medical/marinemed/upp,
 /turf/open/floor/strata/cyan3/north,
 /area/clash_arena/tdm_jungle/upp_base)
 "XW" = (

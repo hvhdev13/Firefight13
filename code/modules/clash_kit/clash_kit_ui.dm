@@ -1,5 +1,7 @@
 GLOBAL_LIST_EMPTY(clash_kit_screens)
 
+/client/var/clash_deploying = FALSE
+
 /proc/get_clash_kit_screen(mob/user)
 	var/ckey = user.ckey
 	if(!ckey)
@@ -192,7 +194,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 		"deploy_state" = deploy_state,
 		"respawn_in" = CEILING(respawn_in / 10, 1),
 		"deploy_block" = deploy_state ? get_deploy_block(user) : null,
-		"revivable" = deploy_state == "dead" && !!user.get_revivable_body(),
+		"revivable" = deploy_state == "dead" && !!clash_revivable_body(user),
 		"hint" = hint,
 		"progress" = clash_progress_ui_data(ckey, job, primary?.item_type, gun_type),
 	)
@@ -465,17 +467,19 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 	if(state == "dead" && clash_respawn_wait(user))
 		return
 	var/client/player = user.client
-	var/role = job
 	if(state == "dead")
+		player.clash_deploying = TRUE
 		user.respawn_to_lobby(TRUE)
-		addtimer(CALLBACK(src, PROC_REF(spawn_from_lobby), player, role), 2)
-		return
-	spawn_from_lobby(player, role)
+		player.clash_deploying = FALSE
+	spawn_from_lobby(player, job)
 
 /datum/clash_kit_screen/proc/spawn_from_lobby(client/player, role)
 	var/mob/new_player/lobby = player?.mob
 	if(!istype(lobby))
 		return
 	SStgui.close_uis(src)
-	if(!lobby.late_spawn(role))
-		open_clash_kit_screen(lobby)
+	if(lobby.late_spawn(role))
+		return
+	if(!SStgui.get_open_ui(lobby, lobby))
+		INVOKE_ASYNC(lobby, TYPE_PROC_REF(/mob/new_player, lobby))
+	open_clash_kit_screen(lobby)

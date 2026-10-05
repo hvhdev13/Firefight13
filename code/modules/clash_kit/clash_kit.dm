@@ -136,7 +136,7 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 				continue
 			kit.name = stored["name"] == "Standard issue" ? "Default" : stored["name"]
 			for(var/slot in stored["choices"])
-				var/id = stored["choices"][slot]
+				var/id = replacetext(stored["choices"][slot], "/obj/item/storage/pouch/firstaid/ert", "/obj/item/storage/pouch/firstaid/clash")
 				if(!get_clash_kit_option(id) && ispath(text2path(id)))
 					id = clash_kit_option_id(clash_kit_faction_for_job(job), slot, text2path(id))
 				if(get_clash_kit_option(id))
@@ -529,10 +529,10 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 	if(primary || sidearm)
 		clash_kit_purge_stray_magazines(wearer)
 	for(var/wear_slot in list(WEAR_L_STORE, WEAR_R_STORE))
-		var/obj/item/storage/pouch/firstaid/full/issued_medkit = wearer.get_item_by_slot(wear_slot)
-		if(istype(issued_medkit))
+		var/obj/item/storage/issued_medkit = wearer.get_item_by_slot(wear_slot)
+		if((istype(issued_medkit, /obj/item/storage/pouch/firstaid) && !istype(issued_medkit, /obj/item/storage/pouch/firstaid/clash)) || istype(issued_medkit, /obj/item/storage/pouch/autoinjector))
 			QDEL_LIST(issued_medkit.contents)
-			clash_kit_replace_worn(wearer, wear_slot, /obj/item/storage/pouch/firstaid/ert)
+			clash_kit_replace_worn(wearer, wear_slot, /obj/item/storage/pouch/firstaid/clash)
 	clash_kit_fit_pouches(wearer, kit, faction)
 	var/datum/clash_kit_option/grenades = kit.get_option(KIT_SLOT_GRENADE)
 	if(grenades && grenades.faction == faction)
@@ -578,6 +578,7 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 		cosmetic?.equip_to_user(fighter, FALSE, FALSE)
 	issue_clash_role_kit(fighter, fighter.job)
 	apply_clash_kit(fighter, kit, CLASH_KIT_SPAWN)
+	clash_issue_medic_gear(fighter)
 
 /proc/describe_clash_kit_item(obj/item/item)
 	return item ? list("name" = item.name, "type" = "[item.type]", "icon" = "[item.icon]", "icon_state" = item.icon_state) : null
