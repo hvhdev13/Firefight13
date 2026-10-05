@@ -93,7 +93,7 @@ GLOBAL_LIST_INIT(clash_arena_crate_removed, list(
 	for(var/family in GLOB.clash_arena_med_removed_families)
 		if(ispath(item_type, family))
 			return null
-	if(clash_arena_eng_removed(item_type) || clash_is_ration(item_type))
+	if(clash_arena_eng_removed(item_type) || clash_is_arena_removed(item_type))
 		return null
 	var/list/swap = GLOB.clash_arena_med_swaps[item_type]
 	if(swap)

@@ -2,6 +2,16 @@
 #define CLASH_REVIVE_ZAP_FAST (1 SECONDS)
 #define CLASH_SECOND_WIND_HEALTH 20
 #define CLASH_REVIVE_SICKNESS (60 SECONDS)
+#define CLASH_REVIVE_FLASH_HOLD (5 DECISECONDS)
+#define CLASH_REVIVE_FLASH_FADE (5 DECISECONDS)
+#define CLASH_REVIVE_GUARD (3 SECONDS)
+
+/mob/living/carbon/human/var/clash_revive_guard_until = 0
+
+/mob/living/carbon/human/GetKnockOutDuration(amount)
+	if(world.time < clash_revive_guard_until)
+		return 0
+	return ..()
 
 GLOBAL_LIST_INIT(clash_revive_health, list(50, 35, 20))
 
@@ -95,7 +105,10 @@ GLOBAL_LIST_INIT(clash_revive_health, list(50, 35, 20))
 	var/missing = revive_health - (maxHealth - brute - burn)
 	if(missing > 0)
 		heal_overall_damage(missing * brute / (brute + burn), missing * burn / (brute + burn))
+	clash_revive_guard_until = world.time + CLASH_REVIVE_GUARD
+	setHalLoss(0)
 	handle_revive()
+	addtimer(CALLBACK(src, TYPE_PROC_REF(/mob, clear_fullscreen), "flash", CLASH_REVIVE_FLASH_FADE), CLASH_REVIVE_FLASH_HOLD)
 	set_effect(0, PARALYZE)
 	set_effect(2, EYE_BLUR)
 	handle_regular_status_updates(FALSE)
@@ -121,3 +134,6 @@ GLOBAL_LIST_INIT(clash_revive_health, list(50, 35, 20))
 #undef CLASH_REVIVE_ZAP_FAST
 #undef CLASH_SECOND_WIND_HEALTH
 #undef CLASH_REVIVE_SICKNESS
+#undef CLASH_REVIVE_FLASH_HOLD
+#undef CLASH_REVIVE_FLASH_FADE
+#undef CLASH_REVIVE_GUARD

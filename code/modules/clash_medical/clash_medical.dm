@@ -447,6 +447,24 @@ GLOBAL_LIST_INIT(clash_adv_firstaid_stock, list(
 	chemclass = CHEM_CLASS_SPECIAL
 	properties = list(PROPERTY_ANTITOXIC = 2)
 
+/obj/item/storage/pouch/pressurized_reagent_canister/clash_unga
+	name = "Pressurized Reagent Canister Pouch (UNGA)"
+	desc = "A pressurized reagent canister pouch. It is used to refill custom injectors, and can also store one. May be refilled with a reagent tank or a Chemical Dispenser. This one came pre-filled with UNGA mix: bicaridine, kelotane, tricordrazine, meralyne, dermaline and oxycodone."
+
+/obj/item/storage/pouch/pressurized_reagent_canister/clash_unga/Initialize()
+	. = ..()
+	var/list/mix = GLOB.clash_chem_mixes["UNGA"]
+	var/parts = 0
+	for(var/id in mix)
+		parts += mix[id]
+	var/obj/item/reagent_container/hypospray/autoinjector/empty/injector = locate() in contents
+	for(var/id in mix)
+		inner.reagents.add_reagent(id, inner.volume * mix[id] / parts)
+		injector?.reagents.add_reagent(id, injector.volume * mix[id] / parts)
+	injector?.update_uses_left()
+	injector?.update_icon()
+	update_icon()
+
 /obj/item/reagent_container/hypospray/autoinjector/clash_antitox
 	name = "dylovene plus autoinjector"
 	chemname = "anti_toxin_plus"

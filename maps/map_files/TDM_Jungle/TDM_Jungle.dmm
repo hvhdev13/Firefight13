@@ -960,6 +960,11 @@
 	},
 /turf/open/auto_turf/tyrargo_grass/layer0_mud_alt,
 /area/clash_arena/tdm_jungle/battlefield)
+"fm" = (
+/obj/structure/prop/tyrargo/boards/boards_2,
+/obj/effect/landmark/clash_objective/domination_zone/a,
+/turf/open/auto_turf/tyrargo_grass/layer1,
+/area/clash_arena/tdm_jungle/battlefield)
 "fn" = (
 /obj/structure/surface/rack,
 /obj/item/tool/weldpack,
@@ -1151,6 +1156,10 @@
 	dir = 7
 	},
 /turf/open/gm/river/desert/tyrargo/deep,
+/area/clash_arena/tdm_jungle/battlefield)
+"gr" = (
+/obj/effect/landmark/clash_objective/clash_flag/upp,
+/turf/open/auto_turf/snow/brown_base,
 /area/clash_arena/tdm_jungle/battlefield)
 "gt" = (
 /obj/structure/prop/tyrargo/boards/boards_2,
@@ -1611,6 +1620,10 @@
 "jr" = (
 /obj/structure/flora/tree/tyrargo,
 /turf/open/auto_turf/snow/layer2,
+/area/clash_arena/tdm_jungle/battlefield)
+"jw" = (
+/obj/effect/landmark/clash_objective/domination_zone/c,
+/turf/open/auto_turf/tyrargo_grass,
 /area/clash_arena/tdm_jungle/battlefield)
 "jz" = (
 /obj/structure/sign/safety/ammunition{
@@ -3071,6 +3084,14 @@
 	},
 /turf/open/auto_turf/snow/brown_base/layer2,
 /area/clash_arena/tdm_jungle/battlefield)
+"to" = (
+/obj/effect/decal/strata_decals/tyrargo_mud_corner{
+	dir = 0
+	},
+/obj/effect/decal/strata_decals/grasses,
+/obj/effect/landmark/clash_objective/clash_flag/uscm,
+/turf/open/auto_turf/tyrargo_grass,
+/area/clash_arena/tdm_jungle/battlefield)
 "tr" = (
 /obj/structure/bed/chair{
 	dir = 4
@@ -3680,6 +3701,13 @@
 	},
 /turf/open/floor/corsat/marked,
 /area/clash_arena/tdm_jungle/upp_base)
+"xz" = (
+/obj/effect/landmark/clash_objective/koth_secondary,
+/turf/open/floor/strata/fake_wood{
+	explo_proof = 1;
+	turf_flags = 16
+	},
+/area/clash_arena/tdm_jungle/battlefield)
 "xB" = (
 /obj/effect/decal/warning_stripes{
 	icon_state = "S"
@@ -7219,6 +7247,14 @@
 	},
 /turf/open/floor/almayer,
 /area/clash_arena/tdm_jungle/uscm_base/req)
+"Vu" = (
+/obj/effect/landmark/clash_objective/domination_zone/b,
+/obj/effect/landmark/clash_objective/koth_primary,
+/turf/open/floor/strata/fake_wood{
+	explo_proof = 1;
+	turf_flags = 16
+	},
+/area/clash_arena/tdm_jungle/battlefield)
 "Vw" = (
 /obj/effect/decal/strata_decals/grasses,
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
@@ -29987,7 +30023,7 @@ tJ
 TF
 TF
 Up
-TF
+gr
 tJ
 TF
 yt
@@ -35232,7 +35268,7 @@ aS
 XQ
 FR
 Fu
-HI
+fm
 Fz
 Sb
 cW
@@ -35648,7 +35684,7 @@ bd
 bd
 Tk
 nG
-Jq
+Vu
 qd
 qy
 bd
@@ -36265,7 +36301,7 @@ bd
 cW
 GD
 mX
-vD
+jw
 Zx
 vD
 WF
@@ -38875,7 +38911,7 @@ DJ
 Vl
 qZ
 Jw
-Jq
+xz
 qd
 Zl
 Bp
@@ -42722,7 +42758,7 @@ vD
 iG
 Fz
 Fz
-wp
+to
 Fz
 Fz
 kU

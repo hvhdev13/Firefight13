@@ -113,7 +113,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 					"type" = "[option.item_type]",
 					"ammo" = option.ammo_count,
 					"stats" = option.stats,
-					"perk_class" = perk?.class,
+					"only_class" = perk ? perk.class : option.only_class,
 				))
 			by_slot[slot] = options
 		menus[faction] = by_slot
@@ -175,7 +175,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 		"choices" = kit?.choices || list(),
 		"issue" = clash_sentry_issue(clash_filter_issue(issue, ckey, job) || list(), job),
 		"sentry_slot" = clash_job_is_engineer(job),
-		"perk_class" = GLOB.clash_job_classes[job],
+		"job_class" = GLOB.clash_job_classes[job],
 		"fits" = fits,
 		"doll" = render?["doll"],
 		"gun" = render?["gun"],

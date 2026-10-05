@@ -424,11 +424,8 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 	if(!useful)
 		return
 	for(var/slot in list(KIT_SLOT_POUCH_R, KIT_SLOT_POUCH_L))
-		if(kit.get_option(slot))
-			continue
 		var/wear_slot = GLOB.clash_kit_slots[slot]["wear"]
-		var/obj/item/worn = wearer.get_item_by_slot(wear_slot)
-		if(istype(worn, /obj/item/storage/pouch/firstaid) || istype(worn, /obj/item/storage/pouch/medical))
+		if(kit.get_option(slot) || wearer.get_item_by_slot(wear_slot))
 			continue
 		clash_kit_replace_worn(wearer, wear_slot, replacement)
 		return
@@ -552,7 +549,7 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 			if(!wearer.equip_to_appropriate_slot(grenade))
 				qdel(grenade)
 	if(clash_fast_medicine())
-		clash_remove_rations(wearer)
+		clash_remove_arena_items(wearer)
 	if(mode != CLASH_KIT_PREVIEW)
 		clash_engrave_guns(wearer, ckey)
 	clash_strip_locked_attachments(wearer, ckey)
