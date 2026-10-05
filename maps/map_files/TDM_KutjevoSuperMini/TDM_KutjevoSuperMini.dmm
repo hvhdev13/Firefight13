@@ -331,7 +331,7 @@
 /turf/open/auto_turf/sand/layer2,
 /area/kutjevo/exterior/lz_dunes)
 "abd" = (
-/obj/structure/machinery/chem_dispenser/corpsman{
+/obj/structure/machinery/chem_dispenser/corpsman/arena{
 	pixel_y = 3
 	},
 /turf/open/floor/almayer/red/north,
@@ -362,7 +362,7 @@
 /turf/open/auto_turf/sand/layer1,
 /area/kutjevo/exterior/lz_dunes)
 "abj" = (
-/obj/structure/machinery/chem_dispenser/corpsman{
+/obj/structure/machinery/chem_dispenser/corpsman/arena{
 	pixel_y = 3
 	},
 /turf/open/floor/almayer/orange,
@@ -1034,8 +1034,6 @@
 /turf/open/floor/almayer/orange/west,
 /area/clash_arena/tdm_kutjevo/uscm_base)
 "adn" = (
-/obj/structure/medical_supply_link,
-/obj/structure/machinery/cm_vending/sorted/medical/marinemed/upp,
 /turf/open/floor/corsat/spiralplate,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "ado" = (
@@ -2092,9 +2090,6 @@
 /turf/open/floor/strata/floor2,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "agy" = (
-/obj/structure/machinery/cm_vending/sorted/medical/chemistry{
-	pixel_x = -1
-	},
 /obj/structure/medical_supply_link,
 /turf/open/floor/almayer/sterile_green,
 /area/clash_arena/tdm_kutjevo/uscm_base/medbay)
@@ -2204,7 +2199,7 @@
 /area/clash_arena/tdm_kutjevo/upp_base)
 "ahe" = (
 /obj/structure/medical_supply_link,
-/obj/structure/machinery/cm_vending/sorted/medical/upp,
+/obj/structure/machinery/cm_vending/sorted/medical/upp/arena,
 /turf/open/floor/strata/cyan3/north,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "ahf" = (
@@ -2327,7 +2322,7 @@
 /turf/open/floor/strata/floor3/east,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "ahy" = (
-/obj/structure/machinery/cm_vending/sorted/medical/upp,
+/obj/structure/machinery/cm_vending/sorted/medical/upp/arena,
 /turf/open/floor/strata/cyan4/west,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "ahA" = (
@@ -2575,7 +2570,7 @@
 /turf/open/floor/almayer/silverfull,
 /area/clash_arena/tdm_kutjevo/upp_base/medbay)
 "air" = (
-/obj/structure/machinery/chem_dispenser,
+/obj/structure/machinery/chem_dispenser/corpsman/arena,
 /obj/item/reagent_container/glass/beaker/bluespace,
 /turf/open/floor/almayer/sterile_green,
 /area/clash_arena/tdm_kutjevo/upp_base/medbay)
@@ -2869,7 +2864,6 @@
 /area/clash_arena/tdm_kutjevo/upp_base/medbay)
 "ajo" = (
 /obj/structure/medical_supply_link,
-/obj/structure/machinery/cm_vending/sorted/medical/chemistry/no_access,
 /turf/open/floor/almayer/sterile_green,
 /area/clash_arena/tdm_kutjevo/upp_base/medbay)
 "ajp" = (
@@ -3733,10 +3727,6 @@
 /area/clash_arena/tdm_kutjevo/upp_base/req)
 "alh" = (
 /obj/structure/surface/rack,
-/obj/item/storage/pill_bottle/mystery/skillless{
-	pixel_x = 7;
-	pixel_y = 1
-	},
 /obj/item/tool/surgery/FixOVein{
 	pixel_x = -4;
 	pixel_y = 2
@@ -3876,10 +3866,6 @@
 	name = "blood bag";
 	pixel_y = 3;
 	pixel_x = 4
-	},
-/obj/item/storage/pill_bottle/kelotane/skillless{
-	pixel_x = -2;
-	pixel_y = 9
 	},
 /obj/structure/machinery/light{
 	dir = 1;
@@ -4024,10 +4010,6 @@
 /obj/structure/surface/table/almayer,
 /obj/item/storage/box/gloves,
 /obj/item/storage/box/gloves,
-/obj/item/storage/pill_bottle/spaceacillin/skillless{
-	pixel_x = 10;
-	pixel_y = 10
-	},
 /obj/structure/sign/nosmoking_2{
 	pixel_y = 31
 	},
@@ -4478,11 +4460,6 @@
 	},
 /turf/open/asphalt/cement_sunbleached,
 /area/kutjevo/exterior/lz_dunes)
-"anf" = (
-/obj/structure/medical_supply_link,
-/obj/structure/machinery/cm_vending/sorted/medical/marinemed/upp,
-/turf/open/floor/almayer/silverfull,
-/area/clash_arena/tdm_kutjevo/upp_base/medbay)
 "ang" = (
 /obj/structure/surface/table/almayer,
 /obj/item/tool/hand_labeler,
@@ -4753,7 +4730,7 @@
 /area/clash_arena/tdm_kutjevo/upp_base/medbay)
 "anR" = (
 /obj/structure/medical_supply_link/green,
-/obj/structure/machinery/cm_vending/sorted/medical/upp,
+/obj/structure/machinery/cm_vending/sorted/medical/upp/arena,
 /turf/open/floor/almayer/sterile_green,
 /area/clash_arena/tdm_kutjevo/upp_base/medbay)
 "anS" = (
@@ -4905,9 +4882,6 @@
 /turf/open/floor/almayer/sterile_green,
 /area/clash_arena/tdm_kutjevo/upp_base/medbay)
 "aok" = (
-/obj/structure/machinery/cm_vending/sorted/medical/chemistry/no_access{
-	req_access = null
-	},
 /obj/structure/medical_supply_link,
 /obj/structure/sign/safety/ref_bio_storage{
 	pixel_x = 35
@@ -4935,7 +4909,7 @@
 /area/clash_arena/tdm_kutjevo/upp_base/medbay)
 "aon" = (
 /obj/structure/medical_supply_link,
-/obj/structure/machinery/cm_vending/sorted/medical/upp,
+/obj/structure/machinery/cm_vending/sorted/medical/upp/arena,
 /turf/open/floor/almayer/silverfull,
 /area/clash_arena/tdm_kutjevo/upp_base/medbay)
 "aoo" = (
@@ -5150,14 +5124,6 @@
 /area/clash_arena/tdm_kutjevo/upp_base/medbay)
 "aoT" = (
 /obj/structure/surface/table/reinforced/rostock_table,
-/obj/item/storage/belt/medical/lifesaver/upp,
-/obj/item/storage/belt/medical/lifesaver/upp,
-/obj/item/storage/belt/medical/lifesaver/upp,
-/obj/item/storage/belt/medical/lifesaver/upp,
-/obj/item/storage/belt/medical/lifesaver/upp,
-/obj/item/storage/belt/medical/lifesaver/upp,
-/obj/item/storage/belt/medical/lifesaver/upp,
-/obj/item/storage/belt/medical/lifesaver/upp,
 /obj/item/clothing/glasses/hud/health,
 /obj/item/clothing/glasses/hud/health,
 /obj/item/clothing/glasses/hud/health,
@@ -5166,14 +5132,6 @@
 /obj/item/clothing/glasses/hud/health,
 /obj/item/clothing/glasses/hud/health,
 /obj/item/clothing/glasses/hud/health,
-/obj/item/reagent_container/hypospray,
-/obj/item/reagent_container/hypospray,
-/obj/item/reagent_container/hypospray,
-/obj/item/reagent_container/hypospray,
-/obj/item/reagent_container/hypospray,
-/obj/item/reagent_container/hypospray,
-/obj/item/reagent_container/hypospray,
-/obj/item/reagent_container/hypospray,
 /turf/open/floor/almayer/sterile_green,
 /area/clash_arena/tdm_kutjevo/upp_base/medbay)
 "aoU" = (
@@ -5544,7 +5502,7 @@
 /area/clash_arena/tdm_kutjevo/upp_base/medbay)
 "apN" = (
 /obj/structure/medical_supply_link,
-/obj/structure/machinery/cm_vending/sorted/medical/upp,
+/obj/structure/machinery/cm_vending/sorted/medical/upp/arena,
 /turf/open/floor/almayer/sterile_green,
 /area/clash_arena/tdm_kutjevo/upp_base/medbay)
 "apO" = (
@@ -5607,24 +5565,15 @@
 /turf/open/floor/almayer/sterile_green,
 /area/clash_arena/tdm_kutjevo/upp_base/medbay)
 "apT" = (
-/obj/item/storage/firstaid/toxin{
+/obj/item/storage/firstaid/adv/arena{
 	pixel_x = 6;
 	pixel_y = 6
 	},
-/obj/item/storage/firstaid/fire{
+/obj/item/storage/firstaid/adv/arena{
 	pixel_x = 3;
 	pixel_y = 3
 	},
-/obj/item/storage/firstaid/o2,
-/obj/item/storage/firstaid/adv{
-	pixel_x = 6;
-	pixel_y = 6
-	},
-/obj/item/storage/firstaid/adv{
-	pixel_x = 3;
-	pixel_y = 3
-	},
-/obj/item/storage/firstaid/adv,
+/obj/item/storage/firstaid/adv/arena,
 /obj/item/device/healthanalyzer,
 /obj/item/device/healthanalyzer,
 /obj/item/device/healthanalyzer,
@@ -5746,7 +5695,7 @@
 	pixel_x = -13;
 	pixel_y = 31
 	},
-/obj/structure/machinery/cm_vending/sorted/medical/upp,
+/obj/structure/machinery/cm_vending/sorted/medical/upp/arena,
 /turf/open/floor/almayer/sterile_green,
 /area/clash_arena/tdm_kutjevo/upp_base/medbay)
 "aqi" = (
@@ -5831,7 +5780,7 @@
 /turf/open/floor/almayer/mono,
 /area/supply/station/uscm)
 "aqp" = (
-/obj/structure/machinery/chem_dispenser/corpsman{
+/obj/structure/machinery/chem_dispenser/corpsman/arena{
 	pixel_y = 3
 	},
 /turf/open/floor/strata/cyan4/north,
@@ -5870,7 +5819,7 @@
 	dir = 4;
 	light_color = "#ccecff"
 	},
-/obj/structure/machinery/chem_dispenser/corpsman,
+/obj/structure/machinery/chem_dispenser/corpsman/arena,
 /turf/open/floor/almayer/sterile_green,
 /area/clash_arena/tdm_kutjevo/upp_base/medbay)
 "aqv" = (
@@ -6032,8 +5981,6 @@
 /turf/open/floor/almayer/cargo_arrow/north,
 /area/supply/station/uscm)
 "aqQ" = (
-/obj/structure/medical_supply_link,
-/obj/structure/machinery/cm_vending/sorted/medical/marinemed,
 /obj/structure/machinery/light{
 	dir = 8
 	},
@@ -6111,7 +6058,7 @@
 /turf/open/gm/dirt/brown/variant_3,
 /area/kutjevo/exterior/stonyfields)
 "ara" = (
-/obj/structure/machinery/chem_dispenser/medbay{
+/obj/structure/machinery/chem_dispenser/corpsman/arena{
 	pixel_x = -1
 	},
 /turf/open/floor/almayer/sterile_green_side/north,
@@ -6256,14 +6203,14 @@
 /area/kutjevo/exterior/stonyfields)
 "arr" = (
 /obj/structure/medical_supply_link/green,
-/obj/structure/machinery/cm_vending/sorted/medical{
+/obj/structure/machinery/cm_vending/sorted/medical/arena{
 	pixel_x = -1
 	},
 /turf/open/floor/almayer/sterile_green_side/north,
 /area/clash_arena/tdm_kutjevo/uscm_base/medbay)
 "ars" = (
 /obj/structure/medical_supply_link/green,
-/obj/structure/machinery/cm_vending/sorted/medical{
+/obj/structure/machinery/cm_vending/sorted/medical/arena{
 	pixel_x = -1
 	},
 /turf/open/floor/almayer/dark_sterile,
@@ -6372,14 +6319,6 @@
 /area/clash_arena/tdm_kutjevo/uscm_base/medbay)
 "arN" = (
 /obj/structure/surface/table/almayer,
-/obj/item/storage/firstaid/fire{
-	pixel_x = 12;
-	pixel_y = 6
-	},
-/obj/item/storage/firstaid/fire{
-	pixel_x = 12;
-	pixel_y = 6
-	},
 /obj/item/clothing/head/welding{
 	pixel_x = -8;
 	pixel_y = 7
@@ -6408,17 +6347,13 @@
 	pixel_y = 3;
 	pixel_x = -8
 	},
-/obj/item/storage/firstaid/fire{
-	pixel_x = 12;
-	pixel_y = 6
-	},
-/obj/item/storage/firstaid/adv{
+/obj/item/storage/firstaid/adv/arena{
 	pixel_x = 12
 	},
-/obj/item/storage/firstaid/adv{
+/obj/item/storage/firstaid/adv/arena{
 	pixel_x = 12
 	},
-/obj/item/storage/firstaid/adv{
+/obj/item/storage/firstaid/adv/arena{
 	pixel_x = 12
 	},
 /turf/open/floor/almayer/sterile_green_side,
@@ -6538,27 +6473,6 @@
 /area/clash_arena/tdm_kutjevo/uscm_base/medbay)
 "arX" = (
 /obj/structure/surface/table/almayer,
-/obj/item/storage/firstaid/toxin{
-	pixel_x = 3;
-	pixel_y = 6
-	},
-/obj/item/storage/firstaid/toxin{
-	pixel_x = 3;
-	pixel_y = 6
-	},
-/obj/item/storage/firstaid/toxin{
-	pixel_x = 3;
-	pixel_y = 6
-	},
-/obj/item/storage/firstaid/o2{
-	pixel_x = 3
-	},
-/obj/item/storage/firstaid/o2{
-	pixel_x = 3
-	},
-/obj/item/storage/firstaid/o2{
-	pixel_x = 3
-	},
 /turf/open/floor/almayer/sterile_green_corner/east,
 /area/clash_arena/tdm_kutjevo/uscm_base/medbay)
 "arY" = (
@@ -6998,22 +6912,6 @@
 	pixel_y = 7;
 	pixel_x = 4
 	},
-/obj/item/reagent_container/hypospray{
-	pixel_x = -4;
-	pixel_y = 2
-	},
-/obj/item/reagent_container/hypospray{
-	pixel_x = -4;
-	pixel_y = 2
-	},
-/obj/item/reagent_container/hypospray{
-	pixel_x = -4;
-	pixel_y = 2
-	},
-/obj/item/reagent_container/hypospray{
-	pixel_x = -4;
-	pixel_y = 2
-	},
 /obj/item/reagent_container/glass/minitank{
 	pixel_x = 5;
 	pixel_y = -1
@@ -7131,10 +7029,6 @@
 /turf/open/floor/almayer/sterile_green_side/west,
 /area/clash_arena/tdm_kutjevo/uscm_base/medbay)
 "atk" = (
-/obj/item/reagent_container/hypospray{
-	pixel_x = -4;
-	pixel_y = 2
-	},
 /turf/open/floor/almayer/sterile_green_corner,
 /area/clash_arena/tdm_kutjevo/uscm_base/medbay)
 "atl" = (
@@ -7211,7 +7105,7 @@
 /turf/open/floor/almayer/dark_sterile,
 /area/clash_arena/tdm_kutjevo/uscm_base/medbay)
 "atv" = (
-/obj/structure/machinery/chem_dispenser/medbay{
+/obj/structure/machinery/chem_dispenser/corpsman/arena{
 	pixel_x = -1
 	},
 /turf/open/floor/almayer/sterile_green_side,
@@ -7283,9 +7177,6 @@
 	},
 /obj/structure/machinery/disposal,
 /turf/open/floor/almayer/sterile_green_side/east,
-/area/clash_arena/tdm_kutjevo/uscm_base/medbay)
-"atI" = (
-/turf/open/floor/almayer/sterile_green_corner,
 /area/clash_arena/tdm_kutjevo/uscm_base/medbay)
 "atJ" = (
 /obj/structure/machinery/light{
@@ -7364,7 +7255,7 @@
 /turf/open/floor/almayer,
 /area/clash_arena/tdm_kutjevo/uscm_base)
 "atT" = (
-/obj/structure/machinery/chem_dispenser/corpsman{
+/obj/structure/machinery/chem_dispenser/corpsman/arena{
 	pixel_y = 3
 	},
 /turf/open/floor/almayer/sterile_green,
@@ -7476,18 +7367,9 @@
 /area/kutjevo/exterior/lz_river)
 "auo" = (
 /obj/structure/surface/rack,
-/obj/item/storage/belt/medical/lifesaver/full,
-/obj/item/storage/belt/medical/lifesaver/full,
-/obj/item/storage/belt/medical/lifesaver/full,
-/obj/item/storage/belt/medical/full{
-	pixel_y = 5
-	},
-/obj/item/storage/belt/medical/full{
-	pixel_y = 5
-	},
-/obj/item/storage/belt/medical/full{
-	pixel_y = 5
-	},
+/obj/item/storage/belt/medical/lifesaver/arena,
+/obj/item/storage/belt/medical/lifesaver/arena,
+/obj/item/storage/belt/medical/lifesaver/arena,
 /turf/open/floor/almayer/dark_sterile,
 /area/clash_arena/tdm_kutjevo/uscm_base/medbay)
 "aup" = (
@@ -8570,7 +8452,7 @@
 /area/clash_arena/tdm_kutjevo/uscm_base/medbay)
 "axq" = (
 /obj/structure/medical_supply_link/green,
-/obj/structure/machinery/cm_vending/sorted/medical,
+/obj/structure/machinery/cm_vending/sorted/medical/arena,
 /turf/open/floor/almayer/sterile_green,
 /area/clash_arena/tdm_kutjevo/uscm_base/medbay)
 "axr" = (
@@ -8583,7 +8465,7 @@
 /area/clash_arena/tdm_kutjevo/uscm_base/medbay)
 "axt" = (
 /obj/structure/medical_supply_link/green,
-/obj/structure/machinery/cm_vending/sorted/medical,
+/obj/structure/machinery/cm_vending/sorted/medical/arena,
 /obj/effect/decal/warning_stripes{
 	icon_state = "SE-out";
 	pixel_y = -1;
@@ -8812,7 +8694,7 @@
 /turf/open/floor/almayer/plating/northeast,
 /area/clash_arena/tdm_kutjevo/uscm_base/medbay)
 "axV" = (
-/obj/structure/machinery/cm_vending/sorted/medical{
+/obj/structure/machinery/cm_vending/sorted/medical/arena{
 	pixel_x = -1
 	},
 /obj/structure/medical_supply_link/green,
@@ -13173,7 +13055,6 @@
 /turf/closed/wall/kutjevo/rock,
 /area/space)
 "gvV" = (
-/obj/structure/machinery/cm_vending/sorted/medical/marinemed/upp,
 /turf/open/floor/strata/cyan3/north,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "gxb" = (
@@ -13582,11 +13463,6 @@
 	pixel_y = 11
 	},
 /turf/open/floor/corsat/spiralplate,
-/area/clash_arena/tdm_kutjevo/upp_base)
-"mul" = (
-/obj/structure/medical_supply_link,
-/obj/structure/machinery/cm_vending/sorted/medical/marinemed/upp,
-/turf/open/floor/strata/cyan3/north,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "mxB" = (
 /turf/closed/wall/kutjevo/rock/border,
@@ -34149,7 +34025,7 @@ aev
 aev
 aev
 ait
-mul
+gvV
 aev
 ahn
 aeK
@@ -38957,7 +38833,7 @@ anc
 and
 amt
 apw
-anf
+aio
 ahR
 abU
 ahA
@@ -39491,7 +39367,7 @@ anH
 aio
 amt
 apw
-anf
+aio
 ait
 aop
 xwV
@@ -48393,7 +48269,7 @@ ayj
 ayj
 ayj
 aao
-atI
+atk
 asu
 aaG
 aaG

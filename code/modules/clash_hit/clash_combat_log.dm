@@ -4,6 +4,8 @@
 /mob/var/clash_next_hit_sound = 0
 /mob/var/clash_revives_seen = 0
 /mob/living/carbon/human/var/datum/squad/clash_dead_squad
+/mob/living/carbon/human/var/clash_died_in_match
+/mob/living/carbon/human/var/clash_enemy_death = FALSE
 
 /datum/element/clash_combat_log
 
@@ -15,13 +17,14 @@
 	RegisterSignal(target, COMSIG_MOB_MELEE_ATTACK, PROC_REF(on_melee))
 	RegisterSignal(target, COMSIG_HUMAN_REVIVED, PROC_REF(on_revived))
 	RegisterSignal(target, COMSIG_MOB_DEATH, PROC_REF(on_death))
+	RegisterSignal(target, COMSIG_MOB_EMOTED("medic"), PROC_REF(on_medic_shout))
 	var/mob/living/carbon/human/fighter = target
 	for(var/obj/limb/limb as anything in fighter.limbs)
 		RegisterSignal(limb, COMSIG_LIMB_SURGERY_STEP_SUCCESS, PROC_REF(on_surgery_step))
 
 /datum/element/clash_combat_log/Detach(datum/source, force)
 	. = ..()
-	UnregisterSignal(source, list(COMSIG_HUMAN_BULLET_ACT, COMSIG_MOB_MELEE_ATTACK, COMSIG_HUMAN_REVIVED, COMSIG_MOB_DEATH))
+	UnregisterSignal(source, list(COMSIG_HUMAN_BULLET_ACT, COMSIG_MOB_MELEE_ATTACK, COMSIG_HUMAN_REVIVED, COMSIG_MOB_DEATH, COMSIG_MOB_EMOTED("medic")))
 	var/mob/living/carbon/human/fighter = source
 	for(var/obj/limb/limb as anything in fighter.limbs)
 		UnregisterSignal(limb, COMSIG_LIMB_SURGERY_STEP_SUCCESS)
@@ -52,10 +55,18 @@
 
 /datum/element/clash_combat_log/proc/on_death(mob/living/carbon/human/source)
 	SIGNAL_HANDLER
+	source.clash_enemy_death = clash_enemy_share(source.last_damage_data?.resolve_mob(), source.faction, 1) > 0
+	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
+	if(istype(clash_mode) && clash_mode.match_live)
+		source.clash_died_in_match = clash_mode.match_number
 	if(source.mind)
 		clash_track_player_corpse(source)
 	if(source.assigned_squad && istype(SSticker.mode, /datum/game_mode/extended/faction_clash/hvh))
 		INVOKE_ASYNC(GLOBAL_PROC, GLOBAL_PROC_REF(clash_free_squad_slot), source)
+
+/datum/element/clash_combat_log/proc/on_medic_shout(mob/living/carbon/human/source)
+	SIGNAL_HANDLER
+	clash_medic_shout(source)
 
 /datum/element/clash_combat_log/proc/on_revived(mob/living/carbon/human/source)
 	SIGNAL_HANDLER

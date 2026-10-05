@@ -154,7 +154,7 @@
 /turf/open/floor/almayer/cargo_arrow/west,
 /area/clash_arena/tdm_jungle/uscm_base/req)
 "aX" = (
-/obj/structure/machinery/chem_dispenser/corpsman{
+/obj/structure/machinery/chem_dispenser/corpsman/arena{
 	pixel_y = 3
 	},
 /turf/open/floor/almayer/orange,
@@ -729,7 +729,7 @@
 /area/clash_arena/tdm_jungle/uscm_base/req)
 "fe" = (
 /obj/structure/medical_supply_link,
-/obj/structure/machinery/cm_vending/sorted/medical/upp,
+/obj/structure/machinery/cm_vending/sorted/medical/upp/arena,
 /turf/open/floor/strata/cyan3/north,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "fh" = (
@@ -1034,7 +1034,7 @@
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "kd" = (
 /obj/structure/medical_supply_link,
-/obj/structure/machinery/cm_vending/sorted/medical/upp,
+/obj/structure/machinery/cm_vending/sorted/medical/upp/arena,
 /turf/open/floor/strata/cyan3,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "ki" = (
@@ -1305,8 +1305,6 @@
 /turf/open/asphalt/cementalt,
 /area/clash_arena/tdm_deathmatch2000/battlefield)
 "og" = (
-/obj/structure/medical_supply_link,
-/obj/structure/machinery/cm_vending/sorted/medical/marinemed/upp,
 /turf/open/floor/strata/cyan3/north,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "oi" = (
@@ -2209,7 +2207,7 @@
 /turf/open/floor/almayer/redfull,
 /area/clash_arena/tdm_jungle/uscm_base/req)
 "zp" = (
-/obj/structure/machinery/cm_vending/sorted/medical,
+/obj/structure/machinery/cm_vending/sorted/medical/arena,
 /turf/open/floor/almayer/plate,
 /area/clash_arena/tdm_jungle/uscm_base)
 "zs" = (
@@ -2627,7 +2625,7 @@
 /turf/open/floor/almayer,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "El" = (
-/obj/structure/machinery/chem_dispenser/corpsman{
+/obj/structure/machinery/chem_dispenser/corpsman/arena{
 	pixel_y = 3
 	},
 /turf/open/floor/strata/cyan4,
@@ -2648,7 +2646,7 @@
 /turf/open/floor/strata/green3/west,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "ED" = (
-/obj/structure/machinery/chem_dispenser/corpsman{
+/obj/structure/machinery/chem_dispenser/corpsman/arena{
 	pixel_y = 3
 	},
 /turf/open/floor/almayer/red/north,
@@ -2862,8 +2860,6 @@
 /turf/open/floor/plating,
 /area/clash_arena/tdm_jungle/uscm_base/req)
 "Il" = (
-/obj/structure/medical_supply_link,
-/obj/structure/machinery/cm_vending/sorted/medical/marinemed/upp,
 /turf/open/floor/corsat/spiralplate,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "Im" = (

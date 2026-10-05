@@ -51,7 +51,7 @@ GLOBAL_VAR(clash_bot_respawn_delay)
 	var/bot_sidearm_magazine
 	var/bot_sidearm_magazines = 2
 	var/bot_grenade = /obj/item/explosive/grenade/high_explosive
-	var/bot_medical = /obj/item/storage/pouch/firstaid/ert
+	var/bot_medical = /obj/item/storage/pouch/firstaid/clash
 	var/respawn_delay = 30 SECONDS
 	var/hold_radius = 6
 	var/rally_id

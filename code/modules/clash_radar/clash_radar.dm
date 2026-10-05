@@ -134,6 +134,16 @@ GLOBAL_LIST_EMPTY(clash_radar_toggle_icons)
 				"oWo.oWo",
 				".o...o.",
 			), list("o" = rgb(10, 12, 15, 220), "W" = rgb(240, 244, 246)))
+		if("downed")
+			mark = clash_pattern_icon(list(
+				"..ooo..",
+				"..oRo..",
+				"oooRooo",
+				"oRRRRRo",
+				"oooRooo",
+				"..oRo..",
+				"..ooo..",
+			), list("o" = rgb(10, 12, 15, 220), "R" = rgb(230, 80, 70)))
 	GLOB.clash_radar_marks[kind] = mark
 	return mark
 
@@ -225,6 +235,19 @@ GLOBAL_LIST_EMPTY(clash_radar_toggle_icons)
 	blip.pixel_x = round(RADAR_SIZE * 0.5 + dx * per_tile - mark_icon.Width() * 0.5)
 	blip.pixel_y = round(RADAR_SIZE * 0.5 + dy * per_tile - mark_icon.Height() * 0.5)
 
+/atom/movable/screen/clash_radar/proc/paint(contact, dx, dy, kind, from, arc, sweep_angle)
+	var/angle = delta_to_angle(dx, dy)
+	if(!swept(angle, from, arc))
+		return
+	var/atom/movable/clash_radar_blip/blip = painted[contact]
+	if(!blip)
+		blip = get_free_blip()
+		blip.contact = contact
+		painted[contact] = blip
+	blip.angle = angle
+	place_mark(blip, dx, dy, kind)
+	fade_blip(blip, (sweep_angle - angle + 720) % 360)
+
 /atom/movable/screen/clash_radar/proc/render(mob/living/carbon/human/viewer)
 	alpha = 255
 	var/sweep_angle = get_sweep_angle()
@@ -241,17 +264,22 @@ GLOBAL_LIST_EMPTY(clash_radar_toggle_icons)
 			continue
 		var/contact = REF(ally)
 		seen[contact] = TRUE
-		var/angle = delta_to_angle(dx, dy)
-		if(!swept(angle, from, arc))
-			continue
-		var/atom/movable/clash_radar_blip/blip = painted[contact]
-		if(!blip)
-			blip = get_free_blip()
-			blip.contact = contact
-			painted[contact] = blip
-		blip.angle = angle
-		place_mark(blip, dx, dy, ally.assigned_squad?.squad_leader == ally ? "leader" : "ally")
-		fade_blip(blip, (sweep_angle - angle + 720) % 360)
+		paint(contact, dx, dy, ally.assigned_squad?.squad_leader == ally ? "leader" : "ally", from, arc, sweep_angle)
+	if(clash_fast_medicine() && clash_is_medic(viewer))
+		for(var/mob/living/carbon/human/body in GLOB.dead_mob_list)
+			if(body.faction != viewer.faction || body.z != viewer.z || body.statistic_exempt || !body.check_tod() || !body.is_revivable())
+				continue
+			var/dx = body.x - viewer.x
+			var/dy = body.y - viewer.y
+			var/distance = sqrt(dx * dx + dy * dy)
+			if(distance > RADAR_RANGE)
+				if(world.time > body.clash_called_until)
+					continue
+				dx *= RADAR_RANGE / distance
+				dy *= RADAR_RANGE / distance
+			var/contact = "downed[REF(body)]"
+			seen[contact] = TRUE
+			paint(contact, dx, dy, "downed", from, arc, sweep_angle)
 	for(var/contact in painted.Copy())
 		var/atom/movable/clash_radar_blip/gone = painted[contact]
 		if(seen[contact] || !swept(gone.angle, from, arc))

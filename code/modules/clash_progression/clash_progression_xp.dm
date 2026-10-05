@@ -146,6 +146,11 @@
 			if(tier[1] == level)
 				found = TRUE
 				clash_notify_unlock(ckey, CLASH_UNLOCK_SHOP, tier[2] == INFINITY ? "Every Shop item" : "Shop items up to [tier[2]] points", source)
+	if(class == CLASH_CLASS_MEDIC)
+		for(var/list/perk as anything in GLOB.clash_medic_perks)
+			if(perk[1] == level)
+				found = TRUE
+				clash_notify_unlock(ckey, CLASH_UNLOCK_PERK, perk[2], source)
 	if(level == CLASH_LEVEL_CAP)
 		found = TRUE
 		clash_notify_unlock(ckey, CLASH_UNLOCK_COSMETIC, "Veteran [GLOB.clash_class_names[class]]", source)
@@ -188,11 +193,33 @@
 	var/list/attackers = clash_mode.last_attackers[victim.real_name]
 	clash_award_xp(killer, CLASH_XP_KILL, CLASH_XP_SOURCE_KILL, clash_kill_weapon(killer, cause, cause_object, attackers?[killer.real_name]))
 	clash_progress_leader_assist(killer)
+	clash_progress_payback(killer, CLASH_XP_PAYBACK)
+
+/proc/clash_is_medic(mob/living/carbon/human/fighter)
+	return clash_job_is_medic(fighter.job)
+
+/proc/clash_job_is_medic(job)
+	return GLOB.clash_job_classes[job] == CLASH_CLASS_MEDIC
+
+/proc/clash_medic_perk(mob/living/carbon/human/medic, level)
+	if(!clash_progression_gating())
+		return TRUE
+	var/datum/clash_progress/progress = clash_progress_of(medic.mind?.ckey || medic.ckey)
+	return progress?.class_level(CLASH_CLASS_MEDIC) >= level
+
+/proc/clash_progress_payback(mob/living/carbon/human/killer, amount)
+	var/mob/living/carbon/human/medic = killer.clash_revived_by?.resolve()
+	if(!medic || world.time > killer.clash_revived_at + CLASH_PAYBACK_WINDOW)
+		return
+	killer.clash_revived_by = null
+	clash_award_xp(medic, amount, CLASH_XP_SOURCE_PAYBACK)
 
 /proc/clash_progress_assist(list/hit)
 	clash_grant_xp(hit["ckey"], hit["faction"], GLOB.clash_job_classes[hit["job"]], CLASH_XP_ASSIST, CLASH_XP_SOURCE_ASSIST, hit["weapon"])
 
 /proc/clash_progress_revive(mob/living/carbon/human/revived)
+	if(!revived.clash_enemy_death)
+		return
 	for(var/mob/living/carbon/human/medic in range(1, revived))
 		if(medic == revived || medic.faction != revived.faction || medic.life_revives_total <= medic.clash_revives_seen)
 			continue
@@ -225,6 +252,7 @@
 	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
 	var/list/hits = clash_mode.recent_damage[body.real_name] || clash_mode.last_attackers[body.real_name]
 	clash_award_xp(killer, CLASH_XP_BOT_KILL, CLASH_XP_SOURCE_BOT_KILL, clash_kill_weapon(killer, body.last_damage_data.cause_name, body.last_damage_data.resolve_cause(), hits?[killer.real_name]), CLASH_XP_KILL)
+	clash_progress_payback(killer, round(CLASH_XP_PAYBACK * CLASH_BOT_DAMAGE_SHARE))
 
 /proc/clash_progress_match_end(winner)
 	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
@@ -346,24 +374,31 @@
 	if(!before || QDELETED(patient) || QDELETED(medic))
 		return
 	if(before["injector"] && result)
+		patient.clash_care_medic = WEAKREF(medic)
+		patient.clash_care_until = world.time + CLASH_CARE_WINDOW
 		clash_award_support_xp(medic, CLASH_XP_INJECT, CLASH_XP_SOURCE_HEALING, CLASH_XP_SOURCE_HEALING, CLASH_XP_MEDICAL_CAP)
+		clash_credit_heal(medic, patient, before["damage"] - (patient.getBruteLoss() + patient.getFireLoss()))
 		return
 	var/obj/item/stack/medical/kit = before["kit"]
 	if(kit && (QDELETED(kit) || kit.amount < before["kit_amount"]))
 		clash_award_support_xp(medic, CLASH_XP_TREAT, CLASH_XP_SOURCE_HEALING, CLASH_XP_SOURCE_HEALING, CLASH_XP_MEDICAL_CAP)
-	var/healed = min(before["damage"] - (patient.getBruteLoss() + patient.getFireLoss()), patient.clash_heal_pool)
-	if(healed > 0)
-		patient.clash_heal_pool -= healed
-		medic.clash_heal_carry += healed
-		var/xp = round(medic.clash_heal_carry / CLASH_XP_HEAL_HP)
-		medic.clash_heal_carry -= xp * CLASH_XP_HEAL_HP
-		clash_award_support_xp(medic, xp, CLASH_XP_SOURCE_HEALING, CLASH_XP_SOURCE_HEALING, CLASH_XP_MEDICAL_CAP)
+	clash_credit_heal(medic, patient, before["damage"] - (patient.getBruteLoss() + patient.getFireLoss()))
 	var/list/splinted = before["splinted"]
 	for(var/obj/limb/limb as anything in patient.limbs)
 		if(!(limb.status & LIMB_SPLINTED) || !(limb.status & LIMB_BROKEN) || (limb in splinted) || limb.clash_splint_paid)
 			continue
 		limb.clash_splint_paid = TRUE
 		clash_award_support_xp(medic, CLASH_XP_SPLINT, CLASH_XP_SOURCE_SPLINT, CLASH_XP_SOURCE_HEALING, CLASH_XP_MEDICAL_CAP)
+
+/proc/clash_credit_heal(mob/living/carbon/human/medic, mob/living/carbon/human/patient, healed)
+	healed = min(healed, patient.clash_heal_pool)
+	if(healed <= 0)
+		return
+	patient.clash_heal_pool -= healed
+	medic.clash_heal_carry += healed
+	var/xp = round(medic.clash_heal_carry / CLASH_XP_HEAL_HP)
+	medic.clash_heal_carry -= xp * CLASH_XP_HEAL_HP
+	clash_award_support_xp(medic, xp, CLASH_XP_SOURCE_HEALING, CLASH_XP_SOURCE_HEALING, CLASH_XP_MEDICAL_CAP)
 
 /proc/clash_progress_surgery(mob/living/carbon/human/patient, mob/living/carbon/human/user)
 	if(!clash_care_snapshot(patient, user) || patient.clash_surgery_xp >= CLASH_XP_SURGERY_PATIENT_CAP)
