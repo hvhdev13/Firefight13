@@ -197,7 +197,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	for(var/seconds_left in 1 to 3)
 		if(round_time_limit > seconds_left SECONDS)
 			addtimer(CALLBACK(src, PROC_REF(match_countdown_beep), match, FALSE), round_time_limit - seconds_left SECONDS)
-	if(could_be_final_match())
+	if(match_number >= matches_per_round)
 		vote_timer_id = addtimer(CALLBACK(src, PROC_REF(start_round_votes)), max(1, round_time_limit - CLASH_VOTE_LEAD), TIMER_STOPPABLE)
 	if(!radar_timer_id)
 		start_clash_radar()
@@ -210,14 +210,6 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 
 /datum/game_mode/extended/faction_clash/hvh/proc/wins_needed()
 	return floor(matches_per_round / 2) + 1
-
-/datum/game_mode/extended/faction_clash/hvh/proc/could_be_final_match()
-	if(match_number >= matches_per_round)
-		return TRUE
-	for(var/faction in match_wins)
-		if(match_wins[faction] + 1 >= wins_needed())
-			return TRUE
-	return FALSE
 
 /datum/game_mode/extended/faction_clash/hvh/proc/hold_fire(hold)
 	if(holding_fire == hold)

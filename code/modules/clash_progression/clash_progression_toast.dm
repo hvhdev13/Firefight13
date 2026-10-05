@@ -59,7 +59,7 @@ GLOBAL_LIST_EMPTY(clash_toast_icons)
 	var/list/size = clash_toast_size(style)
 	var/width = size[1]
 	var/height = size[2]
-	screen_loc = style["banner"] ? "CENTER-3,TOP-5" : "CENTER-2,TOP-3:12"
+	screen_loc = style["banner"] ? "CENTER-3,BOTTOM+4" : "CENTER-2,BOTTOM+4"
 	icon = get_clash_toast_icon(style)
 	overlays.Cut()
 	var/outline = "-dm-text-outline: 1px black"
