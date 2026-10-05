@@ -3,7 +3,7 @@ import { useBackend } from 'tgui/backend';
 import { Box, NoticeBox, Tabs } from 'tgui/components';
 import { Window } from 'tgui/layouts';
 
-interface CareerRow {
+export interface CareerRow {
   ckey: string;
   name: string;
   kills: number;

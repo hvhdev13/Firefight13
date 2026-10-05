@@ -12,6 +12,8 @@
 #define CLASH_BURST_BURN 3
 #define CLASH_BURST_TOX 4
 #define CLASH_BURST_OXY 5
+#define CLASH_OD_DAMAGE 8
+#define CLASH_OD_CRITICAL_DAMAGE 16
 
 GLOBAL_LIST_INIT(clash_med_bursts, list(
 	"bicaridine" = list(5, 5, 0, 0, 0),
@@ -20,6 +22,7 @@ GLOBAL_LIST_INIT(clash_med_bursts, list(
 	"dermaline" = list(5, 0, 7, 0, 0),
 	"tricordrazine" = list(5, 5, 5, 2.5, 2.5),
 	"anti_toxin" = list(5, 0, 0, 5, 0),
+	"anti_toxin_plus" = list(1, 0, 0, 1000, 0),
 ))
 
 GLOBAL_LIST_INIT(clash_med_overdose, list(
@@ -59,10 +62,11 @@ GLOBAL_LIST_INIT(clash_medic_belt_stock, list(
 	/obj/item/reagent_container/hypospray/autoinjector/clash_tramadol = 1,
 	/obj/item/reagent_container/hypospray/autoinjector/adrenaline = 1,
 	/obj/item/reagent_container/hypospray/autoinjector/dexalinp = 1,
-	/obj/item/reagent_container/hypospray/autoinjector/antitoxin = 1,
+	/obj/item/reagent_container/hypospray/autoinjector/clash_antitox = 1,
 	/obj/item/reagent_container/hypospray/autoinjector/inaprovaline = 1,
 	/obj/item/reagent_container/hypospray/autoinjector/peridaxon = 1,
 	/obj/item/device/defibrillator/compact = 1,
+	/obj/item/device/healthanalyzer = 1,
 ))
 
 GLOBAL_LIST_INIT(clash_firstaid_stock, list(
@@ -83,6 +87,38 @@ GLOBAL_LIST_INIT(clash_adv_firstaid_stock, list(
 	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
 	return istype(clash_mode) && clash_mode.arena_rules
 
+/obj/item/dig_out_shrapnel(mob/living/carbon/human/embedded_human, mob/living/carbon/human/user = null)
+	if(!clash_fast_medicine())
+		return ..()
+	user = user || embedded_human
+	if(user.action_busy)
+		return
+	var/self = user == embedded_human
+	if(!do_after(user, CLASH_SHRAPNEL_DIG_TIME, INTERRUPT_ALL, BUSY_ICON_FRIENDLY, self ? null : embedded_human, INTERRUPT_MOVED, BUSY_ICON_MEDICAL))
+		to_chat(user, SPAN_NOTICE("You were interrupted!"))
+		return
+	var/list/removed_limbs = list()
+	for(var/obj/item/shard/shard in embedded_human.embedded_items)
+		var/obj/limb/organ = shard.embedded_organ
+		removed_limbs |= organ.display_name
+		shard.forceMove(embedded_human.loc)
+		organ.implants -= shard
+		embedded_human.embedded_items -= shard
+		for(var/count in 1 to shard.count)
+			user.count_niche_stat(STATISTICS_NICHE_SURGERY_SHRAPNEL)
+		QDEL_IN(shard, 30 SECONDS)
+	if(!length(removed_limbs))
+		to_chat(user, SPAN_NOTICE("You couldn't find any shrapnel."))
+		return
+	var/limbs = english_list(removed_limbs, final_comma_text = ",")
+	user.affected_message(embedded_human,
+		SPAN_NOTICE("You dig the shrapnel out of [self ? "your" : "[embedded_human]'s"] [limbs] with your [name]."),
+		SPAN_NOTICE("[user] digs the shrapnel out of your [limbs] with \his [name]."),
+		SPAN_NOTICE(self ? "[user] digs the shrapnel out of \his [limbs] with \his [name]." : "[user] digs the shrapnel out of [embedded_human]'s [limbs] with \his [name]."))
+	if(!embedded_human.stat && embedded_human.pain.feels_pain && embedded_human.pain.reduction_pain < PAIN_REDUCTION_HEAVY)
+		INVOKE_ASYNC(embedded_human, TYPE_PROC_REF(/mob, emote), "me", 1, pick("winces.", "grimaces.", "flinches."))
+	SEND_SIGNAL(embedded_human, COMSIG_HUMAN_SHRAPNEL_REMOVED)
+
 /proc/clash_stock(atom/holder, list/stock)
 	for(var/item_type in stock)
 		for(var/count in 1 to stock[item_type])
@@ -98,6 +134,8 @@ GLOBAL_LIST_INIT(clash_adv_firstaid_stock, list(
 	if(limits)
 		overdose = limits[1]
 		overdose_critical = limits[2]
+	if(overdose && volume > overdose)
+		M.apply_damage((overdose_critical && volume > overdose_critical ? CLASH_OD_CRITICAL_DAMAGE : CLASH_OD_DAMAGE) * delta_time, TOX)
 	var/list/burst = GLOB.clash_med_bursts[id]
 	if(!burst || !ishuman(M))
 		return ..()
@@ -377,21 +415,46 @@ GLOBAL_LIST_INIT(clash_adv_firstaid_stock, list(
 /obj/item/storage/pouch/firstaid/clash/medic/large/fill_preset_inventory()
 	clash_stock(src, GLOB.clash_large_medic_pouch_stock)
 
+/obj/item/storage/belt/medical/lifesaver/proc/clash_fill_arena()
+	storage_slots = initial(storage_slots) + 1
+	max_storage_space = initial(max_storage_space) + 2
+	clash_stock(src, GLOB.clash_medic_belt_stock)
+
 /obj/item/storage/belt/medical/lifesaver/full/fill_preset_inventory()
 	if(!clash_fast_medicine())
 		return ..()
-	clash_stock(src, GLOB.clash_medic_belt_stock)
+	clash_fill_arena()
 
 /obj/item/storage/belt/medical/lifesaver/upp/full/fill_preset_inventory()
 	if(!clash_fast_medicine())
 		return ..()
-	clash_stock(src, GLOB.clash_medic_belt_stock)
+	clash_fill_arena()
 
 /obj/item/storage/belt/medical/lifesaver/arena/fill_preset_inventory()
-	clash_stock(src, GLOB.clash_medic_belt_stock)
+	clash_fill_arena()
 
 /obj/item/storage/belt/medical/lifesaver/upp/arena/fill_preset_inventory()
-	clash_stock(src, GLOB.clash_medic_belt_stock)
+	clash_fill_arena()
+
+/datum/reagent/medical/anti_toxin_plus
+	name = "Dylovene Plus"
+	id = "anti_toxin_plus"
+	description = "A fast form of Dylovene. One unit immediately clears every toxin from the body."
+	reagent_state = LIQUID
+	color = "#8fe03a"
+	overdose = LOWH_REAGENTS_OVERDOSE
+	overdose_critical = LOWH_REAGENTS_OVERDOSE_CRITICAL
+	chemclass = CHEM_CLASS_SPECIAL
+	properties = list(PROPERTY_ANTITOXIC = 2)
+
+/obj/item/reagent_container/hypospray/autoinjector/clash_antitox
+	name = "dylovene plus autoinjector"
+	chemname = "anti_toxin_plus"
+	desc = "Three 1u doses of Dylovene Plus. Each one clears every toxin from the body at once."
+	amount_per_transfer_from_this = 1
+	volume = 3
+	display_maptext = TRUE
+	maptext_label = "Dy+"
 
 /obj/item/storage/firstaid/regular/fill_preset_inventory()
 	if(!clash_fast_medicine())

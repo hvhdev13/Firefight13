@@ -14,6 +14,8 @@
 #define CLASH_VOTES_MAP 2
 #define CLASH_VOTES_DONE 3
 #define CLASH_INTERMISSION (30 SECONDS)
+#define CLASH_POSTROUND_TIME (2 MINUTES)
+#define CLASH_FINAL_REBOOT_DELAY (7 SECONDS)
 #define CLASH_ASSIST_WINDOW (10 SECONDS)
 #define CLASH_KILL_SOUND 'sound/weapons/gun_xm88_directhit_high.ogg'
 GLOBAL_LIST_INIT(clash_streak_steps, list(3, 5, 7, 10, 15, 20))
@@ -91,6 +93,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	var/list/rivalries = list()
 	var/list/life_kills = list()
 	var/admin_tampered = FALSE
+	var/round_finished_at
 	var/progression = FALSE
 	var/arena_rules = FALSE
 
@@ -281,6 +284,15 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 
 /datum/game_mode/extended/faction_clash/hvh/proc/get_objective_turfs()
 	return list()
+
+/datum/game_mode/extended/faction_clash/hvh/proc/get_radar_pins(mob/viewer)
+	return list()
+
+/datum/game_mode/extended/faction_clash/hvh/proc/get_admin_objective_actions()
+	return list()
+
+/datum/game_mode/extended/faction_clash/hvh/proc/do_admin_objective_action(choice, mob/user)
+	return null
 
 /datum/game_mode/extended/faction_clash/hvh/proc/admin_set_score(faction, score)
 	faction_kills[faction] = score
@@ -476,13 +488,15 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	display.show_panel(build_score_panel(), viewer)
 
 /datum/game_mode/extended/faction_clash/hvh/proc/update_respawn_huds()
-	if(round_finished)
+	if(SSticker.current_state == GAME_STATE_FINISHED)
 		deltimer(respawn_timer_id)
 		respawn_timer_id = null
 		return
 	var/base = get_score_maptext()
 	var/list/panel = build_score_panel()
 	clash_refresh_medic_marks()
+	if(arena_rules)
+		clash_keep_fed()
 	for(var/mob/player as anything in GLOB.player_list)
 		player.hud_used?.clash_respawn?.update(player)
 		player.hud_used?.clash_death_card?.update(player)
@@ -763,8 +777,10 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 /datum/game_mode/extended/faction_clash/hvh/proc/match_countdown_beep(match, final)
 	if(match != match_number || !match_live || round_finished)
 		return
+	var/seconds = final ? 0 : CEILING(max(0, round_end_time - world.time) / 10, 1)
 	for(var/client/player as anything in GLOB.clients)
 		playsound_client(player, final ? 'sound/machines/beepalert.ogg' : 'sound/effects/sebb_beep.ogg', null, 50)
+		clash_show_final_count(player, seconds)
 
 /datum/game_mode/extended/faction_clash/hvh/proc/finish_match(reason)
 	if(round_finished || !match_live)
@@ -795,6 +811,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	faction_deaths = round_faction_deaths
 	environment_kills = round_environment_kills
 	round_finished = get_round_result()
+	round_finished_at = world.time
 	record_career()
 	update_score_huds()
 	log_debug("HVH: round result [round_finished]")
@@ -1045,6 +1062,9 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	SSticker.Reboot()
 
 /datum/game_mode/extended/faction_clash/hvh/roundend_reboot()
+	if(arena_rules)
+		SSticker.Reboot(null, CLASH_FINAL_REBOOT_DELAY)
+		return
 	if(round_vote_stage == CLASH_VOTES_DONE)
 		return ..()
 	reboot_held = TRUE
@@ -1123,6 +1143,7 @@ GLOBAL_VAR(clash_start_mode)
 	if(arena_rules)
 		clash_arena_med_supply()
 		clash_arena_engineering_setup()
+		clash_arena_remove_attachment_vendors()
 	for(var/obj/structure/machinery/cm_vending/vendor in GLOB.machines)
 		vendor.vend_delay = 0
 	SSweather.force_weather_holder(/datum/weather_ss_map_holder/faction_clash)
@@ -1147,8 +1168,13 @@ GLOBAL_VAR(clash_start_mode)
 	return
 
 /datum/game_mode/extended/faction_clash/hvh/check_finished()
-	if(round_finished)
+	if(!round_finished)
+		return FALSE
+	if(!arena_rules)
 		return TRUE
+	if(world.time < round_finished_at + CLASH_POSTROUND_TIME)
+		return FALSE
+	return round_vote_stage == CLASH_VOTES_DONE || world.time >= round_finished_at + CLASH_REBOOT_HOLD_LIMIT
 
 /datum/game_mode/extended/faction_clash/hvh/proc/roundend_ceasefire()
 	set_gamemode_modifier(/datum/gamemode_modifier/ceasefire, enabled = TRUE)

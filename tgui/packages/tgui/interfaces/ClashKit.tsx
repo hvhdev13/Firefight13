@@ -41,6 +41,7 @@ interface RoleGroup {
 
 interface IssueItem {
   name: string;
+  desc?: string;
   type?: string;
   icon: string;
   icon_state: string;
@@ -565,7 +566,7 @@ const SlotTile = (props: {
         ? `${picked.name}: ${picked.blurb}`
         : picked.name
       : issued
-        ? `${issued.name} (job issue)`
+        ? issued.name
         : `${slot.name}: nothing`;
   return (
     <Tooltip content={tooltip}>
@@ -588,10 +589,7 @@ const SlotTile = (props: {
         )}
         {shown ? (
           <DmIcon
-            className={classes([
-              'ClashKit__slotIcon',
-              !picked && 'ClashKit__slotIcon--issue',
-            ])}
+            className="ClashKit__slotIcon"
             icon={shown.icon}
             icon_state={shown.icon_state}
             fallback={<Icon name="spinner" spin />}
@@ -601,11 +599,7 @@ const SlotTile = (props: {
         )}
         <Box className="ClashKit__slotLabel">{slot.name}</Box>
         {fresh && <Box className="ClashKit__slotNew">new</Box>}
-        {picked ? (
-          <Box className="ClashKit__slotDot" />
-        ) : (
-          issued && <Box className="ClashKit__slotIssue">issue</Box>
-        )}
+        {picked && <Box className="ClashKit__slotDot" />}
       </Box>
     </Tooltip>
   );
@@ -635,7 +629,6 @@ const OptionRow = (props: {
   readonly blurb?: string;
   readonly picked: boolean;
   readonly disabled?: boolean;
-  readonly issueTag?: boolean;
   readonly lock?: string;
   readonly fresh?: boolean;
   readonly onClick: () => void;
@@ -647,7 +640,6 @@ const OptionRow = (props: {
     blurb,
     picked,
     disabled,
-    issueTag,
     lock,
     fresh,
     onClick,
@@ -677,11 +669,6 @@ const OptionRow = (props: {
         <Stack.Item grow>
           <Box className="ClashKit__optionName">
             {option?.name ?? label}
-            {issueTag && (
-              <Box as="span" className="ClashKit__optionIssue">
-                issued
-              </Box>
-            )}
             {fresh && (
               <Box as="span" className="ClashKit__optionNew">
                 new
@@ -766,6 +753,7 @@ export const ClashKit = () => {
   const slotById = Object.fromEntries(slots.map((slot) => [slot.id, slot]));
   const kit = kits[kit_index - 1];
   const primary = findOption(menus, faction, 'primary', choices.primary);
+  const gunName = primary?.name ?? issue?.primary?.name;
   const current = slotById[selectedSlot];
   const ranks = progress?.ranks ?? {};
   const slotOptions = (id: string) =>
@@ -782,7 +770,7 @@ export const ClashKit = () => {
     .filter(
       (option) =>
         !slotById[selectedSlot]?.attachment ||
-        !choices.primary ||
+        !gunName ||
         fits.includes(option.id),
     )
     .sort((a, b) => (ranks[a.id] ?? 0) - (ranks[b.id] ?? 0));
@@ -1007,15 +995,15 @@ export const ClashKit = () => {
                 <Box className="ClashKit__attachBar">
                   <Box>
                     <Box className="ClashKit__attachHeader">
-                      {primary ? primary.name : 'Attachments'}
-                      {!primary && (
+                      {gunName ?? 'Attachments'}
+                      {!gunName && (
                         <Box as="span" className="ClashKit__attachHint">
                           pick a primary first
                         </Box>
                       )}
                     </Box>
                     <Box className="ClashKit__attachRow">
-                      {ATTACHMENT_SLOTS.map((id) => tile(id, true, !primary))}
+                      {ATTACHMENT_SLOTS.map((id) => tile(id, true, !gunName))}
                     </Box>
                   </Box>
                   <Box>
@@ -1097,12 +1085,12 @@ export const ClashKit = () => {
                       label={issued ? issued.name : 'Nothing'}
                       blurb={
                         issued
-                          ? `What a ${job} is issued`
+                          ? (issued.desc ?? '')
                           : PERK_SLOTS.includes(selectedSlot)
                             ? 'Spawn without a perk'
                             : current?.attachment
                               ? 'Leave this slot empty'
-                              : `A ${job} gets nothing here`
+                              : 'Nothing in this slot'
                       }
                       picked={!choices[selectedSlot]}
                       onClick={() => act('clear', { slot: selectedSlot })}
@@ -1111,14 +1099,13 @@ export const ClashKit = () => {
                   {options.map((option) => {
                     const unfit =
                       !!current?.attachment &&
-                      (!primary || !fits.includes(option.id));
+                      (!gunName || !fits.includes(option.id));
                     const isIssue = option.id === issuedOption?.id;
                     const lock = isIssue ? undefined : locks[option.id];
                     return (
                       <OptionRow
                         key={option.id}
                         option={option}
-                        issueTag={isIssue}
                         lock={lock}
                         fresh={
                           fresh.includes(option.id) ||

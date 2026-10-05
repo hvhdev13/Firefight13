@@ -144,22 +144,21 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 			if(each.choices[slot])
 				set_count++
 		kit_data += list(list("name" = each.name, "set" = set_count))
-	var/datum/clash_kit_option/primary = kit?.get_option(KIT_SLOT_PRIMARY)
+	var/list/issue = get_clash_issue_items(job)
+	if(isnull(issue))
+		queue_clash_issue_items(job, src)
+	var/gun_type = clash_effective_primary(kit, job)
 	var/list/fits = list()
-	if(primary)
+	if(gun_type)
 		for(var/slot in GLOB.clash_kit_attachment_slots)
-			for(var/datum/clash_kit_option/option as anything in GLOB.clash_kit_menu[primary.faction][slot])
-				if(clash_kit_attachment_fits(option.item_type, primary.item_type) && (!clash_progression_gating() || GLOB.clash_weapon_unlock_levels[clash_track_type(primary.item_type)]?[option.item_type]))
+			for(var/datum/clash_kit_option/option as anything in GLOB.clash_kit_menu[clash_kit_faction_for_job(job)][slot])
+				if(clash_kit_attachment_fits(option.item_type, gun_type) && (!clash_progression_gating() || GLOB.clash_weapon_unlock_levels[clash_track_type(gun_type)]?[option.item_type]))
 					fits += option.id
 	var/mob/living/carbon/human/fighter = ishuman(user) && user.stat != DEAD ? user : null
 	var/deploy_state = get_deploy_state(user)
 	var/respawn_in = deploy_state == "dead" ? clash_respawn_wait(user) : 0
 	if(respawn_in)
 		addtimer(CALLBACK(SStgui, TYPE_PROC_REF(/datum/controller/subsystem/tgui, update_uis), src), respawn_in + 1, TIMER_UNIQUE|TIMER_OVERRIDE)
-	var/list/issue = get_clash_issue_items(job)
-	if(isnull(issue))
-		queue_clash_issue_items(job, src)
-	var/gun_type = clash_effective_primary(kit, job)
 	var/hint
 	if(fighter)
 		if(fighter.job != job)
@@ -192,16 +191,16 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 		"deploy_block" = deploy_state ? get_deploy_block(user) : null,
 		"revivable" = deploy_state == "dead" && !!clash_revivable_body(user),
 		"hint" = hint,
-		"progress" = clash_progress_ui_data(ckey, job, primary?.item_type, gun_type),
+		"progress" = clash_progress_ui_data(ckey, job, gun_type, gun_type),
 	)
 
 /datum/clash_kit_screen/proc/clear_locked_attachments(datum/clash_kit/kit)
-	var/datum/clash_kit_option/primary = kit?.get_option(KIT_SLOT_PRIMARY)
-	if(!primary)
+	var/gun_type = clash_effective_primary(kit, job)
+	if(!gun_type)
 		return
 	var/cleared = FALSE
 	for(var/slot in GLOB.clash_kit_attachment_slots)
-		if(kit.choices[slot] && clash_option_lock_text(ckey, kit.choices[slot], job, primary.item_type))
+		if(kit.choices[slot] && clash_option_lock_text(ckey, kit.choices[slot], job, gun_type))
 			kit.choices -= slot
 			cleared = TRUE
 	if(cleared)
@@ -218,7 +217,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 	if(!user.client)
 		return "Not connected"
 	if(SSticker.current_state != GAME_STATE_PLAYING)
-		return "The round has not started"
+		return SSticker.current_state == GAME_STATE_FINISHED ? "The round is over" : "The round has not started"
 	if(!GLOB.enter_allowed)
 		return "Joining is locked right now"
 	if(get_deploy_state(user) == "dead" && !CONFIG_GET(flag/respawn) && !check_client_rights(user.client, R_ADMIN, FALSE))
@@ -277,7 +276,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 	var/datum/clash_kit/kit = get_kit()
 	var/key = get_doll_key(kit)
 	if(!doll_cache[key])
-		var/list/rendered = render_clash_kit_doll(kit, job, viewer)
+		var/list/rendered = render_clash_kit_doll(kit, job, viewer, TRUE, GLOB.preferences_datums[ckey], ckey)
 		if(!rendered)
 			return null
 		doll_cache[key] = rendered
@@ -325,8 +324,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 			var/datum/clash_kit_option/option = get_clash_kit_option(params["id"])
 			if(!kit || !option || option.faction != clash_kit_faction_for_job(job) || option.slot != params["slot"])
 				return TRUE
-			var/datum/clash_kit_option/primary = option.slot == KIT_SLOT_PRIMARY ? option : kit.get_option(KIT_SLOT_PRIMARY)
-			var/lock_text = clash_option_lock_text(ckey, option.id, job, primary?.item_type)
+			var/lock_text = clash_option_lock_text(ckey, option.id, job, option.slot == KIT_SLOT_PRIMARY ? option.item_type : clash_effective_primary(kit, job))
 			if(lock_text)
 				to_chat(user, SPAN_WARNING("[option.name] is locked. [lock_text]."))
 				return TRUE
@@ -360,7 +358,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 				to_chat(user, SPAN_WARNING("Not enough points left for [item["name"]]."))
 				return TRUE
 			kit.extras += item["id"]
-			var/list/trial = render_clash_kit_doll(kit, job, user.client, FALSE)
+			var/list/trial = render_clash_kit_doll(kit, job, user.client, FALSE, GLOB.preferences_datums[ckey], ckey)
 			var/list/statuses = trial?["statuses"]
 			if(!length(statuses) || statuses[length(statuses)] != "ok")
 				kit.extras.Cut(length(kit.extras))
@@ -467,3 +465,37 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 	if(!SStgui.get_open_ui(lobby, lobby))
 		INVOKE_ASYNC(lobby, TYPE_PROC_REF(/mob/new_player, lobby))
 	open_clash_kit_screen(lobby)
+
+/datum/clash_kit_screen/admin
+
+/datum/clash_kit_screen/admin/tgui_interact(mob/user, datum/tgui/ui)
+	ui = SStgui.try_update_ui(user, src, ui)
+	if(!ui)
+		ui = new(user, src, "ClashKit", "Loadout of [ckey]")
+		ui.set_autoupdate(FALSE)
+		ui.open()
+
+/datum/clash_kit_screen/admin/ui_state(mob/user)
+	return GLOB.admin_state
+
+/datum/clash_kit_screen/admin/get_deploy_state(mob/user)
+	return null
+
+/datum/clash_kit_screen/admin/ui_data(mob/user)
+	. = ..()
+	.["hint"] = "Editing the [job] loadout of [ckey]. Changes save to their loadout and apply at their next spawn."
+
+/datum/clash_kit_screen/admin/ui_act(action, list/params, datum/tgui/ui, datum/ui_state/state)
+	if(action in list("deploy", "seen"))
+		return TRUE
+	if(!CLIENT_HAS_RIGHTS(ui.user.client, R_EVENT))
+		return TRUE
+	. = ..()
+	if(action in list("role", "side"))
+		return
+	log_admin("[key_name(ui.user)] edited the [job] loadout of [ckey]: [action].")
+	var/datum/clash_kit_screen/own = GLOB.clash_kit_screens[ckey]
+	if(own)
+		if(own.job == job)
+			own.kit_index = get_clash_active_kit_index(ckey, job)
+		SStgui.update_uis(own)

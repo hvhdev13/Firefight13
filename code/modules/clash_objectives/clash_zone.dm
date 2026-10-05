@@ -3,10 +3,12 @@ GLOBAL_LIST_EMPTY(clash_objective_landmarks)
 GLOBAL_DATUM(clash_zone_tile_icon, /icon)
 
 #define CLASH_ZONE_SEARCH_STEPS 60
+#define CLASH_ZONE_MAX_RADIUS 7
 
 /obj/effect/landmark/clash_objective
 	name = "Clash objective"
-	var/label = "A"
+	icon_state = "o_white"
+	var/label
 	var/radius
 
 /obj/effect/landmark/clash_objective/Initialize(mapload, ...)
@@ -17,13 +19,35 @@ GLOBAL_DATUM(clash_zone_tile_icon, /icon)
 	GLOB.clash_objective_landmarks -= src
 	return ..()
 
-/obj/effect/landmark/clash_objective/a
+/obj/effect/landmark/clash_objective/koth_primary
+	name = "KOTH primary hill"
+	icon_state = "o_yellow"
+	label = "Hill"
+	var/rotation = CLASH_HILL_STATIC
+	var/rotate_minutes = 3
+
+/obj/effect/landmark/clash_objective/koth_secondary
+	name = "KOTH secondary hill"
+	label = "Hill"
+
+/obj/effect/landmark/clash_objective/koth_tertiary
+	name = "KOTH tertiary hill"
+	label = "Hill"
+
+/obj/effect/landmark/clash_objective/domination_zone
+	name = "Domination zone"
+	icon_state = "o_green"
+
+/obj/effect/landmark/clash_objective/domination_zone/a
+	name = "Domination zone A"
 	label = "A"
 
-/obj/effect/landmark/clash_objective/b
+/obj/effect/landmark/clash_objective/domination_zone/b
+	name = "Domination zone B"
 	label = "B"
 
-/obj/effect/landmark/clash_objective/c
+/obj/effect/landmark/clash_objective/domination_zone/c
+	name = "Domination zone C"
 	label = "C"
 
 /proc/get_clash_zone_tile_icon()
@@ -67,22 +91,30 @@ GLOBAL_DATUM(clash_zone_tile_icon, /icon)
 	var/list/obj/effect/clash_zone_tile/tiles = list()
 	var/obj/effect/clash_zone_label/marker
 	var/shown
+	var/preview = FALSE
 
-/datum/clash_zone/New(label, turf/center, radius)
+/datum/clash_zone/New(label, turf/center, radius, preview = FALSE)
 	. = ..()
 	src.label = label
 	src.center = center
 	src.radius = radius
+	src.preview = preview
 	for(var/turf/spot as anything in RANGE_TURFS(radius, center))
 		if(spot.density || sqrt((spot.x - center.x) ** 2 + (spot.y - center.y) ** 2) > radius + 0.3)
 			continue
 		covered[spot] = TRUE
-		tiles += new /obj/effect/clash_zone_tile(spot)
+		var/obj/effect/clash_zone_tile/tile = new(spot)
+		tiles += tile
+		if(preview)
+			animate(tile, alpha = 0, time = 5, loop = -1)
+			animate(alpha = 255, time = 5)
 	marker = new(center)
-	GLOB.clash_objective_turfs += center
+	if(!preview)
+		GLOB.clash_objective_turfs += center
 
 /datum/clash_zone/Destroy(force)
-	GLOB.clash_objective_turfs -= center
+	if(!preview)
+		GLOB.clash_objective_turfs -= center
 	QDEL_LIST(tiles)
 	QDEL_NULL(marker)
 	center = null
@@ -127,6 +159,15 @@ GLOBAL_DATUM(clash_zone_tile_icon, /icon)
 		tile.color = tint
 	var/state_line = state == "open" ? "" : "<br><span style='font-size: 6px'>[state]</span>"
 	marker.maptext = "<span class='maptext center' style='font-size: 12px; color: [tint]'>[label]</span>[state_line]"
+
+/datum/clash_zone/proc/show_preview(seconds_left)
+	if(shown == "[seconds_left]")
+		return
+	shown = "[seconds_left]"
+	marker.maptext = "<span class='maptext center' style='font-size: 8px; color: #ffffff'>NEXT HILL<br>[clash_clock_text(seconds_left)]</span>"
+
+/proc/clash_clock_text(seconds)
+	return "[floor(seconds / 60)]:[seconds % 60 < 10 ? "0" : ""][seconds % 60]"
 
 /proc/clash_turf_passable(turf/spot)
 	if(!spot || spot.density)
@@ -206,24 +247,31 @@ GLOBAL_DATUM(clash_zone_tile_icon, /icon)
 			return get_clash_nearest_turf(ring, x, y)
 	return null
 
-/proc/get_clash_objective_spots(count, radius)
-	. = list()
+/proc/get_clash_ground_z()
 	var/list/levels = SSmapping.levels_by_trait(ZTRAIT_GROUND)
-	if(!length(levels))
-		return
-	var/z = levels[1]
-	var/list/marks = list()
-	for(var/obj/effect/landmark/clash_objective/mark as anything in GLOB.clash_objective_landmarks)
-		if(mark.z == z)
-			marks[mark.label] = mark
-	if(length(marks))
-		for(var/label in sort_list(marks))
-			if(length(.) >= count)
-				break
-			var/obj/effect/landmark/clash_objective/mark = marks[label]
-			. += list(list(count == 1 ? "Hill" : label, get_turf(mark), mark.radius || radius))
-		return
+	return length(levels) ? levels[1] : null
 
+/proc/get_clash_marker(marker_type, z)
+	for(var/obj/effect/landmark/clash_objective/mark as anything in GLOB.clash_objective_landmarks)
+		if(mark.type == marker_type && mark.z == z)
+			return mark
+	return null
+
+/proc/clash_marker_problem(turf/spot)
+	if(!clash_turf_passable(spot))
+		return "is on a wall or blocked tile"
+	if(clash_in_base(spot))
+		return "is inside a base"
+	return null
+
+/proc/clash_marker_spot(obj/effect/landmark/clash_objective/mark, default_radius)
+	return list(mark.label, get_turf(mark), clamp(round(mark.radius || default_radius), 1, CLASH_ZONE_MAX_RADIUS))
+
+/proc/get_clash_auto_objective_spots(count, radius)
+	. = list()
+	var/z = get_clash_ground_z()
+	if(!z)
+		return
 	var/list/centres = get_clash_base_centres(z)
 	var/list/uscm = centres[FACTION_MARINE]
 	var/list/upp = centres[FACTION_UPP]
@@ -256,3 +304,4 @@ GLOBAL_DATUM(clash_zone_tile_icon, /icon)
 	. += list(list("C", get_clash_nearest_turf(reachable, mid_x - flank_x, mid_y - flank_y) || middle, radius))
 
 #undef CLASH_ZONE_SEARCH_STEPS
+#undef CLASH_ZONE_MAX_RADIUS

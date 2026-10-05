@@ -126,6 +126,34 @@ GLOBAL_LIST_EMPTY(clash_score_panel_icons)
 	icon = null
 	overlays.Cut()
 
+/client/var/atom/movable/screen/clash_final_count/clash_final_count
+
+/atom/movable/screen/clash_final_count
+	icon = null
+	mouse_opacity = MOUSE_OPACITY_TRANSPARENT
+	screen_loc = "CENTER-3:97,TOP-5"
+	maptext_width = 160
+	maptext_height = 64
+	maptext_x = -64
+	maptext_y = -16
+	alpha = 0
+
+/atom/movable/screen/clash_final_count/proc/show(seconds)
+	maptext = "<span style='font-family: \"VCR OSD Mono\"; font-size: 28px; text-align: center; vertical-align: middle; -dm-text-outline: 2px #0a0c0f; color: [seconds ? "#ff5a4f" : "#ffffff"]'>0:0[seconds]</span>"
+	animate(src)
+	transform = matrix(0.6, 0, 0, 0, 0.6, 0)
+	alpha = 255
+	animate(src, transform = matrix(1.3, 0, 0, 0, 1.3, 0), time = 3, easing = CUBIC_EASING|EASE_OUT)
+	animate(transform = matrix(1.45, 0, 0, 0, 1.45, 0), time = 3)
+	animate(transform = matrix(1.7, 0, 0, 0, 1.7, 0), alpha = 0, time = 3, easing = QUAD_EASING|EASE_IN)
+
+/proc/clash_show_final_count(client/player, seconds)
+	if(!player.clash_final_count)
+		player.clash_final_count = new
+	if(!(player.clash_final_count in player.screen))
+		player.screen += player.clash_final_count
+	player.clash_final_count.show(seconds)
+
 /proc/clash_place_killfeed_line(atom/movable/screen/faction_killfeed/line, index, below_objectives)
 	line.screen_loc = "CENTER-3,TOP-2:20"
 	line.maptext_width = 400

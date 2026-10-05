@@ -72,6 +72,18 @@ GLOBAL_LIST_EMPTY(clash_weapon_unlock_levels)
 	GLOB.clash_weapon_tracks[gun_type] = unlocks
 	GLOB.clash_weapon_unlock_levels[gun_type] = levels
 
+/proc/clash_engrave_guns(mob/living/carbon/human/wearer, ckey)
+	if(!clash_progression_active() || !wearer.real_name)
+		return
+	var/datum/clash_progress/progress = clash_progress_of(ckey)
+	if(!progress)
+		return
+	for(var/obj/item/weapon/gun/gun in wearer.get_contents())
+		var/track_type = clash_track_type(gun.type)
+		var/list/unlocks = GLOB.clash_weapon_tracks[track_type]
+		if(unlocks && progress.weapon_level(track_type) > length(unlocks))
+			gun.name = "[wearer.real_name]'s [strip_improper(initial(gun.name))]"
+
 /datum/clash_progress/proc/weapon_level(gun_type)
 	var/list/entry = weapons["[gun_type]"]
 	if(!entry)

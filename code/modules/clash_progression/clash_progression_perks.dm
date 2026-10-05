@@ -59,7 +59,7 @@
 
 /datum/clash_perk/large_pouch
 	name = "Large Medic Pouch"
-	desc = "Your medic pouch has 8 slots and more supplies"
+	desc = "Your first-aid pouch becomes a large medic pouch: 8 slots (from 4) with more supplies"
 	class = CLASH_CLASS_MEDIC
 	level = 10
 	icon_type = /obj/item/storage/pouch/firstaid/clash/medic/large

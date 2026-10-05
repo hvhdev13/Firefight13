@@ -37,11 +37,9 @@ GLOBAL_LIST_EMPTY(clash_call_medic_icons)
 /proc/clash_mark_medic_call(mob/living/carbon/human/patient, duration)
 	var/list/mark = GLOB.clash_medic_marks[patient]
 	if(!mark)
-		var/image/cross = image(get_clash_radar_mark("downed"), patient, layer = ABOVE_FLY_LAYER)
-		cross.pixel_x = 2
-		cross.pixel_y = 30
-		cross.transform = matrix(2, 0, 0, 0, 2, 0)
-		cross.appearance_flags = RESET_COLOR|RESET_ALPHA|RESET_TRANSFORM|KEEP_APART|PIXEL_SCALE
+		var/image/cross = image(get_clash_radar_mark("medic_badge"), patient, layer = ABOVE_FLY_LAYER)
+		cross.pixel_y = 22
+		cross.appearance_flags = RESET_COLOR|RESET_ALPHA|RESET_TRANSFORM|KEEP_APART
 		mark = list("image" = cross, "viewers" = list())
 		GLOB.clash_medic_marks[patient] = mark
 	mark["until"] = duration ? world.time + duration : 0
@@ -146,12 +144,12 @@ GLOBAL_LIST_EMPTY(clash_call_medic_icons)
 	return ..()
 
 /proc/clash_issue_medic_gear(mob/living/carbon/human/medic)
-	if(!clash_fast_medicine() || !clash_is_medic(medic))
+	if(!clash_fast_medicine() || !clash_is_medic(medic) || !clash_has_perk(medic, /datum/clash_perk/large_pouch))
 		return
-	var/pouch_type = clash_has_perk(medic, /datum/clash_perk/large_pouch) ? /obj/item/storage/pouch/firstaid/clash/medic/large : /obj/item/storage/pouch/firstaid/clash/medic
+	var/pouch_type = /obj/item/storage/pouch/firstaid/clash/medic/large
 	for(var/wear_slot in list(WEAR_L_STORE, WEAR_R_STORE))
 		var/obj/item/worn = medic.get_item_by_slot(wear_slot)
-		if(istype(worn, /obj/item/storage/pouch/medkit) || worn?.type == /obj/item/storage/pouch/medical)
+		if(worn?.type == /obj/item/storage/pouch/firstaid/clash)
 			medic.temp_drop_inv_item(worn, TRUE)
 			qdel(worn)
 			var/obj/item/pouch = new pouch_type(medic)

@@ -42,3 +42,52 @@
 	target.death(create_cause_data("an admin"))
 	message_admins("[key_name_admin(user)] killed [key_name_admin(target)].")
 	return TRUE
+
+GLOBAL_VAR_INIT(clash_global_say, TRUE)
+
+/mob/living/say(message, datum/language/speaking = null, verb = "says", alt_name = "", italics = FALSE, message_range = GLOB.world_view_size, sound/speech_sound, sound_vol, nolog = 0, message_mode = null, bubble_type = bubble_icon, langchat_override = null)
+	. = ..()
+	if(!. || message_mode || stat == DEAD || !GLOB.clash_global_say || (speaking?.flags & SIGNLANG) || !istype(SSticker.mode, /datum/game_mode/extended/faction_clash/hvh))
+		return
+	var/list/near = hearers(message_range, get_turf(src))
+	message = process_chat_markup(message, list("~", "_"))
+	for(var/mob/listener as anything in GLOB.player_list)
+		if(isnewplayer(listener) || (listener in near))
+			continue
+		if((listener.stat == DEAD || isobserver(listener)) && (listener.client?.prefs?.toggles_chat & CHAT_GHOSTEARS))
+			continue
+		listener.hear_say(message, verb, speaking, alt_name, italics, src, null, null, message_mode)
+
+/mob/say_dead(message)
+	if(!istype(SSticker.mode, /datum/game_mode/extended/faction_clash/hvh))
+		return ..()
+	if(!client)
+		return
+	if(!(client.admin_holder?.rights & R_MOD) && !GLOB.dsay_allowed)
+		to_chat(src, SPAN_DANGER("Deadchat is globally muted."))
+		return
+	if(!(client.prefs?.toggles_chat & CHAT_DEAD))
+		to_chat(src, SPAN_DANGER("You have deadchat muted."))
+		return
+	if(!client.attempt_talking(message))
+		return
+	log_say("DEAD/[key_name(src)] : [message]")
+	var/turf/my_turf = get_turf(src)
+	var/list/mob/langchat_listeners = list()
+	for(var/mob/listener as anything in GLOB.player_list)
+		if(isnewplayer(listener) || !(listener.client?.prefs?.toggles_chat & CHAT_DEAD))
+			continue
+		if(isobserver(listener) && !orbiting)
+			var/mob/dead/observer/observer = listener
+			var/turf/their_turf = get_turf(listener)
+			if(alpha && observer.ghostvision && my_turf.z == their_turf.z && get_dist(my_turf, their_turf) <= observer.client.view)
+				langchat_listeners += observer
+		var/follow = listener.stat == DEAD ? " (<a href='byond://?src=\ref[listener];track=\ref[src]'>F</a>)" : ""
+		to_chat(listener, "<span class='game deadsay'><span class='prefix'>DEAD:</span> <span class='name'>[real_name][follow]</span> says, <span class='message'>\"[message]\"</span></span>")
+	if(length(langchat_listeners))
+		langchat_speech(message, langchat_listeners, GLOB.all_languages, skip_language_check = TRUE)
+
+/mob/living/carbon/human/visible_message(message, self_message, blind_message, max_distance, message_flags = CHAT_TYPE_OTHER)
+	if(statistic_exempt && !client && message_flags == CHAT_TYPE_TAKING_HIT && findtext(message, " misses "))
+		return
+	return ..()

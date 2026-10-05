@@ -1,3 +1,8 @@
+#define CLASH_HILL_STATIC "static"
+#define CLASH_HILL_MATCH "match"
+#define CLASH_HILL_TIMED "timed"
+#define CLASH_HILL_WARNING (30 SECONDS)
+
 /datum/game_mode/extended/faction_clash/hvh/tdm/objective
 	name = "Objective"
 	config_tag = null
@@ -13,6 +18,7 @@
 	var/list/round_objective_points = list()
 	var/list/point_callouts_made = list()
 	var/objective_timer_id
+	var/list/zone_notes = list()
 
 /datum/game_mode/extended/faction_clash/hvh/tdm/objective/post_setup()
 	build_zones()
@@ -20,22 +26,37 @@
 
 /datum/game_mode/extended/faction_clash/hvh/tdm/objective/proc/build_zones()
 	QDEL_LIST(zones)
-	for(var/list/spot in get_clash_objective_spots(zone_count, zone_radius))
-		var/datum/clash_zone/zone = new(spot[1], spot[2], spot[3])
-		zone.update_visuals(null, capture_time)
-		zones += zone
-		log_debug("HVH: objective [zone.label] at [zone.center.x],[zone.center.y] radius [zone.radius]")
+	zone_notes = list()
+	for(var/list/spot in get_zone_spots())
+		add_zone(spot)
 	if(!length(zones))
 		message_admins("HVH: [name] could not place any objectives on this map. Matches will be decided on time as draws.")
+		return
+	message_admins("HVH: [name]: [zone_notes.Join(" ")]")
+	log_game("HVH: [name]: [zone_notes.Join(" ")]")
+
+/datum/game_mode/extended/faction_clash/hvh/tdm/objective/proc/get_zone_spots()
+	zone_notes += "Objectives placed automatically."
+	return get_clash_auto_objective_spots(zone_count, zone_radius)
+
+/datum/game_mode/extended/faction_clash/hvh/tdm/objective/proc/add_zone(list/spot)
+	var/datum/clash_zone/zone = new(spot[1], spot[2], spot[3])
+	zone.update_visuals(null, capture_time)
+	zones += zone
+	log_debug("HVH: objective [zone.label] at [zone.center.x],[zone.center.y] radius [zone.radius]")
+	return zone
+
+/datum/game_mode/extended/faction_clash/hvh/tdm/objective/proc/reanchor_bots()
+	for(var/datum/clash_bot/bot as anything in GLOB.clash_bots)
+		if(bot.post && !bot.post.rally_id)
+			bot.anchor = bot.post.get_hold_turf()
 
 /datum/game_mode/extended/faction_clash/hvh/tdm/objective/can_rebuild_objectives()
 	return TRUE
 
 /datum/game_mode/extended/faction_clash/hvh/tdm/objective/rebuild_objectives()
 	build_zones()
-	for(var/datum/clash_bot/bot as anything in GLOB.clash_bots)
-		if(bot.post && !bot.post.rally_id)
-			bot.anchor = bot.post.get_hold_turf()
+	reanchor_bots()
 
 /datum/game_mode/extended/faction_clash/hvh/tdm/objective/get_objective_turfs()
 	. = list()
@@ -74,13 +95,21 @@
 		return list()
 	var/list/parts = list()
 	for(var/datum/clash_zone/zone as anything in zones)
-		parts += "<span style='color: [zone.owner ? faction_color(zone.owner) : "#bbbbbb"]'>[zone.label]</span> [zone.get_state_text(capture_time)]"
+		parts += "<span style='color: [zone.owner ? faction_color(zone.owner) : "#bbbbbb"]'>[zone.label]</span> [zone.get_state_text(capture_time)][get_zone_note()]"
 	return list("<span class='maptext center'>[parts.Join(" | ")]</span>")
 
 /datum/game_mode/extended/faction_clash/hvh/tdm/objective/get_objective_data()
 	. = list()
 	for(var/datum/clash_zone/zone as anything in zones)
-		. += list(list("label" = zone.label, "state" = zone.get_state_text(capture_time), "color" = zone.owner ? faction_color(zone.owner) : "#bbbbbb"))
+		. += list(list("label" = zone.label, "state" = "[zone.get_state_text(capture_time)][get_zone_note()]", "color" = zone.owner ? faction_color(zone.owner) : "#bbbbbb"))
+
+/datum/game_mode/extended/faction_clash/hvh/tdm/objective/proc/get_zone_note()
+	return ""
+
+/datum/game_mode/extended/faction_clash/hvh/tdm/objective/get_radar_pins(mob/viewer)
+	. = list()
+	for(var/datum/clash_zone/zone as anything in zones)
+		. += list(list("key" = REF(zone), "turf" = zone.center, "letter" = zone.label == "Hill" ? "H" : zone.label, "tone" = clash_radar_tone(zone.owner, viewer), "hollow" = FALSE))
 
 /datum/game_mode/extended/faction_clash/hvh/tdm/objective/on_match_start()
 	objective_points = list()
@@ -88,9 +117,7 @@
 	for(var/datum/clash_zone/zone as anything in zones)
 		zone.reset()
 		zone.update_visuals(null, capture_time)
-	for(var/datum/clash_bot/bot as anything in GLOB.clash_bots)
-		if(bot.post && !bot.post.rally_id)
-			bot.anchor = bot.post.get_hold_turf()
+	reanchor_bots()
 	if(!objective_timer_id)
 		objective_timer_id = addtimer(CALLBACK(src, PROC_REF(tick_objectives)), 1 SECONDS, TIMER_LOOP|TIMER_STOPPABLE)
 
@@ -171,6 +198,14 @@
 	point_limit = 120
 	zone_count = 1
 	zone_radius = 3
+	var/list/hill_spots = list()
+	var/hill_index = 1
+	var/rotation = CLASH_HILL_STATIC
+	var/rotate_time = 3 MINUTES
+	var/admin_rotation
+	var/admin_rotate_time
+	var/next_move_at
+	var/datum/clash_zone/next_hill
 
 /datum/game_mode/extended/faction_clash/hvh/tdm/objective/koth/pre_setup()
 	var/datum/map_config/ground = SSmapping.configs[GROUND_MAP]
@@ -179,11 +214,164 @@
 	return ..()
 
 /datum/game_mode/extended/faction_clash/hvh/tdm/objective/koth/get_objective_rules()
-	return list(
-		"Occupy the \"hill\" with no enemies on it to score points.",
-		"First team to [point_limit] points wins, otherwise the most points when time runs out.",
-		"Bots fight over the hill but cannot hold or contest it.",
-	)
+	. = list("Occupy the \"hill\" with no enemies on it to score points.")
+	switch(rotation)
+		if(CLASH_HILL_TIMED)
+			. += "The hill moves every [rotate_time / (1 MINUTES)] minute\s."
+		if(CLASH_HILL_MATCH)
+			. += "The hill moves after every match."
+	. += "First team to [point_limit] points wins, otherwise the most points when time runs out."
+	. += "Bots fight over the hill but cannot hold or contest it."
+
+/datum/game_mode/extended/faction_clash/hvh/tdm/objective/koth/get_zone_spots()
+	hill_spots = list()
+	hill_index = 1
+	rotation = CLASH_HILL_STATIC
+	QDEL_NULL(next_hill)
+	next_move_at = null
+	var/z = get_clash_ground_z()
+	if(!z)
+		return list()
+	var/obj/effect/landmark/clash_objective/koth_primary/main = get_clash_marker(/obj/effect/landmark/clash_objective/koth_primary, z)
+	var/list/alternates = list()
+	for(var/marker_type in list(/obj/effect/landmark/clash_objective/koth_secondary, /obj/effect/landmark/clash_objective/koth_tertiary))
+		var/obj/effect/landmark/clash_objective/alternate = get_clash_marker(marker_type, z)
+		if(alternate)
+			alternates += alternate
+	if(!main)
+		zone_notes += length(alternates) ? "Secondary and tertiary hill markers need a KOTH primary hill marker, so the hill was placed automatically." : "No KOTH hill markers on this map, the hill was placed automatically."
+		return get_clash_auto_objective_spots(zone_count, zone_radius)
+	var/problem = clash_marker_problem(get_turf(main))
+	if(problem)
+		zone_notes += "The KOTH primary hill marker [problem], so the hill was placed automatically."
+		return get_clash_auto_objective_spots(zone_count, zone_radius)
+	hill_spots += list(clash_marker_spot(main, zone_radius))
+	for(var/obj/effect/landmark/clash_objective/alternate as anything in alternates)
+		problem = clash_marker_problem(get_turf(alternate))
+		if(problem)
+			zone_notes += "[alternate.name] [problem], skipped."
+			continue
+		hill_spots += list(clash_marker_spot(alternate, zone_radius))
+	var/wanted = admin_rotation || main.rotation
+	if(!(wanted in list(CLASH_HILL_STATIC, CLASH_HILL_MATCH, CLASH_HILL_TIMED)))
+		zone_notes += "The primary hill marker's rotation \"[wanted]\" is not static, match or timed, so the hill stays put."
+		wanted = CLASH_HILL_STATIC
+	if(wanted != CLASH_HILL_STATIC && length(hill_spots) < 2)
+		zone_notes += "Hill rotation needs a usable secondary or tertiary hill marker, so the hill stays put."
+		wanted = CLASH_HILL_STATIC
+	if(wanted == CLASH_HILL_MATCH && matches_per_round < 2)
+		zone_notes += "Moving the hill after every match needs more than one match per round, so the hill stays put."
+		wanted = CLASH_HILL_STATIC
+	rotation = wanted
+	rotate_time = admin_rotate_time || clamp(round(main.rotate_minutes), 1, 10) MINUTES
+	var/how = "it stays put"
+	switch(rotation)
+		if(CLASH_HILL_TIMED)
+			how = "it moves every [rotate_time / (1 MINUTES)] minute\s"
+		if(CLASH_HILL_MATCH)
+			how = "it moves after every match"
+	zone_notes += "The hill comes from the map's primary hill marker with [length(hill_spots) - 1] more usable hill\s, [how]."
+	return list(hill_spots[1])
+
+/datum/game_mode/extended/faction_clash/hvh/tdm/objective/koth/rebuild_objectives()
+	. = ..()
+	if(match_live && rotation == CLASH_HILL_TIMED)
+		next_move_at = world.time + rotate_time
+
+/datum/game_mode/extended/faction_clash/hvh/tdm/objective/koth/proc/move_hill(index)
+	hill_index = index
+	QDEL_NULL(next_hill)
+	QDEL_LIST(zones)
+	add_zone(hill_spots[index])
+	reanchor_bots()
+
+/datum/game_mode/extended/faction_clash/hvh/tdm/objective/koth/proc/get_next_hill_index()
+	return hill_index % length(hill_spots) + 1
+
+/datum/game_mode/extended/faction_clash/hvh/tdm/objective/koth/on_match_start()
+	. = ..()
+	next_move_at = rotation == CLASH_HILL_TIMED ? world.time + rotate_time : null
+
+/datum/game_mode/extended/faction_clash/hvh/tdm/objective/koth/on_match_end()
+	. = ..()
+	QDEL_NULL(next_hill)
+	next_move_at = null
+
+/datum/game_mode/extended/faction_clash/hvh/tdm/objective/koth/reset_arena()
+	. = ..()
+	if(rotation == CLASH_HILL_STATIC)
+		return
+	var/target = rotation == CLASH_HILL_MATCH ? match_number % length(hill_spots) + 1 : 1
+	if(target == hill_index)
+		return
+	move_hill(target)
+
+/datum/game_mode/extended/faction_clash/hvh/tdm/objective/koth/tick_objectives()
+	. = ..()
+	if(!match_live || !next_move_at)
+		return
+	var/left = next_move_at - world.time
+	if(left <= 0)
+		move_hill(get_next_hill_index())
+		next_move_at = world.time + rotate_time
+		for(var/faction in list(FACTION_MARINE, FACTION_UPP))
+			announce_to_faction(faction, "The hill has moved.")
+		return
+	if(left > CLASH_HILL_WARNING)
+		return
+	if(!next_hill)
+		var/list/spot = hill_spots[get_next_hill_index()]
+		next_hill = new(spot[1], spot[2], spot[3], TRUE)
+		for(var/faction in list(FACTION_MARINE, FACTION_UPP))
+			announce_to_faction(faction, "The hill moves in [CLASH_HILL_WARNING / 10] seconds. Follow the flashing tiles or the H on your radar.")
+	next_hill.show_preview(CEILING(left / 10, 1))
+
+/datum/game_mode/extended/faction_clash/hvh/tdm/objective/koth/get_zone_note()
+	if(!next_move_at || !match_live)
+		return ""
+	return ", moves in [clash_clock_text(CEILING(max(0, next_move_at - world.time) / 10, 1))]"
+
+/datum/game_mode/extended/faction_clash/hvh/tdm/objective/koth/get_radar_pins(mob/viewer)
+	. = ..()
+	if(next_hill)
+		. += list(list("key" = REF(next_hill), "turf" = next_hill.center, "letter" = "H", "tone" = "open", "hollow" = TRUE))
+
+/datum/game_mode/extended/faction_clash/hvh/tdm/objective/koth/get_admin_objective_actions()
+	if(length(hill_spots) < 2)
+		return list()
+	return list("Move the hill now", "Set hill rotation")
+
+/datum/game_mode/extended/faction_clash/hvh/tdm/objective/koth/do_admin_objective_action(choice, mob/user)
+	switch(choice)
+		if("Move the hill now")
+			move_hill(get_next_hill_index())
+			if(next_move_at)
+				next_move_at = world.time + rotate_time
+			if(match_live)
+				for(var/faction in list(FACTION_MARINE, FACTION_UPP))
+					announce_to_faction(faction, "The hill has moved.")
+			return "Moved the hill to spot [hill_index] of [length(hill_spots)]"
+		if("Set hill rotation")
+			var/list/options = list("Stays put" = CLASH_HILL_STATIC, "After every match" = CLASH_HILL_MATCH, "On a timer" = CLASH_HILL_TIMED)
+			var/picked = tgui_input_list(user, "How should the hill move for the rest of this round?", "Hill rotation", options)
+			if(!picked)
+				return null
+			var/minutes
+			if(options[picked] == CLASH_HILL_TIMED)
+				minutes = tgui_input_number(user, "Move the hill every how many minutes?", "Hill rotation", rotate_time / (1 MINUTES), 10, 1)
+				if(!minutes)
+					return null
+				admin_rotate_time = round(minutes) MINUTES
+				rotate_time = admin_rotate_time
+			if(options[picked] == CLASH_HILL_MATCH && matches_per_round < 2)
+				to_chat(user, SPAN_WARNING("This round has one match, so the hill would never move."))
+				return null
+			admin_rotation = options[picked]
+			rotation = admin_rotation
+			QDEL_NULL(next_hill)
+			next_move_at = rotation == CLASH_HILL_TIMED && match_live ? world.time + rotate_time : null
+			return "Set the hill rotation to [lowertext(picked)][minutes ? ", every [round(minutes)] minute\s" : ""]"
+	return null
 
 /datum/game_mode/extended/faction_clash/hvh/tdm/objective/domination
 	name = GAMEMODE_DOMINATION
@@ -199,6 +387,37 @@
 	if(ground?.tdm_domination_point_limit)
 		point_limit = ground.tdm_domination_point_limit
 	return ..()
+
+/datum/game_mode/extended/faction_clash/hvh/tdm/objective/domination/get_zone_spots()
+	var/z = get_clash_ground_z()
+	if(!z)
+		return list()
+	var/list/spots = list()
+	var/list/problems = list()
+	var/found = FALSE
+	for(var/obj/effect/landmark/clash_objective/marker_type as anything in list(/obj/effect/landmark/clash_objective/domination_zone/a, /obj/effect/landmark/clash_objective/domination_zone/b, /obj/effect/landmark/clash_objective/domination_zone/c))
+		var/obj/effect/landmark/clash_objective/mark = get_clash_marker(marker_type, z)
+		if(!mark)
+			problems += "[initial(marker_type.label)] is missing"
+			continue
+		found = TRUE
+		var/problem = clash_marker_problem(get_turf(mark))
+		if(problem)
+			problems += "[mark.label] [problem]"
+			continue
+		spots += list(clash_marker_spot(mark, zone_radius))
+	if(!length(problems))
+		for(var/first in 1 to length(spots) - 1)
+			for(var/second in first + 1 to length(spots))
+				var/list/one = spots[first]
+				var/list/two = spots[second]
+				if(get_dist_euclidian(one[2], two[2]) <= one[3] + two[3] + 0.6)
+					problems += "[one[1]] overlaps [two[1]]"
+	if(!length(problems))
+		zone_notes += "Zones A, B and C come from the map's markers."
+		return spots
+	zone_notes += found ? "Zones were placed automatically because domination marker [english_list(problems)]." : "No domination markers on this map, the zones were placed automatically."
+	return get_clash_auto_objective_spots(zone_count, zone_radius)
 
 /datum/game_mode/extended/faction_clash/hvh/tdm/objective/domination/get_objective_rules()
 	return list(

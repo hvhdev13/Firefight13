@@ -1,9 +1,27 @@
 GLOBAL_LIST_EMPTY(clash_welcomed)
 GLOBAL_VAR_INIT(clash_feedback_contact, "")
 
+GLOBAL_LIST_INIT(clash_arena_rations, list(/obj/item/storage/box/mre, /obj/item/ammo_box/magazine/misc/mre))
+
 /proc/clash_fed_spawns()
 	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
 	return istype(clash_mode) && clash_mode.fed_spawns
+
+/proc/clash_is_ration(item_type)
+	for(var/ration_type in GLOB.clash_arena_rations)
+		if(ispath(item_type, ration_type))
+			return TRUE
+	return FALSE
+
+/proc/clash_remove_rations(mob/living/carbon/human/wearer)
+	for(var/obj/item/carried in wearer.get_contents())
+		if(clash_is_ration(carried.type))
+			qdel(carried)
+
+/proc/clash_keep_fed()
+	for(var/mob/living/carbon/human/fighter as anything in GLOB.alive_human_list)
+		if(fighter.nutrition < NUTRITION_NORMAL)
+			fighter.nutrition = NUTRITION_NORMAL
 
 /proc/clash_welcome_path(ckey)
 	return clash_player_save_path(ckey, "clash_welcome.sav")
@@ -51,6 +69,8 @@ SUBSYSTEM_DEF(clash_spawn)
 	UnregisterSignal(spawned, COMSIG_POST_SPAWN_UPDATE)
 	if(spawned.mind)
 		spawned.mind.clash_job = spawned.job
+	spawned.add_language(LANGUAGE_ENGLISH)
+	spawned.add_language(LANGUAGE_RUSSIAN)
 	if(clash_fed_spawns())
 		spawned.nutrition = NUTRITION_NORMAL
 	if(spawned.faction == FACTION_UPP && !(spawned.job in list(JOB_UPP_MEDIC, JOB_UPP_LT_DOKTOR)))
