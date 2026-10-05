@@ -10,6 +10,7 @@
 #define RADAR_COLOR_SHADOW rgb(21, 24, 27)
 #define RADAR_COLOR_TICK rgb(106, 116, 124)
 #define RADAR_TOGGLE_SIZE 11
+#define RADAR_KEEN_EARS_RANGE 14
 
 GLOBAL_VAR(clash_turn_sign)
 GLOBAL_DATUM(clash_radar_backdrop, /icon)
@@ -144,6 +145,22 @@ GLOBAL_LIST_EMPTY(clash_radar_toggle_icons)
 				"..oRo..",
 				"..ooo..",
 			), list("o" = rgb(10, 12, 15, 220), "R" = rgb(230, 80, 70)))
+		if("hurt")
+			mark = clash_pattern_icon(list(
+				".ooo.",
+				"ooRoo",
+				"oRRRo",
+				"ooRoo",
+				".ooo.",
+			), list("o" = rgb(10, 12, 15, 220), "R" = rgb(230, 80, 70)))
+		if("enemy")
+			mark = clash_pattern_icon(list(
+				".ooo.",
+				"oRRRo",
+				"oRRRo",
+				"oRRRo",
+				".ooo.",
+			), list("o" = rgb(10, 12, 15, 220), "R" = rgb(230, 60, 50)))
 		if("bot")
 			mark = clash_pattern_icon(list(
 				".ooo.",
@@ -290,6 +307,7 @@ GLOBAL_LIST_EMPTY(clash_radar_toggle_icons)
 	var/arc = (sweep_angle - from + 720) % 360
 	last_sweep_angle = sweep_angle
 	var/list/seen = list()
+	var/medic_sense = clash_has_perk(viewer, /datum/clash_perk/medic_sense)
 	for(var/mob/living/carbon/human/ally as anything in GLOB.alive_human_list)
 		if(ally == viewer || ally.faction != viewer.faction || ally.z != viewer.z)
 			continue
@@ -304,8 +322,26 @@ GLOBAL_LIST_EMPTY(clash_radar_toggle_icons)
 			kind = "bot"
 		else if(ally.assigned_squad?.squad_leader == ally)
 			kind = "leader"
+		if(medic_sense && ally.health < ally.maxHealth / 2)
+			kind = "hurt"
 		paint(contact, dx, dy, kind, from, arc, sweep_angle)
+	if(clash_has_perk(viewer, /datum/clash_perk/keen_ears))
+		for(var/mob/living/carbon/human/enemy as anything in GLOB.alive_human_list)
+			if(world.time > enemy.clash_loud_until || enemy.faction == viewer.faction || enemy.z != viewer.z)
+				continue
+			var/dx = enemy.x - viewer.x
+			var/dy = enemy.y - viewer.y
+			var/distance = sqrt(dx * dx + dy * dy)
+			if(distance > RADAR_KEEN_EARS_RANGE)
+				continue
+			if(distance > RADAR_RANGE)
+				dx *= RADAR_RANGE / distance
+				dy *= RADAR_RANGE / distance
+			var/contact = "enemy[REF(enemy)]"
+			seen[contact] = TRUE
+			paint(contact, dx, dy, "enemy", from, arc, sweep_angle)
 	if(clash_fast_medicine() && clash_is_medic(viewer))
+		var/triage = clash_has_perk(viewer, /datum/clash_perk/triage)
 		for(var/mob/living/carbon/human/body in GLOB.dead_mob_list)
 			if(body.faction != viewer.faction || body.z != viewer.z || body.statistic_exempt || !body.check_tod() || !body.is_revivable())
 				continue
@@ -313,7 +349,7 @@ GLOBAL_LIST_EMPTY(clash_radar_toggle_icons)
 			var/dy = body.y - viewer.y
 			var/distance = sqrt(dx * dx + dy * dy)
 			if(distance > RADAR_RANGE)
-				if(world.time > body.clash_called_until)
+				if(!triage && world.time > body.clash_called_until)
 					continue
 				dx *= RADAR_RANGE / distance
 				dy *= RADAR_RANGE / distance
@@ -422,3 +458,4 @@ GLOBAL_LIST_EMPTY(clash_radar_toggle_icons)
 #undef RADAR_COLOR_SHADOW
 #undef RADAR_COLOR_TICK
 #undef RADAR_TOGGLE_SIZE
+#undef RADAR_KEEN_EARS_RANGE

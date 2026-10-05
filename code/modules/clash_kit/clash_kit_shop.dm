@@ -3,6 +3,14 @@ GLOBAL_LIST_EMPTY(clash_kit_budgets)
 
 /mob/living/carbon/human/var/list/clash_kit_extras = list()
 
+GLOBAL_LIST_INIT(clash_support_shop, list(
+	list("SUPPORT GEAR", 0, null, null, null),
+	list("Smoke Grenade", 5, /obj/item/explosive/grenade/smokebomb, null, VENDOR_ITEM_REGULAR),
+	list("Webbing", 10, /obj/item/clothing/accessory/storage/webbing, null, VENDOR_ITEM_REGULAR),
+	list("Shoulder Holster", 10, /obj/item/clothing/accessory/storage/holster, null, VENDOR_ITEM_REGULAR),
+	list("Large General Pouch", 10, /obj/item/storage/pouch/general/large, null, VENDOR_ITEM_REGULAR),
+))
+
 /proc/get_clash_shop_sources(job)
 	switch(job)
 		if(JOB_SQUAD_MARINE)
@@ -19,6 +27,8 @@ GLOBAL_LIST_EMPTY(clash_kit_budgets)
 			return list(list(GLOB.cm_vending_gear_tl, CLASH_SHOP_POINTS), list(GLOB.cm_vending_clothing_tl, CLASH_SHOP_POINTS))
 		if(JOB_SQUAD_LEADER)
 			return list(list(GLOB.cm_vending_gear_leader, CLASH_SHOP_POINTS), list(GLOB.cm_vending_clothing_leader, CLASH_SHOP_POINTS))
+		if(JOB_CARGO_TECH, JOB_UPP_SUPPLY)
+			return list(list(GLOB.clash_support_shop, CLASH_SHOP_POINTS))
 	if(clash_kit_faction_for_job(job) != FACTION_UPP)
 		return list()
 	var/datum/job/role = GLOB.RoleAuthority.roles_by_name[job]

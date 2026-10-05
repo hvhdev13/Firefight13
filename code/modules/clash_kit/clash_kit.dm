@@ -465,6 +465,8 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 	job = job || wearer.job
 	ckey = ckey || wearer.ckey
 	kit = clash_filter_kit(kit, ckey, job)
+	if(mode != CLASH_KIT_RESET)
+		wearer.clash_perks = clash_kit_perks(kit)
 	var/list/cosmetics = clash_cosmetic_paths(prefs || wearer.client?.prefs || GLOB.preferences_datums[wearer.ckey])
 	var/faction = wearer.faction
 	var/datum/clash_kit_option/primary = kit.get_option(KIT_SLOT_PRIMARY)
@@ -546,6 +548,8 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 				qdel(grenade)
 	clash_strip_locked_attachments(wearer, ckey)
 	clash_strip_locked_grenades(wearer, ckey, job)
+	if(mode != CLASH_KIT_RESET && clash_has_perk(wearer, /datum/clash_perk/extra_grenade))
+		clash_give_extra_grenade(wearer)
 	clash_kit_fill_ammo(wearer, kit, mode)
 	. = stock_clash_kit(wearer, kit, job, mode, ckey)
 	wearer.regenerate_icons()

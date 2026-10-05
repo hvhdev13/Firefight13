@@ -612,6 +612,9 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		details += html_encode(cause)
 	details += "[distance] tile\s away"
 	var/list/notes = list()
+	var/mob/living/carbon/human/killer_human = killer
+	if(ishuman(killer) && length(killer_human.clash_perks))
+		notes += "Their perks: [english_list(clash_perk_names(killer_human))]"
 	if(length(assisters))
 		notes += "Assists: [html_encode(english_list(assisters))]"
 	if(victim.faction == killer.faction)

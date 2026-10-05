@@ -120,7 +120,7 @@
 	user.visible_message(SPAN_NOTICE("[user] starts assembling a sandbag barricade."),
 	SPAN_NOTICE("You start assembling a sandbag barricade."))
 
-	if(!do_after(user, 10, INTERRUPT_NO_NEEDHAND|BEHAVIOR_IMMOBILE, BUSY_ICON_BUILD))
+	if(!do_after(user, 10 * clash_cover_build_mult(user, /obj/structure/barricade/sandbags), INTERRUPT_NO_NEEDHAND|BEHAVIOR_IMMOBILE, BUSY_ICON_BUILD))
 		return
 
 	for(var/obj/O in user.loc) //Objects, we don't care about mobs. Turfs are checked elsewhere

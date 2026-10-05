@@ -39,9 +39,9 @@
 
 	command_aura_available = FALSE
 	var/command_aura_strength = order_level
-	var/command_aura_duration = (order_level + 1) * 10 SECONDS
-	var/command_aura_cooldown = COMMAND_ORDER_COOLDOWN
-	var/command_aura_range = COMMAND_ORDER_RANGE
+	var/command_aura_duration = clash_order_duration(src, (order_level + 1) * 10 SECONDS)
+	var/command_aura_cooldown = clash_order_cooldown(src, COMMAND_ORDER_COOLDOWN)
+	var/command_aura_range = clash_order_range(src, COMMAND_ORDER_RANGE)
 
 	// whistle checks
 	var/obj/item/clothing/accessory/device/whistle/whistling = locate() in src.contents
@@ -70,6 +70,8 @@
 		if(inspiring.stat == DEAD)
 			continue
 		if(!ishumansynth_strict(inspiring))
+			continue
+		if(!clash_order_reaches(src, inspiring))
 			continue
 		inspiring.activate_order_buff(order, command_aura_strength, command_aura_duration)
 

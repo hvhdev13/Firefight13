@@ -30,6 +30,7 @@ interface Option {
   icon_state: string;
   ammo: number;
   stats: [string, number][];
+  perk_class: string | null;
 }
 
 interface RoleGroup {
@@ -151,6 +152,7 @@ interface Data extends StaticData {
   deploy_block: string | null;
   revivable: BooleanLike;
   sentry_slot: BooleanLike;
+  perk_class: string;
   hint: string | null;
   pack: PackContainer[];
   extras: Extra[];
@@ -517,6 +519,7 @@ const LEFT_SLOTS = ['helmet', 'mask', 'armor', 'back'];
 const RIGHT_SLOTS = ['primary', 'sidearm', 'grenade', 'belt'];
 const POUCH_SLOTS = ['pouch_l', 'webbing', 'pouch_r'];
 const ATTACHMENT_SLOTS = ['rail', 'muzzle', 'under', 'stock'];
+const PERK_SLOTS = ['class_perk', 'general_perk'];
 
 const clock = (seconds: number) =>
   `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
@@ -554,10 +557,13 @@ const SlotTile = (props: {
     onClick,
   } = props;
   const shown = picked ?? issued;
+  const perk = PERK_SLOTS.includes(slot.id);
   const tooltip = lock
-    ? `${picked?.name}: locked, ${lock}. The starting item is used at spawn.`
+    ? `${picked?.name}: locked, ${lock}. ${perk ? 'You spawn without it.' : 'The starting item is used at spawn.'}`
     : picked
-      ? picked.name
+      ? perk
+        ? `${picked.name}: ${picked.blurb}`
+        : picked.name
       : issued
         ? `${issued.name} (job issue)`
         : `${slot.name}: nothing`;
@@ -729,6 +735,7 @@ export const ClashKit = () => {
     deploy_block,
     revivable,
     sentry_slot,
+    perk_class,
     hint,
     progress,
   } = data;
@@ -761,7 +768,17 @@ export const ClashKit = () => {
   const primary = findOption(menus, faction, 'primary', choices.primary);
   const current = slotById[selectedSlot];
   const ranks = progress?.ranks ?? {};
-  const options = (menus[faction]?.[selectedSlot] ?? [])
+  const slotOptions = (id: string) =>
+    (menus[faction]?.[id] ?? []).filter(
+      (option) => id !== 'class_perk' || option.perk_class === perk_class,
+    );
+  const hasClassPerks = slotOptions('class_perk').length > 0;
+  useEffect(() => {
+    if (selectedSlot === 'class_perk' && !hasClassPerks) {
+      setSelectedSlot('general_perk');
+    }
+  }, [job]);
+  const options = slotOptions(selectedSlot)
     .filter(
       (option) =>
         !slotById[selectedSlot]?.attachment ||
@@ -821,7 +838,7 @@ export const ClashKit = () => {
       lock={choices[id] ? locks[choices[id]] : undefined}
       fresh={
         selectedSlot !== id &&
-        !!menus[faction]?.[id]?.some((option) => fresh.includes(option.id))
+        slotOptions(id).some((option) => fresh.includes(option.id))
       }
       onClick={() => {
         setSelectedSlot(id);
@@ -987,16 +1004,27 @@ export const ClashKit = () => {
                   </Box>
                 </Box>
 
-                <Box className="ClashKit__attachHeader">
-                  {primary ? primary.name : 'Attachments'}
-                  {!primary && (
-                    <Box as="span" className="ClashKit__attachHint">
-                      pick a primary first
+                <Box className="ClashKit__attachBar">
+                  <Box>
+                    <Box className="ClashKit__attachHeader">
+                      {primary ? primary.name : 'Attachments'}
+                      {!primary && (
+                        <Box as="span" className="ClashKit__attachHint">
+                          pick a primary first
+                        </Box>
+                      )}
                     </Box>
-                  )}
-                </Box>
-                <Box className="ClashKit__attachRow">
-                  {ATTACHMENT_SLOTS.map((id) => tile(id, true, !primary))}
+                    <Box className="ClashKit__attachRow">
+                      {ATTACHMENT_SLOTS.map((id) => tile(id, true, !primary))}
+                    </Box>
+                  </Box>
+                  <Box>
+                    <Box className="ClashKit__attachHeader">Perks</Box>
+                    <Box className="ClashKit__attachRow">
+                      {hasClassPerks && tile('class_perk', true)}
+                      {tile('general_perk', true)}
+                    </Box>
+                  </Box>
                 </Box>
                 <Box
                   className={classes([
@@ -1070,9 +1098,11 @@ export const ClashKit = () => {
                       blurb={
                         issued
                           ? `What a ${job} is issued`
-                          : current?.attachment
-                            ? 'Leave this slot empty'
-                            : `A ${job} gets nothing here`
+                          : PERK_SLOTS.includes(selectedSlot)
+                            ? 'Spawn without a perk'
+                            : current?.attachment
+                              ? 'Leave this slot empty'
+                              : `A ${job} gets nothing here`
                       }
                       picked={!choices[selectedSlot]}
                       onClick={() => act('clear', { slot: selectedSlot })}

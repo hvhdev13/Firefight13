@@ -128,6 +128,8 @@
 		if(GLOB.clash_role_levels[title] == level && (title in GLOB.clash_arena_roles) && clash_kit_faction_for_job(title) == faction)
 			found = TRUE
 			clash_notify_unlock(ckey, CLASH_UNLOCK_ROLE, title, source)
+	if(notify_perks(null, level, source))
+		found = TRUE
 	if(!found)
 		clash_notify_unlock(ckey, CLASH_UNLOCK_LEVEL, clash_insignia_name(faction, level), source)
 
@@ -141,21 +143,14 @@
 		if(item_type)
 			found = TRUE
 			clash_notify_unlock(ckey, CLASH_UNLOCK_GEAR, capitalize(GLOB.clash_gear_names[gear]), source, item_type)
-	if(class != CLASH_CLASS_SUPPORT && level > 1)
+	if(level > 1)
 		for(var/list/tier as anything in GLOB.clash_shop_tiers)
 			if(tier[1] == level)
 				found = TRUE
 				clash_notify_unlock(ckey, CLASH_UNLOCK_SHOP, tier[2] == INFINITY ? "Every Shop item" : "Shop items up to [tier[2]] points", source)
-	if(class == CLASH_CLASS_MEDIC)
-		for(var/list/perk as anything in GLOB.clash_medic_perks)
-			if(perk[1] == level)
-				found = TRUE
-				clash_notify_unlock(ckey, CLASH_UNLOCK_PERK, perk[2], source)
+	if(notify_perks(class, level, source))
+		found = TRUE
 	if(class == CLASH_CLASS_ENGINEER)
-		for(var/list/perk as anything in GLOB.clash_engineer_perks)
-			if(perk[1] == level)
-				found = TRUE
-				clash_notify_unlock(ckey, CLASH_UNLOCK_PERK, perk[2], source)
 		for(var/tier in GLOB.clash_sentry_tiers)
 			var/list/stats = GLOB.clash_sentry_tiers[tier]
 			if(stats["level"] == level)
@@ -166,6 +161,14 @@
 		clash_notify_unlock(ckey, CLASH_UNLOCK_COSMETIC, "Veteran [GLOB.clash_class_names[class]]", source)
 	if(!found)
 		clash_notify_unlock(ckey, CLASH_UNLOCK_LEVEL, GLOB.clash_class_names[class], source)
+
+/datum/clash_progress/proc/notify_perks(class, level, source)
+	. = FALSE
+	for(var/perk_type in GLOB.clash_perks)
+		var/datum/clash_perk/perk = GLOB.clash_perks[perk_type]
+		if(perk.class == class && perk.level == level)
+			. = TRUE
+			clash_notify_unlock(ckey, CLASH_UNLOCK_PERK, "[perk.name]: [perk.desc]", source, perk.icon_type)
 
 /datum/clash_progress/proc/notify_weapon_level(gun_type, level)
 	var/list/unlocks = GLOB.clash_weapon_tracks[gun_type]
@@ -211,12 +214,6 @@
 /proc/clash_job_is_medic(job)
 	return GLOB.clash_job_classes[job] == CLASH_CLASS_MEDIC
 
-/proc/clash_medic_perk(mob/living/carbon/human/medic, level)
-	if(!clash_progression_gating())
-		return TRUE
-	var/datum/clash_progress/progress = clash_progress_of(medic.mind?.ckey || medic.ckey)
-	return progress?.class_level(CLASH_CLASS_MEDIC) >= level
-
 /proc/clash_is_engineer(mob/living/carbon/human/fighter)
 	return clash_job_is_engineer(fighter.job)
 
@@ -228,9 +225,6 @@
 		return CLASH_LEVEL_CAP
 	var/datum/clash_progress/progress = clash_progress_of(ckey)
 	return progress ? progress.class_level(CLASH_CLASS_ENGINEER) : 1
-
-/proc/clash_engineer_perk(mob/living/carbon/human/engineer, level)
-	return clash_engineer_level(engineer.mind?.ckey || engineer.ckey) >= level
 
 /proc/clash_progress_payback(mob/living/carbon/human/killer, amount)
 	var/mob/living/carbon/human/medic = killer.clash_revived_by?.resolve()
@@ -436,7 +430,7 @@
 		return
 	barricade.clash_builder_ckey = builder.mind?.ckey || builder.ckey
 	barricade.clash_builder_faction = builder.faction
-	if(clash_fast_medicine() && clash_engineer_perk(builder, CLASH_PERK_HARDENED))
+	if(clash_fast_medicine() && clash_has_perk(builder, /datum/clash_perk/hardened))
 		barricade.maxhealth = round(barricade.maxhealth * CLASH_HARDENED_MULT)
 		barricade.health = barricade.maxhealth
 

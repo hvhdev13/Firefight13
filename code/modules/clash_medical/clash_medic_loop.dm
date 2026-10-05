@@ -48,8 +48,15 @@ GLOBAL_LIST_EMPTY(clash_call_medic_icons)
 	clash_refresh_medic_marks()
 
 /proc/clash_medic_shout(mob/living/carbon/human/patient)
-	if(clash_fast_medicine())
-		clash_mark_medic_call(patient, CLASH_MEDIC_SHOUT_MARK)
+	if(!clash_fast_medicine())
+		return
+	clash_mark_medic_call(patient, CLASH_MEDIC_SHOUT_MARK)
+	for(var/mob/living/carbon/human/medic as anything in clash_medics_near(patient))
+		if(medic == patient || !clash_has_perk(medic, /datum/clash_perk/loud_call))
+			continue
+		playsound_client(medic.client, 'sound/machines/twobeep.ogg', null, 50)
+		var/distance = get_dist(medic, patient)
+		to_chat(medic, SPAN_BOLDNOTICE(distance ? "[patient.real_name] is calling for a medic, [distance] tile\s [dir2text(get_dir(medic, patient))]." : "[patient.real_name] is calling for a medic, right here."))
 
 /proc/clash_refresh_medic_marks()
 	for(var/mob/living/carbon/human/patient as anything in GLOB.clash_medic_marks.Copy())
@@ -141,7 +148,7 @@ GLOBAL_LIST_EMPTY(clash_call_medic_icons)
 /proc/clash_issue_medic_gear(mob/living/carbon/human/medic)
 	if(!clash_fast_medicine() || !clash_is_medic(medic))
 		return
-	var/pouch_type = clash_medic_perk(medic, CLASH_PERK_LARGE_POUCH) ? /obj/item/storage/pouch/firstaid/clash/medic/large : /obj/item/storage/pouch/firstaid/clash/medic
+	var/pouch_type = clash_has_perk(medic, /datum/clash_perk/large_pouch) ? /obj/item/storage/pouch/firstaid/clash/medic/large : /obj/item/storage/pouch/firstaid/clash/medic
 	for(var/wear_slot in list(WEAR_L_STORE, WEAR_R_STORE))
 		var/obj/item/worn = medic.get_item_by_slot(wear_slot)
 		if(istype(worn, /obj/item/storage/pouch/medkit) || worn?.type == /obj/item/storage/pouch/medical)

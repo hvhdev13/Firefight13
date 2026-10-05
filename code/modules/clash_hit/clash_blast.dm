@@ -1,7 +1,7 @@
 /proc/clash_blast_delimb(mob/living/carbon/human/victim, obj/limb/focused, damage, mob/attack_source)
 	victim.clash_heal_pool += clash_enemy_share(attack_source, victim.faction, damage)
 	clash_suppress_blast(victim, damage)
-	if(victim.stat == DEAD || (victim.status_flags & GODMODE) || (victim.chem_effect_flags & CHEM_EFFECT_RESIST_FRACTURE) || attack_source?.faction == victim.faction)
+	if(victim.stat == DEAD || (victim.status_flags & GODMODE) || clash_has_perk(victim, /datum/clash_perk/flak) || (victim.chem_effect_flags & CHEM_EFFECT_RESIST_FRACTURE) || attack_source?.faction == victim.faction)
 		return
 	if(!prob(damage * 3))
 		return

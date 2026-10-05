@@ -437,7 +437,7 @@
 	SPAN_NOTICE("You begin repairing the damage to [src]."))
 	playsound(src.loc, 'sound/items/Welder2.ogg', 25, TRUE)
 
-	var/welding_time = skillcheck(user, SKILL_CONSTRUCTION, 2) ? 5 SECONDS : 10 SECONDS
+	var/welding_time = (skillcheck(user, SKILL_CONSTRUCTION, 2) ? 5 SECONDS : 10 SECONDS) * clash_repair_mult(user)
 	if(!do_after(user, welding_time, INTERRUPT_NO_NEEDHAND|BEHAVIOR_IMMOBILE, BUSY_ICON_FRIENDLY, src))
 		return FALSE
 

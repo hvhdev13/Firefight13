@@ -5,6 +5,7 @@
 #define CLASH_CRATE_TAKE_GAP (5 SECONDS)
 #define CLASH_CRATE_DEPLOY_TIME (1 SECONDS)
 #define CLASH_CRATE_PACK_TIME (1 SECONDS)
+#define CLASH_CRATE_BLAST_GUARD (1 SECONDS)
 
 GLOBAL_LIST_EMPTY(clash_engineer_crates)
 
@@ -52,7 +53,7 @@ GLOBAL_LIST_EMPTY(clash_engineer_crates)
 	if(!isturf(spot) || spot.density || (locate(/obj/structure/clash_ammo_crate) in spot))
 		to_chat(user, SPAN_WARNING("You need a clear spot in front of you."))
 		return
-	var/deploy_time = CLASH_CRATE_DEPLOY_TIME * (clash_engineer_perk(user, CLASH_PERK_QUICK_BUILD) ? 0.5 : 1)
+	var/deploy_time = CLASH_CRATE_DEPLOY_TIME * (clash_has_perk(user, /datum/clash_perk/quick_build) ? 0.5 : 1)
 	if(!do_after(user, deploy_time, INTERRUPT_ALL|BEHAVIOR_IMMOBILE, BUSY_ICON_BUILD) || QDELETED(src) || spot.density)
 		return
 	if(!deployed)
@@ -62,10 +63,11 @@ GLOBAL_LIST_EMPTY(clash_engineer_crates)
 	deployed.magazine_state = magazine_state
 	deployed.owner_ckey = user.ckey
 	deployed.faction = user.faction
-	deployed.max_stock = clash_engineer_perk(user, CLASH_PERK_BIG_CRATE) ? CLASH_CRATE_STOCK_BIG : CLASH_CRATE_STOCK
-	deployed.restock_time = clash_engineer_perk(user, CLASH_PERK_BIG_CRATE) ? CLASH_CRATE_RESTOCK_BIG : CLASH_CRATE_RESTOCK
+	deployed.max_stock = clash_has_perk(user, /datum/clash_perk/big_crate) ? CLASH_CRATE_STOCK_BIG : CLASH_CRATE_STOCK
+	deployed.restock_time = clash_has_perk(user, /datum/clash_perk/big_crate) ? CLASH_CRATE_RESTOCK_BIG : CLASH_CRATE_RESTOCK
 	if(isnull(deployed.stock))
 		deployed.stock = deployed.max_stock
+		deployed.blast_proof = clash_has_perk(user, /datum/clash_perk/blast_crate)
 	owner_ckey = user.ckey
 	var/list/owned = GLOB.clash_engineer_crates[user.ckey]
 	for(var/obj/item/clash_ammo_crate/other as anything in owned?.Copy())
@@ -94,6 +96,8 @@ GLOBAL_LIST_EMPTY(clash_engineer_crates)
 	var/max_stock = CLASH_CRATE_STOCK
 	var/restock_time = CLASH_CRATE_RESTOCK
 	var/restock_timer
+	var/blast_proof = FALSE
+	var/blast_guard = 0
 	var/list/next_take = list()
 	var/list/next_pay = list()
 
@@ -165,7 +169,7 @@ GLOBAL_LIST_EMPTY(clash_engineer_crates)
 	if(user.ckey != owner_ckey)
 		to_chat(user, SPAN_WARNING("Only the engineer who set it up can pack it up."))
 		return
-	var/pack_time = CLASH_CRATE_PACK_TIME * (clash_engineer_perk(user, CLASH_PERK_QUICK_BUILD) ? 0.5 : 1)
+	var/pack_time = CLASH_CRATE_PACK_TIME * (clash_has_perk(user, /datum/clash_perk/quick_build) ? 0.5 : 1)
 	if(!do_after(user, pack_time, INTERRUPT_ALL|BEHAVIOR_IMMOBILE, BUSY_ICON_BUILD, src) || QDELETED(src))
 		return
 	deltimer(restock_timer)
@@ -176,8 +180,14 @@ GLOBAL_LIST_EMPTY(clash_engineer_crates)
 	to_chat(user, SPAN_NOTICE("You pack up the ammo crate."))
 
 /obj/structure/clash_ammo_crate/ex_act(severity)
-	if(severity >= EXPLOSION_THRESHOLD_LOW)
-		qdel(src)
+	if(severity < EXPLOSION_THRESHOLD_LOW || world.time < blast_guard)
+		return
+	if(blast_proof)
+		blast_proof = FALSE
+		blast_guard = world.time + CLASH_CRATE_BLAST_GUARD
+		visible_message(SPAN_WARNING("[src] shrugs off the blast."))
+		return
+	qdel(src)
 
 /proc/clash_crate_ammo_for(mob/living/carbon/human/user, obj/item/weapon/gun/gun)
 	if(!gun)
@@ -205,3 +215,4 @@ GLOBAL_LIST_EMPTY(clash_engineer_crates)
 #undef CLASH_CRATE_TAKE_GAP
 #undef CLASH_CRATE_DEPLOY_TIME
 #undef CLASH_CRATE_PACK_TIME
+#undef CLASH_CRATE_BLAST_GUARD

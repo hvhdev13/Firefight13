@@ -121,7 +121,12 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 
 /proc/clash_option_lock_text(ckey, option_id, job, primary_type)
 	var/datum/clash_kit_option/option = get_clash_kit_option(option_id)
-	if(!option || !clash_progression_gating())
+	if(!option)
+		return null
+	var/datum/clash_perk/perk = GLOB.clash_perks[option.item_type]
+	if(perk)
+		return perk.lock_text(ckey, job)
+	if(!clash_progression_gating())
 		return null
 	var/datum/clash_progress/progress = clash_gate_progress(ckey)
 	if(option.slot == KIT_SLOT_SENTRY)
