@@ -609,7 +609,9 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 	var/sentence_end = findtext(blurb, ". ")
 	if(sentence_end)
 		blurb = copytext(blurb, 1, sentence_end + 1)
-	if(istype(item, /obj/item/storage) && length(item.contents))
+	if(istype(item, /obj/item/storage/belt/medical/lifesaver))
+		blurb = "Holds everything a medic needs."
+	else if(istype(item, /obj/item/storage) && length(item.contents))
 		var/list/counts = list()
 		for(var/obj/item/thing in item.contents)
 			counts[thing.name] = (counts[thing.name] || 0) + 1

@@ -1,5 +1,5 @@
-#define CLASH_PACK_HEAL 20
-#define CLASH_KIT_HEAL 30
+#define CLASH_PACK_HEAL 10
+#define CLASH_KIT_HEAL 20
 #define CLASH_PACK_FUMBLE (0.5 SECONDS)
 #define CLASH_KIT_FUMBLE (1 SECONDS)
 #define CLASH_SPLINT_MEDIC (1 SECONDS)
@@ -94,7 +94,7 @@ GLOBAL_LIST_INIT(clash_adv_firstaid_stock, list(
 	if(user.action_busy)
 		return
 	var/self = user == embedded_human
-	if(!do_after(user, CLASH_SHRAPNEL_DIG_TIME, INTERRUPT_ALL, BUSY_ICON_FRIENDLY, self ? null : embedded_human, INTERRUPT_MOVED, BUSY_ICON_MEDICAL))
+	if(!do_after(user, CLASH_SHRAPNEL_DIG_TIME, INTERRUPT_ALL, BUSY_ICON_FRIENDLY, self ? null : embedded_human, INTERRUPT_MOVED, self ? null : BUSY_ICON_MEDICAL))
 		to_chat(user, SPAN_NOTICE("You were interrupted!"))
 		return
 	var/list/removed_limbs = list()
