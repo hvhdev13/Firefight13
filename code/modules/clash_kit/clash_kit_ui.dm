@@ -207,7 +207,8 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 		if(!clash_is_attachment_slot(slot))
 			continue
 		var/slot_gun = clash_kit_slot_gun(kit, job, slot)
-		if(slot_gun && clash_option_lock_text(ckey, kit.choices[slot], job, slot_gun))
+		var/datum/clash_kit_option/option = get_clash_kit_option(kit.choices[slot])
+		if(slot_gun && (!option || !clash_kit_attachment_fits(option.item_type, slot_gun) || clash_option_lock_text(ckey, option.id, job, slot_gun)))
 			kit.choices -= slot
 			cleared = TRUE
 	if(cleared)

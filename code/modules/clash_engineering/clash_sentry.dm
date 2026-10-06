@@ -148,7 +148,8 @@ GLOBAL_LIST_INIT(clash_sentry_kits, list(
 		. += SPAN_HELPFUL("Click it with metal to reload it, [clash_has_perk(user, /datum/clash_perk/efficient_reload) ? 5 : 10] sheets for a full load. A welder repairs it and a wrench packs it up.")
 
 /obj/structure/machinery/defenses/sentry/proc/clash_activate(mob/living/carbon/human/engineer)
-	faction_group = LAZYCOPY(engineer.faction_group)
+	var/list/groups = engineer.faction_group
+	faction_group = LAZYCOPY(groups)
 	clash_faction = engineer.faction
 	clash_owner_ckey = engineer.ckey
 	owner_mob = engineer

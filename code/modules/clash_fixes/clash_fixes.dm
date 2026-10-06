@@ -43,24 +43,17 @@
 	message_admins("[key_name_admin(user)] killed [key_name_admin(target)].")
 	return TRUE
 
-GLOBAL_VAR_INIT(clash_global_say, TRUE)
-
-/mob/living/say(message, datum/language/speaking = null, verb = "says", alt_name = "", italics = FALSE, message_range = GLOB.world_view_size, sound/speech_sound, sound_vol, nolog = 0, message_mode = null, bubble_type = bubble_icon, langchat_override = null)
-	. = ..()
-	if(!. || message_mode || stat == DEAD || !GLOB.clash_global_say || (speaking?.flags & SIGNLANG) || !istype(SSticker.mode, /datum/game_mode/extended/faction_clash/hvh))
-		return
-	var/list/near = hearers(message_range, get_turf(src))
-	message = process_chat_markup(message, list("~", "_"))
-	for(var/mob/listener as anything in GLOB.player_list)
-		if(isnewplayer(listener) || (listener in near))
-			continue
-		if((listener.stat == DEAD || isobserver(listener)) && (listener.client?.prefs?.toggles_chat & CHAT_GHOSTEARS))
-			continue
-		listener.hear_say(message, verb, speaking, alt_name, italics, src, null, null, message_mode)
-
-/mob/say_dead(message)
+/mob/living/say_dead(message)
 	if(!istype(SSticker.mode, /datum/game_mode/extended/faction_clash/hvh))
 		return ..()
+	clash_say_dead(message)
+
+/mob/dead/say_dead(message)
+	if(!istype(SSticker.mode, /datum/game_mode/extended/faction_clash/hvh))
+		return ..()
+	clash_say_dead(message)
+
+/mob/proc/clash_say_dead(message)
 	if(!client)
 		return
 	if(!(client.admin_holder?.rights & R_MOD) && !GLOB.dsay_allowed)
@@ -103,10 +96,18 @@ GLOBAL_VAR_INIT(clash_global_say, TRUE)
 /obj/structure/barricade/update_health(damage, nomessage)
 	return ..(damage, nomessage || istype(SSticker.mode, /datum/game_mode/extended/faction_clash/hvh))
 
-/mob/say_verb(message as text)
-	if(copytext(message, 1, 2) != ";" || isnewplayer(src) || !istype(SSticker.mode, /datum/game_mode/extended/faction_clash/hvh))
+/mob/living/say_verb(message as text)
+	if(!clash_wants_all_chat(message))
 		return ..()
 	clash_all_chat(copytext(message, 2))
+
+/mob/dead/say_verb(message as text)
+	if(!clash_wants_all_chat(message))
+		return ..()
+	clash_all_chat(copytext(message, 2))
+
+/proc/clash_wants_all_chat(message)
+	return copytext(message, 1, 2) == ";" && istype(SSticker.mode, /datum/game_mode/extended/faction_clash/hvh)
 
 /mob/proc/clash_all_chat(message)
 	message = trim(strip_html(message, MAX_MESSAGE_LEN))

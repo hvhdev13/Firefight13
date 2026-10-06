@@ -98,7 +98,8 @@ GLOBAL_DATUM_INIT(clash_progression_admin, /datum/clash_progression_admin, new)
 	)
 
 /datum/clash_progression_admin/proc/get_live_data(ckey)
-	var/mob/body = GLOB.directory[ckey]?.mob
+	var/client/player = GLOB.directory[ckey]
+	var/mob/body = player?.mob
 	if(!body)
 		return null
 	var/mob/living/carbon/human/fighter = ishuman(body) ? body : null
@@ -128,7 +129,8 @@ GLOBAL_DATUM_INIT(clash_progression_admin, /datum/clash_progression_admin, new)
 	var/job = loadout_jobs[user.ckey]
 	if(job in GLOB.clash_arena_roles)
 		return job
-	var/mob/living/carbon/human/fighter = GLOB.directory[ckey]?.mob
+	var/client/player = GLOB.directory[ckey]
+	var/mob/living/carbon/human/fighter = player?.mob
 	if(ishuman(fighter) && (fighter.job in GLOB.clash_arena_roles))
 		return fighter.job
 	return GLOB.clash_arena_roles[1]
@@ -157,7 +159,8 @@ GLOBAL_DATUM_INIT(clash_progression_admin, /datum/clash_progression_admin, new)
 	return list("job" = job, "kits" = kit_rows)
 
 /proc/clash_admin_body(ckey)
-	var/mob/living/carbon/human/fighter = GLOB.directory[ckey]?.mob
+	var/client/player = GLOB.directory[ckey]
+	var/mob/living/carbon/human/fighter = player?.mob
 	return ishuman(fighter) && fighter.stat != DEAD ? fighter : null
 
 /datum/clash_progression_admin/proc/refresh_player(ckey)
