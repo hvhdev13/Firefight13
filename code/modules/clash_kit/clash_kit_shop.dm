@@ -1,15 +1,13 @@
 GLOBAL_LIST_EMPTY(clash_kit_shops)
 GLOBAL_LIST_EMPTY(clash_kit_budgets)
+GLOBAL_LIST_EMPTY(clash_item_contents)
+GLOBAL_LIST_INIT(clash_role_shop_ammo, list(
+	JOB_SQUAD_SMARTGUN = list(/obj/item/ammo_magazine/smartgun = 10),
+))
 
 /mob/living/carbon/human/var/list/clash_kit_extras = list()
-
-GLOBAL_LIST_INIT(clash_support_shop, list(
-	list("SUPPORT GEAR", 0, null, null, null),
-	list("Smoke Grenade", 5, /obj/item/explosive/grenade/smokebomb, null, VENDOR_ITEM_REGULAR),
-	list("Webbing", 10, /obj/item/clothing/accessory/storage/webbing, null, VENDOR_ITEM_REGULAR),
-	list("Shoulder Holster", 10, /obj/item/clothing/accessory/storage/holster, null, VENDOR_ITEM_REGULAR),
-	list("Large General Pouch", 10, /obj/item/storage/pouch/general/large, null, VENDOR_ITEM_REGULAR),
-))
+/mob/living/carbon/human/var/list/clash_kit_placed = list()
+/mob/living/carbon/human/var/list/clash_kit_move_failed = list()
 
 /proc/get_clash_shop_sources(job)
 	switch(job)
@@ -27,8 +25,6 @@ GLOBAL_LIST_INIT(clash_support_shop, list(
 			return list(list(GLOB.cm_vending_gear_tl, CLASH_SHOP_POINTS), list(GLOB.cm_vending_clothing_tl, CLASH_SHOP_POINTS))
 		if(JOB_SQUAD_LEADER)
 			return list(list(GLOB.cm_vending_gear_leader, CLASH_SHOP_POINTS), list(GLOB.cm_vending_clothing_leader, CLASH_SHOP_POINTS))
-		if(JOB_CARGO_TECH, JOB_UPP_SUPPLY)
-			return list(list(GLOB.clash_support_shop, CLASH_SHOP_POINTS))
 	if(clash_kit_faction_for_job(job) != FACTION_UPP)
 		return list()
 	var/datum/job/role = GLOB.RoleAuthority.roles_by_name[job]
@@ -36,6 +32,29 @@ GLOBAL_LIST_INIT(clash_support_shop, list(
 	if(!preset)
 		return list()
 	return list(list(preset.get_antag_gear_equipment(), CLASH_SHOP_POINTS), list(preset.get_antag_clothing_equipment(), CLASH_SHOP_POINTS))
+
+/proc/clash_list_contents(obj/item/holder)
+	. = list()
+	if(!isstorage(holder))
+		return
+	var/list/counts = list()
+	for(var/obj/item/thing in holder.contents)
+		var/thing_name = capitalize(strip_improper(thing.name))
+		counts[thing_name] = (counts[thing_name] || 0) + 1
+	for(var/thing_name in counts)
+		. += counts[thing_name] > 1 ? "[thing_name] x[counts[thing_name]]" : thing_name
+
+/proc/clash_type_contents(item_type)
+	if(!ispath(item_type, /obj/item/storage))
+		return list()
+	if(isnull(GLOB.clash_item_contents[item_type]))
+		var/obj/item/storage/sample = new item_type
+		GLOB.clash_item_contents[item_type] = clash_list_contents(sample)
+		qdel(sample)
+	return GLOB.clash_item_contents[item_type]
+
+/proc/clash_is_extended_magazine(item_type)
+	return ispath(item_type, /obj/item/ammo_magazine) && findtext("[item_type]/", "/extended/")
 
 /proc/get_clash_shop(job)
 	if(GLOB.clash_kit_shops[job])
@@ -52,6 +71,11 @@ GLOBAL_LIST_INIT(clash_support_shop, list(
 			var/list/item = list("id" = "[ammo_type]", "name" = capitalize(strip_improper(initial(ammo_type.name))), "cost" = CLASH_SHOP_AMMO_COST, "pool" = CLASH_SHOP_POINTS, "icon" = "[initial(ammo_type.icon)]", "icon_state" = initial(ammo_type.icon_state))
 			ammo_items += list(item)
 			by_id["[ammo_type]"] = item
+	var/list/role_ammo = GLOB.clash_role_shop_ammo[job]
+	for(var/obj/item/ammo_type as anything in role_ammo)
+		var/list/item = list("id" = "[ammo_type]", "name" = capitalize(strip_improper(initial(ammo_type.name))), "cost" = role_ammo[ammo_type], "pool" = CLASH_SHOP_POINTS, "icon" = "[initial(ammo_type.icon)]", "icon_state" = initial(ammo_type.icon_state))
+		ammo_items += list(item)
+		by_id["[ammo_type]"] = item
 	if(length(ammo_items))
 		sections += list(list("name" = "Weapon ammo", "items" = ammo_items))
 	for(var/list/source in get_clash_shop_sources(job))
@@ -66,10 +90,10 @@ GLOBAL_LIST_INIT(clash_support_shop, list(
 				sections += list(section)
 				continue
 			var/id = "[entry_type]"
-			if(!section || entry[4] || entry[2] <= 0 || !ispath(entry_type, /obj/item) || by_id[id] || (ispath(entry_type, /obj/item/ammo_magazine) && findtext("[entry_type]/", "/ap/")))
+			if(!section || entry[4] || entry[2] <= 0 || !ispath(entry_type, /obj/item) || by_id[id] || (ispath(entry_type, /obj/item/ammo_magazine) && findtext("[entry_type]/", "/ap/")) || clash_is_extended_magazine(entry_type))
 				continue
 			var/obj/item/sample = entry_type
-			var/list/item = list("id" = id, "name" = entry[1], "cost" = entry[2], "pool" = source[2], "icon" = "[initial(sample.icon)]", "icon_state" = initial(sample.icon_state))
+			var/list/item = list("id" = id, "name" = entry[1], "cost" = entry[2], "pool" = source[2], "icon" = "[initial(sample.icon)]", "icon_state" = initial(sample.icon_state), "contents" = clash_type_contents(entry_type))
 			section["items"] += list(item)
 			by_id[id] = item
 	for(var/list/section as anything in sections.Copy())
@@ -104,14 +128,23 @@ GLOBAL_LIST_INIT(clash_support_shop, list(
 		return suit.pockets
 	return null
 
+/proc/clash_kit_container_slots(mob/living/carbon/human/wearer)
+	. = list()
+	var/list/worn = list("back" = wearer.back, "belt" = wearer.belt, "l_store" = wearer.l_store, "r_store" = wearer.r_store, "suit" = wearer.wear_suit)
+	for(var/key in worn)
+		var/obj/item/storage/holder = clash_kit_storage_of(worn[key])
+		if(holder)
+			.[key] = holder
+	var/count = 0
+	for(var/obj/item/clothing/accessory/storage/webbing in wearer.w_uniform?.accessories)
+		count++
+		.[count > 1 ? "webbing_[count]" : "webbing"] = webbing.hold
+
 /proc/clash_kit_containers(mob/living/carbon/human/wearer)
 	. = list()
-	for(var/obj/item/worn in list(wearer.back, wearer.belt, wearer.l_store, wearer.r_store, wearer.wear_suit))
-		var/obj/item/storage/holder = clash_kit_storage_of(worn)
-		if(holder)
-			. += holder
-	for(var/obj/item/clothing/accessory/storage/webbing in wearer.w_uniform?.accessories)
-		. += webbing.hold
+	var/list/holders = clash_kit_container_slots(wearer)
+	for(var/key in holders)
+		. += holders[key]
 
 /proc/clash_kit_carried(mob/living/carbon/human/wearer, obj/item/thing)
 	var/atom/holder = thing.loc
@@ -126,6 +159,8 @@ GLOBAL_LIST_INIT(clash_support_shop, list(
 			continue
 		qdel(given)
 	wearer.clash_kit_extras = list()
+	wearer.clash_kit_placed = list()
+	var/list/holders = clash_kit_container_slots(wearer)
 	var/list/containers = clash_kit_containers(wearer)
 	if(mode == CLASH_KIT_SPAWN || mode == CLASH_KIT_PREVIEW)
 		var/list/unwanted = kit.removed.Copy()
@@ -136,57 +171,116 @@ GLOBAL_LIST_INIT(clash_support_shop, list(
 				unwanted -= "[thing.type]"
 				holder.remove_from_storage(thing, wearer)
 				qdel(thing)
-	. = list()
+	kit.sync_extra_slots()
+	var/list/statuses = new /list(length(kit.extras))
 	var/list/by_id = get_clash_shop(job)["by_id"]
 	var/list/limits = clash_shop_budget(ckey, job)
 	var/list/spent = list(CLASH_SHOP_POINTS = 0, CLASH_SHOP_SNOWFLAKE = 0)
 	var/obj/item/weapon/gun/primary = clash_kit_primary_of(wearer)
-	for(var/id in kit.extras)
+	var/list/order = list()
+	for(var/index in 1 to length(kit.extras))
+		if(kit.extra_slots[index])
+			order += index
+	for(var/index in 1 to length(kit.extras))
+		if(!kit.extra_slots[index])
+			order += index
+	for(var/index in order)
+		var/id = kit.extras[index]
 		var/list/item = by_id[id]
 		if(!item)
-			. += "gone"
+			statuses[index] = "gone"
 			continue
 		if(!clash_shop_item_unlocked(ckey, job, item["cost"], text2path(id), primary?.type))
-			. += "locked"
+			statuses[index] = "locked"
 			continue
 		var/snowflake = item["pool"] == CLASH_SHOP_SNOWFLAKE
 		if((snowflake ? wearer.vendor_snowflake_points : wearer.vendor_points) < item["cost"] || (limits && spent[item["pool"]] + item["cost"] > limits[snowflake ? 2 : 1]))
-			. += "points"
+			statuses[index] = "points"
 			continue
 		var/item_type = text2path(id)
 		var/obj/item/bought = new item_type
-		var/placed = FALSE
-		for(var/obj/item/storage/holder as anything in containers)
+		var/list/tries = containers.Copy()
+		var/wanted = kit.extra_slots[index]
+		var/obj/item/storage/target = wanted && holders[wanted]
+		if(target)
+			tries -= target
+			tries.Insert(1, target)
+		var/obj/item/storage/placed
+		for(var/obj/item/storage/holder as anything in tries)
 			if(holder.can_be_inserted(bought, wearer, TRUE) && holder.handle_item_insertion(bought, TRUE, wearer))
-				placed = TRUE
+				placed = holder
 				break
 		if(!placed)
 			qdel(bought)
-			. += "room"
+			statuses[index] = "room"
 			continue
 		if(snowflake)
 			wearer.vendor_snowflake_points -= item["cost"]
 		else
 			wearer.vendor_points -= item["cost"]
 		spent[item["pool"]] += item["cost"]
-		wearer.clash_kit_extras[WEAKREF(bought)] = item
-		. += "ok"
+		wearer.clash_kit_extras[WEAKREF(bought)] = index
+		for(var/key in holders)
+			if(holders[key] == placed)
+				wearer.clash_kit_placed["[index]"] = key
+		statuses[index] = "ok"
+	return statuses
+
+/proc/apply_clash_kit_moves(mob/living/carbon/human/wearer, datum/clash_kit/kit)
+	. = list()
+	var/list/holders = clash_kit_container_slots(wearer)
+	var/list/bought = list()
+	for(var/datum/weakref/given_ref as anything in wearer.clash_kit_extras)
+		bought += given_ref.resolve()
+	for(var/index in 1 to length(kit.moves))
+		var/list/move = kit.moves[index]
+		var/obj/item/storage/source = holders[move[2]]
+		var/obj/item/storage/target = holders[move[3]]
+		var/item_type = text2path(move[1])
+		if(!source || !target || !item_type)
+			continue
+		var/obj/item/moving
+		for(var/obj/item/thing in source.contents)
+			if(thing.type == item_type && !(thing in bought))
+				moving = thing
+				break
+		if(!moving)
+			continue
+		if(!target.can_be_inserted(moving, wearer, TRUE))
+			. += index
+			continue
+		source.remove_from_storage(moving, wearer)
+		target.handle_item_insertion(moving, TRUE, wearer)
 
 /proc/describe_clash_kit_pack(mob/living/carbon/human/wearer, datum/clash_kit/kit, obj/item/weapon/gun/primary)
 	. = list()
 	var/list/shells = primary && clash_kit_shells_for(primary)
 	var/list/extras = list()
 	for(var/datum/weakref/given_ref as anything in wearer.clash_kit_extras)
-		extras += given_ref.resolve()
-	for(var/obj/item/storage/holder as anything in clash_kit_containers(wearer))
+		var/obj/item/given = given_ref.resolve()
+		if(given)
+			extras[given] = wearer.clash_kit_extras[given_ref]
+	var/list/holders = clash_kit_container_slots(wearer)
+	for(var/key in holders)
+		var/obj/item/storage/holder = holders[key]
 		var/list/items = list()
 		var/used = 0
+		var/count = 0
 		for(var/obj/item/thing as anything in holder.contents)
-			used += thing.get_storage_cost()
-			items += list(list("type" = "[thing.type]", "name" = thing.name, "icon" = "[thing.icon]", "icon_state" = thing.icon_state, "extra" = (thing in extras)))
+			var/extra_index = extras[thing] || 0
+			var/unassigned = extra_index && !LAZYACCESS(kit?.extra_slots, extra_index)
+			if(!unassigned)
+				used += thing.get_storage_cost()
+				count++
+			var/list/fits = unassigned ? list(key) : list()
+			for(var/other_key in holders)
+				var/obj/item/storage/other = holders[other_key]
+				if(other != holder && other.can_be_inserted(thing, wearer, TRUE))
+					fits += other_key
+			items += list(list("type" = "[thing.type]", "name" = thing.name, "icon" = "[thing.icon]", "icon_state" = thing.icon_state, "extra" = !!extra_index, "extra_index" = extra_index, "unassigned" = unassigned, "fits" = fits, "contents" = clash_list_contents(thing)))
 		var/label = istype(holder, /obj/item/storage/internal) ? "[holder.name] pockets" : holder.name
-		var/capacity = isnull(holder.storage_slots) ? "[used]/[holder.max_storage_space]" : "[length(holder.contents)]/[holder.storage_slots]"
-		var/list/entry = list("name" = capitalize(label), "capacity" = capacity, "items" = items, "type" = "[holder.type]")
+		var/capacity = isnull(holder.storage_slots) ? "[used]/[holder.max_storage_space]" : "[count]/[holder.storage_slots]"
+		var/list/entry = list("name" = capitalize(label), "capacity" = capacity, "items" = items, "type" = "[holder.type]", "slot" = key)
 		if(shells && clash_kit_holds_ammo(holder) && holder.can_hold_type(shells[shells[1]], wearer))
 			entry["shells"] = GLOB.clash_kit_shell_names
 			entry["fill"] = kit?.fills["[holder.type]"] || GLOB.clash_kit_shell_names[1]

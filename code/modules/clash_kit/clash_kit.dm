@@ -1,3 +1,6 @@
+#define CLASH_DOLL_MARKER "#ff00fe"
+#define CLASH_DOLL_MARKER_LAYER 1000
+
 GLOBAL_LIST_EMPTY(clash_kits)
 GLOBAL_LIST_EMPTY(clash_active_kits)
 GLOBAL_LIST_EMPTY(clash_kit_issue_items)
@@ -9,9 +12,39 @@ GLOBAL_LIST_EMPTY(clash_kit_issue_pending)
 	var/list/extras = list()
 	var/list/removed = list()
 	var/list/fills = list()
+	var/list/extra_slots = list()
+	var/list/moves = list()
 
 /datum/clash_kit/proc/get_option(slot)
 	return get_clash_kit_option(choices[slot])
+
+/datum/clash_kit/proc/sync_extra_slots()
+	extra_slots.len = length(extras)
+
+/datum/clash_kit/proc/add_extra(id)
+	extras += id
+	sync_extra_slots()
+
+/datum/clash_kit/proc/remove_extra(index)
+	sync_extra_slots()
+	extras.Cut(index, index + 1)
+	extra_slots.Cut(index, index + 1)
+
+/datum/clash_kit/proc/copy_from(datum/clash_kit/source)
+	choices = source.choices.Copy()
+	extras = source.extras.Copy()
+	extra_slots = source.extra_slots.Copy()
+	removed = source.removed.Copy()
+	fills = source.fills.Copy()
+	moves = source.moves.Copy()
+
+/datum/clash_kit/proc/clear()
+	choices = list()
+	extras = list()
+	extra_slots = list()
+	removed = list()
+	fills = list()
+	moves = list()
 
 GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 
@@ -100,7 +133,8 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 	for(var/job in by_job)
 		var/list/stored = list()
 		for(var/datum/clash_kit/kit as anything in by_job[job])
-			stored += list(list("name" = kit.name, "choices" = kit.choices, "extras" = kit.extras, "removed" = kit.removed, "fills" = kit.fills))
+			kit.sync_extra_slots()
+			stored += list(list("name" = kit.name, "choices" = kit.choices, "extras" = kit.extras, "extra_slots" = kit.extra_slots, "removed" = kit.removed, "fills" = kit.fills, "moves" = kit.moves))
 		payload[job] = stored
 	var/savefile/save = new(clash_kit_path(ckey))
 	save.cd = "/"
@@ -141,9 +175,18 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 					id = clash_kit_option_id(clash_kit_faction_for_job(job), slot, text2path(id))
 				if(get_clash_kit_option(id))
 					kit.choices[slot] = id
-			for(var/extra in stored["extras"])
-				if(ispath(text2path(extra), /obj/item))
-					kit.extras += extra
+			var/list/stored_slots = stored["extra_slots"]
+			var/list/stored_extras = stored["extras"]
+			for(var/index in 1 to length(stored_extras))
+				if(!ispath(text2path(stored_extras[index]), /obj/item))
+					continue
+				kit.add_extra(stored_extras[index])
+				var/wanted = LAZYACCESS(stored_slots, index)
+				if(istext(wanted))
+					kit.extra_slots[length(kit.extra_slots)] = wanted
+			for(var/list/move in stored["moves"])
+				if(length(move) == 3 && ispath(text2path(move[1]), /obj/item) && istext(move[2]) && istext(move[3]))
+					kit.moves += list(move)
 			for(var/unwanted in stored["removed"])
 				if(ispath(text2path(unwanted), /obj/item))
 					kit.removed += unwanted
@@ -233,6 +276,15 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 		qdel(old)
 	return TRUE
 
+/proc/clash_kit_fit_sidearm_attachments(mob/living/carbon/human/wearer, obj/item/weapon/gun/gun, datum/clash_kit/kit, ckey, job, check_locks)
+	for(var/gun_slot in GLOB.clash_kit_sidearm_attachment_slots)
+		var/datum/clash_kit_option/option = kit.get_option(GLOB.clash_kit_sidearm_attachment_slots[gun_slot])
+		if(!option || !clash_kit_attachment_fits(option.item_type, gun.type) || (check_locks && clash_option_lock_text(ckey, option.id, job, gun.type)))
+			continue
+		var/obj/item/attachable/attachment = new option.item_type(gun)
+		if(!clash_fit_attachment(gun, attachment, wearer, TRUE))
+			qdel(attachment)
+
 /proc/clash_kit_fit_webbing(mob/living/carbon/human/wearer, item_type, list/cosmetics)
 	var/obj/item/clothing/under/uniform = wearer.w_uniform
 	if(!uniform)
@@ -275,7 +327,8 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 	var/top = 0
 	for(var/x in 1 to width)
 		for(var/y in 1 to height)
-			if(!source.GetPixel(x, y))
+			var/pixel = source.GetPixel(x, y)
+			if(!pixel || (length(pixel) == 9 && text2num(copytext(pixel, 8), 16) < 16))
 				continue
 			left = min(left, x)
 			right = max(right, x)
@@ -284,6 +337,35 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 	if(right)
 		source.Crop(left, bottom, right, top)
 	return source
+
+/proc/clash_doll_icon(mob/living/carbon/human/model)
+	var/static/icon/marker_icon
+	if(!marker_icon)
+		marker_icon = icon('icons/effects/effects.dmi', "nothing")
+		marker_icon.DrawBox(CLASH_DOLL_MARKER, 1, 1)
+		marker_icon.DrawBox(CLASH_DOLL_MARKER, world.icon_size, world.icon_size)
+	var/image/marker = image(marker_icon, icon_state = icon_states(marker_icon)[1], layer = CLASH_DOLL_MARKER_LAYER)
+	model.overlays += marker
+	var/icon/flat = getFlatIcon(model, no_anim = TRUE)
+	model.overlays -= marker
+	var/left = 1
+	var/bottom = 1
+	if(flat.Width() != world.icon_size || flat.Height() != world.icon_size)
+		left = 0
+		for(var/x in 1 to flat.Width() - world.icon_size + 1)
+			for(var/y in 1 to flat.Height() - world.icon_size + 1)
+				if(lowertext(flat.GetPixel(x, y)) == CLASH_DOLL_MARKER && lowertext(flat.GetPixel(x + world.icon_size - 1, y + world.icon_size - 1)) == CLASH_DOLL_MARKER)
+					left = x
+					bottom = y
+					break
+			if(left)
+				break
+		if(!left)
+			return flat
+		flat.Crop(left, bottom, left + world.icon_size - 1, bottom + world.icon_size - 1)
+	flat.DrawBox(null, 1, 1)
+	flat.DrawBox(null, world.icon_size, world.icon_size)
+	return flat
 
 /proc/clash_kit_primary_of(mob/living/carbon/human/wearer)
 	var/obj/item/weapon/gun/stored = wearer.s_store
@@ -490,6 +572,7 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 	if(issue_primary)
 		wearer.temp_drop_inv_item(issue_primary, TRUE)
 		issue_primary.forceMove(wearer)
+	clash_swap_issued_flare_pouches(wearer)
 	for(var/slot in GLOB.clash_kit_worn_slots)
 		var/datum/clash_kit_option/option = kit.get_option(slot)
 		if(!option || option.faction != faction)
@@ -532,8 +615,13 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 	if(sidearm)
 		clash_kit_purge_guns(wearer, TRUE)
 		var/obj/item/weapon/gun/side_gun = new sidearm.item_type(wearer)
+		clash_kit_fit_sidearm_attachments(wearer, side_gun, kit, ckey, job, FALSE)
 		if(!(wearer.belt && wearer.equip_to_slot_if_possible(side_gun, WEAR_IN_BELT, TRUE, FALSE, TRUE)) && !wearer.equip_to_appropriate_slot(side_gun))
 			clash_kit_hand_or_floor(wearer, side_gun)
+	else
+		var/obj/item/weapon/gun/issued_sidearm = clash_kit_sidearm_of(wearer)
+		if(issued_sidearm)
+			clash_kit_fit_sidearm_attachments(wearer, issued_sidearm, chosen, ckey, job, TRUE)
 	if(primary || sidearm)
 		clash_kit_purge_stray_magazines(wearer)
 	clash_swap_issued_medpouches(wearer)
@@ -550,6 +638,9 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 				qdel(grenade)
 	if(clash_fast_medicine())
 		clash_remove_arena_items(wearer)
+		if(clash_job_is_medic(job))
+			clash_strip_medic_kit(wearer)
+	clash_swap_extended_magazines(wearer)
 	if(mode != CLASH_KIT_PREVIEW)
 		clash_engrave_guns(wearer, ckey)
 	clash_strip_locked_attachments(wearer, ckey)
@@ -558,6 +649,7 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 		clash_give_extra_grenade(wearer)
 	clash_kit_fill_ammo(wearer, kit, mode)
 	. = stock_clash_kit(wearer, kit, job, mode, ckey)
+	wearer.clash_kit_move_failed = apply_clash_kit_moves(wearer, kit)
 	wearer.regenerate_icons()
 
 /proc/clash_cosmetic_paths(datum/preferences/prefs)
@@ -590,6 +682,38 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 	apply_clash_kit(fighter, kit, CLASH_KIT_SPAWN)
 	clash_issue_medic_gear(fighter)
 	clash_issue_engineer_gear(fighter)
+
+/proc/clash_swap_issued_flare_pouches(mob/living/carbon/human/wearer)
+	for(var/wear_slot in list(WEAR_L_STORE, WEAR_R_STORE))
+		if(istype(wearer.get_item_by_slot(wear_slot), /obj/item/storage/pouch/flare))
+			clash_kit_replace_worn(wearer, wear_slot, /obj/item/storage/pouch/magazine)
+
+/proc/clash_swap_extended_magazines(mob/living/carbon/human/wearer)
+	for(var/obj/item/ammo_magazine/extended in wearer.get_contents())
+		if(!clash_is_extended_magazine(extended.type))
+			continue
+		var/regular_type = text2path(replacetext("[extended.type]", "/extended", ""))
+		if(!ispath(regular_type, /obj/item/ammo_magazine))
+			continue
+		var/atom/holder = extended.loc
+		var/obj/item/ammo_magazine/regular = new regular_type
+		if(isgun(holder))
+			var/obj/item/weapon/gun/loaded = holder
+			loaded.current_mag = regular
+			regular.forceMove(loaded)
+			qdel(extended)
+			loaded.update_icon()
+			continue
+		if(isstorage(holder))
+			var/obj/item/storage/storage = holder
+			storage.remove_from_storage(extended, wearer)
+			qdel(extended)
+			if(storage.can_be_inserted(regular, wearer, TRUE) && storage.handle_item_insertion(regular, TRUE, wearer))
+				continue
+		else
+			qdel(extended)
+		if(!wearer.equip_to_appropriate_slot(regular))
+			qdel(regular)
 
 /proc/clash_swap_issued_medpouches(mob/living/carbon/human/wearer)
 	for(var/wear_slot in list(WEAR_L_STORE, WEAR_R_STORE))
@@ -642,6 +766,7 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 			model.faction = clash_kit_faction_for_job(job)
 			arm_equipment(model, role.gear_preset, FALSE, FALSE, null, TRUE)
 			issue_clash_role_kit(model, job)
+			clash_swap_issued_flare_pouches(model)
 			if(clash_fast_medicine())
 				clash_swap_issued_medpouches(model)
 			for(var/slot in GLOB.clash_kit_worn_slots)
@@ -653,11 +778,10 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 				if(found[slot])
 					continue
 				found[slot] = describe_clash_kit_item(gun)
-				if(slot == KIT_SLOT_PRIMARY)
-					for(var/attachment_slot in GLOB.clash_kit_attachment_slots)
-						var/list/info = describe_clash_kit_item(gun.attachments[attachment_slot])
-						if(info)
-							found[attachment_slot] = info
+				for(var/attachment_slot in GLOB.clash_kit_attachment_slots)
+					var/list/info = describe_clash_kit_item(gun.attachments[attachment_slot])
+					if(info)
+						found[slot == KIT_SLOT_PRIMARY ? attachment_slot : GLOB.clash_kit_sidearm_attachment_slots[attachment_slot]] = info
 			var/obj/item/clothing/accessory/storage/issued_webbing = locate() in model.w_uniform?.accessories
 			if(issued_webbing)
 				found[KIT_SLOT_WEBBING] = describe_clash_kit_item(issued_webbing)
@@ -700,15 +824,21 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 		clash_raise_vendor_points(model, ckey, job)
 		var/list/statuses = apply_clash_kit(model, kit, CLASH_KIT_PREVIEW, job, prefs, ckey)
 		if(!draw)
+			. = list("statuses" = statuses, "placed" = model.clash_kit_placed, "moves_failed" = model.clash_kit_move_failed)
 			qdel(model)
-			return list("statuses" = statuses)
+			return
 		for(var/obj/limb/limb in model.limbs)
 			limb.blocks_emissive = EMISSIVE_BLOCK_NONE
 		model.regenerate_icons()
-		var/icon/flat = getFlatIcon(model, no_anim = TRUE)
+		var/icon/flat = clash_doll_icon(model)
 		var/obj/item/weapon/gun/primary = clash_kit_primary_of(model)
 		var/icon/gun_flat = primary && clash_trim_icon(getFlatIcon(primary, no_anim = TRUE))
-		. = list("doll" = flat ? icon2base64(flat) : null, "gun" = gun_flat ? icon2base64(gun_flat) : null, "pack" = describe_clash_kit_pack(model, kit, primary), "statuses" = statuses)
+		var/obj/item/weapon/gun/sidearm = clash_kit_sidearm_of(model)
+		var/icon/sidearm_flat = sidearm && clash_trim_icon(getFlatIcon(sidearm, no_anim = TRUE))
+		. = list("doll" = flat ? icon2base64(flat) : null, "gun" = gun_flat ? icon2base64(gun_flat) : null, "sidearm" = sidearm_flat ? icon2base64(sidearm_flat) : null, "pack" = describe_clash_kit_pack(model, kit, primary), "statuses" = statuses)
 	catch(var/exception/error)
 		stack_trace("Clash kit could not draw a [job] doll: [error]")
 	qdel(model)
+
+#undef CLASH_DOLL_MARKER
+#undef CLASH_DOLL_MARKER_LAYER

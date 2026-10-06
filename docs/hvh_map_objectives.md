@@ -92,6 +92,27 @@ What players see on a timed move:
 - If either is missing or unusable, or they are too close, both stands are placed automatically.
 - A flag away from its stand, carried or dropped, shows on everyone's radar at any range.
 
+## Painted zones
+
+- Paint the zone's tiles with an objective zone area: `/area/clash_arena/<map>/battlefield/zone_1`
+  to `zone_6` (`<map>` is `tdm_deathmatch2000`, `tdm_jungle` or `tdm_kutjevo`). In StrongDMM they show
+  as yellow, green, purple, blue, red and dark yellow. In game they read "Objective Zone 1" and so on.
+- Put the usual marker (`koth_primary`, `domination_zone/a` ...) on a tile inside that area. The zone
+  is then exactly the area's tiles and the marker's `radius` is ignored. The label sits on the marker.
+- Each zone needs its own area number. A KOTH hill and a Domination zone may share one area.
+- A marker outside any zone area keeps the round `radius` zone.
+- Walls inside a zone count: once destroyed, standing there captures.
+- Kutjevo maps: `/area/clash_arena/tdm_kutjevo/battlefield` replaces the Kutjevo exterior areas
+  (no ceiling, same as the other maps' battlefields).
+
+## TDM bot rally
+
+- `/obj/effect/landmark/clash_bot_rally/uscm` (blue X) and `/upp` (red X): bots of that side walk to
+  the rally and hold within 6 tiles of it instead of holding their spawner.
+- With several rallies for one side, each new bot picks the one with the fewest bots.
+- Only used in modes without objectives (TDM). In KOTH, Domination and CTF bots go to the objectives.
+- Without a rally for its side a bot holds around its own spawner.
+
 ## Fallback
 
 | Situation | Result |

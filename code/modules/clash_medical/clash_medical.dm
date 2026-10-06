@@ -14,6 +14,8 @@
 #define CLASH_BURST_OXY 5
 #define CLASH_OD_DAMAGE 8
 #define CLASH_OD_CRITICAL_DAMAGE 16
+#define CLASH_SHRAPNEL_SLOW 0.4
+#define CLASH_SHRAPNEL_SLOW_MAX 1.6
 
 GLOBAL_LIST_INIT(clash_med_bursts, list(
 	"bicaridine" = list(5, 5, 0, 0, 0),
@@ -117,7 +119,40 @@ GLOBAL_LIST_INIT(clash_adv_firstaid_stock, list(
 		SPAN_NOTICE(self ? "[user] digs the shrapnel out of \his [limbs] with \his [name]." : "[user] digs the shrapnel out of [embedded_human]'s [limbs] with \his [name]."))
 	if(!embedded_human.stat && embedded_human.pain.feels_pain && embedded_human.pain.reduction_pain < PAIN_REDUCTION_HEAVY)
 		INVOKE_ASYNC(embedded_human, TYPE_PROC_REF(/mob, emote), "me", 1, pick("winces.", "grimaces.", "flinches."))
+	embedded_human.recalculate_move_delay = TRUE
 	SEND_SIGNAL(embedded_human, COMSIG_HUMAN_SHRAPNEL_REMOVED)
+
+/mob/living/carbon/human/movement_delay()
+	. = ..()
+	if(!length(embedded_items) || !clash_fast_medicine())
+		return
+	var/pieces = 0
+	for(var/obj/item/shard/shrapnel/shard in embedded_items)
+		pieces += shard.count
+	if(!pieces)
+		return
+	var/slow = min(pieces * CLASH_SHRAPNEL_SLOW, CLASH_SHRAPNEL_SLOW_MAX)
+	. += slow
+	move_delay += slow
+
+GLOBAL_LIST_INIT(clash_medic_stripped_items, list(
+	/obj/item/device/defibrillator,
+	/obj/item/storage/firstaid/regular,
+	/obj/item/storage/firstaid/adv,
+	/obj/item/tool/surgery/surgical_line,
+	/obj/item/tool/surgery/synthgraft,
+))
+
+/proc/clash_strip_medic_kit(mob/living/carbon/human/medic)
+	for(var/obj/item/carried in medic.get_contents())
+		if(carried.type in GLOB.clash_medic_stripped_items)
+			qdel(carried)
+
+/obj/item/stack/medical/splint/Initialize(mapload, amount)
+	. = ..()
+	if(indestructible_splints && !istype(src, /obj/item/stack/medical/splint/nano))
+		icon_state = initial(icon_state)
+		update_icon()
 
 /proc/clash_stock(atom/holder, list/stock)
 	for(var/item_type in stock)
@@ -517,3 +552,5 @@ GLOBAL_LIST_INIT(clash_adv_firstaid_stock, list(
 #undef CLASH_BURST_BURN
 #undef CLASH_BURST_TOX
 #undef CLASH_BURST_OXY
+#undef CLASH_SHRAPNEL_SLOW
+#undef CLASH_SHRAPNEL_SLOW_MAX

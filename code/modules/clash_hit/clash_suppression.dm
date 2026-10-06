@@ -1,17 +1,20 @@
 #define CLASH_SUPPRESSION_MAX 100
-#define CLASH_SUPPRESSION_NEAR_MISS 12
-#define CLASH_SUPPRESSION_HIT 25
-#define CLASH_SUPPRESSION_FIRE 20
-#define CLASH_SUPPRESSION_BLAST_MAX 40
+#define CLASH_SUPPRESSION_NEAR_MISS 18
+#define CLASH_SUPPRESSION_HIT 35
+#define CLASH_SUPPRESSION_FIRE 30
+#define CLASH_SUPPRESSION_BLAST_MAX 60
 #define CLASH_SUPPRESSION_HOLD (1.5 SECONDS)
 #define CLASH_SUPPRESSION_DECAY 15
-#define CLASH_SUPPRESSION_DESATURATE 0.25
+#define CLASH_SUPPRESSION_DESATURATE 0.6
+#define CLASH_SUPPRESSION_DARKEN 0.45
 #define CLASH_SUPPRESSION_PULSE (4 DECISECONDS)
 #define CLASH_SUPPRESSION_PULSE_LOW 0.55
 #define CLASH_SUPPRESSION_RAMP (2 DECISECONDS)
 #define CLASH_SUPPRESSION_MISS_RADIUS 1.5
 #define CLASH_SUPPRESSION_OVERSHOOT 3
 #define CLASH_SUPPRESSION_STEADY 0.5
+#define CLASH_SUPPRESSION_SHAKE 0.1
+#define CLASH_SUPPRESSION_SHAKE_HEAVY 0.15
 #define CLASH_LOUD_TIME (3 SECONDS)
 
 /mob/living/carbon/human/var/clash_suppression = 0
@@ -30,7 +33,14 @@
 	return max(target.clash_suppression - CLASH_SUPPRESSION_DECAY * faded / (1 SECONDS), 0)
 
 /proc/clash_suppression_alpha(value)
-	return value > 0 ? min(value, 20) * 4.5 + value * 1.65 : 0
+	return value > 0 ? min(min(value, 20) * 7 + value * 1.15, 255) : 0
+
+/proc/clash_suppression_matrix(value)
+	var/list/matrix = color_matrix_saturation(1 - CLASH_SUPPRESSION_DESATURATE * value / CLASH_SUPPRESSION_MAX)
+	var/light = 1 - CLASH_SUPPRESSION_DARKEN * value / CLASH_SUPPRESSION_MAX
+	for(var/index in list(1, 2, 3, 5, 6, 7, 9, 10, 11))
+		matrix[index] *= light
+	return matrix
 
 /proc/clash_suppress(mob/living/carbon/human/target, amount)
 	if(!target.client || target.stat == DEAD || amount <= 0)
@@ -58,10 +68,11 @@
 		animate(alpha = 0, time = CLASH_SUPPRESSION_PULSE)
 	var/atom/movable/screen/plane_master/plate = target.hud_used?.plane_masters["[RENDER_PLANE_GAME]"]
 	if(plate)
-		plate.add_filter("clash_suppression", 10, color_matrix_filter(color_matrix_saturation(1 - CLASH_SUPPRESSION_DESATURATE * previous / CLASH_SUPPRESSION_MAX)))
-		animate(plate.get_filter("clash_suppression"), color = color_matrix_saturation(1 - CLASH_SUPPRESSION_DESATURATE * value / CLASH_SUPPRESSION_MAX), time = CLASH_SUPPRESSION_RAMP)
+		plate.add_filter("clash_suppression", 10, color_matrix_filter(clash_suppression_matrix(previous)))
+		animate(plate.get_filter("clash_suppression"), color = clash_suppression_matrix(value), time = CLASH_SUPPRESSION_RAMP)
 		animate(time = CLASH_SUPPRESSION_HOLD - CLASH_SUPPRESSION_RAMP)
-		animate(color = color_matrix_saturation(1), time = fade)
+		animate(color = clash_suppression_matrix(0), time = fade)
+	shake_camera(target, 2, value >= CLASH_SUPPRESSION_MAX / 2 ? CLASH_SUPPRESSION_SHAKE_HEAVY : CLASH_SUPPRESSION_SHAKE)
 	addtimer(CALLBACK(target, TYPE_PROC_REF(/mob/living/carbon/human, clash_suppression_end)), CLASH_SUPPRESSION_HOLD + fade + 1, TIMER_UNIQUE|TIMER_OVERRIDE|TIMER_NO_HASH_WAIT)
 
 /mob/living/carbon/human/proc/clash_suppression_end()
@@ -152,10 +163,13 @@
 #undef CLASH_SUPPRESSION_HOLD
 #undef CLASH_SUPPRESSION_DECAY
 #undef CLASH_SUPPRESSION_DESATURATE
+#undef CLASH_SUPPRESSION_DARKEN
 #undef CLASH_SUPPRESSION_PULSE
 #undef CLASH_SUPPRESSION_PULSE_LOW
 #undef CLASH_SUPPRESSION_RAMP
 #undef CLASH_SUPPRESSION_MISS_RADIUS
 #undef CLASH_SUPPRESSION_OVERSHOOT
 #undef CLASH_SUPPRESSION_STEADY
+#undef CLASH_SUPPRESSION_SHAKE
+#undef CLASH_SUPPRESSION_SHAKE_HEAVY
 #undef CLASH_LOUD_TIME

@@ -13,16 +13,23 @@
 #define KIT_SLOT_MUZZLE "muzzle"
 #define KIT_SLOT_UNDER "under"
 #define KIT_SLOT_STOCK "stock"
+#define KIT_SLOT_SIDE_RAIL "side_rail"
+#define KIT_SLOT_SIDE_MUZZLE "side_muzzle"
+#define KIT_SLOT_SIDE_UNDER "side_under"
+#define KIT_SLOT_SIDE_STOCK "side_stock"
 #define KIT_SLOT_WEBBING "webbing"
 #define KIT_SLOT_CLASS_PERK "class_perk"
 #define KIT_SLOT_GENERAL_PERK "general_perk"
 GLOBAL_LIST_INIT(clash_kit_worn_slots, list(KIT_SLOT_HELMET, KIT_SLOT_EYES, KIT_SLOT_ARMOR, KIT_SLOT_MASK, KIT_SLOT_BACK, KIT_SLOT_BELT, KIT_SLOT_POUCH_L, KIT_SLOT_POUCH_R))
 GLOBAL_LIST_INIT(clash_kit_attachment_slots, list(KIT_SLOT_RAIL, KIT_SLOT_MUZZLE, KIT_SLOT_UNDER, KIT_SLOT_STOCK))
+GLOBAL_LIST_INIT(clash_kit_sidearm_attachment_slots, list(KIT_SLOT_RAIL = KIT_SLOT_SIDE_RAIL, KIT_SLOT_MUZZLE = KIT_SLOT_SIDE_MUZZLE, KIT_SLOT_UNDER = KIT_SLOT_SIDE_UNDER, KIT_SLOT_STOCK = KIT_SLOT_SIDE_STOCK))
 #define CLASH_KIT_COUNT 7
 #define CLASH_KIT_SPAWN "spawn"
 #define CLASH_KIT_RESET "reset"
 #define CLASH_KIT_PREVIEW "preview"
 #define CLASH_KIT_FILL_LIMIT 30
+#define CLASH_KIT_MOVE_LIMIT 40
+#define CLASH_ATTACHMENT_EFFECTS_SHOWN 5
 #define CLASH_KIT_SPARE_PRIMARY 4
 #define CLASH_KIT_SPARE_SIDEARM 3
 #define CLASH_SHOP_POINTS "points"
@@ -45,6 +52,10 @@ GLOBAL_LIST_INIT(clash_kit_slots, list(
 	KIT_SLOT_MUZZLE = list("name" = "Muzzle", "image" = null, "wear" = null),
 	KIT_SLOT_UNDER = list("name" = "Underbarrel", "image" = null, "wear" = null),
 	KIT_SLOT_STOCK = list("name" = "Stock", "image" = null, "wear" = null),
+	KIT_SLOT_SIDE_RAIL = list("name" = "Rail", "image" = null, "wear" = null),
+	KIT_SLOT_SIDE_MUZZLE = list("name" = "Muzzle", "image" = null, "wear" = null),
+	KIT_SLOT_SIDE_UNDER = list("name" = "Underbarrel", "image" = null, "wear" = null),
+	KIT_SLOT_SIDE_STOCK = list("name" = "Stock", "image" = null, "wear" = null),
 	KIT_SLOT_WEBBING = list("name" = "Accessory", "image" = "inventory-uniform.png", "wear" = null),
 	KIT_SLOT_SENTRY = list("name" = "Sentry", "image" = null, "wear" = null),
 	KIT_SLOT_CLASS_PERK = list("name" = "Class perk", "image" = null, "wear" = null),
@@ -66,6 +77,27 @@ GLOBAL_LIST_INIT(clash_kit_shells, list(
 GLOBAL_LIST_INIT(clash_kit_shell_names, list("Buckshot", "Slug", "Flechette"))
 
 GLOBAL_LIST_EMPTY(clash_kit_options)
+GLOBAL_LIST_INIT(clash_attachment_purposes, list(
+	/obj/item/attachable/flashlight = "Light you can switch on",
+	/obj/item/attachable/flashlight/laser_light_combo = "Light and laser you can switch on",
+	/obj/item/attachable/magnetic_harness = "The gun snaps back to you when dropped",
+	/obj/item/attachable/scope = "Zooms in when you aim",
+	/obj/item/attachable/scope/mini = "Short zoom when you aim",
+	/obj/item/attachable/suppressor = "Quiet shots that Keen Ears can't hear",
+	/obj/item/attachable/bayonet = "Stab with the gun",
+	/obj/item/attachable/bipod = "Deploy it lying down or on cover for much better accuracy and less recoil. Worse when not deployed",
+	/obj/item/attachable/attached_gun = "Underbarrel weapon",
+	/obj/item/attachable/attached_gun/grenade = "Underslung grenade launcher",
+	/obj/item/attachable/attached_gun/shotgun = "Underslung shotgun",
+	/obj/item/attachable/attached_gun/flamer = "Underslung flamethrower",
+	/obj/item/attachable/attached_gun/extinguisher = "Sprays foam that puts out fires",
+	/obj/item/attachable/attached_gun/flare_launcher = "Fires flares",
+	/obj/item/attachable/attached_gun/flamer_nozzle = "Your flamer fires balls of burning gel instead of a stream",
+))
+GLOBAL_LIST_INIT(clash_attachment_purpose_only, list(/obj/item/attachable/bipod))
+GLOBAL_LIST_INIT(clash_attachment_names, list(
+	/obj/item/attachable/flashlight/under_barrel = "Underbarrel flashlight",
+))
 GLOBAL_LIST_EMPTY(clash_kit_menu)
 GLOBAL_LIST_EMPTY(clash_kit_gun_attachables)
 
@@ -83,7 +115,6 @@ GLOBAL_LIST_INIT(clash_kit_role_kits, list(
 	JOB_UPP_SPECIALIST = /datum/equipment_preset/upp/machinegunner/dressed,
 	JOB_UPP_LEADER = /datum/equipment_preset/upp/leader/dressed,
 	JOB_UPP_LT_DOKTOR = /datum/equipment_preset/upp/doctor/dressed,
-	JOB_UPP_SUPPLY = /datum/equipment_preset/upp/supply/dressed,
 ))
 
 /datum/equipment_preset/upp/soldier/dressed/rifleman
@@ -192,8 +223,90 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 		qdel(gun)
 	return allowed
 
+/proc/clash_attachment_purpose(attachment_type)
+	var/best_depth = 0
+	for(var/root in GLOB.clash_attachment_purposes)
+		var/depth = length("[root]")
+		if(depth > best_depth && ispath(attachment_type, root))
+			best_depth = depth
+			. = GLOB.clash_attachment_purposes[root]
+
+/proc/clash_attachment_effects(obj/item/attachable/sample)
+	. = list()
+	if(sample.damage_mod)
+		. += sample.damage_mod > 0 ? "damage up" : "damage down"
+	if(sample.accuracy_mod)
+		. += sample.accuracy_mod > 0 ? "accuracy up" : "accuracy down"
+	if(sample.recoil_mod)
+		. += sample.recoil_mod < 0 ? "recoil down" : "recoil up"
+	if(sample.scatter_mod)
+		. += sample.scatter_mod < 0 ? "scatter down" : "scatter up"
+	if(sample.burst_mod)
+		. += sample.burst_mod > 0 ? "longer bursts" : "shorter bursts"
+	if(sample.burst_scatter_mod)
+		. += sample.burst_scatter_mod < 0 ? "tighter bursts" : "wider bursts"
+	if(sample.bonus_proj_scatter_mod)
+		. += sample.bonus_proj_scatter_mod < 0 ? "tighter pellet spread" : "wider pellet spread"
+	if(sample.delay_mod)
+		. += sample.delay_mod < 0 ? "fires faster" : "fires slower"
+	if(sample.damage_falloff_mod)
+		. += sample.damage_falloff_mod < 0 ? "keeps damage at range" : "loses damage at range"
+	if(sample.range_max_mod > 0 || sample.projectile_max_range_mod > 0 || sample.velocity_mod > 0)
+		. += "longer reach"
+	if(sample.wield_delay_mod)
+		. += sample.wield_delay_mod > 0 ? "wields slower" : "wields faster"
+	if(sample.aim_speed_mod)
+		. += sample.aim_speed_mod > 0 ? "slower while aiming" : "faster while aiming"
+	var/one_handed = sample.accuracy_unwielded_mod - sample.scatter_unwielded_mod - sample.recoil_unwielded_mod - sample.movement_onehanded_acc_penalty_mod
+	if(one_handed)
+		. += one_handed > 0 ? "better one-handed" : "worse one-handed"
+	if(sample.size_mod > 0)
+		. += "bulkier"
+	if(sample.melee_mod)
+		. += sample.melee_mod > 0 ? "stronger melee" : "weaker melee"
+
+/proc/clash_attachment_blurb(attachment_type)
+	var/obj/item/attachable/sample = new attachment_type
+	var/list/effects = clash_attachment_effects(sample)
+	var/purpose = clash_attachment_purpose(attachment_type)
+	if(istype(sample, /obj/item/attachable/stock) && (sample.flags_attach_features & ATTACH_ACTIVATION))
+		purpose = "Unfold it for steadier aim, fold it to move and wield faster"
+		effects = list()
+	qdel(sample)
+	for(var/purpose_only in GLOB.clash_attachment_purpose_only)
+		if(ispath(attachment_type, purpose_only))
+			effects = list()
+	if(length(effects) > CLASH_ATTACHMENT_EFFECTS_SHOWN)
+		effects.Cut(CLASH_ATTACHMENT_EFFECTS_SHOWN + 1)
+	var/effect_text = length(effects) ? capitalize(jointext(effects, ", ")) : null
+	if(purpose && effect_text)
+		return "[purpose]. [effect_text]"
+	return purpose || effect_text || "No stat changes"
+
+/proc/describe_clash_attachment_options()
+	for(var/id in GLOB.clash_kit_options)
+		var/datum/clash_kit_option/option = GLOB.clash_kit_options[id]
+		if(!clash_is_attachment_slot(option.slot) || !ispath(option.item_type, /obj/item/attachable))
+			continue
+		option.blurb = clash_attachment_blurb(option.item_type)
+		var/better_name = GLOB.clash_attachment_names[option.item_type]
+		if(better_name)
+			option.name = better_name
+
 /proc/clash_kit_attachment_fits(attachment_type, gun_type)
 	return attachment_type in get_clash_gun_attachables(gun_type)
+
+/proc/clash_is_attachment_slot(slot)
+	return (slot in GLOB.clash_kit_attachment_slots) || clash_is_sidearm_attachment_slot(slot)
+
+/proc/clash_is_sidearm_attachment_slot(slot)
+	for(var/gun_slot in GLOB.clash_kit_sidearm_attachment_slots)
+		if(GLOB.clash_kit_sidearm_attachment_slots[gun_slot] == slot)
+			return TRUE
+	return FALSE
+
+/proc/clash_kit_slot_gun(datum/clash_kit/kit, job, slot)
+	return clash_is_sidearm_attachment_slot(slot) ? clash_effective_sidearm(kit, job) : clash_effective_primary(kit, job)
 
 /proc/build_clash_kit_catalog()
 	if(length(GLOB.clash_kit_options))
@@ -208,6 +321,7 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 	add_clash_perk_options(FACTION_UPP)
 	add_clash_kit_gun_attachments(FACTION_MARINE)
 	add_clash_kit_gun_attachments(FACTION_UPP)
+	describe_clash_attachment_options()
 	build_clash_weapon_tracks()
 
 /proc/add_clash_kit_gun_attachments(faction)
@@ -221,10 +335,21 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 				continue
 			if(GLOB.clash_kit_options[clash_kit_option_id(faction, initial(attachment.slot), attachment_type)])
 				continue
-			LAZYADD(fits_by_type[attachment_type], gun.name)
+			fits_by_type |= attachment_type
 	for(var/attachment_type in fits_by_type)
 		var/obj/item/attachable/attachment = attachment_type
-		add_clash_kit_option(faction, initial(attachment.slot), capitalize(initial(attachment.name)), attachment_type, "Fits the [english_list(fits_by_type[attachment_type])]")
+		add_clash_kit_option(faction, initial(attachment.slot), capitalize(strip_improper(initial(attachment.name))), attachment_type)
+	var/list/sidearm_fits = list()
+	for(var/datum/clash_kit_option/gun as anything in GLOB.clash_kit_menu[faction][KIT_SLOT_SIDEARM])
+		for(var/attachment_type in get_clash_gun_attachables(gun.item_type))
+			var/obj/item/attachable/attachment = attachment_type
+			if(ispath(attachment_type, /obj/item/attachable/bayonet) || !GLOB.clash_kit_sidearm_attachment_slots[initial(attachment.slot)])
+				continue
+			sidearm_fits |= attachment_type
+	for(var/attachment_type in sidearm_fits)
+		var/obj/item/attachable/attachment = attachment_type
+		var/datum/clash_kit_option/primary_option = GLOB.clash_kit_options[clash_kit_option_id(faction, initial(attachment.slot), attachment_type)]
+		add_clash_kit_option(faction, GLOB.clash_kit_sidearm_attachment_slots[initial(attachment.slot)], primary_option?.name || capitalize(strip_improper(initial(attachment.name))), attachment_type)
 
 /proc/build_clash_kit_shared(faction)
 	for(var/slot in list(KIT_SLOT_POUCH_L, KIT_SLOT_POUCH_R))
@@ -247,33 +372,33 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 		add_clash_kit_option(faction, slot, "Bayonet sheath", faction == FACTION_UPP ? /obj/item/storage/pouch/bayonet/upp : /obj/item/storage/pouch/bayonet, "Spare blade on the hip")
 	var/datum/clash_kit_option/goggles = add_clash_kit_option(faction, KIT_SLOT_EYES, "Welding goggles", /obj/item/clothing/glasses/welding, "Flip them down to weld without hurting your eyes")
 	goggles.only_class = GLOB.clash_job_classes[JOB_SQUAD_ENGI]
-	add_clash_kit_option(faction, KIT_SLOT_WEBBING, "Webbing", /obj/item/clothing/accessory/storage/webbing, "Chest rig for small gear")
-	add_clash_kit_option(faction, KIT_SLOT_WEBBING, "Black webbing", /obj/item/clothing/accessory/storage/webbing/black, "Chest rig for small gear")
-	add_clash_kit_option(faction, KIT_SLOT_WEBBING, "Brown webbing vest", /obj/item/clothing/accessory/storage/black_vest/brown_vest, "Vest with pockets")
-	add_clash_kit_option(faction, KIT_SLOT_WEBBING, "Black webbing vest", /obj/item/clothing/accessory/storage/black_vest, "Vest with pockets")
+	add_clash_kit_option(faction, KIT_SLOT_WEBBING, "Black webbing", /obj/item/clothing/accessory/storage/webbing/black, "3-slot chest rig for small gear. Fits magazines.")
+	add_clash_kit_option(faction, KIT_SLOT_WEBBING, "Brown webbing", /obj/item/clothing/accessory/storage/webbing, "3-slot chest rig for small gear. Fits magazines.")
+	add_clash_kit_option(faction, KIT_SLOT_WEBBING, "Brown webbing vest", /obj/item/clothing/accessory/storage/black_vest/brown_vest, "5-slot vest for small gear.")
+	add_clash_kit_option(faction, KIT_SLOT_WEBBING, "Black webbing vest", /obj/item/clothing/accessory/storage/black_vest, "5-slot vest for small gear.")
 	add_clash_kit_option(faction, KIT_SLOT_WEBBING, "Drop pouch", /obj/item/clothing/accessory/storage/droppouch, "Loose items up to medium size")
 	add_clash_kit_option(faction, KIT_SLOT_WEBBING, "Black drop pouch", /obj/item/clothing/accessory/storage/droppouch/black, "Loose items up to medium size")
 	add_clash_kit_option(faction, KIT_SLOT_WEBBING, "Shoulder holster", /obj/item/clothing/accessory/storage/holster, "Carries a sidearm")
 	if(faction == FACTION_MARINE)
 		add_clash_kit_option(faction, KIT_SLOT_WEBBING, "Leg pouch", /obj/item/clothing/accessory/storage/black_vest/leg_pouch, "Pockets on the thigh")
 		add_clash_kit_option(faction, KIT_SLOT_WEBBING, "Black leg pouch", /obj/item/clothing/accessory/storage/black_vest/black_leg_pouch, "Pockets on the thigh")
-	add_clash_kit_option(faction, KIT_SLOT_RAIL, "Red dot sight", /obj/item/attachable/reddot, "Accuracy up")
-	add_clash_kit_option(faction, KIT_SLOT_RAIL, "Reflex sight", /obj/item/attachable/reflex, "Accuracy up, less than the red dot, no scatter penalty")
-	add_clash_kit_option(faction, KIT_SLOT_RAIL, "Rail flashlight", /obj/item/attachable/flashlight, "Light")
-	add_clash_kit_option(faction, KIT_SLOT_RAIL, "Magnetic harness", /obj/item/attachable/magnetic_harness, "The gun returns to you when dropped")
-	add_clash_kit_option(faction, KIT_SLOT_RAIL, "S4 2x mini scope", /obj/item/attachable/scope/mini, "Short zoom on aim")
-	add_clash_kit_option(faction, KIT_SLOT_MUZZLE, "Extended barrel", /obj/item/attachable/extended_barrel, "Damage and accuracy up, recoil up")
-	add_clash_kit_option(faction, KIT_SLOT_MUZZLE, "Suppressor", /obj/item/attachable/suppressor, "Quiet, hides you from Keen Ears, less recoil, less damage")
-	add_clash_kit_option(faction, KIT_SLOT_MUZZLE, "Recoil compensator", /obj/item/attachable/compensator, "Recoil and scatter down")
-	add_clash_kit_option(faction, KIT_SLOT_MUZZLE, faction == FACTION_UPP ? "Type 80 bayonet" : "M5 bayonet", faction == FACTION_UPP ? /obj/item/attachable/bayonet/upp : /obj/item/attachable/bayonet, "Melee with the gun")
-	add_clash_kit_option(faction, KIT_SLOT_UNDER, "Vertical grip", /obj/item/attachable/verticalgrip, "Recoil and scatter down, wield slower")
-	add_clash_kit_option(faction, KIT_SLOT_UNDER, "Angled grip", /obj/item/attachable/angledgrip, "Wield faster")
-	add_clash_kit_option(faction, KIT_SLOT_UNDER, "Flashlight grip", /obj/item/attachable/flashlight/grip, "Light and a little stability")
-	add_clash_kit_option(faction, KIT_SLOT_UNDER, "Laser sight", /obj/item/attachable/lasersight, "Hipfire accuracy up")
-	add_clash_kit_option(faction, KIT_SLOT_UNDER, "Underslung grenade launcher", /obj/item/attachable/attached_gun/grenade, "Two 40mm grenades")
-	add_clash_kit_option(faction, KIT_SLOT_STOCK, "Rifle stock", /obj/item/attachable/stock/rifle, "Recoil and scatter down, slower")
-	add_clash_kit_option(faction, KIT_SLOT_STOCK, "Folding rifle stock", /obj/item/attachable/stock/rifle/collapsible, "Fold it for speed, extend it for control")
-	add_clash_kit_option(faction, KIT_SLOT_STOCK, "Folding SMG stock", /obj/item/attachable/stock/smg/collapsible, "Same, for the SMG")
+	add_clash_kit_option(faction, KIT_SLOT_RAIL, "Red dot sight", /obj/item/attachable/reddot)
+	add_clash_kit_option(faction, KIT_SLOT_RAIL, "Reflex sight", /obj/item/attachable/reflex)
+	add_clash_kit_option(faction, KIT_SLOT_RAIL, "Rail flashlight", /obj/item/attachable/flashlight)
+	add_clash_kit_option(faction, KIT_SLOT_RAIL, "Magnetic harness", /obj/item/attachable/magnetic_harness)
+	add_clash_kit_option(faction, KIT_SLOT_RAIL, "S4 2x mini scope", /obj/item/attachable/scope/mini)
+	add_clash_kit_option(faction, KIT_SLOT_MUZZLE, "Extended barrel", /obj/item/attachable/extended_barrel)
+	add_clash_kit_option(faction, KIT_SLOT_MUZZLE, "Suppressor", /obj/item/attachable/suppressor)
+	add_clash_kit_option(faction, KIT_SLOT_MUZZLE, "Recoil compensator", /obj/item/attachable/compensator)
+	add_clash_kit_option(faction, KIT_SLOT_MUZZLE, faction == FACTION_UPP ? "Type 80 bayonet" : "M5 bayonet", faction == FACTION_UPP ? /obj/item/attachable/bayonet/upp : /obj/item/attachable/bayonet)
+	add_clash_kit_option(faction, KIT_SLOT_UNDER, "Vertical grip", /obj/item/attachable/verticalgrip)
+	add_clash_kit_option(faction, KIT_SLOT_UNDER, "Angled grip", /obj/item/attachable/angledgrip)
+	add_clash_kit_option(faction, KIT_SLOT_UNDER, "Flashlight grip", /obj/item/attachable/flashlight/grip)
+	add_clash_kit_option(faction, KIT_SLOT_UNDER, "Laser sight", /obj/item/attachable/lasersight)
+	add_clash_kit_option(faction, KIT_SLOT_UNDER, "Underslung grenade launcher", /obj/item/attachable/attached_gun/grenade)
+	add_clash_kit_option(faction, KIT_SLOT_STOCK, "Rifle stock", /obj/item/attachable/stock/rifle)
+	add_clash_kit_option(faction, KIT_SLOT_STOCK, "Folding rifle stock", /obj/item/attachable/stock/rifle/collapsible)
+	add_clash_kit_option(faction, KIT_SLOT_STOCK, "Folding SMG stock", /obj/item/attachable/stock/smg/collapsible)
 
 /proc/build_clash_kit_uscm()
 	var/faction = FACTION_MARINE
