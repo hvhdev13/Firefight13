@@ -1,4 +1,4 @@
-#define INACTIVITY_KICK 20 MINUTES
+#define INACTIVITY_KICK 60 MINUTES
 
 SUBSYSTEM_DEF(inactivity)
 	name = "Inactivity"

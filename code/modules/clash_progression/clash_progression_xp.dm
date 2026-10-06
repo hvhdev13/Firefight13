@@ -399,9 +399,10 @@
 		clash_credit_heal(medic, patient, before["damage"] - (patient.getBruteLoss() + patient.getFireLoss()))
 		return
 	var/obj/item/stack/medical/kit = before["kit"]
-	if(kit && (QDELETED(kit) || kit.amount < before["kit_amount"]))
+	var/healed = before["damage"] - (patient.getBruteLoss() + patient.getFireLoss())
+	if(kit && healed > 0 && (QDELETED(kit) || kit.amount < before["kit_amount"]))
 		clash_award_support_xp(medic, CLASH_XP_TREAT, CLASH_XP_SOURCE_HEALING, CLASH_XP_SOURCE_HEALING, CLASH_XP_MEDICAL_CAP)
-	clash_credit_heal(medic, patient, before["damage"] - (patient.getBruteLoss() + patient.getFireLoss()))
+	clash_credit_heal(medic, patient, healed)
 	var/list/splinted = before["splinted"]
 	for(var/obj/limb/limb as anything in patient.limbs)
 		if(!(limb.status & LIMB_SPLINTED) || !(limb.status & LIMB_BROKEN) || (limb in splinted) || limb.clash_splint_paid)

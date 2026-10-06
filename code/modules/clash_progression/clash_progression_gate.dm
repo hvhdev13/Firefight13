@@ -43,6 +43,14 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 	var/list/issued_gun = issue?[KIT_SLOT_PRIMARY]
 	return issued_gun ? text2path(issued_gun["type"]) : null
 
+/proc/clash_effective_sidearm(datum/clash_kit/kit, job)
+	var/datum/clash_kit_option/sidearm = kit?.get_option(KIT_SLOT_SIDEARM)
+	if(sidearm)
+		return sidearm.item_type
+	var/list/issue = get_clash_issue_items(job)
+	var/list/issued_gun = issue?[KIT_SLOT_SIDEARM]
+	return issued_gun ? text2path(issued_gun["type"]) : null
+
 /proc/clash_attachment_lock_text(datum/clash_progress/progress, attachment_type, gun_type)
 	var/track_type = clash_track_type(gun_type)
 	var/obj/item/weapon/gun/gun = track_type
@@ -115,6 +123,16 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 		var/needed = info ? levels?[text2path(info["type"])] : null
 		if(needed && level < needed)
 			. -= slot
+	var/list/issued_sidearm = issue[KIT_SLOT_SIDEARM]
+	var/sidearm_track = clash_track_type(issued_sidearm ? text2path(issued_sidearm["type"]) : null)
+	var/list/sidearm_levels = GLOB.clash_weapon_unlock_levels[sidearm_track]
+	var/sidearm_level = progress.weapon_level(sidearm_track)
+	for(var/gun_slot in GLOB.clash_kit_sidearm_attachment_slots)
+		var/slot = GLOB.clash_kit_sidearm_attachment_slots[gun_slot]
+		var/list/info = issue[slot]
+		var/needed = info ? sidearm_levels?[text2path(info["type"])] : null
+		if(needed && sidearm_level < needed)
+			. -= slot
 
 /proc/clash_option_unlocked(ckey, option_id, job, primary_type)
 	return !clash_option_lock_text(ckey, option_id, job, primary_type)
@@ -134,7 +152,7 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 	if(option.slot == KIT_SLOT_SENTRY)
 		var/level = GLOB.clash_sentry_tiers[clash_sentry_tier_of(option.item_type)]["level"]
 		return progress.class_level(CLASH_CLASS_ENGINEER) < level ? "Unlocks at Engineer level [level]" : null
-	if(option.slot in GLOB.clash_kit_attachment_slots)
+	if(clash_is_attachment_slot(option.slot))
 		if(!primary_type || !clash_kit_attachment_fits(option.item_type, primary_type))
 			return null
 		return clash_attachment_lock_text(progress, option.item_type, primary_type)
@@ -253,7 +271,7 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 	filtered.removed = kit.removed
 	filtered.fills = kit.fills
 	for(var/slot in kit.choices)
-		if(slot in GLOB.clash_kit_attachment_slots)
+		if(clash_is_attachment_slot(slot))
 			continue
 		var/id = kit.choices[slot]
 		if(clash_option_lock_text(ckey, id, job))
@@ -261,12 +279,18 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 		if(id)
 			filtered.choices[slot] = id
 	var/gun_type = clash_effective_primary(filtered, job)
-	if(!gun_type)
-		return filtered
-	for(var/slot in GLOB.clash_kit_attachment_slots)
-		var/id = kit.choices[slot]
-		if(id && !clash_option_lock_text(ckey, id, job, gun_type))
-			filtered.choices[slot] = id
+	if(gun_type)
+		for(var/slot in GLOB.clash_kit_attachment_slots)
+			var/id = kit.choices[slot]
+			if(id && !clash_option_lock_text(ckey, id, job, gun_type))
+				filtered.choices[slot] = id
+	var/sidearm_type = clash_effective_sidearm(filtered, job)
+	if(sidearm_type)
+		for(var/gun_slot in GLOB.clash_kit_sidearm_attachment_slots)
+			var/slot = GLOB.clash_kit_sidearm_attachment_slots[gun_slot]
+			var/id = kit.choices[slot]
+			if(id && !clash_option_lock_text(ckey, id, job, sidearm_type))
+				filtered.choices[slot] = id
 	return filtered
 
 /proc/clash_set_progress_level(ckey, track, key, level, mob/admin = usr)

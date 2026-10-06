@@ -139,6 +139,7 @@
 	for(var/datum/clash_zone/zone as anything in zones)
 		settle_zone(zone)
 		zone.update_visuals(zone.owner ? faction_color(zone.owner) : null, capture_time)
+		zone.refresh_tiles()
 	for(var/datum/clash_zone/zone as anything in zones)
 		if(zone.owner && (persistent || !zone.contested))
 			objective_points[zone.owner] = (objective_points[zone.owner] || 0) + 1
@@ -411,7 +412,7 @@
 			for(var/second in first + 1 to length(spots))
 				var/list/one = spots[first]
 				var/list/two = spots[second]
-				if(get_dist_euclidian(one[2], two[2]) <= one[3] + two[3] + 0.6)
+				if(length(get_clash_zone_turfs(one[2], one[3]) & get_clash_zone_turfs(two[2], two[3])))
 					problems += "[one[1]] overlaps [two[1]]"
 	if(!length(problems))
 		zone_notes += "Zones A, B and C come from the map's markers."

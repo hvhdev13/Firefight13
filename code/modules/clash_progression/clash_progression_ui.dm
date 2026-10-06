@@ -64,7 +64,7 @@
 	var/next_xp = clash_level_xp_for(level + 1, base)
 	return list("to_next" = max(0, next_xp - xp), "fill" = clamp((xp - floor_xp) / (next_xp - floor_xp), 0, 1))
 
-/proc/clash_progress_ui_data(ckey, job, primary_type, gun_type)
+/proc/clash_progress_ui_data(ckey, job, primary_type, gun_type, sidearm_type)
 	if(!clash_progression_gating())
 		return null
 	build_clash_option_gates()
@@ -79,15 +79,16 @@
 	var/list/fresh = list()
 	var/list/ranks = list()
 	for(var/slot in GLOB.clash_kit_menu[faction])
-		var/attachment = (slot in GLOB.clash_kit_attachment_slots)
+		var/attachment = clash_is_attachment_slot(slot)
+		var/slot_gun = clash_is_sidearm_attachment_slot(slot) ? sidearm_type : primary_type
 		for(var/datum/clash_kit_option/option as anything in GLOB.clash_kit_menu[faction][slot])
-			ranks[option.id] = clash_option_rank(progress, option, class, primary_type)
-			var/lock_text = clash_option_lock_text(ckey, option.id, job, primary_type)
+			ranks[option.id] = clash_option_rank(progress, option, class, slot_gun)
+			var/lock_text = clash_option_lock_text(ckey, option.id, job, slot_gun)
 			if(lock_text)
 				locks[option.id] = lock_text
 				continue
 			var/list/gate = GLOB.clash_option_gates[clash_gate_key(faction, option.item_type)]
-			if((GLOB.clash_perks[option.item_type] || (attachment ? primary_type && clash_kit_attachment_fits(option.item_type, primary_type) : gate && gate["kind"] != CLASH_GATE_FREE)) && !(option.id in progress.seen))
+			if((GLOB.clash_perks[option.item_type] || (attachment ? slot_gun && clash_kit_attachment_fits(option.item_type, slot_gun) : gate && gate["kind"] != CLASH_GATE_FREE)) && !(option.id in progress.seen))
 				fresh += option.id
 	var/list/role_locks = list()
 	var/client/player = GLOB.directory[ckey]
@@ -117,6 +118,7 @@
 		"role_locks" = role_locks,
 		"shop_locks" = shop_locks,
 		"gun" = clash_gun_progress(progress, clash_track_type(gun_type)),
+		"sidearm_gun" = clash_gun_progress(progress, clash_track_type(sidearm_type)),
 		"carriers" = clash_carrier_progress(progress, faction),
 	)
 
@@ -124,7 +126,7 @@
 	var/datum/clash_perk/perk = GLOB.clash_perks[option.item_type]
 	if(perk)
 		return perk.level
-	if(option.slot in GLOB.clash_kit_attachment_slots)
+	if(clash_is_attachment_slot(option.slot))
 		return GLOB.clash_weapon_unlock_levels[clash_track_type(primary_type)]?[option.item_type] || 1
 	var/list/gate = clash_gate_for(option.faction, option.item_type)
 	switch(gate?["kind"])
@@ -206,7 +208,12 @@
 		var/list/entry = progress.factions[faction]
 		factions += list(list("id" = faction, "side" = clash_side_name(faction), "level" = level, "insignia" = clash_insignia_name(faction, level), "xp" = entry ? entry["xp"] : 0))
 	var/list/classes = list()
+	var/list/played_classes = list()
+	for(var/title in GLOB.clash_arena_roles)
+		played_classes |= GLOB.clash_job_classes[title]
 	for(var/class in GLOB.clash_class_names)
+		if(!(class in played_classes))
+			continue
 		var/list/entry = progress.classes[class]
 		classes += list(list("id" = class, "name" = GLOB.clash_class_names[class], "level" = progress.class_level(class), "xp" = entry ? entry["xp"] : 0))
 	var/list/carriers = list()

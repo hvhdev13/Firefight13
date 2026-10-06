@@ -5,6 +5,8 @@ GLOBAL_DATUM(clash_zone_tile_icon, /icon)
 #define CLASH_ZONE_SEARCH_STEPS 60
 #define CLASH_ZONE_MAX_RADIUS 7
 
+/area/clash_arena/var/clash_zone = FALSE
+
 /obj/effect/landmark/clash_objective
 	name = "Clash objective"
 	icon_state = "o_white"
@@ -99,15 +101,14 @@ GLOBAL_DATUM(clash_zone_tile_icon, /icon)
 	src.center = center
 	src.radius = radius
 	src.preview = preview
-	for(var/turf/spot as anything in RANGE_TURFS(radius, center))
-		if(spot.density || sqrt((spot.x - center.x) ** 2 + (spot.y - center.y) ** 2) > radius + 0.3)
-			continue
+	for(var/turf/spot as anything in get_clash_zone_turfs(center, radius))
 		covered[spot] = TRUE
 		var/obj/effect/clash_zone_tile/tile = new(spot)
 		tiles += tile
 		if(preview)
 			animate(tile, alpha = 0, time = 5, loop = -1)
 			animate(alpha = 255, time = 5)
+	refresh_tiles()
 	marker = new(center)
 	if(!preview)
 		GLOB.clash_objective_turfs += center
@@ -120,6 +121,12 @@ GLOBAL_DATUM(clash_zone_tile_icon, /icon)
 	center = null
 	covered = null
 	return ..()
+
+/datum/clash_zone/proc/refresh_tiles()
+	for(var/obj/effect/clash_zone_tile/tile as anything in tiles)
+		var/hidden = tile.loc.density ? INVISIBILITY_MAXIMUM : 0
+		if(tile.invisibility != hidden)
+			tile.invisibility = hidden
 
 /datum/clash_zone/proc/reset()
 	owner = null
@@ -165,6 +172,18 @@ GLOBAL_DATUM(clash_zone_tile_icon, /icon)
 		return
 	shown = "[seconds_left]"
 	marker.maptext = "<span class='maptext center' style='font-size: 8px; color: #ffffff'>NEXT HILL<br>[clash_clock_text(seconds_left)]</span>"
+
+/proc/get_clash_zone_turfs(turf/center, radius)
+	. = list()
+	var/area/clash_arena/zone_area = get_area(center)
+	if(istype(zone_area) && zone_area.clash_zone)
+		for(var/turf/spot in zone_area)
+			if(spot.z == center.z)
+				. += spot
+		return
+	for(var/turf/spot as anything in RANGE_TURFS(radius, center))
+		if(sqrt((spot.x - center.x) ** 2 + (spot.y - center.y) ** 2) <= radius + 0.3)
+			. += spot
 
 /proc/clash_clock_text(seconds)
 	return "[floor(seconds / 60)]:[seconds % 60 < 10 ? "0" : ""][seconds % 60]"

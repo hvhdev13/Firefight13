@@ -1,5 +1,5 @@
 import { type BooleanLike, classes } from 'common/react';
-import { useEffect, useState } from 'react';
+import { type ReactNode, useEffect, useState } from 'react';
 import { resolveAsset } from 'tgui/assets';
 import { useBackend } from 'tgui/backend';
 import {
@@ -12,6 +12,7 @@ import {
   Stack,
   Tooltip,
 } from 'tgui/components';
+import { fetchRetry } from 'tgui/http';
 import { Window } from 'tgui/layouts';
 
 interface Slot {
@@ -31,6 +32,7 @@ interface Option {
   ammo: number;
   stats: [string, number][];
   only_class: string | null;
+  contents?: string[];
 }
 
 interface RoleGroup {
@@ -53,6 +55,7 @@ interface PackItem {
   icon: string;
   icon_state: string;
   extra: BooleanLike;
+  contents?: string[];
 }
 
 interface PackContainer {
@@ -77,6 +80,7 @@ interface ShopItem {
   pool: 'points' | 'snowflake';
   icon: string;
   icon_state: string;
+  contents?: string[];
 }
 
 interface ShopSection {
@@ -127,6 +131,7 @@ interface KitProgress {
   role_locks: Record<string, string>;
   shop_locks: Record<string, string>;
   gun?: GunProgress;
+  sidearm_gun?: GunProgress;
   carriers: CarrierProgress[];
 }
 
@@ -147,6 +152,7 @@ interface Data extends StaticData {
   fits: string[];
   doll: string | null;
   gun: string | null;
+  sidearm: string | null;
   doll_pending: BooleanLike;
   deploy_state: 'lobby' | 'dead' | null;
   respawn_in: number;
@@ -245,6 +251,62 @@ const GunPanel = (props: { readonly gun: GunProgress }) => {
   );
 };
 
+const AttachmentGroup = (props: {
+  readonly name?: string;
+  readonly sidearm: boolean;
+  readonly tiles: ReactNode[];
+}) => {
+  const { name, sidearm, tiles } = props;
+  return (
+    <Box>
+      <Box className="ClashKit__attachHeader">
+        {name ?? 'Attachments'}
+        {!name && (
+          <Box as="span" className="ClashKit__attachHint">
+            {sidearm ? 'pick a sidearm first' : 'pick a primary first'}
+          </Box>
+        )}
+      </Box>
+      <Box className="ClashKit__attachRow">{tiles}</Box>
+    </Box>
+  );
+};
+
+const WeaponPreview = (props: {
+  readonly image: string | null;
+  readonly sidearm: boolean;
+  readonly pending: boolean;
+  readonly progress?: GunProgress;
+}) => {
+  const { image, sidearm, pending, progress } = props;
+  return (
+    <>
+      <Box
+        className={classes([
+          'ClashKit__gunFrame',
+          pending && 'ClashKit__gunFrame--pending',
+        ])}
+      >
+        {image ? (
+          <FitSprite
+            className="ClashKit__gun"
+            src={`data:image/png;base64,${image}`}
+            fitWidth={392}
+            fitHeight={100}
+            maxScale={sidearm ? SIDEARM_SCALE : PRIMARY_SCALE}
+            whole
+          />
+        ) : (
+          <Box className="ClashKit__gunEmpty">
+            {sidearm ? 'No sidearm' : 'No primary'}
+          </Box>
+        )}
+      </Box>
+      {progress && <GunPanel gun={progress} />}
+    </>
+  );
+};
+
 const CarrierList = (props: { readonly carriers: CarrierProgress[] }) => (
   <Box className="ClashKit__packHolder">
     <Box className="ClashKit__packHead">Ammo carriers</Box>
@@ -267,6 +329,195 @@ const CarrierList = (props: { readonly carriers: CarrierProgress[] }) => (
     ))}
   </Box>
 );
+
+type Sprite = {
+  url: string;
+  width: number;
+  height: number;
+};
+
+let iconRefs: Promise<Record<string, string>> | undefined;
+
+const loadIconRefs = () => {
+  if (!iconRefs) {
+    iconRefs = fetchRetry(resolveAsset('icon_ref_map.json')).then((response) =>
+      response.json(),
+    );
+    iconRefs.catch(() => {
+      iconRefs = undefined;
+    });
+  }
+  return iconRefs;
+};
+
+const spriteCache = new Map<string, Promise<Sprite>>();
+
+const loadImage = (source: string, attempt = 0): Promise<HTMLImageElement> =>
+  new Promise((resolve, reject) => {
+    const image = new window.Image();
+    image.onload = () => resolve(image);
+    image.onerror = () => {
+      if (attempt >= 4) {
+        reject(new Error(`Could not load ${source}`));
+        return;
+      }
+      setTimeout(
+        () => loadImage(source, attempt + 1).then(resolve, reject),
+        1000,
+      );
+    };
+    image.src = attempt ? `${source}&attempt=${attempt}` : source;
+  });
+
+const cropSprite = async (
+  source: string,
+  fitWidth: number,
+  fitHeight: number,
+  maxScale: number,
+  whole: boolean,
+): Promise<Sprite> => {
+  const image = await loadImage(source);
+  const fullWidth = image.naturalWidth;
+  const fullHeight = image.naturalHeight;
+  const canvas = document.createElement('canvas');
+  canvas.width = fullWidth;
+  canvas.height = fullHeight;
+  const context = canvas.getContext('2d');
+  if (!context) throw new Error('No canvas');
+  context.drawImage(image, 0, 0);
+  const pixels = context.getImageData(0, 0, fullWidth, fullHeight).data;
+  let left = fullWidth;
+  let right = -1;
+  let top = fullHeight;
+  let bottom = -1;
+  for (let y = 0; y < fullHeight; y++) {
+    for (let x = 0; x < fullWidth; x++) {
+      if (pixels[(y * fullWidth + x) * 4 + 3] < 16) continue;
+      left = Math.min(left, x);
+      right = Math.max(right, x);
+      top = Math.min(top, y);
+      bottom = Math.max(bottom, y);
+    }
+  }
+  if (right < 0) throw new Error('Empty sprite');
+  const width = right - left + 1;
+  const height = bottom - top + 1;
+  const cropped = document.createElement('canvas');
+  cropped.width = width;
+  cropped.height = height;
+  cropped
+    .getContext('2d')
+    ?.drawImage(canvas, left, top, width, height, 0, 0, width, height);
+  const fit = Math.min(fitWidth / width, fitHeight / height, maxScale);
+  const scale = whole ? Math.max(1, Math.floor(fit)) : fit;
+  return {
+    url: cropped.toDataURL(),
+    width: Math.round(width * scale),
+    height: Math.round(height * scale),
+  };
+};
+
+const FitSprite = (props: {
+  readonly src?: string;
+  readonly fitWidth: number;
+  readonly fitHeight: number;
+  readonly maxScale?: number;
+  readonly whole?: boolean;
+  readonly className?: string;
+  readonly fallback?: ReactNode;
+}) => {
+  const {
+    src,
+    fitWidth,
+    fitHeight,
+    maxScale = 8,
+    whole = false,
+    className,
+    fallback = null,
+  } = props;
+  const [sprite, setSprite] = useState<Sprite | null>(null);
+  useEffect(() => {
+    if (!src) return;
+    let live = true;
+    const key = `${fitWidth}x${fitHeight}x${maxScale}${whole}|${src}`;
+    let job = spriteCache.get(key);
+    if (!job) {
+      job = cropSprite(src, fitWidth, fitHeight, maxScale, whole);
+      spriteCache.set(key, job);
+      job.catch(() => spriteCache.delete(key));
+    }
+    job.then(
+      (result) => live && setSprite(result),
+      () => live && setSprite({ url: src, width: fitWidth, height: fitHeight }),
+    );
+    return () => {
+      live = false;
+    };
+  }, [src, fitWidth, fitHeight, maxScale, whole]);
+  if (!sprite) return fallback;
+  return (
+    <img
+      className={className}
+      src={sprite.url}
+      style={{
+        width: `${sprite.width}px`,
+        height: `${sprite.height}px`,
+        imageRendering: 'pixelated',
+        objectFit: 'contain',
+      }}
+      alt=""
+    />
+  );
+};
+
+const IconSprite = (props: {
+  readonly icon: string;
+  readonly state: string;
+  readonly fitWidth: number;
+  readonly fitHeight: number;
+}) => {
+  const { icon, state, fitWidth, fitHeight } = props;
+  const [src, setSrc] = useState<string>();
+  useEffect(() => {
+    let live = true;
+    loadIconRefs().then((refs) => {
+      if (live && refs[icon]) {
+        setSrc(`${refs[icon]}?state=${state}&dir=2&movement=false&frame=1`);
+      }
+    });
+    return () => {
+      live = false;
+    };
+  }, [icon, state]);
+  return (
+    <FitSprite
+      src={src}
+      fitWidth={fitWidth}
+      fitHeight={fitHeight}
+      maxScale={3}
+      fallback={<Icon name="spinner" spin />}
+    />
+  );
+};
+
+const ContentsHint = (props: { readonly contents?: string[] }) => {
+  const { contents } = props;
+  if (!contents?.length) return null;
+  return (
+    <Tooltip
+      content={
+        <>
+          <Box bold>Contains</Box>
+          {contents.map((line) => (
+            <Box key={line}>{line}</Box>
+          ))}
+        </>
+      }
+    >
+      <Icon name="circle-exclamation" className="ClashKit__contentsHint" />
+    </Tooltip>
+  );
+};
 
 const ItemIcon = (props: { readonly icon: string; readonly state: string }) => (
   <Box className="ClashKit__optionIcon">
@@ -340,6 +591,7 @@ const PackView = () => {
                   </Stack.Item>
                   <Stack.Item grow>
                     {item.name}
+                    <ContentsHint contents={item.contents} />
                     {!!item.extra && (
                       <Box as="span" className="ClashKit__packBought">
                         bought
@@ -474,6 +726,7 @@ const ShopView = () => {
                   </Stack.Item>
                   <Stack.Item grow>
                     {item.name}
+                    <ContentsHint contents={item.contents} />
                     {lock && (
                       <Box className="ClashKit__optionLock">
                         <Icon name="lock" /> {lock}
@@ -520,6 +773,32 @@ const LEFT_SLOTS = ['helmet', 'eyes', 'mask', 'armor', 'back'];
 const RIGHT_SLOTS = ['primary', 'sidearm', 'grenade', 'belt'];
 const POUCH_SLOTS = ['pouch_l', 'webbing', 'pouch_r'];
 const ATTACHMENT_SLOTS = ['rail', 'muzzle', 'under', 'stock'];
+const SIDE_ATTACHMENT_SLOTS = [
+  'side_rail',
+  'side_muzzle',
+  'side_under',
+  'side_stock',
+];
+const PRIMARY_SCALE = 5;
+const SIDEARM_SCALE = 8;
+
+type WeaponView = 'primary' | 'sidearm';
+
+const issueForSlot = (
+  id: string,
+  choices: Record<string, string>,
+  issue: Record<string, IssueItem>,
+) => {
+  if (ATTACHMENT_SLOTS.includes(id) && choices.primary) return undefined;
+  if (SIDE_ATTACHMENT_SLOTS.includes(id) && choices.sidearm) return undefined;
+  return issue?.[id];
+};
+
+const weaponViewFor = (id: string): WeaponView | null => {
+  if (id === 'sidearm' || SIDE_ATTACHMENT_SLOTS.includes(id)) return 'sidearm';
+  if (id === 'primary' || ATTACHMENT_SLOTS.includes(id)) return 'primary';
+  return null;
+};
 const PERK_SLOTS = ['class_perk', 'general_perk'];
 
 const clock = (seconds: number) =>
@@ -542,6 +821,7 @@ const SlotTile = (props: {
   readonly selected: boolean;
   readonly dimmed?: boolean;
   readonly small?: boolean;
+  readonly dense?: boolean;
   readonly lock?: string;
   readonly fresh?: boolean;
   readonly onClick: () => void;
@@ -553,6 +833,7 @@ const SlotTile = (props: {
     selected,
     dimmed,
     small,
+    dense,
     lock,
     fresh,
     onClick,
@@ -588,12 +869,14 @@ const SlotTile = (props: {
           />
         )}
         {shown ? (
-          <DmIcon
-            className="ClashKit__slotIcon"
-            icon={shown.icon}
-            icon_state={shown.icon_state}
-            fallback={<Icon name="spinner" spin />}
-          />
+          <Box className="ClashKit__slotIcon">
+            <IconSprite
+              icon={shown.icon}
+              state={shown.icon_state}
+              fitWidth={small ? 52 : 60}
+              fitHeight={small ? 32 : dense ? 30 : 40}
+            />
+          </Box>
         ) : (
           !slot.image && <Icon className="ClashKit__slotEmpty" name="plus" />
         )}
@@ -669,6 +952,7 @@ const OptionRow = (props: {
         <Stack.Item grow>
           <Box className="ClashKit__optionName">
             {option?.name ?? label}
+            <ContentsHint contents={option?.contents} />
             {fresh && (
               <Box as="span" className="ClashKit__optionNew">
                 new
@@ -728,6 +1012,7 @@ export const ClashKit = () => {
   } = data;
 
   const [selectedSlot, setSelectedSlot] = useState('primary');
+  const [weaponView, setWeaponView] = useState<WeaponView>('primary');
   const [tab, setTab] = useState<Tab>('gear');
   const left = pointsLeft(data);
   const packProblems = data.extras.filter(
@@ -754,6 +1039,12 @@ export const ClashKit = () => {
   const kit = kits[kit_index - 1];
   const primary = findOption(menus, faction, 'primary', choices.primary);
   const gunName = primary?.name ?? issue?.primary?.name;
+  const sidearm = findOption(menus, faction, 'sidearm', choices.sidearm);
+  const sidearmName = sidearm?.name ?? issue?.sidearm?.name;
+  const slotGunName = (id: string) =>
+    SIDE_ATTACHMENT_SLOTS.includes(id) ? sidearmName : gunName;
+  const showSidearm = weaponView === 'sidearm';
+  const viewName = showSidearm ? sidearmName : gunName;
   const current = slotById[selectedSlot];
   const ranks = progress?.ranks ?? {};
   const slotOptions = (id: string) =>
@@ -770,12 +1061,11 @@ export const ClashKit = () => {
     .filter(
       (option) =>
         !slotById[selectedSlot]?.attachment ||
-        !gunName ||
+        !slotGunName(selectedSlot) ||
         fits.includes(option.id),
     )
     .sort((a, b) => (ranks[a.id] ?? 0) - (ranks[b.id] ?? 0));
-  const issueFor = (id: string) =>
-    ATTACHMENT_SLOTS.includes(id) && choices.primary ? undefined : issue?.[id];
+  const issueFor = (id: string) => issueForSlot(id, choices, issue);
   const issued = issueFor(selectedSlot);
   const issuedOption = issued?.type
     ? options
@@ -814,7 +1104,12 @@ export const ClashKit = () => {
     }
   }, [selectedSlot, job]);
 
-  const tile = (id: string, small?: boolean, dimmed?: boolean) => (
+  const tile = (
+    id: string,
+    small?: boolean,
+    dimmed?: boolean,
+    dense?: boolean,
+  ) => (
     <SlotTile
       key={id}
       slot={slotById[id]}
@@ -823,6 +1118,7 @@ export const ClashKit = () => {
       selected={selectedSlot === id}
       small={small}
       dimmed={dimmed}
+      dense={dense}
       lock={choices[id] ? locks[choices[id]] : undefined}
       fresh={
         selectedSlot !== id &&
@@ -830,6 +1126,7 @@ export const ClashKit = () => {
       }
       onClick={() => {
         setSelectedSlot(id);
+        setWeaponView((view) => weaponViewFor(id) ?? view);
         setTab('gear');
       }}
     />
@@ -947,7 +1244,7 @@ export const ClashKit = () => {
 
                 <Box className="ClashKit__dollGrid">
                   <Box className="ClashKit__slotColumn ClashKit__slotColumn--dense">
-                    {LEFT_SLOTS.map((id) => tile(id))}
+                    {LEFT_SLOTS.map((id) => tile(id, false, false, true))}
                   </Box>
                   <Box className="ClashKit__dollStage">
                     <Box
@@ -993,19 +1290,14 @@ export const ClashKit = () => {
                 </Box>
 
                 <Box className="ClashKit__attachBar">
-                  <Box>
-                    <Box className="ClashKit__attachHeader">
-                      {gunName ?? 'Attachments'}
-                      {!gunName && (
-                        <Box as="span" className="ClashKit__attachHint">
-                          pick a primary first
-                        </Box>
-                      )}
-                    </Box>
-                    <Box className="ClashKit__attachRow">
-                      {ATTACHMENT_SLOTS.map((id) => tile(id, true, !gunName))}
-                    </Box>
-                  </Box>
+                  <AttachmentGroup
+                    name={viewName}
+                    sidearm={showSidearm}
+                    tiles={(showSidearm
+                      ? SIDE_ATTACHMENT_SLOTS
+                      : ATTACHMENT_SLOTS
+                    ).map((id) => tile(id, true, !viewName))}
+                  />
                   <Box>
                     <Box className="ClashKit__attachHeader">Perks</Box>
                     <Box className="ClashKit__attachRow">
@@ -1014,23 +1306,12 @@ export const ClashKit = () => {
                     </Box>
                   </Box>
                 </Box>
-                <Box
-                  className={classes([
-                    'ClashKit__gunFrame',
-                    doll_pending && 'ClashKit__gunFrame--pending',
-                  ])}
-                >
-                  {data.gun ? (
-                    <img
-                      className="ClashKit__gun"
-                      src={`data:image/png;base64,${data.gun}`}
-                      alt=""
-                    />
-                  ) : (
-                    <Box className="ClashKit__gunEmpty">No primary</Box>
-                  )}
-                </Box>
-                {progress?.gun && <GunPanel gun={progress.gun} />}
+                <WeaponPreview
+                  image={showSidearm ? data.sidearm : data.gun}
+                  sidearm={showSidearm}
+                  pending={!!doll_pending}
+                  progress={showSidearm ? progress?.sidearm_gun : progress?.gun}
+                />
               </Stack.Item>
 
               <Stack.Item grow className="ClashKit__optionsPanel">
@@ -1040,7 +1321,9 @@ export const ClashKit = () => {
                       ['gear', current?.name ?? 'Gear'],
                       [
                         'pack',
-                        packProblems ? `Pack (${packProblems}!)` : 'Pack',
+                        packProblems
+                          ? `Pack · ${packProblems} ${packProblems === 1 ? 'problem' : 'problems'}`
+                          : 'Pack',
                       ],
                       [
                         'shop',
@@ -1053,6 +1336,9 @@ export const ClashKit = () => {
                       className={classes([
                         'ClashKit__tab',
                         tab === id && 'ClashKit__tab--selected',
+                        id === 'pack' &&
+                          !!packProblems &&
+                          'ClashKit__tab--warn',
                       ])}
                       onClick={() => setTab(id)}
                     >
@@ -1099,7 +1385,7 @@ export const ClashKit = () => {
                   {options.map((option) => {
                     const unfit =
                       !!current?.attachment &&
-                      (!gunName || !fits.includes(option.id));
+                      (!slotGunName(selectedSlot) || !fits.includes(option.id));
                     const isIssue = option.id === issuedOption?.id;
                     const lock = isIssue ? undefined : locks[option.id];
                     return (
@@ -1169,15 +1455,14 @@ export const ClashKit = () => {
                 </Stack.Item>
               )}
               <Stack.Item grow basis={0} textAlign="right">
-                <Button.Confirm
+                <Button
                   icon="rotate-left"
                   color="transparent"
-                  confirmContent="Clear this kit?"
                   tooltip="Clear every pick in this kit"
                   onClick={() => act('reset')}
                 >
                   Reset
-                </Button.Confirm>
+                </Button>
               </Stack.Item>
             </Stack>
           </Stack.Item>

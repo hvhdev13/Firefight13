@@ -47,7 +47,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 	var/list/doll_cache = list()
 	var/render_queued = FALSE
 	var/list/side_jobs = list()
-	var/list/named_kits = list()
+	var/naming = FALSE
 
 /datum/clash_kit_screen/New(ckey)
 	. = ..()
@@ -95,7 +95,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 	var/list/slots = list()
 	for(var/slot in GLOB.clash_kit_slots)
 		var/list/info = GLOB.clash_kit_slots[slot]
-		slots += list(list("id" = slot, "name" = info["name"], "image" = info["image"], "attachment" = (slot in GLOB.clash_kit_attachment_slots)))
+		slots += list(list("id" = slot, "name" = info["name"], "image" = info["image"], "attachment" = clash_is_attachment_slot(slot)))
 	var/list/menus = list()
 	for(var/faction in GLOB.clash_kit_menu)
 		var/list/by_slot = list()
@@ -114,6 +114,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 					"ammo" = option.ammo_count,
 					"stats" = option.stats,
 					"only_class" = perk ? perk.class : option.only_class,
+					"contents" = clash_type_contents(option.item_type),
 				))
 			by_slot[slot] = options
 		menus[faction] = by_slot
@@ -148,12 +149,17 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 	if(isnull(issue))
 		queue_clash_issue_items(job, src)
 	var/gun_type = clash_effective_primary(kit, job)
+	var/sidearm_type = clash_effective_sidearm(kit, job)
 	var/list/fits = list()
-	if(gun_type)
-		for(var/slot in GLOB.clash_kit_attachment_slots)
-			for(var/datum/clash_kit_option/option as anything in GLOB.clash_kit_menu[clash_kit_faction_for_job(job)][slot])
-				if(clash_kit_attachment_fits(option.item_type, gun_type) && (!clash_progression_gating() || GLOB.clash_weapon_unlock_levels[clash_track_type(gun_type)]?[option.item_type]))
-					fits += option.id
+	for(var/slot in GLOB.clash_kit_slots)
+		if(!clash_is_attachment_slot(slot))
+			continue
+		var/slot_gun = clash_is_sidearm_attachment_slot(slot) ? sidearm_type : gun_type
+		if(!slot_gun)
+			continue
+		for(var/datum/clash_kit_option/option as anything in GLOB.clash_kit_menu[clash_kit_faction_for_job(job)][slot])
+			if(clash_kit_attachment_fits(option.item_type, slot_gun) && (!clash_progression_gating() || GLOB.clash_weapon_unlock_levels[clash_track_type(slot_gun)]?[option.item_type]))
+				fits += option.id
 	var/mob/living/carbon/human/fighter = ishuman(user) && user.stat != DEAD ? user : null
 	var/deploy_state = get_deploy_state(user)
 	var/respawn_in = deploy_state == "dead" ? clash_respawn_wait(user) : 0
@@ -179,6 +185,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 		"fits" = fits,
 		"doll" = render?["doll"],
 		"gun" = render?["gun"],
+		"sidearm" = render?["sidearm"],
 		"doll_pending" = doll_pending,
 		"pack" = render?["pack"] || list(),
 		"extras" = describe_extras(kit, doll_key == wanted ? render?["statuses"] : null),
@@ -191,16 +198,16 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 		"deploy_block" = deploy_state ? get_deploy_block(user) : null,
 		"revivable" = deploy_state == "dead" && !!clash_revivable_body(user),
 		"hint" = hint,
-		"progress" = clash_progress_ui_data(ckey, job, gun_type, gun_type),
+		"progress" = clash_progress_ui_data(ckey, job, gun_type, gun_type, sidearm_type),
 	)
 
 /datum/clash_kit_screen/proc/clear_locked_attachments(datum/clash_kit/kit)
-	var/gun_type = clash_effective_primary(kit, job)
-	if(!gun_type)
-		return
 	var/cleared = FALSE
-	for(var/slot in GLOB.clash_kit_attachment_slots)
-		if(kit.choices[slot] && clash_option_lock_text(ckey, kit.choices[slot], job, gun_type))
+	for(var/slot in kit.choices.Copy())
+		if(!clash_is_attachment_slot(slot))
+			continue
+		var/slot_gun = clash_kit_slot_gun(kit, job, slot)
+		if(slot_gun && clash_option_lock_text(ckey, kit.choices[slot], job, slot_gun))
 			kit.choices -= slot
 			cleared = TRUE
 	if(cleared)
@@ -317,14 +324,14 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 				active[job] = kit_index
 				save_clash_kits(ckey)
 				var/datum/clash_kit/picked = get_kit()
-				if(findtext(picked.name, "Custom") == 1 && !length(picked.choices) && !(picked in named_kits))
-					named_kits += picked
+				if(!naming && findtext(picked.name, regex(@"^Custom( \d+)?$")))
+					naming = TRUE
 					INVOKE_ASYNC(src, PROC_REF(name_new_kit), user, picked)
 		if("pick")
 			var/datum/clash_kit_option/option = get_clash_kit_option(params["id"])
 			if(!kit || !option || option.faction != clash_kit_faction_for_job(job) || option.slot != params["slot"])
 				return TRUE
-			var/lock_text = clash_option_lock_text(ckey, option.id, job, option.slot == KIT_SLOT_PRIMARY ? option.item_type : clash_effective_primary(kit, job))
+			var/lock_text = clash_option_lock_text(ckey, option.id, job, option.slot == KIT_SLOT_PRIMARY ? option.item_type : clash_kit_slot_gun(kit, job, option.slot))
 			if(lock_text)
 				to_chat(user, SPAN_WARNING("[option.name] is locked. [lock_text]."))
 				return TRUE
@@ -338,11 +345,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 		if("reset")
 			if(!kit)
 				return TRUE
-			kit.choices = list()
-			kit.extras = list()
-			kit.removed = list()
-			kit.fills = list()
-			save_clash_kits(ckey)
+			INVOKE_ASYNC(src, PROC_REF(confirm_reset), user, kit)
 		if("buy")
 			var/list/item = get_clash_shop(job)["by_id"][params["id"]]
 			if(!kit || !item)
@@ -429,8 +432,22 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 					progress.dirty = TRUE
 	return TRUE
 
+/datum/clash_kit_screen/proc/confirm_reset(mob/user, datum/clash_kit/kit)
+	if(tgui_alert(user, "Are you sure you want to reset your loadout?", "Reset loadout", list("Reset", "Cancel")) != "Reset")
+		return
+	kit.choices = list()
+	kit.extras = list()
+	kit.removed = list()
+	kit.fills = list()
+	save_clash_kits(ckey)
+	SStgui.update_uis(src)
+	var/datum/clash_kit_screen/own = GLOB.clash_kit_screens[ckey]
+	if(own && own != src)
+		SStgui.update_uis(own)
+
 /datum/clash_kit_screen/proc/name_new_kit(mob/user, datum/clash_kit/kit)
 	var/entered = tgui_input_text(user, "Name your new loadout.", "New loadout", "", 24, encode = FALSE)
+	naming = FALSE
 	var/new_name = sanitize(copytext(trim("[entered]"), 1, 25))
 	if(!length(new_name))
 		return

@@ -1371,7 +1371,7 @@
 				var/ff_living = TRUE
 				if(src.stat == DEAD)
 					ff_living = FALSE
-				if(!(((mob_flags & MUTINY_MUTINEER) && (firingMob.mob_flags & MUTINY_LOYALIST)) || ((mob_flags & MUTINY_LOYALIST) && (firingMob.mob_flags & MUTINY_MUTINEER))))
+				if(!(((mob_flags & MUTINY_MUTINEER) && (firingMob.mob_flags & MUTINY_LOYALIST)) || ((mob_flags & MUTINY_LOYALIST) && (firingMob.mob_flags & MUTINY_MUTINEER))) && !(clash_is_bot(firingMob) && clash_is_bot(src)))
 					msg_admin_ff(ff_msg, ff_living, loc.z)
 				if(ishuman(firingMob) && bullet.weapon_cause_data)
 					var/mob/living/carbon/human/H = firingMob

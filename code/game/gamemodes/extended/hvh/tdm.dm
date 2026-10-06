@@ -8,7 +8,7 @@
 	kill_limit = 40
 	countdown_time = 20 SECONDS
 	spawn_protection = 5 SECONDS
-	idle_limit = 3 MINUTES
+	idle_limit = 10 MINUTES
 	arena_rules = TRUE
 	progression = TRUE
 

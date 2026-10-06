@@ -1,11 +1,4 @@
 //MAP CONVERTED BY dmm2tgm.py THIS HEADER COMMENT PREVENTS RECONVERSION, DO NOT REMOVE
-"aa" = (
-/obj/structure/noticeboard{
-	pixel_x = -10;
-	pixel_y = 31
-	},
-/turf/open/floor/almayer/plating/northeast,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "ab" = (
 /obj/structure/prop/tyrargo/boards/boards_2{
 	pixel_x = -2;
@@ -14,22 +7,16 @@
 /turf/open/auto_turf/tyrargo_grass/layer0_mud_alt,
 /area/clash_arena/tdm_jungle/battlefield)
 "ad" = (
-/obj/structure/closet/coffin/woodencrate,
-/obj/structure/largecrate/random/mini/wooden{
-	pixel_x = 4;
-	pixel_y = 6
+/obj/structure/sign/flag/upp{
+	pixel_y = 27;
+	pixel_x = -1
 	},
-/obj/item/storage/box/mre,
-/obj/item/storage/box/mre,
-/turf/open/floor/almayer/test_floor4,
-/area/clash_arena/tdm_jungle/uscm_base/req)
+/turf/open/floor/corsat/squares,
+/area/clash_arena/tdm_jungle/upp_base)
 "ag" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "E";
-	pixel_x = 1
-	},
-/turf/open/floor/almayer/greencorner,
-/area/clash_arena/tdm_jungle/uscm_base/req)
+/obj/structure/machinery/cm_vending/sorted/cargo_guns/upp_squad,
+/turf/open/floor/corsat/plate,
+/area/clash_arena/tdm_jungle/upp_base)
 "ah" = (
 /obj/effect/landmark/survivor_spawner/us_army_gunner,
 /turf/open/auto_turf/snow/brown_base/layer3,
@@ -52,9 +39,10 @@
 /turf/open/auto_turf/snow/brown_base/layer3,
 /area/clash_arena/tdm_jungle/battlefield)
 "ao" = (
-/obj/structure/machinery/door/airlock/almayer/marine/alpha/smart,
-/turf/open/floor/almayer/test_floor4,
-/area/clash_arena/tdm_jungle/uscm_base)
+/obj/structure/flora/tree/tyrargo/tree_3,
+/obj/effect/decal/strata_decals/grasses,
+/turf/open/auto_turf/tyrargo_grass,
+/area/clash_arena/tdm_jungle/battlefield)
 "aq" = (
 /obj/structure/flora/bush/ausbushes/var3/fullgrass,
 /obj/structure/flora/tree/tyrargo/tree_6,
@@ -64,52 +52,6 @@
 /obj/structure/flora/tree/tyrargo_small,
 /turf/open/auto_turf/snow/brown_base/layer3,
 /area/clash_arena/tdm_jungle/battlefield)
-"as" = (
-/obj/structure/surface/rack,
-/obj/item/storage/belt/gun/type47,
-/obj/item/storage/belt/gun/type47,
-/obj/item/storage/belt/gun/type47,
-/obj/item/storage/belt/gun/type47,
-/turf/open/floor/prison/floor_marked/west,
-/area/clash_arena/tdm_jungle/upp_base)
-"at" = (
-/obj/structure/barricade/handrail{
-	pixel_x = 2
-	},
-/obj/structure/barricade/handrail{
-	dir = 4;
-	pixel_x = 2
-	},
-/turf/open/floor/strata/multi_tiles/west,
-/area/clash_arena/tdm_jungle/upp_base)
-"au" = (
-/obj/structure/surface/table/almayer,
-/turf/open/floor/interior/wood,
-/area/clash_arena/tdm_jungle/uscm_base)
-"av" = (
-/obj/structure/machinery/door/airlock/multi_tile/almayer/glass{
-	access_modified = 1;
-	dir = 2;
-	name = "\improper Requisitions Break Room";
-	req_one_access_txt = "19;21"
-	},
-/turf/open/floor/almayer/test_floor4,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"aw" = (
-/obj/structure/machinery/light{
-	dir = 1;
-	invisibility = 101
-	},
-/turf/open/floor/strata/floor3/east,
-/area/clash_arena/tdm_jungle/upp_base)
-"ax" = (
-/obj/structure/machinery/cm_vending/sorted/cargo_guns/squad_prep{
-	pixel_y = -29;
-	density = 0;
-	layer = 4.1
-	},
-/turf/open/floor/almayer/cargo_arrow,
-/area/clash_arena/tdm_jungle/uscm_base)
 "az" = (
 /obj/structure/flora/grass/ice/brown/snowgrassbb_1,
 /turf/open/auto_turf/snow/brown_base/layer2,
@@ -118,36 +60,27 @@
 /obj/structure/platform_decoration/stone/tyrargo,
 /turf/open/auto_turf/snow/layer2,
 /area/clash_arena/tdm_jungle/battlefield)
-"aC" = (
-/obj/structure/machinery/cm_vending/sorted/tech/electronics_storage/antag,
-/turf/open/floor/strata/orange_edge/north,
-/area/clash_arena/tdm_jungle/upp_base)
 "aD" = (
 /turf/open/hybrisa/street/cement1,
 /area/space)
-"aH" = (
-/turf/open/floor/almayer/green/west,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "aK" = (
-/obj/structure/platform_decoration/metal/strata/east,
-/turf/open/floor/strata/orange_edge/northwest,
+/obj/structure/medical_supply_link,
+/obj/structure/machinery/cm_vending/sorted/medical/upp/arena,
+/turf/open/floor/corsat/squares,
 /area/clash_arena/tdm_jungle/upp_base)
 "aL" = (
-/obj/structure/machinery/cm_vending/clothing/tl/alpha{
-	density = 0;
-	pixel_x = 32
-	},
-/turf/open/floor/plating/plating_catwalk,
-/area/clash_arena/tdm_jungle/uscm_base)
+/turf/closed/wall/strata_ice/forest,
+/area/clash_arena/tdm_jungle/battlefield/zone_2)
 "aO" = (
 /obj/structure/flora/tree/tyrargo/tree_5,
 /turf/open/auto_turf/tyrargo_grass/layer0_mud,
 /area/clash_arena/tdm_jungle/battlefield)
 "aP" = (
-/turf/closed/wall/almayer/reinforced,
+/obj/structure/sign/banners/colonial_marines_flag,
+/turf/closed/wall/almayer/outer,
 /area/clash_arena/tdm_jungle/uscm_base)
 "aQ" = (
-/turf/open/floor/strata/green4/west,
+/turf/open/floor/corsat/red/southwest,
 /area/clash_arena/tdm_jungle/upp_base)
 "aR" = (
 /obj/structure/flora/tree/tyrargo{
@@ -170,14 +103,6 @@
 "aS" = (
 /turf/closed/wall/strata_ice/forest/rock,
 /area/clash_arena/tdm_jungle/battlefield)
-"aU" = (
-/obj/structure/barricade/handrail{
-	dir = 1;
-	pixel_y = 4
-	},
-/obj/structure/barricade/handrail,
-/turf/open/floor/almayer,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "aV" = (
 /turf/open/gm/dirt/dark_brown/variant_1,
 /area/clash_arena/tdm_jungle/battlefield)
@@ -196,27 +121,19 @@
 /turf/open/auto_turf/snow/brown_base/layer3,
 /area/clash_arena/tdm_jungle/battlefield)
 "bc" = (
-/obj/structure/machinery/door/poddoor/shutters/almayer{
-	dir = 4;
-	id = "ROlobby1";
-	name = "\improper RO Line 1"
+/obj/effect/decal/warning_stripes{
+	icon_state = "NE-out";
+	pixel_x = 2;
+	pixel_y = 3
 	},
-/obj/structure/machinery/door/firedoor/border_only/almayer,
-/obj/structure/window/framed/almayer/hull/hijack_bustable,
-/turf/open/floor/plating,
-/area/clash_arena/tdm_jungle/uscm_base/req)
+/turf/open/floor/corsat/red/east,
+/area/clash_arena/tdm_jungle/upp_base)
 "bd" = (
 /turf/open/gm/river/tyrargo,
 /area/clash_arena/tdm_jungle/battlefield)
 "bf" = (
-/obj/structure/sign/safety/ammunition{
-	pixel_x = 15;
-	pixel_y = 25
-	},
-/obj/structure/sign/safety/hazard{
-	pixel_y = 25
-	},
-/turf/open/floor/almayer,
+/obj/structure/machinery/cm_vending/sorted/cargo_guns/squad_prep,
+/turf/open/floor/almayer/floor,
 /area/clash_arena/tdm_jungle/uscm_base)
 "bh" = (
 /obj/effect/landmark/survivor_spawner/us_army_sl,
@@ -226,18 +143,6 @@
 /obj/effect/landmark/clash_objective/clash_flag/upp,
 /turf/open/auto_turf/snow/brown_base,
 /area/clash_arena/tdm_jungle/battlefield)
-"bk" = (
-/obj/effect/decal/cleanable/dirt,
-/obj/structure/machinery/light{
-	dir = 8
-	},
-/obj/structure/bed,
-/obj/item/bedsheet/mime,
-/turf/open/floor/interior/wood,
-/area/clash_arena/tdm_jungle/uscm_base)
-"bl" = (
-/turf/closed/wall/almayer/reinforced,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "bn" = (
 /obj/structure/prop/tyrargo/boards/boards_2{
 	pixel_x = -1;
@@ -245,15 +150,6 @@
 	},
 /turf/open/auto_turf/tyrargo_grass,
 /area/clash_arena/tdm_jungle/battlefield)
-"bo" = (
-/obj/structure/machinery/light{
-	dir = 4
-	},
-/obj/structure/flora/pottedplant{
-	icon_state = "pottedplant_21"
-	},
-/turf/open/floor/almayer/floor,
-/area/clash_arena/tdm_jungle/uscm_base)
 "bp" = (
 /obj/structure/flora/bush/ausbushes/var3/ppflowers{
 	desc = "Just like a real plant, but fake!";
@@ -277,35 +173,19 @@
 	},
 /turf/open/floor/interior/wood,
 /area/clash_arena/tdm_jungle/uscm_base)
-"bt" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "SE-out";
-	pixel_x = 1
-	},
-/obj/structure/machinery/gear/upp,
-/turf/open/floor/almayer/mono,
-/area/clash_arena/tdm_jungle/upp_base)
-"bx" = (
-/obj/structure/closet/coffin/woodencrate,
-/obj/item/stack/sheet/mineral/plastic/small_stack,
-/obj/item/stack/sheet/mineral/plastic/small_stack,
-/obj/structure/platform/metal/strata/north,
-/turf/open/floor/strata/floor2,
-/area/clash_arena/tdm_jungle/upp_base)
 "bB" = (
 /obj/effect/decal/strata_decals/grasses,
 /obj/effect/decal/strata_decals/grasses,
 /obj/effect/decal/strata_decals/grasses,
 /turf/open/auto_turf/tyrargo_grass,
 /area/clash_arena/tdm_jungle/battlefield)
-"bC" = (
-/obj/structure/bed/chair,
-/turf/open/floor/interior/wood,
-/area/clash_arena/tdm_jungle/uscm_base)
 "bF" = (
-/obj/structure/machinery/computer/supply_drop_console/limited,
-/turf/closed/wall/almayer,
-/area/clash_arena/tdm_jungle/uscm_base/req)
+/obj/effect/decal/warning_stripes{
+	icon_state = "NW-out";
+	pixel_y = 3
+	},
+/turf/closed/wall/upp_ship/reinforced/outer,
+/area/clash_arena/tdm_jungle/upp_base)
 "bM" = (
 /obj/effect/decal/warning_stripes{
 	icon_state = "E";
@@ -329,13 +209,6 @@
 	},
 /turf/open/gm/river/desert/tyrargo/deep,
 /area/clash_arena/tdm_jungle/battlefield)
-"bO" = (
-/obj/structure/machinery/door/poddoor/railing{
-	dir = 8;
-	id = "supply_elevator_railing"
-	},
-/turf/open/floor/almayer,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "bP" = (
 /obj/structure/machinery/cryopod{
 	pixel_y = -6
@@ -347,52 +220,24 @@
 /turf/open/floor/prison/floor_marked/west,
 /area/clash_arena/tdm_jungle/upp_base)
 "bR" = (
-/obj/structure/closet/crate/trashcart,
-/obj/item/trash/boonie,
-/obj/item/trash/chunk/hunk,
-/obj/item/trash/crushed_cup,
-/obj/item/trash/uscm_mre,
-/turf/open/floor/almayer/test_floor4,
-/area/clash_arena/tdm_jungle/uscm_base/req)
+/obj/effect/decal/strata_decals/grasses,
+/turf/open/auto_turf/tyrargo_grass/layer0_mud,
+/area/clash_arena/tdm_jungle/battlefield/zone_3)
 "bS" = (
-/obj/structure/machinery/cm_vending/sorted/cargo_ammo/squad{
-	req_access = null;
-	req_one_access = null;
-	req_one_access_txt = "15;16;21";
-	vend_x_offset = 0
+/obj/effect/decal/warning_stripes{
+	icon_state = "NW-out";
+	pixel_y = 3
 	},
-/turf/open/floor/almayer,
-/area/clash_arena/tdm_jungle/uscm_base)
-"bV" = (
-/turf/closed/wall/almayer/outer,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"bX" = (
-/obj/structure/machinery/cm_vending/clothing/marine/bravo{
-	density = 0;
-	pixel_y = 16
+/obj/effect/decal/warning_stripes{
+	icon_state = "SW-out";
+	pixel_x = -1;
+	pixel_y = -1
 	},
-/turf/open/floor/almayer/cargo_arrow/north,
-/area/clash_arena/tdm_jungle/uscm_base)
-"bY" = (
-/obj/structure/machinery/cm_vending/gear/leader,
-/turf/open/floor/almayer/plate,
-/area/clash_arena/tdm_jungle/uscm_base)
-"cb" = (
-/turf/open/floor/strata/green3/southeast,
+/turf/open/floor/corsat/squares,
 /area/clash_arena/tdm_jungle/upp_base)
-"cc" = (
-/obj/structure/bed/chair/office/dark{
-	dir = 8
-	},
-/turf/open/floor/almayer/plate,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"cd" = (
-/obj/structure/machinery/door/poddoor/railing{
-	dir = 2;
-	id = "supply_elevator_railing"
-	},
-/turf/open/floor/almayer,
-/area/clash_arena/tdm_jungle/uscm_base/req)
+"bX" = (
+/turf/open/auto_turf/snow/brown_base,
+/area/clash_arena/tdm_jungle/battlefield/zone_2)
 "cf" = (
 /obj/structure/flora/grass/tallgrass/jungle/corner,
 /obj/structure/flora/bush/ausbushes/var3/fullgrass,
@@ -401,27 +246,6 @@
 	},
 /turf/open/gm/river/red,
 /area/clash_arena/tdm_jungle/battlefield)
-"cg" = (
-/obj/structure/sign/safety/medical{
-	pixel_x = 15;
-	pixel_y = 2
-	},
-/turf/closed/wall/almayer/outer,
-/area/clash_arena/tdm_jungle/uscm_base)
-"ch" = (
-/turf/closed/wall/almayer,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"ci" = (
-/turf/open/floor/strata/red4,
-/area/clash_arena/tdm_jungle/upp_base)
-"cj" = (
-/obj/structure/machinery/door/poddoor/shutters/almayer{
-	dir = 4;
-	id = "crate_room2";
-	name = "\improper Storage Shutters"
-	},
-/turf/open/floor/almayer/plating/northeast,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "cm" = (
 /obj/structure/barricade/sandbags/weak_wired{
 	dir = 4;
@@ -431,46 +255,6 @@
 /obj/structure/prop/tyrargo/boards/boards_2,
 /turf/open/auto_turf/snow/brown_base,
 /area/clash_arena/tdm_jungle/battlefield)
-"cr" = (
-/obj/effect/landmark/start/marine/smartgunner/alpha,
-/obj/effect/landmark/late_join/alpha,
-/turf/open/floor/interior/wood,
-/area/clash_arena/tdm_jungle/uscm_base)
-"cs" = (
-/obj/structure/machinery/cm_vending/clothing/medic/bravo,
-/turf/open/floor/almayer/plate,
-/area/clash_arena/tdm_jungle/uscm_base)
-"ct" = (
-/obj/structure/sign/safety/ammunition{
-	pixel_x = 15;
-	pixel_y = -32
-	},
-/obj/structure/sign/safety/hazard{
-	pixel_y = -32
-	},
-/obj/structure/closet/secure_closet/guncabinet/red/armory_shotgun,
-/turf/open/floor/almayer/redfull,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"cu" = (
-/obj/structure/machinery/door/airlock/almayer/marine/requisitions{
-	dir = 1;
-	name = "\improper Requisitions Storage"
-	},
-/obj/structure/disposalpipe/up/almayer{
-	dir = 4;
-	id = "almayerlink_OT1_req"
-	},
-/turf/open/floor/almayer/test_floor4,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"cx" = (
-/obj/structure/machinery/cm_vending/sorted/attachments/squad{
-	req_access = null;
-	req_one_access = null;
-	req_one_access_txt = "15;16;21";
-	vend_y_offset = 0
-	},
-/turf/open/floor/almayer,
-/area/clash_arena/tdm_jungle/uscm_base)
 "cy" = (
 /obj/effect/landmark/start/marine/bravo,
 /obj/effect/landmark/late_join/bravo,
@@ -496,20 +280,22 @@
 /turf/open/auto_turf/tyrargo_grass,
 /area/clash_arena/tdm_jungle/battlefield)
 "cD" = (
+/obj/effect/decal/cleanable/dirt,
 /obj/structure/machinery/light{
 	dir = 8
 	},
-/obj/structure/machinery/computer/cryopod/upp{
-	dir = 8
-	},
-/turf/open/floor/strata/green3/west,
-/area/clash_arena/tdm_jungle/upp_base)
+/obj/structure/bed/hybrisa/bunkbed3,
+/turf/open/floor/interior/wood,
+/area/clash_arena/tdm_jungle/uscm_base)
 "cF" = (
 /obj/effect/decal/warning_stripes{
-	icon_state = "NW-out";
+	icon_state = "N";
 	pixel_y = 3
 	},
-/turf/open/floor/strata/floor2,
+/obj/structure/machinery/light{
+	dir = 4
+	},
+/turf/open/floor/corsat/plate,
 /area/clash_arena/tdm_jungle/upp_base)
 "cG" = (
 /obj/structure/prop/tyrargo/boards/boards_1{
@@ -518,38 +304,24 @@
 	},
 /turf/open/auto_turf/tyrargo_grass/layer0_mud_alt,
 /area/clash_arena/tdm_jungle/battlefield)
-"cI" = (
-/turf/closed/wall/almayer/outer,
-/area/clash_arena/tdm_jungle/uscm_base/medbay)
-"cM" = (
-/obj/effect/landmark/start/upp{
-	job_list = list("UPP Logistics Technician");
-	name = "UPP LogTech"
-	},
-/obj/effect/landmark/start/upp{
-	job_list = list("UPP Logistics Technician");
-	name = "UPP LogTech"
-	},
-/obj/effect/landmark/late_join/upp{
-	job_list = list("UPP Logistics Technician");
-	name = "UPP late logistics join"
-	},
-/turf/open/floor/plating/plating_catwalk/prison,
-/area/clash_arena/tdm_jungle/upp_base)
-"cQ" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "E";
-	pixel_x = 1
-	},
-/turf/open/floor/almayer/green/southeast,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"cT" = (
-/turf/open/floor/almayer/empty/requisitions,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "cU" = (
-/obj/structure/window/framed/almayer/hull,
-/turf/closed/wall/almayer,
-/area/clash_arena/tdm_jungle/uscm_base)
+/obj/structure/barricade/handrail/kutjevo{
+	explo_proof = 1;
+	unacidable = 1;
+	brute_multiplier = 0;
+	brute_projectile_multiplier = 0;
+	burn_flame_multiplier = 0;
+	burn_multiplier = 0;
+	explosive_multiplier = 0;
+	can_be_reinforced = 0;
+	health = 10000;
+	maxhealth = 10000
+	},
+/turf/open/floor/strata/fake_wood{
+	explo_proof = 1;
+	turf_flags = 16
+	},
+/area/clash_arena/tdm_jungle/battlefield/zone_1)
 "cW" = (
 /turf/open/gm/coast/dirt/forestbeachcorner2/south_west,
 /area/clash_arena/tdm_jungle/battlefield)
@@ -560,21 +332,6 @@
 /obj/effect/decal/strata_decals/grasses,
 /turf/open/auto_turf/tyrargo_grass/layer0_mud,
 /area/clash_arena/tdm_jungle/battlefield)
-"db" = (
-/obj/structure/machinery/light{
-	dir = 8
-	},
-/turf/open/floor/almayer/orange/west,
-/area/clash_arena/tdm_jungle/uscm_base)
-"dd" = (
-/obj/structure/bed/chair{
-	dir = 4
-	},
-/turf/open/floor/interior/wood,
-/area/clash_arena/tdm_jungle/uscm_base)
-"dh" = (
-/turf/open/floor/almayer/plate,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "di" = (
 /obj/structure/machinery/cryopod{
 	pixel_y = -6;
@@ -587,51 +344,13 @@
 	},
 /turf/open/floor/prison/floor_marked/west,
 /area/clash_arena/tdm_jungle/upp_base)
-"dj" = (
-/turf/open/floor/almayer/plating_striped,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "dk" = (
 /turf/open/gm/coast/dirt/forestbeachcorner2/south_west,
 /area/space)
-"dl" = (
-/obj/structure/medical_supply_link,
-/obj/structure/machinery/cm_vending/sorted/medical/upp/arena,
-/turf/open/floor/strata/cyan3,
-/area/clash_arena/tdm_jungle/upp_base)
-"dm" = (
-/obj/structure/machinery/light{
-	dir = 4
-	},
-/turf/open/floor/strata/orange_edge/east,
-/area/clash_arena/tdm_jungle/upp_base)
-"do" = (
-/obj/structure/machinery/cm_vending/gear/antag{
-	name = "\improper Response Team Automated Gear Rack"
-	},
-/turf/open/floor/strata/cyan3,
-/area/clash_arena/tdm_jungle/upp_base)
-"dp" = (
-/obj/effect/landmark/start/upp{
-	job_list = list("UPP Logistics Technician");
-	name = "UPP LogTech"
-	},
-/obj/effect/landmark/late_join/upp{
-	job_list = list("UPP Logistics Technician");
-	name = "UPP late logistics join"
-	},
-/turf/open/floor/plating/plating_catwalk/prison,
-/area/clash_arena/tdm_jungle/upp_base)
-"dr" = (
-/obj/structure/machinery/light{
-	dir = 8
-	},
-/turf/open/floor/strata/green3,
-/area/clash_arena/tdm_jungle/upp_base)
 "ds" = (
 /obj/structure/prop/tyrargo/boards/boards_2,
-/obj/effect/landmark/clash_objective/domination_zone/a,
 /turf/open/auto_turf/tyrargo_grass/layer1,
-/area/clash_arena/tdm_jungle/battlefield)
+/area/clash_arena/tdm_jungle/battlefield/zone_2)
 "dv" = (
 /turf/open/hybrisa/street/cement3,
 /area/space)
@@ -660,49 +379,22 @@
 /area/clash_arena/tdm_jungle/battlefield)
 "dK" = (
 /obj/effect/decal/warning_stripes{
-	icon_state = "NE-out";
-	pixel_x = 2;
-	pixel_y = 3
+	icon_state = "W"
 	},
-/obj/effect/decal/warning_stripes{
-	icon_state = "NW-out";
-	pixel_y = 3
-	},
-/turf/open/floor/strata/floor2,
-/area/clash_arena/tdm_jungle/upp_base)
-"dM" = (
-/obj/structure/machinery/cm_vending/sorted/attachments/upp_squad,
-/obj/structure/sign/safety/ammunition{
-	pixel_x = 40;
-	pixel_y = -30
-	},
-/turf/open/floor/strata/red3/south,
-/area/clash_arena/tdm_jungle/upp_base)
-"dN" = (
-/obj/structure/fence/slim/upp,
-/turf/open/floor/strata/green3/west,
+/turf/open/floor/corsat/squares,
 /area/clash_arena/tdm_jungle/upp_base)
 "dP" = (
 /obj/effect/landmark/clash_npc/upp/fill,
 /turf/open/auto_turf/tyrargo_grass,
 /area/clash_arena/tdm_jungle/battlefield)
-"dT" = (
-/obj/structure/machinery/cm_vending/gear/antag{
-	name = "\improper Response Team Automated Gear Rack"
-	},
-/turf/open/floor/strata/orange_edge,
-/area/clash_arena/tdm_jungle/upp_base)
 "dU" = (
-/obj/structure/surface/table/almayer,
-/obj/structure/machinery/prop/almayer/computer/PC{
-	dir = 4
+/obj/effect/decal/warning_stripes{
+	icon_state = "SW-out";
+	pixel_x = -1;
+	pixel_y = -1
 	},
-/obj/item/tool/stamp/approved{
-	pixel_x = -3;
-	pixel_y = -11
-	},
-/turf/open/floor/almayer,
-/area/clash_arena/tdm_jungle/uscm_base/req)
+/turf/closed/wall/upp_ship/reinforced/outer,
+/area/clash_arena/tdm_jungle/upp_base)
 "dV" = (
 /obj/structure/prop/tyrargo/boards/boards_1{
 	pixel_x = 3;
@@ -711,126 +403,14 @@
 /obj/effect/landmark/clash_npc/clf,
 /turf/open/auto_turf/tyrargo_grass/layer0_mud_alt,
 /area/clash_arena/tdm_jungle/battlefield)
-"dW" = (
-/obj/structure/machinery/cryopod{
-	pixel_y = 8;
-	layer = 2.7
-	},
-/obj/structure/machinery/light{
-	dir = 8;
-	light_color = "#66ccff";
-	invisibility = 101
-	},
-/turf/open/floor/prison/floor_marked/west,
-/area/clash_arena/tdm_jungle/upp_base)
 "dY" = (
 /obj/structure/prop/brazier,
 /turf/open/hybrisa/street/cement3,
 /area/space)
-"dZ" = (
-/obj/structure/sign/flag/upp{
-	pixel_y = 27;
-	pixel_x = -1
-	},
-/turf/open/floor/strata/floor2,
-/area/clash_arena/tdm_jungle/upp_base)
-"ea" = (
-/obj/structure/surface/table/almayer,
-/obj/item/storage/box/mre/wy{
-	pixel_y = 7;
-	pixel_x = 5
-	},
-/obj/effect/spawner/random/tool,
-/obj/item/tool/hand_labeler,
-/obj/item/clipboard,
-/obj/effect/landmark/map_item,
-/turf/open/floor/almayer/plate,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"ed" = (
-/obj/structure/machinery/cm_vending/clothing/engi/bravo,
-/turf/open/floor/almayer/plate,
-/area/clash_arena/tdm_jungle/uscm_base)
-"ee" = (
-/obj/structure/machinery/cryopod{
-	pixel_y = 14;
-	layer = 2.8
-	},
-/obj/structure/sign/safety/cryo{
-	pixel_x = -19;
-	pixel_y = -15
-	},
-/turf/open/floor/prison/floor_marked/west,
-/area/clash_arena/tdm_jungle/upp_base)
-"ej" = (
-/obj/structure/machinery/light{
-	dir = 8
-	},
-/obj/structure/machinery/personal_gear_vendor{
-	dir = 8;
-	pixel_x = -4
-	},
-/turf/open/floor/almayer/plate,
-/area/clash_arena/tdm_jungle/uscm_base)
-"ek" = (
-/obj/structure/machinery/cryopod{
-	layer = 3.1
-	},
-/obj/structure/machinery/light{
-	dir = 8;
-	light_color = "#66ccff";
-	invisibility = 101
-	},
-/turf/open/floor/prison/floor_marked/west,
-/area/clash_arena/tdm_jungle/upp_base)
-"el" = (
-/obj/structure/closet/firecloset,
-/turf/open/floor/strata/orange_icorner,
-/area/clash_arena/tdm_jungle/upp_base)
-"em" = (
-/obj/structure/machinery/cryopod{
-	pixel_y = 8;
-	layer = 2.7;
-	dir = 1
-	},
-/obj/structure/machinery/light{
-	dir = 4;
-	light_color = "#66ccff";
-	invisibility = 101
-	},
-/turf/open/floor/prison/floor_marked/west,
-/area/clash_arena/tdm_jungle/upp_base)
-"en" = (
-/obj/structure/machinery/cryopod{
-	pixel_y = 14;
-	layer = 2.8;
-	dir = 8
-	},
-/obj/structure/sign/safety/cryo{
-	pixel_x = 32;
-	pixel_y = -15
-	},
-/turf/open/floor/prison/floor_marked/west,
-/area/clash_arena/tdm_jungle/upp_base)
 "eo" = (
-/obj/structure/machinery/door/airlock/multi_tile/almayer{
-	access_modified = 1;
-	name = "\improper Requisitions Auxiliary Storage Room";
-	req_one_access_txt = "19;21"
-	},
-/turf/open/floor/almayer/plate,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"ep" = (
-/obj/structure/machinery/cryopod{
-	layer = 3.1;
-	dir = 8
-	},
-/obj/structure/machinery/light{
-	dir = 4;
-	light_color = "#66ccff";
-	invisibility = 101
-	},
-/turf/open/floor/prison/floor_marked/west,
-/area/clash_arena/tdm_jungle/upp_base)
+/obj/structure/prop/tyrargo/boards/boards_2,
+/turf/open/auto_turf/snow/brown_base,
+/area/clash_arena/tdm_jungle/battlefield/zone_2)
 "et" = (
 /turf/closed/wall/strata_ice/forest/rock/dirty,
 /area/clash_arena/tdm_jungle/battlefield)
@@ -862,28 +442,15 @@
 	turf_flags = 16
 	},
 /area/clash_arena/tdm_jungle/battlefield)
-"eB" = (
-/turf/open/floor/almayer,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"eC" = (
-/obj/structure/machinery/light{
-	dir = 4
-	},
-/turf/open/floor/almayer/orange/east,
-/area/clash_arena/tdm_jungle/uscm_base)
 "eD" = (
-/obj/structure/surface/rack,
-/turf/open/floor/almayer/cargo,
-/area/clash_arena/tdm_jungle/uscm_base/req)
+/turf/closed/wall/strata_ice/jungle,
+/area/clash_arena/tdm_jungle/battlefield/zone_3)
 "eF" = (
-/obj/structure/surface/table/almayer,
-/obj/item/device/defibrillator,
-/obj/item/tool/screwdriver{
-	pixel_x = -3;
-	pixel_y = 6
+/turf/open/floor/strata/fake_wood{
+	explo_proof = 1;
+	turf_flags = 16
 	},
-/turf/open/floor/strata/floor2,
-/area/clash_arena/tdm_jungle/upp_base)
+/area/clash_arena/tdm_jungle/battlefield/zone_1)
 "eG" = (
 /obj/structure/flora/bush/ausbushes/var3/brflowers{
 	desc = "Just like a real plant, but fake!";
@@ -895,15 +462,6 @@
 	},
 /turf/open/gm/grass,
 /area/space)
-"eK" = (
-/obj/structure/machinery/light{
-	dir = 4
-	},
-/turf/open/floor/almayer/plating_striped/west,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"eL" = (
-/turf/open/floor/almayer/greencorner/west,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "eM" = (
 /obj/effect/decal/warning_stripes{
 	icon_state = "NE-out";
@@ -920,15 +478,9 @@
 "eO" = (
 /turf/open/gm/grass/gbcorner/north_west,
 /area/space)
-"eP" = (
-/turf/open/floor/almayer/flooredgesmooth2/west,
-/area/clash_arena/tdm_jungle/uscm_base)
 "eR" = (
 /turf/open/auto_turf/tyrargo_grass/layer0,
 /area/clash_arena/tdm_jungle/battlefield)
-"eU" = (
-/turf/open/floor/almayer/cargo_arrow/north,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "eV" = (
 /obj/structure/machinery/cryopod{
 	pixel_y = -6
@@ -944,20 +496,9 @@
 	},
 /turf/open/floor/prison/floor_marked/west,
 /area/clash_arena/tdm_jungle/upp_base)
-"eY" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "NE-out";
-	pixel_x = 2;
-	pixel_y = 3
-	},
-/turf/open/floor/strata/floor3/east,
-/area/clash_arena/tdm_jungle/upp_base)
 "ff" = (
 /turf/open/floor/strata/red2,
 /area/clash_arena/tdm_jungle/upp_base)
-"fh" = (
-/turf/open/floor/plating/plating_catwalk,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "fj" = (
 /obj/structure/flora/grass/tallgrass/jungle,
 /turf/open/auto_turf/tyrargo_grass,
@@ -969,32 +510,17 @@
 	},
 /turf/open/auto_turf/tyrargo_grass/layer0_mud_alt,
 /area/clash_arena/tdm_jungle/battlefield)
-"fn" = (
-/obj/structure/surface/rack,
-/obj/item/tool/weldpack,
-/turf/open/floor/almayer/cargo,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "fo" = (
 /turf/open/floor/almayer/plate,
 /area/clash_arena/tdm_jungle/uscm_base)
-"fp" = (
-/obj/structure/machinery/cryopod/right{
-	pixel_y = 6
-	},
-/turf/open/floor/almayer/cargo,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "fq" = (
-/turf/open/floor/almayer/green/east,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"fs" = (
-/turf/open/floor/almayer/cargo_arrow/west,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"ft" = (
-/turf/open/floor/almayer/green/north,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"fu" = (
-/turf/open/floor/almayer/greencorner/north,
-/area/clash_arena/tdm_jungle/uscm_base/req)
+/obj/effect/decal/warning_stripes{
+	icon_state = "SE-out";
+	pixel_x = 2;
+	pixel_y = -1
+	},
+/turf/open/floor/corsat/squares,
+/area/clash_arena/tdm_jungle/upp_base)
 "fv" = (
 /turf/open/gm/river,
 /area/space)
@@ -1006,23 +532,22 @@
 /turf/open/gm/coast/dirt/forestdir/east,
 /area/clash_arena/tdm_jungle/battlefield)
 "fB" = (
-/turf/open/floor/almayer/plating_striped/east,
-/area/clash_arena/tdm_jungle/uscm_base/req)
+/obj/effect/decal/warning_stripes{
+	icon_state = "SW-out";
+	pixel_x = -1;
+	pixel_y = -1
+	},
+/turf/open/floor/corsat/squares,
+/area/clash_arena/tdm_jungle/upp_base)
 "fG" = (
-/obj/structure/closet/crate,
-/obj/item/stack/sheet/metal/medium_stack{
-	amount = 40;
-	pixel_x = -4;
-	pixel_y = -4
+/obj/structure/machinery/cm_vending/sorted/cargo_ammo/squad{
+	req_access = null;
+	req_one_access = null;
+	req_one_access_txt = "15;16;21";
+	vend_x_offset = 0
 	},
-/obj/item/stack/sheet/plasteel/small_stack{
-	amount = 15
-	},
-/obj/structure/machinery/light/small{
-	dir = 1
-	},
-/turf/open/floor/almayer/cargo,
-/area/clash_arena/tdm_jungle/uscm_base/req)
+/turf/open/floor/almayer/floor,
+/area/clash_arena/tdm_jungle/uscm_base)
 "fI" = (
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
 	dir = 1
@@ -1070,14 +595,6 @@
 	},
 /turf/open/auto_turf/tyrargo_grass,
 /area/clash_arena/tdm_jungle/battlefield)
-"fP" = (
-/obj/structure/surface/rack,
-/obj/item/storage/box/spec/mortar,
-/turf/open/floor/almayer/cargo,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"fT" = (
-/turf/open/floor/almayer/empty/requisitions,
-/area/clash_arena/tdm_jungle/upp_base)
 "fU" = (
 /turf/closed/wall/upp_ship/reinforced/outer,
 /area/clash_arena/tdm_jungle/upp_base)
@@ -1095,36 +612,23 @@
 	},
 /turf/open/gm/river/desert/tyrargo/deep,
 /area/clash_arena/tdm_jungle/battlefield)
-"fZ" = (
-/obj/structure/machinery/cm_vending/sorted/cargo_guns/squad{
-	req_access = null;
-	req_one_access = null;
-	req_one_access_txt = "15;16;21";
-	vend_x_offset = 0;
-	vend_y_offset = 0
-	},
-/obj/structure/machinery/light,
-/turf/open/floor/almayer,
-/area/clash_arena/tdm_jungle/uscm_base)
 "gb" = (
 /obj/effect/decal/warning_stripes{
-	icon_state = "NE-out";
-	pixel_x = 2;
-	pixel_y = 3
+	icon_state = "E";
+	pixel_x = 2
 	},
-/turf/open/floor/strata/floor2,
+/turf/open/floor/corsat/squares,
 /area/clash_arena/tdm_jungle/upp_base)
 "gc" = (
-/obj/structure/machinery/door/poddoor/railing/upp{
-	dir = 4
-	},
-/turf/open/floor/almayer,
-/area/clash_arena/tdm_jungle/upp_base)
-"gg" = (
 /obj/effect/decal/warning_stripes{
-	icon_state = "E"
+	icon_state = "S";
+	pixel_y = -1
 	},
-/turf/open/floor/strata/multi_tiles/west,
+/obj/effect/decal/warning_stripes{
+	icon_state = "N";
+	pixel_y = 3
+	},
+/turf/open/floor/kutjevo/colors/red/tile,
 /area/clash_arena/tdm_jungle/upp_base)
 "gj" = (
 /obj/structure/machinery/cryopod{
@@ -1148,7 +652,7 @@
 /obj/effect/decal/warning_stripes{
 	icon_state = "W"
 	},
-/turf/open/floor/strata/red3/west,
+/turf/open/floor/corsat/red/west,
 /area/clash_arena/tdm_jungle/upp_base)
 "go" = (
 /obj/effect/landmark/start/marine/spec/alpha,
@@ -1169,45 +673,12 @@
 	},
 /turf/open/auto_turf/snow/brown_base,
 /area/clash_arena/tdm_jungle/battlefield)
-"gu" = (
-/obj/structure/surface/table/almayer,
-/obj/structure/machinery/line_nexter_control{
-	id = "uppline2";
-	pixel_x = -4;
-	pixel_y = 10
-	},
-/obj/structure/machinery/door_control{
-	id = "cargdoor";
-	name = "Shutter View Access";
-	pixel_x = -4;
-	pixel_y = 2;
-	req_one_access_txt = "230"
-	},
-/obj/item/tool/hand_labeler{
-	pixel_x = 8;
-	pixel_y = 3
-	},
-/turf/open/floor/strata,
-/area/clash_arena/tdm_jungle/upp_base)
 "gv" = (
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
 	dir = 1
 	},
 /turf/open/auto_turf/tyrargo_grass,
 /area/clash_arena/tdm_jungle/battlefield)
-"gy" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "SW-out"
-	},
-/obj/structure/machinery/gear{
-	id = "supply_elevator_gear"
-	},
-/turf/open/floor/almayer/mono,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"gA" = (
-/obj/structure/machinery/cm_vending/clothing/smartgun/alpha,
-/turf/open/floor/almayer/plate,
-/area/clash_arena/tdm_jungle/uscm_base)
 "gB" = (
 /obj/effect/decal/strata_decals/grasses,
 /obj/structure/largecrate/random/barrel/green,
@@ -1228,34 +699,17 @@
 /obj/structure/platform/stone/tyrargo/north,
 /turf/open/gm/coast/dirt/forestdir/west,
 /area/clash_arena/tdm_jungle/battlefield)
-"gJ" = (
-/obj/structure/bed/chair/office/dark{
-	dir = 1
-	},
-/turf/open/floor/strata/floor3/east,
-/area/clash_arena/tdm_jungle/upp_base)
-"gL" = (
-/obj/structure/machinery/door/poddoor/railing/upp{
-	dir = 8
-	},
-/turf/open/floor/almayer,
-/area/clash_arena/tdm_jungle/upp_base)
-"gQ" = (
-/obj/structure/machinery/cm_vending/sorted/cargo_guns/upp_cargo_guns/blend,
-/turf/open/floor/strata/floor3/east,
-/area/clash_arena/tdm_jungle/upp_base)
 "gS" = (
 /obj/structure/flora/bush/ausbushes/var3/fullgrass,
 /obj/effect/decal/strata_decals/grasses,
 /turf/open/auto_turf/tyrargo_grass/layer0_mud_alt,
 /area/clash_arena/tdm_jungle/battlefield)
-"gV" = (
-/turf/open/floor/almayer/orange/west,
-/area/clash_arena/tdm_jungle/uscm_base)
 "gX" = (
-/obj/structure/machinery/cm_vending/sorted/cargo_guns/upp_squad,
-/turf/open/floor/strata/red3/south,
-/area/clash_arena/tdm_jungle/upp_base)
+/obj/structure/machinery/chem_dispenser/corpsman/arena{
+	pixel_y = 3
+	},
+/turf/open/floor/almayer/floor,
+/area/clash_arena/tdm_jungle/uscm_base)
 "ha" = (
 /obj/structure/flora/tree/tyrargo{
 	pixel_x = -23;
@@ -1297,16 +751,6 @@
 /obj/structure/flora/bush/ausbushes/var3/fullgrass,
 /turf/open/auto_turf/tyrargo_grass/layer0_mud_alt,
 /area/clash_arena/tdm_jungle/battlefield)
-"hm" = (
-/obj/structure/sign/banners/colonial_marines_flag,
-/turf/closed/wall/almayer/reinforced,
-/area/clash_arena/tdm_jungle/uscm_base)
-"hn" = (
-/obj/structure/machinery/light{
-	dir = 4
-	},
-/turf/open/floor/almayer/floor,
-/area/clash_arena/tdm_jungle/uscm_base)
 "ho" = (
 /turf/open/gm/river/desert/tyrargo/no_slowdown,
 /area/clash_arena/tdm_jungle/battlefield)
@@ -1325,12 +769,6 @@
 	},
 /turf/open/gm/river/desert/tyrargo/deep,
 /area/clash_arena/tdm_jungle/battlefield)
-"hr" = (
-/obj/structure/bed/chair/office/light{
-	dir = 8
-	},
-/turf/open/floor/plating/plating_catwalk,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "hs" = (
 /obj/effect/landmark/clash_npc/uscm/fill,
 /turf/open/auto_turf/snow/brown_base/layer3,
@@ -1354,9 +792,6 @@
 	},
 /turf/open/floor/grass,
 /area/space)
-"hy" = (
-/turf/open/floor/almayer/redcorner/east,
-/area/clash_arena/tdm_jungle/uscm_base)
 "hF" = (
 /obj/effect/landmark/start/marine/medic/bravo,
 /obj/effect/landmark/late_join/bravo,
@@ -1364,13 +799,10 @@
 /area/clash_arena/tdm_jungle/uscm_base)
 "hJ" = (
 /obj/effect/decal/warning_stripes{
-	icon_state = "E";
-	pixel_x = 2
+	icon_state = "NW-out";
+	pixel_y = 3
 	},
-/obj/effect/decal/warning_stripes{
-	icon_state = "W"
-	},
-/turf/open/floor/strata/floor2,
+/turf/open/floor/corsat/squares,
 /area/clash_arena/tdm_jungle/upp_base)
 "hO" = (
 /obj/structure/flora/bush/ausbushes/var3/fullgrass,
@@ -1380,22 +812,6 @@
 	},
 /turf/open/gm/river/red,
 /area/clash_arena/tdm_jungle/battlefield)
-"hR" = (
-/obj/structure/machinery/cm_vending/clothing/marine/alpha{
-	density = 0;
-	layer = 4.1;
-	pixel_y = -29
-	},
-/turf/open/floor/almayer/cargo_arrow,
-/area/clash_arena/tdm_jungle/uscm_base)
-"hS" = (
-/turf/open/floor/strata/orange_edge/northeast,
-/area/clash_arena/tdm_jungle/upp_base)
-"hV" = (
-/obj/structure/medical_supply_link,
-/obj/structure/machinery/cm_vending/sorted/medical/upp/arena,
-/turf/open/floor/strata/cyan3/north,
-/area/clash_arena/tdm_jungle/upp_base)
 "ia" = (
 /obj/structure/bed/chair/wood/normal{
 	dir = 4
@@ -1410,9 +826,6 @@
 	},
 /turf/open/auto_turf/tyrargo_grass,
 /area/clash_arena/tdm_jungle/battlefield)
-"ie" = (
-/turf/open/floor/strata/red3/east,
-/area/clash_arena/tdm_jungle/upp_base)
 "ii" = (
 /obj/structure/prop/tyrargo/boards/boards_2{
 	pixel_x = -2;
@@ -1446,13 +859,6 @@
 	},
 /turf/open/floor/interior/wood,
 /area/clash_arena/tdm_jungle/uscm_base)
-"iv" = (
-/obj/structure/surface/table/almayer,
-/obj/effect/spawner/random/toolbox,
-/obj/item/clipboard,
-/obj/item/tool/pen,
-/turf/open/floor/almayer/green/west,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "iA" = (
 /obj/structure/platform/metal/almayer_smooth/north,
 /turf/open/floor/grass,
@@ -1468,21 +874,14 @@
 /turf/open/auto_turf/tyrargo_grass,
 /area/clash_arena/tdm_jungle/battlefield)
 "iH" = (
-/obj/structure/surface/table/almayer,
-/obj/structure/machinery/line_nexter_control{
-	id = "uppline1";
-	pixel_x = 6;
-	pixel_y = 10
+/obj/structure/barricade/sandbags/weak_wired{
+	dir = 4;
+	pixel_x = 0;
+	pixel_y = 5
 	},
-/obj/structure/machinery/door_control{
-	id = "cargdoor";
-	name = "Shutter View Access";
-	pixel_x = 6;
-	pixel_y = 2;
-	req_one_access_txt = "230"
-	},
-/turf/open/floor/strata,
-/area/clash_arena/tdm_jungle/upp_base)
+/obj/effect/decal/strata_decals/grasses,
+/turf/open/auto_turf/tyrargo_grass,
+/area/clash_arena/tdm_jungle/battlefield)
 "iI" = (
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
 	dir = 7
@@ -1517,11 +916,6 @@
 	},
 /turf/open/gm/river/desert/tyrargo/deep,
 /area/clash_arena/tdm_jungle/battlefield)
-"iM" = (
-/obj/structure/machinery/light,
-/obj/structure/closet/secure_closet,
-/turf/open/floor/strata/green3,
-/area/clash_arena/tdm_jungle/upp_base)
 "iN" = (
 /obj/structure/prop/tyrargo/boards/boards_2{
 	pixel_x = 13;
@@ -1555,12 +949,6 @@
 /obj/structure/flora/grass/tallgrass/jungle,
 /turf/open/gm/river/desert/tyrargo/deep,
 /area/clash_arena/tdm_jungle/battlefield)
-"iX" = (
-/turf/open/floor/almayer/orangecorner,
-/area/clash_arena/tdm_jungle/uscm_base)
-"jh" = (
-/turf/open/floor/almayer/green/east,
-/area/clash_arena/tdm_jungle/uscm_base)
 "ji" = (
 /turf/open/gm/coast/dirt/forestbeachcorner2/north_west,
 /area/clash_arena/tdm_jungle/battlefield)
@@ -1599,14 +987,6 @@
 /obj/effect/decal/strata_decals/grasses,
 /turf/open/gm/river/desert/tyrargo/deep,
 /area/clash_arena/tdm_jungle/battlefield)
-"jn" = (
-/obj/structure/surface/table/reinforced/rostock_table,
-/obj/item/storage/belt/utility/full,
-/obj/item/storage/belt/utility/full,
-/obj/item/clothing/glasses/welding,
-/obj/item/clothing/glasses/welding,
-/turf/open/floor/strata/orange_edge,
-/area/clash_arena/tdm_jungle/upp_base)
 "jq" = (
 /obj/structure/flora/bush/ausbushes/var3/fullgrass,
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
@@ -1626,17 +1006,9 @@
 	pixel_x = -17;
 	pixel_y = -7
 	},
-/obj/structure/machinery/cm_vending/sorted/attachments/upp_squad,
-/turf/open/floor/corsat/spiralplate,
+/obj/structure/machinery/cm_vending/sorted/cargo_guns/upp_squad_guns,
+/turf/open/floor/corsat/plate,
 /area/clash_arena/tdm_jungle/upp_base)
-"jA" = (
-/obj/structure/filingcabinet,
-/obj/structure/sign/safety/galley{
-	pixel_x = 8;
-	pixel_y = 25
-	},
-/turf/open/floor/almayer/green/northeast,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "jB" = (
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
 	dir = 0
@@ -1657,7 +1029,7 @@
 /turf/open/gm/grass/grassbeach/east,
 /area/space)
 "jF" = (
-/turf/open/floor/strata/floor2,
+/turf/open/floor/corsat/red,
 /area/clash_arena/tdm_jungle/upp_base)
 "jG" = (
 /obj/effect/decal/strata_decals/grasses,
@@ -1672,12 +1044,6 @@
 	},
 /turf/open/auto_turf/tyrargo_grass,
 /area/clash_arena/tdm_jungle/battlefield)
-"jI" = (
-/obj/structure/machinery/light{
-	dir = 1
-	},
-/turf/open/floor/strata/floor2,
-/area/clash_arena/tdm_jungle/upp_base)
 "jJ" = (
 /turf/open/space/basic,
 /area/space)
@@ -1711,42 +1077,48 @@
 /turf/open/auto_turf/tyrargo_grass,
 /area/clash_arena/tdm_jungle/battlefield)
 "jX" = (
-/obj/structure/window/framed/upp_ship/reinforced,
-/turf/open/floor/plating,
+/obj/structure/surface/table/reinforced/rostock_table,
+/obj/item/book/manual/upphistory{
+	pixel_x = 7;
+	pixel_y = 8
+	},
+/obj/item/book/manual/upphistory{
+	pixel_x = -6;
+	pixel_y = 8
+	},
+/obj/item/book/manual/upphistory{
+	pixel_x = 7;
+	pixel_y = 0
+	},
+/obj/item/book/manual/upphistory{
+	pixel_x = -6;
+	pixel_y = 0
+	},
+/obj/item/book/codebook/upp,
+/turf/open/floor/corsat/plate,
 /area/clash_arena/tdm_jungle/upp_base)
-"kb" = (
-/turf/open/floor/almayer/plating/northeast,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"kf" = (
-/obj/structure/reagent_dispensers/tank/fuel,
-/obj/item/tool/extinguisher,
-/obj/item/tool/extinguisher,
-/obj/item/tool/extinguisher,
-/turf/open/floor/almayer/cargo,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "kg" = (
 /obj/effect/landmark/clash_npc/upp/fill,
 /turf/open/auto_turf/tyrargo_grass/layer1,
 /area/clash_arena/tdm_jungle/battlefield)
 "kj" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "W"
-	},
-/turf/open/floor/strata/floor2,
+/obj/structure/machinery/cm_vending/sorted/tech/electronics_storage/antag,
+/turf/open/floor/corsat/plate,
 /area/clash_arena/tdm_jungle/upp_base)
 "km" = (
 /obj/effect/decal/warning_stripes{
-	icon_state = "S";
+	icon_state = "SE-out";
+	pixel_x = 2;
 	pixel_y = -1
 	},
-/turf/open/floor/strata/red3/south,
+/turf/open/floor/corsat/red/east,
 /area/clash_arena/tdm_jungle/upp_base)
 "ko" = (
 /obj/effect/decal/siding,
 /turf/open/auto_turf/tyrargo_grass/layer0_mud,
 /area/clash_arena/tdm_jungle/battlefield)
 "kt" = (
-/turf/open/floor/strata/red3/west,
+/turf/open/floor/corsat/red/northwest,
 /area/clash_arena/tdm_jungle/upp_base)
 "kv" = (
 /obj/effect/decal/strata_decals/grasses,
@@ -1791,30 +1163,14 @@
 /turf/open/gm/river/desert/tyrargo/no_slowdown,
 /area/clash_arena/tdm_jungle/battlefield)
 "kC" = (
-/obj/effect/landmark/supply_elevator,
-/turf/open/floor/almayer/empty/requisitions,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"kL" = (
-/obj/structure/machinery/cm_vending/clothing/medic/alpha,
-/turf/open/floor/almayer/plate,
-/area/clash_arena/tdm_jungle/uscm_base)
+/turf/open/floor/corsat/red/east,
+/area/clash_arena/tdm_jungle/upp_base)
 "kM" = (
 /turf/open/floor/interior/wood,
 /area/clash_arena/tdm_jungle/uscm_base)
 "kN" = (
-/obj/structure/machinery/cm_vending/gear/engi,
-/turf/open/floor/almayer/plate,
-/area/clash_arena/tdm_jungle/uscm_base)
-"kP" = (
-/obj/structure/machinery/conveyor{
-	id = "req_belt"
-	},
-/turf/open/floor/almayer/plating/northeast,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"kQ" = (
-/obj/structure/machinery/computer/supply/asrs/upp,
-/turf/open/floor/strata/orange_edge/east,
-/area/clash_arena/tdm_jungle/upp_base)
+/turf/open/auto_turf/tyrargo_grass/layer0_mud,
+/area/clash_arena/tdm_jungle/battlefield/zone_3)
 "kR" = (
 /obj/structure/prop/colorable_rock/colorable/alt{
 	color = "#8D8468";
@@ -1840,9 +1196,6 @@
 /obj/effect/decal/strata_decals/grasses,
 /turf/open/auto_turf/tyrargo_grass,
 /area/clash_arena/tdm_jungle/battlefield)
-"kY" = (
-/turf/open/floor/almayer/plating,
-/area/clash_arena/tdm_jungle/upp_base)
 "la" = (
 /obj/structure/machinery/light{
 	dir = 8
@@ -1850,17 +1203,10 @@
 /obj/structure/bed/hybrisa/bunkbed3,
 /turf/open/floor/interior/wood,
 /area/clash_arena/tdm_jungle/uscm_base)
-"lb" = (
-/obj/structure/machinery/cm_vending/sorted/attachments/blend,
-/turf/closed/wall/almayer/outer,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"ld" = (
-/obj/structure/machinery/cm_vending/clothing/specialist/alpha,
-/turf/open/floor/almayer/plate,
-/area/clash_arena/tdm_jungle/uscm_base)
 "lf" = (
-/obj/structure/machinery/cm_vending/sorted/medical/arena,
-/turf/open/floor/almayer/plate,
+/obj/structure/bed,
+/obj/item/bedsheet/mime,
+/turf/open/floor/interior/wood,
 /area/clash_arena/tdm_jungle/uscm_base)
 "li" = (
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
@@ -1872,7 +1218,7 @@
 /obj/structure/machinery/cm_vending/gear/antag{
 	name = "\improper Response Team Automated Gear Rack"
 	},
-/turf/open/floor/corsat/spiralplate,
+/turf/open/floor/corsat/squares,
 /area/clash_arena/tdm_jungle/upp_base)
 "lp" = (
 /obj/structure/platform_decoration/metal/almayer_smooth,
@@ -1887,8 +1233,11 @@
 /turf/open/auto_turf/tyrargo_grass,
 /area/clash_arena/tdm_jungle/battlefield)
 "lt" = (
-/obj/structure/machinery/door/airlock/almayer/marine/bravo/sl,
-/turf/open/floor/almayer/test_floor4,
+/obj/structure/machinery/cm_vending/sorted/uniform_supply/squad_prep,
+/obj/structure/machinery/light{
+	dir = 8
+	},
+/turf/open/floor/almayer,
 /area/clash_arena/tdm_jungle/uscm_base)
 "lv" = (
 /obj/structure/prop/almayer/ship_memorial{
@@ -1897,36 +1246,12 @@
 	},
 /turf/open/gm/grass/grassbeach/south,
 /area/space)
-"lw" = (
-/obj/structure/machinery/door/poddoor/railing{
-	dir = 4;
-	id = "supply_elevator_railing"
-	},
-/turf/open/floor/almayer/cargo_arrow/west,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"lA" = (
-/obj/structure/closet/crate/supply,
-/obj/item/stack/sheet/wood/medium_stack,
-/obj/structure/platform/metal/strata/north,
-/turf/open/floor/strata/floor3/east,
-/area/clash_arena/tdm_jungle/upp_base)
 "lB" = (
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
 	dir = 4
 	},
 /turf/open/auto_turf/tyrargo_grass,
 /area/clash_arena/tdm_jungle/battlefield)
-"lC" = (
-/obj/structure/machinery/cm_vending/gear/smartgun,
-/obj/structure/sign/safety/hazard{
-	pixel_y = 32
-	},
-/obj/structure/sign/safety/ammunition{
-	pixel_x = 15;
-	pixel_y = 32
-	},
-/turf/open/floor/almayer/plate,
-/area/clash_arena/tdm_jungle/uscm_base)
 "lK" = (
 /turf/closed/cordon,
 /area/space)
@@ -1938,13 +1263,6 @@
 /obj/structure/prop/tyrargo/boards/boards_2,
 /turf/open/auto_turf/snow/brown_base,
 /area/clash_arena/tdm_jungle/battlefield)
-"lQ" = (
-/obj/structure/machinery/door/firedoor/border_only/almayer{
-	dir = 1
-	},
-/obj/structure/window/framed/almayer/hull,
-/turf/open/floor/almayer/green/northeast,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "lU" = (
 /obj/structure/prop/tyrargo/boards/boards_2,
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
@@ -1966,7 +1284,7 @@
 /obj/structure/machinery/light{
 	dir = 1
 	},
-/turf/open/floor/strata/red3/south,
+/turf/open/floor/corsat/squares,
 /area/clash_arena/tdm_jungle/upp_base)
 "ma" = (
 /obj/structure/platform/metal/almayer_smooth/east,
@@ -1981,9 +1299,6 @@
 /obj/structure/flora/grass/temperate,
 /turf/open/auto_turf/tyrargo_grass/layer0_mud_alt,
 /area/clash_arena/tdm_jungle/battlefield)
-"mh" = (
-/turf/open/floor/strata/green3/east,
-/area/clash_arena/tdm_jungle/upp_base)
 "mj" = (
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
 	dir = 8
@@ -2009,32 +1324,10 @@
 /area/clash_arena/tdm_jungle/battlefield)
 "mt" = (
 /obj/structure/machinery/light,
-/turf/open/floor/strata/floor2,
+/turf/open/floor/corsat/red,
 /area/clash_arena/tdm_jungle/upp_base)
-"mu" = (
-/obj/structure/machinery/door/airlock/almayer/marine/alpha/spec,
-/turf/open/floor/almayer/test_floor4,
-/area/clash_arena/tdm_jungle/uscm_base)
 "mv" = (
-/obj/structure/surface/table/reinforced/rostock_table,
-/obj/item/book/manual/upphistory{
-	pixel_x = 7;
-	pixel_y = 8
-	},
-/obj/item/book/manual/upphistory{
-	pixel_x = -6;
-	pixel_y = 8
-	},
-/obj/item/book/manual/upphistory{
-	pixel_x = 7;
-	pixel_y = 0
-	},
-/obj/item/book/manual/upphistory{
-	pixel_x = -6;
-	pixel_y = 0
-	},
-/obj/item/book/codebook/upp,
-/turf/open/floor/strata/red3/south,
+/turf/open/floor/corsat/plate,
 /area/clash_arena/tdm_jungle/upp_base)
 "mw" = (
 /obj/effect/decal/strata_decals/grasses,
@@ -2049,38 +1342,6 @@
 	},
 /turf/open/auto_turf/tyrargo_grass,
 /area/clash_arena/tdm_jungle/battlefield)
-"mz" = (
-/obj/effect/decal/cleanable/blood/oil,
-/obj/effect/decal/warning_stripes{
-	icon_state = "S"
-	},
-/obj/effect/decal/warning_stripes{
-	icon_state = "E";
-	pixel_x = 1
-	},
-/turf/open/floor/almayer,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"mB" = (
-/obj/structure/transmitter{
-	dir = 8;
-	name = "RO Office Telephone";
-	phone_category = "Offices";
-	phone_id = "RO Office";
-	pixel_x = 16
-	},
-/turf/open/floor/almayer/green/east,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"mC" = (
-/obj/structure/sign/safety/cryo{
-	pixel_x = 32
-	},
-/turf/open/floor/almayer/plate,
-/area/clash_arena/tdm_jungle/uscm_base)
-"mD" = (
-/obj/effect/landmark/start/requisition,
-/obj/effect/landmark/late_join/requisition,
-/turf/open/floor/plating/plating_catwalk,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "mN" = (
 /obj/structure/flora/tree/tyrargo{
 	layer = 5.97
@@ -2124,7 +1385,7 @@
 	pixel_y = 5
 	},
 /turf/open/auto_turf/tyrargo_grass/layer0_mud_alt,
-/area/clash_arena/tdm_jungle/battlefield)
+/area/clash_arena/tdm_jungle/battlefield/zone_3)
 "mZ" = (
 /obj/effect/decal/strata_decals/grasses,
 /obj/effect/decal/strata_decals/grasses,
@@ -2139,23 +1400,6 @@
 /obj/effect/landmark/clash_npc/uscm/fill,
 /turf/open/auto_turf/tyrargo_grass/layer0_mud,
 /area/clash_arena/tdm_jungle/battlefield)
-"ne" = (
-/obj/structure/closet/crate/freezer/cooler{
-	pixel_x = -7
-	},
-/obj/structure/largecrate/random/mini/ammo{
-	pixel_x = 10;
-	pixel_y = -4
-	},
-/obj/item/reagent_container/food/drinks/cans/aspen,
-/obj/item/reagent_container/food/drinks/cans/aspen,
-/obj/item/reagent_container/food/drinks/cans/aspen,
-/obj/item/reagent_container/food/drinks/cans/aspen,
-/obj/structure/sign/safety/storage{
-	pixel_x = -24
-	},
-/turf/open/floor/almayer/test_floor4,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "nf" = (
 /obj/effect/decal/strata_decals/grasses,
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
@@ -2186,34 +1430,9 @@
 /obj/effect/decal/strata_decals/grasses,
 /turf/open/gm/river/desert/tyrargo/deep,
 /area/clash_arena/tdm_jungle/battlefield)
-"nk" = (
-/obj/structure/machinery/conveyor{
-	id = "req_belt"
-	},
-/turf/open/floor/almayer,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"nl" = (
-/obj/structure/machinery/door/airlock/almayer/marine/requisitions{
-	access_modified = 1;
-	name = "\improper Requisition's Office";
-	req_one_access = null;
-	req_one_access_txt = "1;26"
-	},
-/turf/open/floor/almayer/test_floor4,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "no" = (
 /turf/open/gm/coast/dirt/forestdir/west,
 /area/clash_arena/tdm_jungle/battlefield)
-"nu" = (
-/obj/effect/landmark/start/cargo,
-/obj/effect/landmark/late_join/cargo,
-/turf/open/floor/plating/plating_catwalk,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"nv" = (
-/obj/structure/surface/rack,
-/obj/item/ammo_magazine/sentry/upp,
-/turf/open/floor/prison/floor_marked/west,
-/area/clash_arena/tdm_jungle/upp_base)
 "nx" = (
 /obj/structure/prop/tyrargo/boards/boards_1{
 	pixel_x = 13;
@@ -2224,23 +1443,13 @@
 	turf_flags = 16
 	},
 /area/clash_arena/tdm_jungle/battlefield)
-"nC" = (
-/turf/open/floor/almayer/plating_striped/west,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "nG" = (
 /obj/effect/decal/siding,
 /turf/open/floor/strata/fake_wood{
 	explo_proof = 1;
 	turf_flags = 16
 	},
-/area/clash_arena/tdm_jungle/battlefield)
-"nI" = (
-/obj/effect/decal/strata_decals/grasses,
-/obj/effect/decal/strata_decals/tyrargo_mud_corner{
-	dir = 4
-	},
-/turf/open/auto_turf/tyrargo_grass/layer0_mud,
-/area/clash_arena/tdm_jungle/battlefield)
+/area/clash_arena/tdm_jungle/battlefield/zone_1)
 "nN" = (
 /obj/structure/flora/bush/ausbushes/var3/fullgrass,
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
@@ -2313,10 +1522,6 @@
 /obj/effect/decal/strata_decals/grasses,
 /turf/open/auto_turf/tyrargo_grass/layer0_mud,
 /area/clash_arena/tdm_jungle/battlefield)
-"oo" = (
-/obj/structure/machinery/cm_vending/sorted/uniform_supply/squad_prep/upp_squad_prep,
-/turf/open/floor/strata/floor3/east,
-/area/clash_arena/tdm_jungle/upp_base)
 "or" = (
 /obj/structure/platform_decoration/metal/almayer_smooth/north,
 /obj/structure/flora/bush/ausbushes/var3/sparsegrass,
@@ -2356,12 +1561,11 @@
 /turf/open/floor/strata/multi_tiles,
 /area/clash_arena/tdm_jungle/upp_base)
 "oK" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "S"
+/obj/structure/machinery/light{
+	dir = 8
 	},
-/obj/structure/machinery/door/poddoor/railing/upp,
-/turf/open/floor/almayer,
-/area/clash_arena/tdm_jungle/upp_base)
+/turf/open/floor/interior/wood,
+/area/clash_arena/tdm_jungle/uscm_base)
 "oL" = (
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
 	dir = 8
@@ -2394,10 +1598,6 @@
 /obj/effect/decal/strata_decals/grasses,
 /turf/open/gm/coast/dirt/forestbeachcorner2/north_west,
 /area/clash_arena/tdm_jungle/battlefield)
-"oX" = (
-/obj/structure/machinery/cm_vending/sorted/cargo_guns/cargo/blend,
-/turf/open/floor/almayer/green/southwest,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "oZ" = (
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
 	dir = 8
@@ -2409,26 +1609,6 @@
 /obj/structure/flora/bush/ausbushes/var3/fullgrass,
 /turf/open/gm/river/tyrargo,
 /area/clash_arena/tdm_jungle/battlefield)
-"pg" = (
-/obj/structure/window/framed/almayer/hull,
-/turf/closed/wall/almayer/reinforced,
-/area/clash_arena/tdm_jungle/uscm_base)
-"pi" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "SW-out";
-	pixel_x = -1
-	},
-/obj/structure/machinery/gear/upp,
-/turf/open/floor/almayer/mono,
-/area/clash_arena/tdm_jungle/upp_base)
-"pj" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "S";
-	pixel_y = -1
-	},
-/obj/structure/machinery/light,
-/turf/open/floor/kutjevo/colors/red/tile,
-/area/clash_arena/tdm_jungle/upp_base)
 "pl" = (
 /obj/structure/flora/tree/tyrargo/tree_2{
 	pixel_x = -18;
@@ -2449,11 +1629,8 @@
 /turf/open/floor/interior/wood,
 /area/clash_arena/tdm_jungle/uscm_base)
 "pn" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "N";
-	pixel_y = 3
-	},
-/turf/open/floor/strata/floor3/east,
+/obj/structure/machinery/light,
+/turf/open/floor/kutjevo/colors/red/tile,
 /area/clash_arena/tdm_jungle/upp_base)
 "pq" = (
 /obj/effect/decal/strata_decals/grasses,
@@ -2462,14 +1639,6 @@
 	},
 /turf/open/auto_turf/tyrargo_grass,
 /area/clash_arena/tdm_jungle/battlefield)
-"pr" = (
-/obj/structure/largecrate,
-/obj/item/folded_tent/reqs{
-	pixel_x = -3;
-	pixel_y = 10
-	},
-/turf/open/floor/almayer/test_floor4,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "ps" = (
 /obj/effect/decal/strata_decals/grasses,
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
@@ -2495,9 +1664,6 @@
 	},
 /turf/open/gm/river/desert/tyrargo/no_slowdown,
 /area/clash_arena/tdm_jungle/battlefield)
-"pv" = (
-/turf/open/floor/strata/green3/northwest,
-/area/clash_arena/tdm_jungle/upp_base)
 "pw" = (
 /obj/effect/decal/strata_decals/grasses,
 /obj/structure/flora/bush/ausbushes/var3/fullgrass,
@@ -2507,29 +1673,6 @@
 	},
 /turf/open/gm/river/red,
 /area/clash_arena/tdm_jungle/battlefield)
-"px" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "NE-out"
-	},
-/obj/structure/machinery/gear{
-	id = "supply_elevator_gear"
-	},
-/turf/open/floor/almayer/mono,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"pF" = (
-/obj/structure/machinery/door/firedoor/border_only/almayer,
-/obj/structure/machinery/door/poddoor/shutters/almayer{
-	dir = 4;
-	id = "ROlobby2";
-	name = "\improper RO Line 2"
-	},
-/obj/structure/window/framed/almayer/hull/hijack_bustable,
-/turf/open/floor/plating,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"pK" = (
-/obj/structure/machinery/cm_vending/sorted/cargo_ammo/upp_cargo_ammo/blend,
-/turf/open/floor/strata/floor3/east,
-/area/clash_arena/tdm_jungle/upp_base)
 "pN" = (
 /obj/effect/decal/strata_decals/grasses,
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
@@ -2544,14 +1687,6 @@
 	},
 /turf/open/gm/river/desert/tyrargo/deep,
 /area/clash_arena/tdm_jungle/battlefield)
-"pV" = (
-/obj/structure/window/framed/upp_ship/reinforced,
-/obj/structure/machinery/door/poddoor/shutters/almayer{
-	id = "cargdoor";
-	name = "Cargo Access"
-	},
-/turf/open/floor/plating,
-/area/clash_arena/tdm_jungle/upp_base)
 "pX" = (
 /obj/effect/decal/strata_decals/grasses,
 /obj/structure/barricade/sandbags/weak_wired{
@@ -2570,12 +1705,6 @@
 /obj/effect/landmark/survivor_spawner/us_army_engineer,
 /turf/open/auto_turf/snow/layer2,
 /area/clash_arena/tdm_jungle/battlefield)
-"qc" = (
-/obj/structure/surface/rack,
-/obj/item/explosive/plastic/breaching_charge,
-/obj/item/explosive/plastic/breaching_charge,
-/turf/open/floor/prison/floor_marked/west,
-/area/clash_arena/tdm_jungle/upp_base)
 "qd" = (
 /obj/structure/barricade/handrail/kutjevo{
 	explo_proof = 1;
@@ -2612,20 +1741,6 @@
 	},
 /turf/open/auto_turf/snow/brown_base,
 /area/clash_arena/tdm_jungle/battlefield)
-"qi" = (
-/obj/structure/machinery/photocopier,
-/obj/item/paper{
-	color = "grey";
-	info = "This is seemingly a photocopy of an image, containing.. OH GOD, WHY, GET IT OUT OF MY SIGHT";
-	name = "photocopied image";
-	pixel_y = 5
-	},
-/obj/structure/sign/safety/rad_shield{
-	pixel_x = 8;
-	pixel_y = -32
-	},
-/turf/open/floor/almayer/green,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "qk" = (
 /obj/effect/decal/strata_decals/grasses,
 /obj/effect/decal/strata_decals/grasses,
@@ -2648,12 +1763,6 @@
 	},
 /turf/open/auto_turf/tyrargo_grass,
 /area/clash_arena/tdm_jungle/battlefield)
-"qq" = (
-/obj/structure/surface/rack,
-/obj/item/defenses/handheld/planted_flag/upp,
-/obj/item/defenses/handheld/planted_flag/upp,
-/turf/open/floor/prison/floor_marked/west,
-/area/clash_arena/tdm_jungle/upp_base)
 "qs" = (
 /obj/structure/prop/colorable_rock/colorable/alt,
 /turf/open/auto_turf/snow/layer2,
@@ -2697,10 +1806,6 @@
 	},
 /turf/open/gm/river/desert/tyrargo/no_slowdown,
 /area/clash_arena/tdm_jungle/battlefield)
-"qw" = (
-/obj/structure/machinery/cm_vending/sorted/tech/tool_storage/antag,
-/turf/open/floor/strata/orange_icorner/north,
-/area/clash_arena/tdm_jungle/upp_base)
 "qx" = (
 /obj/structure/machinery/door/airlock/upp/medical/solid/autoname{
 	unacidable = 1;
@@ -2731,52 +1836,28 @@
 /turf/open/floor/grass,
 /area/space)
 "qF" = (
-/obj/structure/machinery/cm_vending/sorted/attachments/upp_squad,
-/turf/open/floor/strata/multi_tiles/southeast,
+/obj/effect/decal/warning_stripes{
+	icon_state = "E";
+	pixel_x = 2
+	},
+/turf/open/floor/corsat/red/east,
 /area/clash_arena/tdm_jungle/upp_base)
 "qG" = (
 /obj/effect/landmark/start/marine/tl/bravo,
 /obj/effect/landmark/late_join/bravo,
 /turf/open/floor/interior/wood,
 /area/clash_arena/tdm_jungle/uscm_base)
-"qH" = (
-/obj/structure/surface/table/almayer,
-/obj/structure/sign/safety/cryo{
-	pixel_x = 8;
-	pixel_y = 33
-	},
-/obj/item/toy/deck{
-	pixel_x = -4;
-	pixel_y = 10
-	},
-/obj/item/reagent_container/food/drinks/cans/souto/diet/cherry{
-	pixel_x = 9;
-	pixel_y = 12
-	},
-/obj/item/ashtray/plastic{
-	pixel_y = -4
-	},
-/obj/item/trash/cigbutt{
-	pixel_x = 1;
-	pixel_y = 5
-	},
-/turf/open/floor/almayer/green/southeast,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "qL" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "NW-out"
+/obj/effect/landmark/start/marine/engineer/alpha,
+/obj/effect/landmark/late_join/alpha,
+/obj/structure/machinery/light{
+	dir = 1
 	},
-/obj/effect/decal/warning_stripes{
-	icon_state = "S"
-	},
-/obj/structure/machinery/gear/upp,
-/turf/open/floor/almayer/mono,
-/area/clash_arena/tdm_jungle/upp_base)
+/turf/open/floor/interior/wood,
+/area/clash_arena/tdm_jungle/uscm_base)
 "qP" = (
-/obj/structure/surface/rack,
-/obj/item/stack/sheet/plasteel/large_stack,
-/obj/item/stack/sheet/plasteel/large_stack,
-/turf/open/floor/prison/floor_marked/west,
+/obj/structure/machinery/cm_vending/sorted/cargo_ammo/upp_squad,
+/turf/open/floor/corsat/plate,
 /area/clash_arena/tdm_jungle/upp_base)
 "qS" = (
 /obj/effect/decal/siding,
@@ -2797,18 +1878,6 @@
 	},
 /turf/open/auto_turf/tyrargo_grass,
 /area/clash_arena/tdm_jungle/battlefield)
-"qW" = (
-/obj/structure/machinery/door/poddoor/railing/upp{
-	dir = 2
-	},
-/turf/open/floor/almayer/cargo_arrow/north,
-/area/clash_arena/tdm_jungle/upp_base)
-"qY" = (
-/obj/structure/bed/chair/office/dark{
-	dir = 8
-	},
-/turf/open/floor/strata/floor3/east,
-/area/clash_arena/tdm_jungle/upp_base)
 "qZ" = (
 /obj/structure/prop/colorable_rock/colorable/alt{
 	color = "#8D8468";
@@ -2832,7 +1901,7 @@
 	dir = 5
 	},
 /turf/open/gm/coast/dirt/forestbeachcorner/south_west,
-/area/clash_arena/tdm_jungle/battlefield)
+/area/clash_arena/tdm_jungle/battlefield/zone_3)
 "rm" = (
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
 	dir = 0
@@ -2866,11 +1935,6 @@
 	},
 /turf/open/gm/river/desert/tyrargo/deep,
 /area/clash_arena/tdm_jungle/battlefield)
-"ro" = (
-/obj/structure/closet/secure_closet/cargotech,
-/obj/item/clothing/accessory/storage/webbing,
-/turf/open/floor/almayer/green/north,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "rr" = (
 /obj/structure/prop/tyrargo/boards/boards_1{
 	pixel_x = 3;
@@ -2880,7 +1944,7 @@
 /area/clash_arena/tdm_jungle/battlefield)
 "ru" = (
 /obj/structure/machinery/cm_vending/clothing/antag/upp,
-/turf/open/floor/corsat/spiralplate,
+/turf/open/floor/corsat/squares,
 /area/clash_arena/tdm_jungle/upp_base)
 "rx" = (
 /obj/structure/prop/tyrargo/boards/boards_2,
@@ -2936,14 +2000,6 @@
 /obj/structure/flora/tree/tyrargo,
 /turf/open/auto_turf/snow/layer2,
 /area/clash_arena/tdm_jungle/battlefield)
-"rT" = (
-/obj/structure/closet/emcloset,
-/turf/open/floor/strata/orange_icorner/north,
-/area/clash_arena/tdm_jungle/upp_base)
-"rW" = (
-/obj/structure/machinery/light,
-/turf/open/floor/strata/green4/east,
-/area/clash_arena/tdm_jungle/upp_base)
 "rX" = (
 /turf/open/gm/grass/gbcorner/south_west,
 /area/space)
@@ -2963,21 +2019,9 @@
 	},
 /turf/open/gm/river/desert/tyrargo/deep,
 /area/clash_arena/tdm_jungle/battlefield)
-"sk" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "SE-out"
-	},
-/obj/structure/machinery/gear{
-	id = "supply_elevator_gear"
-	},
-/turf/open/floor/almayer/mono,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"sn" = (
-/turf/open/floor/strata/orange_icorner,
-/area/clash_arena/tdm_jungle/upp_base)
 "so" = (
 /obj/structure/machinery/cm_vending/sorted/cargo_guns/upp_squad_guns,
-/turf/open/floor/corsat/spiralplate,
+/turf/open/floor/corsat/plate,
 /area/clash_arena/tdm_jungle/upp_base)
 "sv" = (
 /turf/open/floor/corsat/marked,
@@ -2999,10 +2043,11 @@
 /area/clash_arena/tdm_jungle/battlefield)
 "sG" = (
 /obj/effect/decal/warning_stripes{
-	icon_state = "E";
-	pixel_x = 2
+	icon_state = "NE-out";
+	pixel_x = 2;
+	pixel_y = 3
 	},
-/turf/open/floor/strata/floor2,
+/turf/open/floor/corsat/squares,
 /area/clash_arena/tdm_jungle/upp_base)
 "sI" = (
 /obj/structure/flora/grass/tallgrass/jungle/corner,
@@ -3046,7 +2091,7 @@
 	dir = 9
 	},
 /turf/open/gm/coast/dirt/forestbeachcorner/south_east,
-/area/clash_arena/tdm_jungle/battlefield)
+/area/clash_arena/tdm_jungle/battlefield/zone_3)
 "sZ" = (
 /obj/structure/prop/tyrargo/boards/boards_2{
 	pixel_x = 23;
@@ -3054,23 +2099,6 @@
 	},
 /turf/open/auto_turf/snow/brown_base,
 /area/clash_arena/tdm_jungle/battlefield)
-"td" = (
-/obj/structure/machinery/conveyor_switch{
-	id = "cargo_belt"
-	},
-/obj/effect/decal/warning_stripes{
-	icon_state = "S";
-	pixel_y = -1
-	},
-/turf/open/floor/strata/floor3/east,
-/area/clash_arena/tdm_jungle/upp_base)
-"te" = (
-/turf/open/floor/almayer/cargo_arrow/north,
-/area/clash_arena/tdm_jungle/uscm_base)
-"th" = (
-/obj/structure/machinery/light,
-/turf/open/floor/almayer/plate,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "ti" = (
 /obj/structure/flora/grass/ice/brown/snowgrassbb_1,
 /obj/structure/barricade/sandbags/weak_wired{
@@ -3080,22 +2108,6 @@
 	},
 /turf/open/auto_turf/snow/brown_base/layer2,
 /area/clash_arena/tdm_jungle/battlefield)
-"tr" = (
-/obj/structure/bed/chair{
-	dir = 4
-	},
-/turf/open/floor/plating/plating_catwalk,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"tt" = (
-/obj/structure/machinery/conveyor{
-	id = "req_belt"
-	},
-/obj/structure/plasticflaps,
-/obj/structure/machinery/door/firedoor/border_only/almayer{
-	dir = 1
-	},
-/turf/open/floor/almayer,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "tu" = (
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
 	dir = 0
@@ -3127,30 +2139,12 @@
 /turf/open/gm/coast/dirt/forestdir/west,
 /area/clash_arena/tdm_jungle/battlefield)
 "ty" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "W"
+/obj/structure/prop/almayer/ship_memorial{
+	pixel_x = -15;
+	pixel_y = -1
 	},
-/turf/open/floor/almayer,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"tA" = (
-/obj/item/prop/almayer/box,
-/obj/item/prop{
-	desc = "This M57 smartgun was utilized in field testing by the greatest smartgunner the USS Almayer ever had, Larry A.W Lewis, until he was fatally and tragically decapitated from a single clean shot to the head by a CLF sniper. As he didn't wear a helmet, it took weeks to find the body.";
-	icon = 'icons/obj/items/weapons/guns/guns_by_faction/USCM/machineguns.dmi';
-	icon_state = "m56c";
-	item_state = "m56c";
-	name = "broken M57 'Larry's Will' smartgun";
-	pixel_x = -7;
-	pixel_y = 3
-	},
-/obj/effect/decal/cleanable/cobweb2/dynamic,
-/obj/item/packageWrap,
-/obj/structure/machinery/computer/working_joe{
-	dir = 8;
-	pixel_x = 17
-	},
-/turf/open/floor/almayer/test_floor5,
-/area/clash_arena/tdm_jungle/uscm_base/req)
+/turf/open/floor/interior/wood,
+/area/clash_arena/tdm_jungle/uscm_base)
 "tF" = (
 /obj/structure/flora/grass/ice/brown/snowgrassbb_1,
 /turf/open/auto_turf/snow/brown_base/layer3,
@@ -3161,21 +2155,13 @@
 	pixel_x = 2;
 	pixel_y = -1
 	},
-/turf/open/floor/strata/floor2,
+/obj/effect/decal/warning_stripes{
+	icon_state = "NE-out";
+	pixel_x = 2;
+	pixel_y = 3
+	},
+/turf/open/floor/corsat/squares,
 /area/clash_arena/tdm_jungle/upp_base)
-"tI" = (
-/obj/structure/machinery/cm_vending/sorted/cargo_guns/squad{
-	req_access = null;
-	req_one_access = null;
-	req_one_access_txt = "15;16;21";
-	vend_x_offset = 0;
-	vend_y_offset = 0
-	},
-/obj/structure/machinery/light{
-	dir = 1
-	},
-/turf/open/floor/almayer,
-/area/clash_arena/tdm_jungle/uscm_base)
 "tJ" = (
 /turf/open/auto_turf/tyrargo_grass/layer1,
 /area/clash_arena/tdm_jungle/battlefield)
@@ -3184,16 +2170,12 @@
 	icon_state = "N";
 	pixel_y = 3
 	},
-/turf/open/floor/strata/multi_tiles/southeast,
+/turf/open/floor/corsat/plate,
 /area/clash_arena/tdm_jungle/upp_base)
 "tQ" = (
 /obj/structure/flora/tree/tyrargo/tree_2,
 /turf/open/auto_turf/snow/brown_base/layer3,
 /area/clash_arena/tdm_jungle/battlefield)
-"tR" = (
-/obj/structure/fence/slim/upp,
-/turf/open/floor/strata/green3/east,
-/area/clash_arena/tdm_jungle/upp_base)
 "tT" = (
 /obj/structure/flora/tree/tyrargo/tree_2,
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
@@ -3201,21 +2183,6 @@
 	},
 /turf/open/gm/coast/dirt/forestbeachcorner/north_west,
 /area/clash_arena/tdm_jungle/battlefield)
-"tZ" = (
-/obj/structure/machinery/cm_vending/sorted/uniform_supply/squad_prep,
-/turf/open/floor/almayer,
-/area/clash_arena/tdm_jungle/uscm_base)
-"uc" = (
-/obj/structure/machinery/cm_vending/sorted/attachments/upp_attachments/blend,
-/turf/closed/wall/upp_ship/reinforced/outer,
-/area/clash_arena/tdm_jungle/upp_base)
-"ud" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "S";
-	pixel_y = -1
-	},
-/turf/open/floor/strata/floor3/east,
-/area/clash_arena/tdm_jungle/upp_base)
 "ue" = (
 /obj/structure/barricade/handrail/kutjevo{
 	explo_proof = 1;
@@ -3231,28 +2198,9 @@
 	},
 /turf/open/auto_turf/tyrargo_grass,
 /area/clash_arena/tdm_jungle/battlefield)
-"ug" = (
-/obj/structure/machinery/cm_vending/clothing/leader/bravo,
-/turf/open/floor/almayer/plate,
-/area/clash_arena/tdm_jungle/uscm_base)
-"ui" = (
-/obj/structure/bed/chair{
-	dir = 4
-	},
-/obj/structure/machinery/light{
-	dir = 8
-	},
-/turf/open/floor/almayer/cargo,
-/area/clash_arena/tdm_jungle/uscm_base)
 "uj" = (
-/obj/structure/flora/bush/ausbushes/var3/sparsegrass,
-/obj/structure/flora/bush/ausbushes/var3/fullgrass,
-/turf/open/auto_turf/tyrargo_grass,
-/area/clash_arena/tdm_jungle/battlefield)
-"ur" = (
-/obj/structure/closet/secure_closet/guncabinet/red/armory_m39_submachinegun,
-/turf/open/floor/almayer/redfull,
-/area/clash_arena/tdm_jungle/uscm_base/req)
+/turf/open/floor/kutjevo/colors/red/tile,
+/area/clash_arena/tdm_jungle/upp_base)
 "us" = (
 /obj/structure/machinery/cryopod{
 	layer = 3.1
@@ -3263,17 +2211,6 @@
 /obj/structure/flora/tree/tyrargo/tree_6,
 /turf/open/auto_turf/tyrargo_grass/layer0_mud_alt,
 /area/clash_arena/tdm_jungle/battlefield)
-"uw" = (
-/obj/structure/surface/table/almayer,
-/obj/item/tool/hand_labeler,
-/turf/open/floor/almayer/red/east,
-/area/clash_arena/tdm_jungle/uscm_base)
-"uy" = (
-/obj/structure/machinery/light{
-	dir = 1
-	},
-/turf/open/floor/almayer/plating/northeast,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "uB" = (
 /obj/structure/flora/bush/ausbushes/var3/fullgrass,
 /obj/structure/barricade/handrail/kutjevo,
@@ -3285,19 +2222,6 @@
 /obj/effect/landmark/late_join/bravo,
 /turf/open/floor/interior/wood,
 /area/clash_arena/tdm_jungle/uscm_base)
-"uD" = (
-/obj/structure/machinery/door/airlock/almayer/generic{
-	access_modified = 1;
-	dir = 1;
-	name = "Storage";
-	req_one_access_txt = "19;21"
-	},
-/turf/open/floor/almayer/test_floor4,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"uE" = (
-/obj/structure/platform/metal/strata/west,
-/turf/open/floor/strata/orange_edge/west,
-/area/clash_arena/tdm_jungle/upp_base)
 "uH" = (
 /obj/structure/barricade/sandbags/weak_wired{
 	dir = 3;
@@ -3311,18 +2235,6 @@
 /obj/structure/prop/tyrargo/boards/boards_2,
 /turf/open/gm/river/desert/tyrargo/no_slowdown,
 /area/clash_arena/tdm_jungle/battlefield)
-"uL" = (
-/obj/structure/sign/safety/terminal{
-	pixel_x = -17
-	},
-/turf/open/floor/almayer/cargo,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"uO" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "E"
-	},
-/turf/open/floor/strata/floor3/east,
-/area/clash_arena/tdm_jungle/upp_base)
 "uP" = (
 /obj/effect/decal/strata_decals/grasses,
 /obj/effect/decal/strata_decals/grasses,
@@ -3334,20 +2246,6 @@
 	},
 /turf/open/auto_turf/tyrargo_grass/layer0_mud,
 /area/clash_arena/tdm_jungle/battlefield)
-"uS" = (
-/obj/structure/machinery/line_nexter{
-	id = "line2";
-	pixel_x = -2
-	},
-/turf/open/floor/almayer/test_floor5,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"uY" = (
-/obj/structure/machinery/cm_vending/clothing/tl/bravo{
-	density = 0;
-	pixel_x = 32
-	},
-/turf/open/floor/plating/plating_catwalk,
-/area/clash_arena/tdm_jungle/uscm_base)
 "uZ" = (
 /obj/effect/decal/strata_decals/grasses,
 /obj/structure/flora/tree/tyrargo/tree_2,
@@ -3374,18 +2272,20 @@
 /turf/open/gm/river/desert/tyrargo/no_slowdown,
 /area/clash_arena/tdm_jungle/battlefield)
 "vu" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "W";
-	pixel_x = -1
-	},
-/turf/open/floor/strata/floor3/east,
-/area/clash_arena/tdm_jungle/upp_base)
+/obj/effect/landmark/start/marine/bravo,
+/obj/effect/landmark/late_join/bravo,
+/obj/effect/decal/cleanable/dirt,
+/obj/structure/machinery/light,
+/turf/open/floor/interior/wood,
+/area/clash_arena/tdm_jungle/uscm_base)
 "vx" = (
-/obj/structure/machinery/light{
-	dir = 4
+/obj/effect/decal/strata_decals/grasses,
+/obj/effect/decal/strata_decals/grasses,
+/obj/effect/decal/strata_decals/tyrargo_mud_corner{
+	dir = 0
 	},
-/turf/open/floor/almayer,
-/area/clash_arena/tdm_jungle/uscm_base/req)
+/turf/open/auto_turf/tyrargo_grass,
+/area/clash_arena/tdm_jungle/battlefield)
 "vC" = (
 /obj/structure/flora/grass/tallgrass/jungle/corner,
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
@@ -3399,29 +2299,12 @@
 "vD" = (
 /turf/open/auto_turf/tyrargo_grass,
 /area/clash_arena/tdm_jungle/battlefield)
-"vG" = (
-/obj/structure/machinery/computer/supply/asrs/upp,
-/obj/structure/transmitter/upp_net{
-	name = "Rostock Requisition Telephone";
-	phone_category = "Rostock";
-	phone_id = "Requisition";
-	pixel_y = 32
-	},
-/turf/open/floor/strata/green3/east,
-/area/clash_arena/tdm_jungle/upp_base)
-"vK" = (
-/turf/open/floor/almayer/cargo,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "vQ" = (
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
 	dir = 8
 	},
 /turf/open/gm/dirt/dark_brown,
 /area/clash_arena/tdm_jungle/battlefield)
-"vR" = (
-/obj/structure/machinery/computer/arcade,
-/turf/open/floor/almayer/green/northwest,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "vS" = (
 /obj/effect/landmark/start/marine/engineer/bravo,
 /obj/effect/landmark/late_join/bravo,
@@ -3431,16 +2314,10 @@
 /obj/structure/sign/poster/upp,
 /turf/closed/wall/upp_ship/reinforced/outer,
 /area/clash_arena/tdm_jungle/upp_base)
-"vX" = (
-/obj/structure/machinery/light{
-	dir = 4
-	},
-/turf/open/floor/almayer/floor,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "we" = (
-/obj/structure/largecrate/random/secure,
-/turf/open/floor/almayer/green/north,
-/area/clash_arena/tdm_jungle/uscm_base/req)
+/obj/structure/machinery/cm_vending/sorted/tech/tool_storage/antag,
+/turf/open/floor/corsat/plate,
+/area/clash_arena/tdm_jungle/upp_base)
 "wf" = (
 /obj/structure/prop/colorable_rock/colorable/alt{
 	pixel_x = -5;
@@ -3458,12 +2335,6 @@
 	},
 /turf/open/gm/dirt/dark_brown,
 /area/clash_arena/tdm_jungle/battlefield)
-"wj" = (
-/obj/structure/sign/safety/rewire{
-	pixel_x = 32
-	},
-/turf/open/floor/almayer/plating_striped/west,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "wm" = (
 /turf/open/gm/dirt/dark_brown/variant_3,
 /area/clash_arena/tdm_jungle/battlefield)
@@ -3512,7 +2383,7 @@
 	pixel_x = -6;
 	pixel_y = 11
 	},
-/turf/open/floor/corsat/spiralplate,
+/turf/open/floor/corsat/plate,
 /area/clash_arena/tdm_jungle/upp_base)
 "ww" = (
 /turf/open/floor/almayer/test_floor4,
@@ -3533,25 +2404,6 @@
 	pixel_x = -3;
 	layer = 3.01
 	},
-/obj/item/stack/sheet/cardboard/small_stack{
-	pixel_y = 2;
-	pixel_x = -3;
-	layer = 3.01
-	},
-/obj/item/stack/sheet/cardboard/small_stack{
-	pixel_y = 2;
-	pixel_x = -3;
-	layer = 3.01
-	},
-/obj/item/storage/toolbox/mechanical{
-	pixel_x = 1;
-	pixel_y = 12
-	},
-/obj/item/stack/sheet/cardboard/small_stack{
-	pixel_y = 2;
-	pixel_x = -3;
-	layer = 3.01
-	},
 /obj/item/tool/shovel/etool/folded,
 /obj/item/tool/shovel/etool/folded,
 /obj/item/tool/shovel/etool/folded,
@@ -3562,14 +2414,10 @@
 /obj/item/tool/shovel/etool/folded,
 /obj/item/tool/shovel/etool/folded,
 /obj/item/tool/shovel/etool/folded,
-/turf/open/floor/strata/green3,
+/turf/open/floor/corsat/plate,
 /area/clash_arena/tdm_jungle/upp_base)
 "wA" = (
-/turf/open/floor/strata/green3,
-/area/clash_arena/tdm_jungle/upp_base)
-"wB" = (
-/obj/structure/machinery/cm_vending/sorted/cargo_ammo/upp_squad,
-/turf/open/floor/strata/red3/north,
+/turf/open/floor/corsat/squares,
 /area/clash_arena/tdm_jungle/upp_base)
 "wC" = (
 /turf/open/floor/grass,
@@ -3578,7 +2426,15 @@
 /turf/open/floor/almayer/orange/north,
 /area/clash_arena/tdm_jungle/uscm_base)
 "wG" = (
-/turf/open/floor/almayer/red/north,
+/obj/effect/decal/warning_stripes{
+	icon_state = "NW-out";
+	pixel_x = -1;
+	pixel_y = 1
+	},
+/obj/structure/machinery/light{
+	dir = 1
+	},
+/turf/open/floor/interior/wood,
 /area/clash_arena/tdm_jungle/uscm_base)
 "wL" = (
 /obj/structure/barricade/handrail/kutjevo{
@@ -3595,16 +2451,10 @@
 	},
 /turf/open/auto_turf/snow/brown_base,
 /area/clash_arena/tdm_jungle/battlefield)
-"wM" = (
-/obj/effect/decal/cleanable/blood/oil,
-/turf/open/floor/plating/plating_catwalk,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "wN" = (
-/obj/structure/machinery/door/airlock/upp/req/autoname{
-	dir = 1
-	},
-/turf/open/floor/corsat/marked,
-/area/clash_arena/tdm_jungle/upp_base)
+/obj/structure/machinery/light,
+/turf/open/floor/interior/wood,
+/area/clash_arena/tdm_jungle/uscm_base)
 "wO" = (
 /obj/structure/platform/stone/tyrargo,
 /turf/open/auto_turf/snow/layer2,
@@ -3615,6 +2465,9 @@
 	icon_state = "pottedplant_22";
 	name = "synthetic potted plant";
 	pixel_y = 8
+	},
+/obj/structure/machinery/light{
+	dir = 4
 	},
 /turf/open/floor/almayer,
 /area/clash_arena/tdm_jungle/uscm_base)
@@ -3641,36 +2494,10 @@
 	},
 /turf/open/floor/interior/wood,
 /area/clash_arena/tdm_jungle/uscm_base)
-"xp" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "NW-out"
-	},
-/obj/structure/machinery/gear{
-	id = "supply_elevator_gear"
-	},
-/turf/open/floor/almayer/mono,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"xq" = (
-/obj/structure/surface/table/reinforced/rostock_table,
-/obj/item/storage/toolkit/empty,
-/obj/item/storage/toolkit/empty,
-/obj/item/storage/toolkit/empty,
-/obj/item/storage/toolkit/empty,
-/obj/structure/machinery/light{
-	dir = 4
-	},
-/turf/open/floor/strata/floor3/east,
-/area/clash_arena/tdm_jungle/upp_base)
 "xu" = (
 /obj/structure/flora/tree/tyrargo/tree_3,
 /turf/open/auto_turf/tyrargo_grass/layer0_mud_alt,
 /area/clash_arena/tdm_jungle/battlefield)
-"xv" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "W"
-	},
-/turf/open/floor/plating/plating_catwalk,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "xx" = (
 /obj/structure/prop/tyrargo/boards/boards_2{
 	pixel_x = 23;
@@ -3689,36 +2516,13 @@
 	},
 /turf/open/floor/corsat/marked,
 /area/clash_arena/tdm_jungle/upp_base)
-"xB" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "S"
-	},
-/obj/effect/decal/warning_stripes{
-	icon_state = "W"
-	},
-/turf/open/floor/almayer,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"xE" = (
-/obj/structure/stairs/perspective{
-	dir = 4;
-	icon_state = "p_stair_sn_full_cap"
-	},
-/obj/structure/platform_decoration/metal/strata/west,
-/turf/open/floor/strata/floor3/east,
-/area/clash_arena/tdm_jungle/upp_base)
 "xJ" = (
 /obj/effect/decal/warning_stripes{
 	icon_state = "NW-out";
 	pixel_y = 3
 	},
-/turf/open/floor/strata/red3/west,
+/turf/open/floor/corsat/red/west,
 /area/clash_arena/tdm_jungle/upp_base)
-"xK" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "N"
-	},
-/turf/open/floor/almayer/test_floor4,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "xN" = (
 /obj/structure/prop/tyrargo/boards/boards_2{
 	pixel_x = 23;
@@ -3729,40 +2533,10 @@
 	},
 /turf/open/gm/river/desert/tyrargo/no_slowdown,
 /area/clash_arena/tdm_jungle/battlefield)
-"xQ" = (
-/obj/structure/largecrate,
-/obj/structure/prop/server_equipment/laptop{
-	pixel_x = 1;
-	pixel_y = 10
-	},
-/turf/open/floor/almayer/test_floor4,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "xS" = (
 /obj/effect/landmark/clash_npc/uscm/fill,
 /turf/open/auto_turf/snow/layer2,
 /area/clash_arena/tdm_jungle/battlefield)
-"xU" = (
-/obj/structure/machinery/atm{
-	pixel_y = 32
-	},
-/turf/open/floor/almayer/green/north,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"xZ" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "W";
-	pixel_x = -1
-	},
-/obj/effect/decal/warning_stripes{
-	icon_state = "E"
-	},
-/obj/effect/decal/warning_stripes{
-	icon_state = "E"
-	},
-/obj/effect/decal/warning_stripes{
-	icon_state = "E"
-	},
-/turf/open/floor/strata/floor2,
-/area/clash_arena/tdm_jungle/upp_base)
 "yc" = (
 /obj/effect/decal/strata_decals/mud_corner{
 	dir = 6
@@ -3809,21 +2583,6 @@
 	},
 /turf/open/auto_turf/tyrargo_grass/layer1,
 /area/clash_arena/tdm_jungle/battlefield)
-"yl" = (
-/turf/open/floor/plating/plating_catwalk/strata,
-/area/clash_arena/tdm_jungle/upp_base)
-"ym" = (
-/obj/structure/surface/rack,
-/obj/item/storage/backpack/marine,
-/obj/item/storage/backpack/marine,
-/obj/item/storage/backpack/marine,
-/obj/item/storage/backpack/marine,
-/obj/item/tool/hand_labeler,
-/turf/open/floor/almayer/green/north,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"yn" = (
-/turf/open/floor/strata/cyan4/east,
-/area/clash_arena/tdm_jungle/upp_base)
 "yq" = (
 /obj/structure/barricade/sandbags/weak_wired{
 	pixel_x = 0;
@@ -3835,10 +2594,6 @@
 	},
 /turf/open/auto_turf/snow/brown_base,
 /area/clash_arena/tdm_jungle/battlefield)
-"ys" = (
-/obj/effect/landmark/supply_elevator/upp,
-/turf/open/floor/almayer/empty/requisitions,
-/area/clash_arena/tdm_jungle/upp_base)
 "yt" = (
 /obj/structure/prop/tyrargo/boards/boards_1{
 	pixel_x = -8;
@@ -3846,15 +2601,6 @@
 	},
 /turf/open/auto_turf/snow/brown_base,
 /area/clash_arena/tdm_jungle/battlefield)
-"yu" = (
-/obj/structure/machinery/cm_vending/sorted/attachments/squad{
-	req_access = null;
-	req_one_access = null;
-	req_one_access_txt = "15;16;21";
-	vend_y_offset = 0
-	},
-/turf/open/floor/almayer/plate,
-/area/clash_arena/tdm_jungle/uscm_base)
 "yv" = (
 /obj/structure/flora/bush/ausbushes/var3/brflowers{
 	desc = "Just like a real plant, but fake!";
@@ -3867,44 +2613,12 @@
 /obj/effect/decal/strata_decals/grasses,
 /turf/open/auto_turf/snow/brown_base,
 /area/clash_arena/tdm_jungle/battlefield)
-"yA" = (
-/obj/structure/surface/table/almayer,
-/obj/structure/machinery/line_nexter_control{
-	id = "line2";
-	pixel_x = -4;
-	pixel_y = 10;
-	req_one_access_txt = "1;21"
-	},
-/obj/structure/machinery/door_control{
-	id = "ROlobby2";
-	name = "RO Line 2 Shutters";
-	pixel_x = 5;
-	pixel_y = 10;
-	req_one_access_txt = "1;21"
-	},
-/obj/item/paper_bin/uscm{
-	pixel_y = -4
-	},
-/obj/item/tool/pen{
-	pixel_y = -5
-	},
-/turf/open/floor/almayer/plate,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "yE" = (
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
 	dir = 9
 	},
 /turf/open/gm/river/tyrargo,
 /area/clash_arena/tdm_jungle/battlefield)
-"yG" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "S"
-	},
-/obj/effect/decal/warning_stripes{
-	icon_state = "N"
-	},
-/turf/closed/wall/almayer/outer,
-/area/clash_arena/tdm_jungle/uscm_base)
 "yH" = (
 /turf/open/gm/river/desert/tyrargo/deep,
 /area/clash_arena/tdm_jungle/battlefield)
@@ -3915,21 +2629,8 @@
 /turf/open/floor/interior/wood,
 /area/clash_arena/tdm_jungle/uscm_base)
 "yN" = (
-/obj/structure/surface/rack{
-	density = 0;
-	pixel_x = -16
-	},
-/obj/item/clothing/suit/storage/marine/light/vest,
-/obj/item/clothing/suit/storage/marine/light/vest,
-/turf/open/floor/almayer/plating_stripedcorner/west,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"yO" = (
-/obj/structure/machinery/door/firedoor/border_only/almayer{
-	dir = 1
-	},
-/obj/structure/window/framed/almayer/hull,
-/turf/open/floor/plating,
-/area/clash_arena/tdm_jungle/uscm_base/req)
+/turf/open/auto_turf/strata_grass/layer1,
+/area/clash_arena/tdm_jungle/battlefield/zone_2)
 "yQ" = (
 /obj/effect/decal/strata_decals/grasses,
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
@@ -3987,40 +2688,6 @@
 	},
 /turf/open/gm/coast/dirt/forestbeachcorner/south_west,
 /area/clash_arena/tdm_jungle/battlefield)
-"ze" = (
-/obj/structure/platform/metal/strata/north,
-/turf/open/floor/strata/orange_edge/north,
-/area/clash_arena/tdm_jungle/upp_base)
-"zf" = (
-/obj/structure/closet/coffin/woodencrate,
-/obj/item/storage/box/m94,
-/obj/item/storage/box/m94,
-/obj/item/storage/box/m94,
-/obj/item/stack/sheet/mineral/plastic/small_stack,
-/obj/item/frame/rack,
-/obj/item/frame/rack,
-/obj/item/frame/rack,
-/obj/item/frame/rack,
-/obj/item/frame/rack,
-/turf/open/floor/almayer/test_floor4,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"zh" = (
-/obj/structure/surface/table/almayer,
-/obj/item/clothing/accessory/storage/webbing,
-/obj/item/clothing/accessory/storage/webbing,
-/obj/item/clothing/accessory/storage/webbing,
-/obj/item/clothing/accessory/storage/webbing,
-/obj/item/tool/hand_labeler,
-/obj/item/tool/hand_labeler,
-/obj/item/clothing/suit/storage/webbing,
-/obj/item/clothing/suit/storage/webbing,
-/obj/item/clothing/suit/storage/webbing,
-/obj/item/clothing/suit/storage/webbing,
-/obj/structure/machinery/light{
-	dir = 1
-	},
-/turf/open/floor/strata/purp2,
-/area/clash_arena/tdm_jungle/upp_base)
 "zj" = (
 /obj/structure/machinery/cryopod{
 	pixel_y = 8;
@@ -4046,13 +2713,6 @@
 	},
 /turf/open/floor/prison/floor_marked/west,
 /area/clash_arena/tdm_jungle/upp_base)
-"zs" = (
-/obj/structure/surface/table/almayer,
-/obj/effect/spawner/random/powercell,
-/obj/effect/spawner/random/tool,
-/obj/item/packageWrap,
-/turf/open/floor/almayer/green/west,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "zt" = (
 /obj/structure/flora/grass/tallgrass/jungle,
 /obj/effect/decal/strata_decals/grasses,
@@ -4092,41 +2752,23 @@
 /turf/open/gm/river/desert/tyrargo/no_slowdown,
 /area/clash_arena/tdm_jungle/battlefield)
 "zI" = (
-/obj/structure/machinery/cm_vending/clothing/tl/alpha{
-	density = 0;
-	pixel_x = 32
-	},
-/turf/open/floor/almayer/red/north,
+/obj/effect/decal/cleanable/dirt,
+/obj/structure/bed/hybrisa/bunkbed3,
+/turf/open/floor/interior/wood,
 /area/clash_arena/tdm_jungle/uscm_base)
-"zS" = (
-/obj/structure/machinery/cm_vending/gear/tl{
-	density = 0;
-	pixel_x = -32;
-	vend_x_offset = 1
-	},
-/obj/structure/machinery/light,
-/turf/open/floor/almayer/red/west,
-/area/clash_arena/tdm_jungle/uscm_base)
-"zT" = (
-/turf/open/floor/strata/red4/north,
-/area/clash_arena/tdm_jungle/upp_base)
 "zY" = (
-/obj/structure/machinery/power/apc/almayer/west,
-/turf/closed/wall/almayer/outer,
-/area/clash_arena/tdm_jungle/uscm_base)
-"zZ" = (
-/obj/structure/platform/metal/strata/north,
-/obj/structure/closet/crate/supply,
-/obj/item/stack/sandbags_empty/small_stack,
-/turf/open/floor/strata/orange_edge/north,
-/area/clash_arena/tdm_jungle/upp_base)
-"Ab" = (
-/obj/structure/machinery/door/poddoor/railing{
-	dir = 4;
-	id = "supply_elevator_railing"
+/obj/structure/machinery/cm_vending/sorted/cargo_guns/squad{
+	req_access = null;
+	req_one_access = null;
+	req_one_access_txt = "15;16;21";
+	vend_x_offset = 0;
+	vend_y_offset = 0
 	},
-/turf/open/floor/almayer,
-/area/clash_arena/tdm_jungle/uscm_base/req)
+/obj/structure/machinery/light{
+	dir = 4
+	},
+/turf/open/floor/almayer/floor,
+/area/clash_arena/tdm_jungle/uscm_base)
 "Ac" = (
 /obj/structure/prop/colorable_rock/colorable/alt{
 	color = "#8D8468";
@@ -4145,20 +2787,18 @@
 /turf/open/gm/river/desert/tyrargo/no_slowdown,
 /area/clash_arena/tdm_jungle/battlefield)
 "Ai" = (
-/obj/structure/filingcabinet,
-/turf/open/floor/almayer/cargo,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"Aj" = (
-/obj/structure/machinery/cm_vending/sorted/cargo_guns/upp_squad_guns,
-/turf/open/floor/strata/multi_tiles/southeast,
+/obj/structure/machinery/chem_dispenser/corpsman/arena{
+	pixel_y = 3
+	},
+/turf/open/floor/corsat/squares,
 /area/clash_arena/tdm_jungle/upp_base)
 "Aq" = (
-/obj/structure/machinery/cm_vending/gear/tl{
-	density = 0;
-	pixel_x = -32;
-	vend_x_offset = 1
+/obj/effect/landmark/start/marine/smartgunner/alpha,
+/obj/effect/landmark/late_join/alpha,
+/obj/structure/machinery/light{
+	dir = 4
 	},
-/turf/open/floor/almayer/red/northwest,
+/turf/open/floor/interior/wood,
 /area/clash_arena/tdm_jungle/uscm_base)
 "Ar" = (
 /obj/structure/flora/grass/tallgrass/jungle{
@@ -4167,12 +2807,6 @@
 	},
 /turf/open/auto_turf/tyrargo_grass/layer0_mud_alt,
 /area/clash_arena/tdm_jungle/battlefield)
-"As" = (
-/obj/structure/sign/poster{
-	pixel_y = 32
-	},
-/turf/open/floor/almayer/red/west,
-/area/clash_arena/tdm_jungle/uscm_base)
 "At" = (
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
 	dir = 0
@@ -4191,12 +2825,11 @@
 /turf/open/floor/prison/floor_marked/west,
 /area/clash_arena/tdm_jungle/upp_base)
 "AA" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "E";
-	pixel_x = 1
+/obj/effect/decal/strata_decals/tyrargo_mud_corner{
+	dir = 1
 	},
-/turf/open/floor/plating/plating_catwalk,
-/area/clash_arena/tdm_jungle/uscm_base/req)
+/turf/open/auto_turf/tyrargo_grass/layer0_mud,
+/area/clash_arena/tdm_jungle/battlefield)
 "AD" = (
 /obj/structure/prop/colorable_rock/colorable/alt{
 	color = "#8D8468";
@@ -4213,16 +2846,12 @@
 /turf/open/gm/river/desert/tyrargo/deep,
 /area/clash_arena/tdm_jungle/battlefield)
 "AG" = (
-/obj/structure/machinery/door_control{
-	id = "cargent";
-	name = "Entrance Access";
-	pixel_x = 13;
-	pixel_y = -24;
-	req_one_access_txt = "230"
+/obj/structure/machinery/cm_vending/sorted/uniform_supply/squad_prep,
+/obj/structure/machinery/light{
+	dir = 8
 	},
-/obj/structure/machinery/light,
-/turf/open/floor/strata/green4/west,
-/area/clash_arena/tdm_jungle/upp_base)
+/turf/open/floor/plating/plating_catwalk,
+/area/clash_arena/tdm_jungle/uscm_base)
 "AH" = (
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
 	dir = 4
@@ -4268,22 +2897,11 @@
 /obj/structure/window/framed/upp_ship,
 /turf/open/floor/plating,
 /area/clash_arena/tdm_jungle/upp_base)
-"AW" = (
-/obj/structure/machinery/cm_vending/sorted/cargo_ammo/cargo/blend,
-/turf/open/floor/almayer/green,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "AY" = (
 /obj/effect/decal/strata_decals/grasses,
 /obj/effect/decal/strata_decals/grasses,
 /turf/open/auto_turf/tyrargo_grass,
 /area/clash_arena/tdm_jungle/battlefield)
-"Ba" = (
-/obj/structure/machinery/cm_vending/clothing/tl/bravo{
-	density = 0;
-	pixel_x = 32
-	},
-/turf/open/floor/almayer/orange,
-/area/clash_arena/tdm_jungle/uscm_base)
 "Bd" = (
 /obj/effect/decal/strata_decals/grasses,
 /obj/structure/barricade/sandbags/weak_wired{
@@ -4292,7 +2910,7 @@
 	pixel_y = 5
 	},
 /turf/open/auto_turf/tyrargo_grass/layer0_mud,
-/area/clash_arena/tdm_jungle/battlefield)
+/area/clash_arena/tdm_jungle/battlefield/zone_3)
 "Bf" = (
 /obj/structure/flora/tree/tyrargo/tree_2,
 /turf/open/gm/dirt/dark_brown/variant_1,
@@ -4310,12 +2928,6 @@
 	},
 /turf/open/gm/river/desert/tyrargo/deep,
 /area/clash_arena/tdm_jungle/battlefield)
-"Bl" = (
-/obj/structure/surface/table/almayer,
-/obj/item/paper_bin/uscm,
-/obj/item/clipboard,
-/turf/open/floor/almayer/green/southwest,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "Bp" = (
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
 	dir = 1
@@ -4325,12 +2937,6 @@
 	},
 /turf/open/gm/coast/dirt/forestbeachcorner/south_east,
 /area/clash_arena/tdm_jungle/battlefield)
-"Br" = (
-/obj/structure/machinery/door/poddoor/railing{
-	id = "supply_elevator_railing"
-	},
-/turf/open/floor/almayer,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "Bs" = (
 /obj/structure/barricade/sandbags/weak_wired{
 	dir = 4;
@@ -4345,11 +2951,10 @@
 /area/clash_arena/tdm_jungle/battlefield)
 "Bt" = (
 /obj/effect/decal/warning_stripes{
-	icon_state = "SW-out";
-	pixel_x = -1;
+	icon_state = "S";
 	pixel_y = -1
 	},
-/turf/open/floor/strata/multi_tiles,
+/turf/open/floor/corsat/plate,
 /area/clash_arena/tdm_jungle/upp_base)
 "Bu" = (
 /obj/structure/flora/bush/ausbushes/var3/ppflowers{
@@ -4358,11 +2963,6 @@
 	},
 /turf/open/gm/grass,
 /area/space)
-"Bv" = (
-/obj/structure/surface/table/almayer,
-/obj/item/tool/hand_labeler,
-/turf/open/floor/strata,
-/area/clash_arena/tdm_jungle/upp_base)
 "Bw" = (
 /obj/structure/flora/tree/tyrargo/tree_5,
 /turf/open/auto_turf/tyrargo_grass,
@@ -4407,20 +3007,10 @@
 	},
 /turf/open/gm/river/desert/tyrargo/deep,
 /area/clash_arena/tdm_jungle/battlefield)
-"BG" = (
-/obj/structure/flora/pottedplant{
-	icon_state = "pottedplant_21"
-	},
-/turf/open/floor/almayer,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "BJ" = (
 /obj/structure/flora/tree/tyrargo/tree_2,
 /turf/open/auto_turf/strata_grass/layer1,
 /area/clash_arena/tdm_jungle/battlefield)
-"BK" = (
-/obj/structure/machinery/door/airlock/almayer/marine/bravo/engineer,
-/turf/open/floor/almayer/test_floor4,
-/area/clash_arena/tdm_jungle/uscm_base)
 "BM" = (
 /obj/structure/flora/grass/tallgrass/jungle,
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
@@ -4428,10 +3018,6 @@
 	},
 /turf/open/auto_turf/tyrargo_grass/layer0_mud_alt,
 /area/clash_arena/tdm_jungle/battlefield)
-"BP" = (
-/obj/structure/machinery/door/airlock/almayer/marine/alpha/tl,
-/turf/open/floor/almayer/test_floor4,
-/area/clash_arena/tdm_jungle/uscm_base)
 "BS" = (
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
 	dir = 0
@@ -4441,10 +3027,6 @@
 	},
 /turf/open/auto_turf/tyrargo_grass,
 /area/clash_arena/tdm_jungle/battlefield)
-"BU" = (
-/obj/structure/machinery/computer/supply/asrs,
-/turf/open/floor/almayer/green/north,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "BX" = (
 /obj/structure/prop/tyrargo/boards/boards_2,
 /turf/open/auto_turf/tyrargo_grass/layer0_mud,
@@ -4471,13 +3053,6 @@
 	},
 /turf/open/gm/river/desert/tyrargo/deep,
 /area/clash_arena/tdm_jungle/battlefield)
-"Ck" = (
-/obj/structure/machinery/light{
-	dir = 8
-	},
-/obj/structure/platform_decoration/metal/strata/north,
-/turf/open/floor/strata/orange_edge/west,
-/area/clash_arena/tdm_jungle/upp_base)
 "Cl" = (
 /obj/effect/decal/strata_decals/grasses,
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
@@ -4490,11 +3065,8 @@
 /turf/open/auto_turf/tyrargo_grass,
 /area/clash_arena/tdm_jungle/battlefield)
 "Cm" = (
-/obj/structure/closet/coffin/woodencrate,
-/obj/item/frame/table/wood/poor,
-/obj/item/frame/table/wood/poor,
-/turf/open/floor/almayer/test_floor4,
-/area/clash_arena/tdm_jungle/uscm_base/req)
+/turf/open/auto_turf/tyrargo_grass/layer0_mud,
+/area/clash_arena/tdm_jungle/battlefield/zone_2)
 "Cn" = (
 /obj/structure/barricade/sandbags/weak_wired{
 	dir = 4;
@@ -4518,16 +3090,6 @@
 "Cu" = (
 /turf/closed/wall/strata_ice/forest/rock,
 /area/space)
-"Cv" = (
-/obj/structure/sign/banners/colonial_marines_flag{
-	pixel_x = -16;
-	pixel_y = -4
-	},
-/turf/closed/wall/almayer/outer,
-/area/clash_arena/tdm_jungle/uscm_base)
-"Cw" = (
-/turf/open/floor/almayer/green,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "Cz" = (
 /obj/effect/decal/warning_stripes{
 	icon_state = "N";
@@ -4550,36 +3112,6 @@
 "CI" = (
 /turf/open/floor/plating/plating_catwalk,
 /area/clash_arena/tdm_jungle/uscm_base)
-"CL" = (
-/obj/structure/machinery/vending/coffee,
-/obj/structure/sign/safety/coffee{
-	pixel_x = 8;
-	pixel_y = 32
-	},
-/turf/open/floor/strata/green3/east,
-/area/clash_arena/tdm_jungle/upp_base)
-"CM" = (
-/obj/structure/machinery/cm_vending/sorted/cargo_guns/squad_prep{
-	pixel_y = -16
-	},
-/turf/closed/wall/almayer,
-/area/clash_arena/tdm_jungle/uscm_base)
-"CN" = (
-/obj/structure/surface/table/reinforced/rostock_table,
-/obj/item/storage/firstaid/adv/empty,
-/obj/item/storage/firstaid/adv/empty,
-/obj/item/storage/firstaid/fire/empty,
-/obj/item/storage/firstaid/fire/empty,
-/obj/item/storage/firstaid/regular/empty,
-/obj/item/storage/firstaid/regular/empty,
-/obj/item/storage/firstaid/regular/empty,
-/obj/item/storage/firstaid/regular/empty,
-/obj/item/storage/firstaid/regular/empty,
-/obj/structure/machinery/light{
-	dir = 4
-	},
-/turf/open/floor/strata/cyan3,
-/area/clash_arena/tdm_jungle/upp_base)
 "CR" = (
 /obj/structure/sign/flag/upp{
 	dir = 1;
@@ -4595,35 +3127,6 @@
 	job_list = list("UPP Ryadovoy","UPP MSzht Engineer","UPP MSzht Medic","UPP Serzhant","UPP Starshiy Serzhant")
 	},
 /turf/open/floor/plating/plating_catwalk/prison,
-/area/clash_arena/tdm_jungle/upp_base)
-"CS" = (
-/obj/structure/sign/safety/storage{
-	pixel_x = -17;
-	pixel_y = 7
-	},
-/obj/structure/sign/safety/commline_connection{
-	pixel_x = -17;
-	pixel_y = -7
-	},
-/turf/open/floor/almayer/green/west,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"CT" = (
-/obj/structure/machinery/light{
-	dir = 8
-	},
-/turf/open/floor/strata/floor2,
-/area/clash_arena/tdm_jungle/upp_base)
-"Db" = (
-/obj/structure/machinery/door/airlock/almayer/marine/bravo/medic,
-/turf/open/floor/almayer/test_floor4,
-/area/clash_arena/tdm_jungle/uscm_base)
-"Dc" = (
-/obj/structure/surface/table/reinforced/rostock_blend/east,
-/obj/structure/machinery/door/poddoor/shutters/almayer{
-	id = "cargdoor";
-	name = "Cargo Access"
-	},
-/turf/open/floor/plating,
 /area/clash_arena/tdm_jungle/upp_base)
 "Dn" = (
 /turf/open/gm/grass/gbcorner/north_east,
@@ -4643,18 +3146,10 @@
 /obj/effect/decal/strata_decals/grasses,
 /turf/open/auto_turf/tyrargo_grass,
 /area/clash_arena/tdm_jungle/battlefield)
-"Ds" = (
-/obj/structure/machinery/light{
-	dir = 1
-	},
-/turf/open/floor/almayer/red/north,
-/area/clash_arena/tdm_jungle/uscm_base)
 "Dt" = (
-/obj/structure/machinery/computer/cryopod{
-	dir = 8
-	},
-/turf/open/floor/almayer/cargo,
-/area/clash_arena/tdm_jungle/uscm_base/req)
+/obj/structure/flora/tree/tyrargo/tree_4,
+/turf/open/auto_turf/tyrargo_grass,
+/area/clash_arena/tdm_jungle/battlefield/zone_3)
 "Dz" = (
 /obj/structure/flora/tree/tyrargo/tree_3,
 /obj/effect/decal/strata_decals/grasses,
@@ -4669,22 +3164,8 @@
 	},
 /turf/open/auto_turf/snow/brown_base/layer2,
 /area/clash_arena/tdm_jungle/battlefield)
-"DK" = (
-/obj/structure/machinery/door/poddoor/railing{
-	dir = 2;
-	id = "supply_elevator_railing"
-	},
-/turf/open/floor/almayer/cargo_arrow/north,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"DL" = (
-/obj/structure/machinery/cm_vending/clothing/antag/upp,
-/turf/open/floor/strata/orange_edge,
-/area/clash_arena/tdm_jungle/upp_base)
 "DO" = (
-/obj/structure/sign/safety/galley{
-	pixel_x = -16;
-	pixel_y = 28
-	},
+/obj/structure/machinery/cm_vending/gear/engi,
 /turf/open/floor/almayer/floor,
 /area/clash_arena/tdm_jungle/uscm_base)
 "DP" = (
@@ -4716,9 +3197,6 @@
 	},
 /turf/open/gm/river/desert/tyrargo/deep,
 /area/clash_arena/tdm_jungle/battlefield)
-"DU" = (
-/turf/open/auto_turf/tyrargo_grass,
-/area/clash_arena/tdm_jungle/uscm_base)
 "DV" = (
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
 	dir = 9
@@ -4728,46 +3206,14 @@
 	},
 /turf/open/gm/river/desert/tyrargo/deep,
 /area/clash_arena/tdm_jungle/battlefield)
-"DZ" = (
-/obj/structure/machinery/cm_vending/gear/spec,
-/obj/structure/sign/safety/hazard{
-	pixel_y = 25
-	},
-/obj/structure/sign/safety/ammunition{
-	pixel_x = 15;
-	pixel_y = 25
-	},
-/turf/open/floor/almayer/plate,
-/area/clash_arena/tdm_jungle/uscm_base)
 "Ec" = (
 /turf/closed/wall/almayer/outer,
 /area/clash_arena/tdm_jungle/uscm_base)
-"Ee" = (
-/obj/structure/closet/crate/internals,
-/obj/item/storage/toolbox/emergency,
-/turf/open/floor/almayer/cargo,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"Eh" = (
-/obj/structure/closet/coffin/woodencrate,
-/obj/item/frame/table/wood/poor,
-/obj/structure/platform/metal/strata/north,
-/turf/open/floor/strata/floor2,
-/area/clash_arena/tdm_jungle/upp_base)
 "Ei" = (
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
 	dir = 8
 	},
 /turf/open/auto_turf/tyrargo_grass,
-/area/clash_arena/tdm_jungle/battlefield)
-"Ej" = (
-/obj/structure/flora/tree/tyrargo/tree_2,
-/turf/open/auto_turf/snow/brown_base,
-/area/clash_arena/tdm_jungle/battlefield)
-"Eq" = (
-/obj/effect/decal/strata_decals/tyrargo_mud_corner{
-	dir = 0
-	},
-/turf/closed/wall/strata_ice/forest/rock,
 /area/clash_arena/tdm_jungle/battlefield)
 "Ev" = (
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
@@ -4781,61 +3227,10 @@
 	},
 /turf/open/gm/river/red,
 /area/clash_arena/tdm_jungle/battlefield)
-"Ew" = (
-/obj/structure/machinery/computer/supply,
-/obj/structure/machinery/light{
-	dir = 8
-	},
-/turf/open/floor/almayer/floor,
-/area/clash_arena/tdm_jungle/uscm_base)
 "EA" = (
-/obj/structure/machinery/light{
-	dir = 8
-	},
-/turf/open/floor/almayer/green/west,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"EC" = (
-/obj/structure/machinery/line_nexter{
-	id = "uppline1";
-	dir = 4
-	},
-/turf/open/floor/strata/green3/southeast,
-/area/clash_arena/tdm_jungle/upp_base)
-"EG" = (
-/obj/structure/machinery/line_nexter{
-	id = "line1";
-	pixel_x = -2
-	},
-/turf/open/floor/almayer/test_floor5,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"EJ" = (
-/obj/structure/barricade/handrail{
-	dir = 8
-	},
-/obj/structure/sign/safety/intercom{
-	pixel_x = 32;
-	pixel_y = 1
-	},
-/turf/open/floor/almayer/test_floor5,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"EK" = (
-/obj/structure/largecrate/random/mini/small_case/b{
-	pixel_x = 8;
-	pixel_y = -1
-	},
-/obj/structure/largecrate/random/mini/small_case/c{
-	pixel_x = -7;
-	pixel_y = -1
-	},
-/obj/structure/largecrate/random/mini/small_case{
-	pixel_x = -1;
-	pixel_y = 9
-	},
-/obj/item/trash/crushed_cup{
-	pixel_y = 12
-	},
-/turf/open/floor/almayer/test_floor4,
-/area/clash_arena/tdm_jungle/uscm_base/req)
+/obj/effect/decal/strata_decals/grasses,
+/turf/open/auto_turf/tyrargo_grass/layer0_mud_alt,
+/area/clash_arena/tdm_jungle/battlefield/zone_3)
 "EM" = (
 /obj/structure/prop/colorable_rock/colorable/alt{
 	color = "#8D8468";
@@ -4844,12 +3239,6 @@
 	},
 /turf/open/auto_turf/tyrargo_grass,
 /area/clash_arena/tdm_jungle/battlefield)
-"ER" = (
-/obj/structure/machinery/light{
-	dir = 4
-	},
-/turf/open/floor/strata/floor3/east,
-/area/clash_arena/tdm_jungle/upp_base)
 "ES" = (
 /obj/structure/platform/stone/tyrargo/east,
 /turf/open/gm/dirt/dark_brown,
@@ -4864,11 +3253,18 @@
 /turf/open/auto_turf/tyrargo_grass/layer0_mud_alt,
 /area/clash_arena/tdm_jungle/battlefield)
 "Fc" = (
-/turf/open/floor/strata/floor3/east,
+/obj/effect/decal/warning_stripes{
+	icon_state = "W"
+	},
+/turf/closed/wall/upp_ship/reinforced/outer,
 /area/clash_arena/tdm_jungle/upp_base)
 "Fg" = (
-/obj/structure/machinery/cm_vending/gear/medic,
-/turf/open/floor/almayer/plate,
+/obj/structure/bed,
+/obj/item/bedsheet/mime,
+/obj/structure/machinery/light{
+	dir = 4
+	},
+/turf/open/floor/interior/wood,
 /area/clash_arena/tdm_jungle/uscm_base)
 "Fj" = (
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
@@ -4878,10 +3274,12 @@
 /area/clash_arena/tdm_jungle/battlefield)
 "Fu" = (
 /obj/structure/prop/tyrargo/boards/boards_2,
+/obj/effect/landmark/clash_objective/domination_zone/a,
 /turf/open/auto_turf/strata_grass/layer1,
-/area/clash_arena/tdm_jungle/battlefield)
+/area/clash_arena/tdm_jungle/battlefield/zone_2)
 "Fv" = (
-/turf/open/floor/almayer/redcorner/north,
+/obj/structure/machinery/cm_vending/clothing/marine/bravo,
+/turf/open/floor/almayer/floor,
 /area/clash_arena/tdm_jungle/uscm_base)
 "Fz" = (
 /turf/open/auto_turf/tyrargo_grass/layer0_mud,
@@ -4948,9 +3346,6 @@
 	},
 /turf/open/gm/coast/dirt/forestdir/west,
 /area/clash_arena/tdm_jungle/battlefield)
-"FO" = (
-/turf/open/floor/almayer/floor,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "FQ" = (
 /obj/structure/prop/tyrargo/large_tents/small,
 /obj/item/clothing/accessory/clf_cape{
@@ -4967,7 +3362,7 @@
 	},
 /obj/effect/landmark/clash_npc/upp/fill,
 /turf/open/auto_turf/snow/brown_base,
-/area/clash_arena/tdm_jungle/battlefield)
+/area/clash_arena/tdm_jungle/battlefield/zone_2)
 "FX" = (
 /obj/structure/flora/grass/tallgrass/jungle,
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
@@ -4975,31 +3370,6 @@
 	},
 /turf/open/auto_turf/tyrargo_grass/layer0_mud_alt,
 /area/clash_arena/tdm_jungle/battlefield)
-"Gg" = (
-/obj/structure/machinery/door_control{
-	id = "ROlobby1";
-	name = "RO Line 1 Shutters";
-	pixel_x = 5;
-	pixel_y = -2;
-	req_one_access_txt = "1;21"
-	},
-/obj/structure/machinery/line_nexter_control{
-	id = "line1";
-	pixel_x = -4;
-	pixel_y = -2;
-	req_one_access_txt = "1;21"
-	},
-/obj/structure/surface/table/almayer,
-/turf/open/floor/almayer/plate,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"Gi" = (
-/obj/structure/window/framed/almayer,
-/turf/open/floor/plating,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"Gj" = (
-/obj/structure/bed/stool,
-/turf/open/floor/almayer/green/northwest,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "Gl" = (
 /obj/structure/flora/tree/tyrargo/tree_2,
 /obj/structure/flora/tree/tyrargo/tree_2,
@@ -5037,11 +3407,7 @@
 	pixel_y = -9
 	},
 /turf/open/gm/coast/dirt/forestbeachcorner/south_west,
-/area/clash_arena/tdm_jungle/battlefield)
-"GG" = (
-/obj/structure/bed/stool,
-/turf/open/floor/almayer/plating_striped/east,
-/area/clash_arena/tdm_jungle/uscm_base/req)
+/area/clash_arena/tdm_jungle/battlefield/zone_3)
 "GN" = (
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
 	dir = 10
@@ -5067,22 +3433,9 @@
 	},
 /turf/closed/wall/strata_ice/forest/rock,
 /area/clash_arena/tdm_jungle/battlefield)
-"GR" = (
-/obj/structure/machinery/vending/cigarette/koorlander,
-/turf/open/floor/almayer/green/southwest,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "GS" = (
 /turf/open/auto_turf/snow/brown_base/layer3,
 /area/clash_arena/tdm_jungle/battlefield)
-"GW" = (
-/obj/structure/transmitter/no_dnd{
-	name = "Requisition Telephone";
-	phone_category = "Almayer";
-	phone_id = "Requisition";
-	pixel_y = 30
-	},
-/turf/open/floor/almayer/plating/northeast,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "GX" = (
 /obj/effect/decal/warning_stripes{
 	icon_state = "N";
@@ -5090,33 +3443,11 @@
 	},
 /turf/open/floor/interior/wood,
 /area/clash_arena/tdm_jungle/uscm_base)
-"GZ" = (
-/obj/structure/machinery/light{
-	dir = 4;
-	light_color = "#66ccff";
-	invisibility = 101
-	},
-/obj/structure/sign/safety/cryo{
-	pixel_x = 32
-	},
-/turf/open/floor/strata/green3/east,
-/area/clash_arena/tdm_jungle/upp_base)
 "Ha" = (
 /obj/effect/decal/strata_decals/grasses,
 /obj/effect/decal/strata_decals/grasses,
 /turf/open/auto_turf/tyrargo_grass/layer1,
 /area/clash_arena/tdm_jungle/battlefield)
-"Hb" = (
-/obj/structure/closet/crate,
-/obj/item/storage/backpack/industrial,
-/obj/item/storage/backpack/industrial,
-/obj/item/storage/backpack/marine,
-/obj/item/storage/backpack/marine,
-/turf/open/floor/almayer/cargo,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"Hd" = (
-/turf/open/floor/strata/multi_tiles/west,
-/area/clash_arena/tdm_jungle/upp_base)
 "He" = (
 /obj/structure/prop/colorable_rock/colorable/alt{
 	color = "#8D8468";
@@ -5128,9 +3459,6 @@
 "Hg" = (
 /turf/open/gm/coast/dirt/forestdir/east,
 /area/clash_arena/tdm_jungle/battlefield)
-"Hi" = (
-/turf/open/floor/almayer/greencorner,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "Hj" = (
 /obj/structure/prop/tyrargo/boards/boards_2{
 	pixel_x = -3;
@@ -5158,30 +3486,10 @@
 	},
 /turf/open/floor/plating/plating_catwalk/prison,
 /area/clash_arena/tdm_jungle/upp_base)
-"Ho" = (
-/obj/structure/machinery/light{
-	dir = 1;
-	invisibility = 101
-	},
-/turf/closed/wall/upp_ship/reinforced/outer,
-/area/clash_arena/tdm_jungle/upp_base)
 "Hq" = (
 /obj/effect/decal/strata_decals/grasses,
 /turf/open/auto_turf/strata_grass/layer1,
 /area/clash_arena/tdm_jungle/battlefield)
-"Hv" = (
-/obj/structure/machinery/cm_vending/clothing/senior_officer{
-	req_access = list();
-	req_access_txt = "26"
-	},
-/turf/open/floor/almayer/cargo,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"Hw" = (
-/obj/effect/decal/cleanable/dirt,
-/obj/structure/bed,
-/obj/item/bedsheet/mime,
-/turf/open/floor/interior/wood,
-/area/clash_arena/tdm_jungle/uscm_base)
 "HC" = (
 /obj/effect/decal/strata_decals/grasses,
 /obj/structure/barricade/sandbags/weak_wired{
@@ -5190,39 +3498,18 @@
 	},
 /turf/open/auto_turf/tyrargo_grass/layer1,
 /area/clash_arena/tdm_jungle/battlefield)
-"HD" = (
-/obj/structure/bed/chair{
-	dir = 4
-	},
-/obj/effect/landmark/map_item,
-/turf/open/floor/almayer/cargo,
-/area/clash_arena/tdm_jungle/uscm_base)
-"HE" = (
-/turf/open/floor/strata,
-/area/clash_arena/tdm_jungle/upp_base)
 "HF" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "SE-out";
-	pixel_x = 2;
-	pixel_y = -1
-	},
 /obj/effect/decal/warning_stripes{
 	icon_state = "SW-out";
 	pixel_x = -1;
 	pixel_y = -1
 	},
-/turf/open/floor/strata/floor2,
-/area/clash_arena/tdm_jungle/upp_base)
-"HH" = (
-/obj/structure/machinery/chem_dispenser/corpsman/arena{
+/obj/effect/decal/warning_stripes{
+	icon_state = "NW-out";
 	pixel_y = 3
 	},
-/turf/open/floor/almayer/orange,
-/area/clash_arena/tdm_jungle/uscm_base)
-"HI" = (
-/obj/structure/prop/tyrargo/boards/boards_2,
-/turf/open/auto_turf/tyrargo_grass/layer1,
-/area/clash_arena/tdm_jungle/battlefield)
+/turf/open/floor/corsat/squares,
+/area/clash_arena/tdm_jungle/upp_base)
 "HJ" = (
 /obj/structure/prop/colorable_rock/colorable/alt{
 	pixel_x = 6;
@@ -5269,22 +3556,12 @@
 	},
 /turf/open/gm/coast/dirt/forestbeachcorner/north_east,
 /area/clash_arena/tdm_jungle/battlefield)
-"HX" = (
-/turf/closed/wall/upp_ship,
-/area/clash_arena/tdm_jungle/upp_base)
 "Ic" = (
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
 	dir = 4
 	},
 /turf/open/gm/coast/dirt/forestbeachcorner/north_west,
 /area/clash_arena/tdm_jungle/battlefield)
-"If" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "SE-out";
-	pixel_y = -1
-	},
-/turf/open/floor/strata/multi_tiles/west,
-/area/clash_arena/tdm_jungle/upp_base)
 "Ik" = (
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
 	dir = 8
@@ -5298,9 +3575,6 @@
 /obj/structure/flora/grass/ice/brown/snowgrassbb_3,
 /turf/open/auto_turf/snow/layer2,
 /area/clash_arena/tdm_jungle/battlefield)
-"Io" = (
-/turf/open/floor/almayer/orange,
-/area/clash_arena/tdm_jungle/uscm_base)
 "Iq" = (
 /obj/structure/flora/grass/tallgrass/jungle/corner,
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
@@ -5308,17 +3582,6 @@
 	},
 /turf/open/gm/river/red,
 /area/clash_arena/tdm_jungle/battlefield)
-"Ir" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "SW-out";
-	pixel_y = -1;
-	pixel_x = -1
-	},
-/obj/effect/decal/warning_stripes{
-	icon_state = "E"
-	},
-/turf/open/floor/strata/floor3/east,
-/area/clash_arena/tdm_jungle/upp_base)
 "It" = (
 /turf/open/gm/dirt/dark_brown,
 /area/clash_arena/tdm_jungle/battlefield)
@@ -5327,9 +3590,6 @@
 /obj/structure/flora/grass/ice/brown/snowgrassbb_3,
 /turf/open/auto_turf/snow/brown_base/layer3,
 /area/clash_arena/tdm_jungle/battlefield)
-"Iz" = (
-/turf/open/floor/strata/orange_edge/east,
-/area/clash_arena/tdm_jungle/upp_base)
 "IB" = (
 /obj/structure/machinery/light{
 	dir = 8
@@ -5338,7 +3598,7 @@
 	pixel_x = -30
 	},
 /obj/structure/machinery/cm_vending/sorted/cargo_guns/upp_squad_guns,
-/turf/open/floor/corsat/spiralplate,
+/turf/open/floor/corsat/plate,
 /area/clash_arena/tdm_jungle/upp_base)
 "IC" = (
 /obj/structure/prop/colorable_rock/colorable/alt{
@@ -5357,9 +3617,6 @@
 	},
 /turf/open/gm/river/desert/tyrargo/deep,
 /area/clash_arena/tdm_jungle/battlefield)
-"IF" = (
-/turf/open/floor/strata/orange_edge,
-/area/clash_arena/tdm_jungle/upp_base)
 "IG" = (
 /obj/effect/landmark/clash_objective/domination_zone/b,
 /obj/effect/landmark/clash_objective/koth_primary,
@@ -5367,33 +3624,13 @@
 	explo_proof = 1;
 	turf_flags = 16
 	},
-/area/clash_arena/tdm_jungle/battlefield)
+/area/clash_arena/tdm_jungle/battlefield/zone_1)
 "II" = (
 /obj/effect/decal/strata_decals/grasses,
 /obj/structure/flora/bush/ausbushes/var3/fullgrass,
 /obj/structure/flora/grass/tallgrass/jungle/corner,
 /turf/open/gm/river/desert/tyrargo/deep,
 /area/clash_arena/tdm_jungle/battlefield)
-"IK" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "NE-out"
-	},
-/obj/effect/decal/warning_stripes{
-	icon_state = "S"
-	},
-/obj/structure/machinery/gear/upp,
-/turf/open/floor/almayer/mono,
-/area/clash_arena/tdm_jungle/upp_base)
-"IL" = (
-/obj/structure/machinery/door/poddoor/railing{
-	id = "supply_elevator_railing"
-	},
-/turf/open/floor/almayer/cargo_arrow,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"IN" = (
-/obj/structure/machinery/cm_vending/sorted/tech/comtech_tools,
-/turf/open/floor/almayer/cargo,
-/area/clash_arena/tdm_jungle/uscm_base)
 "IQ" = (
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
 	dir = 4
@@ -5420,46 +3657,8 @@
 /obj/effect/decal/strata_decals/grasses,
 /turf/open/auto_turf/tyrargo_grass,
 /area/clash_arena/tdm_jungle/battlefield)
-"Jc" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "SW-out";
-	pixel_x = -1;
-	pixel_y = -1
-	},
-/turf/open/floor/strata/floor2,
-/area/clash_arena/tdm_jungle/upp_base)
-"Jd" = (
-/obj/structure/machinery/cm_vending/sorted/cargo_ammo/upp_squad,
-/turf/open/floor/strata/red3/south,
-/area/clash_arena/tdm_jungle/upp_base)
-"Jh" = (
-/obj/structure/sign/safety/hazard{
-	pixel_x = 15;
-	pixel_y = -25
-	},
-/obj/structure/sign/safety/ammunition{
-	pixel_y = -25
-	},
-/turf/open/floor/almayer,
-/area/clash_arena/tdm_jungle/uscm_base)
-"Jk" = (
-/obj/structure/machinery/door/firedoor/border_only/almayer{
-	dir = 1
-	},
-/obj/structure/window/framed/almayer/hull,
-/turf/open/floor/almayer/green/northwest,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"Jl" = (
-/obj/structure/barricade/handrail{
-	pixel_x = 2
-	},
-/turf/open/floor/strata/multi_tiles/southeast,
-/area/clash_arena/tdm_jungle/upp_base)
-"Jn" = (
-/turf/open/floor/almayer/test_floor4,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "Jo" = (
-/turf/open/floor/strata/red4/east,
+/turf/open/floor/corsat/red/west,
 /area/clash_arena/tdm_jungle/upp_base)
 "Jq" = (
 /turf/open/floor/strata/fake_wood{
@@ -5473,11 +3672,6 @@
 	},
 /obj/structure/flora/tree/tyrargo/tree_2,
 /turf/open/auto_turf/tyrargo_grass,
-/area/clash_arena/tdm_jungle/battlefield)
-"Js" = (
-/obj/effect/decal/strata_decals/grasses,
-/obj/effect/landmark/clash_npc/uscm/fill,
-/turf/open/auto_turf/tyrargo_grass/layer0_mud,
 /area/clash_arena/tdm_jungle/battlefield)
 "Jt" = (
 /turf/closed/wall/almayer,
@@ -5510,7 +3704,7 @@
 	pixel_y = 26;
 	pixel_x = -17
 	},
-/turf/open/floor/strata/multi_tiles,
+/turf/open/floor/corsat/plate,
 /area/clash_arena/tdm_jungle/upp_base)
 "JI" = (
 /obj/structure/barricade/sandbags/weak_wired{
@@ -5524,13 +3718,8 @@
 /turf/open/auto_turf/snow/brown_base,
 /area/clash_arena/tdm_jungle/battlefield)
 "JJ" = (
-/turf/open/floor/strata/red3/north,
-/area/clash_arena/tdm_jungle/upp_base)
-"JK" = (
-/obj/structure/machinery/door/poddoor/railing/upp{
-	dir = 4
-	},
-/turf/open/floor/almayer/cargo_arrow/west,
+/obj/structure/machinery/cm_vending/sorted/uniform_supply/squad_prep/upp_squad_prep,
+/turf/open/floor/corsat/plate,
 /area/clash_arena/tdm_jungle/upp_base)
 "JL" = (
 /obj/effect/decal/strata_decals/grasses,
@@ -5573,17 +3762,6 @@
 	},
 /turf/open/auto_turf/tyrargo_grass/layer0_mud_alt,
 /area/clash_arena/tdm_jungle/battlefield)
-"JP" = (
-/obj/structure/machinery/cm_vending/gear/smartgun,
-/obj/structure/sign/safety/hazard{
-	pixel_x = 15;
-	pixel_y = -25
-	},
-/obj/structure/sign/safety/ammunition{
-	pixel_y = -25
-	},
-/turf/open/floor/almayer/plate,
-/area/clash_arena/tdm_jungle/uscm_base)
 "JT" = (
 /obj/structure/flora/tree/tyrargo/tree_5,
 /turf/open/auto_turf/tyrargo_grass/layer0_mud_alt,
@@ -5595,24 +3773,12 @@
 	},
 /turf/open/auto_turf/tyrargo_grass/layer0_mud_alt,
 /area/clash_arena/tdm_jungle/battlefield)
-"Kd" = (
-/turf/open/floor/strata/green3/northeast,
-/area/clash_arena/tdm_jungle/upp_base)
-"Ke" = (
-/obj/structure/surface/table/almayer,
-/obj/item/tool/hand_labeler,
-/turf/open/floor/almayer/orange/east,
-/area/clash_arena/tdm_jungle/uscm_base)
-"Ki" = (
-/obj/structure/filingcabinet,
-/obj/item/reagent_container/food/drinks/coffeecup/uscm{
-	pixel_y = 14
-	},
-/turf/open/floor/almayer/green,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "Kj" = (
-/turf/open/floor/strata/orange_icorner/north,
-/area/clash_arena/tdm_jungle/upp_base)
+/obj/structure/machinery/light{
+	dir = 4
+	},
+/turf/closed/wall/almayer/outer,
+/area/clash_arena/tdm_jungle/uscm_base)
 "Kk" = (
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
 	dir = 3
@@ -5623,26 +3789,6 @@
 /obj/structure/flora/tree/tyrargo,
 /turf/open/auto_turf/snow/brown_base/layer3,
 /area/clash_arena/tdm_jungle/battlefield)
-"Km" = (
-/obj/structure/machinery/autolathe,
-/turf/open/floor/almayer/cargo,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"Kn" = (
-/obj/structure/machinery/door_control{
-	id = "crate_room2";
-	name = "storage shutters";
-	pixel_y = 26
-	},
-/obj/structure/sign/safety/synth_storage{
-	pixel_x = 8;
-	pixel_y = 36
-	},
-/obj/structure/machinery/recharge_station{
-	desc = "Where the cargo department's Working Joe used to charge before it tragically fell into the ASRS elevator three years ago. The replacement still hasn't arrived.";
-	name = "Working Joe charging station"
-	},
-/turf/open/floor/almayer/test_floor5,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "Kp" = (
 /obj/effect/decal/strata_decals/grasses,
 /obj/structure/prop/colorable_rock/colorable/alt{
@@ -5676,9 +3822,6 @@
 	},
 /turf/open/gm/dirt/dark_brown/variant_2,
 /area/clash_arena/tdm_jungle/battlefield)
-"KD" = (
-/turf/open/floor/strata/green3/southwest,
-/area/clash_arena/tdm_jungle/upp_base)
 "KF" = (
 /obj/structure/barricade/sandbags/weak_wired{
 	pixel_x = 0;
@@ -5702,30 +3845,6 @@
 /obj/structure/flora/tree/tyrargo/tree_3,
 /turf/open/auto_turf/tyrargo_grass/layer0_mud,
 /area/clash_arena/tdm_jungle/battlefield)
-"KM" = (
-/obj/structure/surface/rack,
-/obj/item/storage/backpack/marine/satchel/rto/small/upp_net,
-/obj/item/storage/backpack/marine/satchel/rto/small/upp_net,
-/obj/item/storage/backpack/marine/satchel/rto/small/upp_net,
-/obj/item/storage/backpack/marine/satchel/rto/small/upp_net,
-/obj/item/storage/backpack/marine/satchel/rto/small/upp_net,
-/obj/item/storage/backpack/marine/satchel/rto/small/upp_net,
-/obj/item/storage/backpack/marine/satchel/rto/small/upp_net,
-/obj/item/storage/backpack/marine/satchel/rto/small/upp_net,
-/obj/item/storage/backpack/marine/satchel/rto/small/upp_net,
-/obj/item/storage/backpack/marine/satchel/rto/small/upp_net,
-/obj/item/pamphlet/upgradeable/jtac,
-/obj/item/pamphlet/upgradeable/jtac,
-/obj/item/pamphlet/upgradeable/jtac,
-/obj/item/pamphlet/upgradeable/jtac,
-/obj/item/pamphlet/upgradeable/jtac,
-/obj/item/pamphlet/upgradeable/jtac,
-/obj/item/pamphlet/upgradeable/jtac,
-/obj/item/pamphlet/upgradeable/jtac,
-/obj/item/pamphlet/upgradeable/jtac,
-/obj/item/pamphlet/upgradeable/jtac,
-/turf/open/floor/prison/floor_marked/west,
-/area/clash_arena/tdm_jungle/upp_base)
 "KN" = (
 /obj/effect/decal/strata_decals/grasses,
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
@@ -5742,32 +3861,23 @@
 	},
 /turf/open/gm/river/desert/tyrargo/deep,
 /area/clash_arena/tdm_jungle/battlefield)
-"KQ" = (
-/obj/structure/machinery/computer/supply/asrs,
-/obj/structure/sign/safety/terminal{
-	pixel_x = 16;
-	pixel_y = 32
-	},
-/turf/open/floor/almayer/green/north,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "KR" = (
-/obj/structure/prop/colorable_rock/colorable/alt{
-	color = "#8D8468";
-	dir = 4;
-	pixel_y = -1
+/obj/structure/flora/pottedplant{
+	desc = "It is made of Fiberbush(tm). It contains asbestos.";
+	icon_state = "pottedplant_22";
+	name = "synthetic potted plant";
+	pixel_y = 8
 	},
-/obj/effect/decal/strata_decals/tyrargo_mud_corner{
-	dir = 4
-	},
-/obj/effect/decal/strata_decals/grasses,
-/turf/open/auto_turf/tyrargo_grass,
-/area/clash_arena/tdm_jungle/battlefield)
-"KS" = (
 /obj/structure/machinery/light{
 	dir = 8
 	},
-/turf/open/floor/almayer/red/west,
+/turf/open/floor/almayer,
 /area/clash_arena/tdm_jungle/uscm_base)
+"KS" = (
+/obj/structure/window/framed/upp_ship,
+/obj/structure/sign/poster/upp,
+/turf/open/floor/plating,
+/area/clash_arena/tdm_jungle/upp_base)
 "KV" = (
 /obj/structure/flora/grass/tallgrass/jungle,
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
@@ -5812,24 +3922,12 @@
 /turf/open/gm/coast/dirt/forestbeachcorner/south_east,
 /area/clash_arena/tdm_jungle/battlefield)
 "La" = (
-/obj/structure/machinery/door/window/eastleft{
-	req_one_access_txt = "2;21"
+/obj/effect/decal/strata_decals/tyrargo_mud_corner{
+	dir = 1
 	},
-/obj/structure/machinery/door/window/westright,
-/obj/structure/machinery/door/poddoor/shutters/almayer{
-	dir = 4;
-	id = "ROlobby2";
-	name = "\improper RO Line 2"
-	},
-/obj/structure/machinery/door/firedoor/border_only/almayer,
-/obj/structure/surface/table/reinforced/almayer_blend,
-/obj/item/desk_bell{
-	anchored = 1;
-	pixel_x = -6;
-	pixel_y = 10
-	},
-/turf/open/floor/almayer/test_floor4,
-/area/clash_arena/tdm_jungle/uscm_base/req)
+/obj/effect/decal/strata_decals/grasses,
+/turf/open/auto_turf/tyrargo_grass,
+/area/clash_arena/tdm_jungle/battlefield)
 "Lf" = (
 /obj/structure/flora/bush/ausbushes/var3/fullgrass,
 /obj/effect/landmark/corpsespawner/colonist/random,
@@ -5858,9 +3956,6 @@
 /obj/structure/bed/hybrisa/bunkbed3,
 /turf/open/floor/interior/wood,
 /area/clash_arena/tdm_jungle/uscm_base)
-"Lk" = (
-/turf/open/floor/strata/orange_icorner/east,
-/area/clash_arena/tdm_jungle/upp_base)
 "Lm" = (
 /obj/structure/bed/bedroll/comfy/green{
 	pixel_x = -17;
@@ -5891,17 +3986,6 @@
 /obj/structure/flora/grass/temperate,
 /turf/open/auto_turf/tyrargo_grass,
 /area/clash_arena/tdm_jungle/battlefield)
-"LA" = (
-/obj/structure/machinery/door/airlock/almayer/marine/requisitions{
-	dir = 2;
-	no_panel = 1;
-	not_weldable = 1
-	},
-/obj/structure/machinery/door/firedoor/border_only/almayer{
-	dir = 1
-	},
-/turf/open/floor/almayer/test_floor4,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "LD" = (
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
 	dir = 1
@@ -5916,11 +4000,11 @@
 /turf/open/auto_turf/tyrargo_grass/layer1,
 /area/clash_arena/tdm_jungle/battlefield)
 "LK" = (
-/obj/structure/machinery/cm_vending/sorted/attachments/upp_squad,
 /obj/structure/sign/poster/clf{
 	pixel_x = -30
 	},
-/turf/open/floor/corsat/spiralplate,
+/obj/structure/machinery/cm_vending/sorted/cargo_guns/upp_squad_guns,
+/turf/open/floor/corsat/plate,
 /area/clash_arena/tdm_jungle/upp_base)
 "LL" = (
 /obj/structure/barricade/sandbags/weak_wired{
@@ -5943,24 +4027,12 @@
 	},
 /turf/open/gm/river/desert/tyrargo/deep,
 /area/clash_arena/tdm_jungle/battlefield)
-"LP" = (
-/obj/structure/fence/slim/upp,
-/turf/open/floor/strata/multi_tiles/southeast,
-/area/clash_arena/tdm_jungle/upp_base)
 "LV" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "S";
-	pixel_y = -1
-	},
-/obj/structure/machinery/light{
-	dir = 1
-	},
-/turf/open/floor/strata/floor3/east,
-/area/clash_arena/tdm_jungle/upp_base)
-"LX" = (
+/obj/effect/landmark/start/marine/medic/bravo,
+/obj/effect/landmark/late_join/bravo,
 /obj/structure/machinery/light,
-/turf/open/floor/almayer/cargo,
-/area/clash_arena/tdm_jungle/uscm_base/req)
+/turf/open/floor/interior/wood,
+/area/clash_arena/tdm_jungle/uscm_base)
 "Mh" = (
 /obj/effect/decal/cleanable/dirt,
 /obj/structure/machinery/cryopod/right{
@@ -5969,21 +4041,6 @@
 	},
 /turf/open/floor/interior/wood,
 /area/clash_arena/tdm_jungle/uscm_base)
-"Mi" = (
-/obj/structure/machinery/conveyor_switch{
-	id = "req_belt"
-	},
-/turf/open/floor/almayer/plating_striped/east,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"Mk" = (
-/obj/structure/surface/table/almayer,
-/obj/item/stack/sheet/cardboard/full_stack,
-/obj/item/stack/sheet/cardboard/full_stack,
-/obj/item/stack/sheet/cardboard/full_stack,
-/obj/item/stack/sheet/cardboard/full_stack,
-/obj/item/stack/sheet/cardboard/full_stack,
-/turf/open/floor/strata/green3/west,
-/area/clash_arena/tdm_jungle/upp_base)
 "Mm" = (
 /obj/structure/prop/tyrargo/boards/boards_2,
 /obj/structure/prop/tyrargo/boards/boards_1{
@@ -5991,36 +4048,6 @@
 	pixel_y = 0
 	},
 /turf/open/auto_turf/tyrargo_grass/layer0_mud,
-/area/clash_arena/tdm_jungle/battlefield)
-"Mq" = (
-/obj/structure/surface/table/almayer,
-/obj/item/tool/stamp/denied{
-	pixel_x = 2;
-	pixel_y = 10
-	},
-/obj/item/device/eftpos{
-	eftpos_name = "Cargo Bay EFTPOS scanner";
-	pixel_x = -10
-	},
-/obj/item/tool/stamp/ro{
-	pixel_x = -8;
-	pixel_y = 10
-	},
-/obj/item/storage/fancy/cigar{
-	pixel_x = 6
-	},
-/obj/item/ashtray/glass{
-	pixel_x = 11;
-	pixel_y = 9
-	},
-/turf/open/floor/plating/plating_catwalk,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"Mr" = (
-/obj/effect/landmark/clash_objective/koth_secondary,
-/turf/open/floor/strata/fake_wood{
-	explo_proof = 1;
-	turf_flags = 16
-	},
 /area/clash_arena/tdm_jungle/battlefield)
 "MA" = (
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
@@ -6043,40 +4070,26 @@
 /turf/open/floor/almayer/test_floor4,
 /area/clash_arena/tdm_jungle/uscm_base)
 "MI" = (
-/obj/structure/machinery/door/airlock/almayer/marine/alpha/medic,
-/turf/open/floor/almayer/test_floor4,
+/obj/structure/sign/safety/maint{
+	pixel_x = 15;
+	pixel_y = 25
+	},
+/obj/structure/bed/hybrisa/bunkbed3,
+/turf/open/floor/interior/wood,
 /area/clash_arena/tdm_jungle/uscm_base)
 "MJ" = (
-/obj/structure/machinery/light{
-	dir = 8
+/obj/structure/barricade/sandbags/weak_wired{
+	dir = 4;
+	pixel_x = 0;
+	pixel_y = 5
 	},
-/obj/structure/machinery/cm_vending/sorted/uniform_supply,
-/turf/open/floor/almayer/cargo,
-/area/clash_arena/tdm_jungle/uscm_base/req)
+/turf/open/auto_turf/tyrargo_grass,
+/area/clash_arena/tdm_jungle/battlefield/zone_3)
 "MK" = (
 /obj/effect/landmark/start/marine/alpha,
 /obj/effect/landmark/late_join/alpha,
 /turf/open/floor/interior/wood,
 /area/clash_arena/tdm_jungle/uscm_base)
-"MM" = (
-/obj/structure/closet/secure_closet/quartermaster_uscm,
-/turf/open/floor/almayer/green,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"MN" = (
-/turf/open/floor/almayer/orange/east,
-/area/clash_arena/tdm_jungle/uscm_base)
-"MO" = (
-/obj/structure/disposaloutlet{
-	density = 0;
-	desc = "An outlet for the pneumatic delivery system.";
-	icon_state = "delivery_outlet";
-	name = "delivery outlet";
-	pixel_x = -1;
-	pixel_y = 25;
-	range = 0
-	},
-/turf/open/floor/almayer/cargo,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "MQ" = (
 /obj/effect/decal/strata_decals/grasses,
 /turf/open/auto_turf/tyrargo_grass/layer1,
@@ -6108,10 +4121,6 @@
 	},
 /turf/open/gm/river/desert/tyrargo/no_slowdown,
 /area/clash_arena/tdm_jungle/battlefield)
-"MY" = (
-/obj/structure/machinery/computer/supply/asrs,
-/turf/open/floor/almayer/plate,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "MZ" = (
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
 	dir = 1
@@ -6144,34 +4153,13 @@
 /obj/structure/flora/bush/ausbushes/var3/sparsegrass,
 /turf/open/floor/grass,
 /area/space)
-"Nr" = (
-/obj/structure/machinery/cm_vending/gear/tl{
-	density = 0;
-	pixel_x = -32;
-	vend_x_offset = 1
-	},
-/obj/structure/machinery/light{
-	dir = 1
-	},
-/turf/open/floor/almayer/orange/west,
-/area/clash_arena/tdm_jungle/uscm_base)
 "Ns" = (
 /obj/structure/barricade/sandbags/weak_wired{
 	pixel_x = 0;
 	pixel_y = -9
 	},
 /turf/open/gm/coast/dirt/forestbeachcorner/south_east,
-/area/clash_arena/tdm_jungle/battlefield)
-"Nx" = (
-/obj/structure/machinery/light{
-	dir = 4
-	},
-/turf/open/floor/strata/floor2,
-/area/clash_arena/tdm_jungle/upp_base)
-"NB" = (
-/obj/structure/machinery/door/airlock/almayer/marine/bravo/tl,
-/turf/open/floor/almayer/test_floor4,
-/area/clash_arena/tdm_jungle/uscm_base)
+/area/clash_arena/tdm_jungle/battlefield/zone_3)
 "NC" = (
 /obj/structure/flora/tree/tyrargo/tree_2{
 	pixel_x = -26;
@@ -6185,36 +4173,6 @@
 	},
 /turf/open/auto_turf/snow/brown_base/layer3,
 /area/clash_arena/tdm_jungle/battlefield)
-"NF" = (
-/obj/structure/surface/table/almayer,
-/obj/item/paper_bin/uscm{
-	pixel_x = -8;
-	pixel_y = 5
-	},
-/obj/item/clipboard{
-	pixel_x = 12
-	},
-/obj/item/tool/pen{
-	pixel_x = 12
-	},
-/obj/item/tool/hand_labeler{
-	pixel_x = 4;
-	pixel_y = 11
-	},
-/obj/structure/sign/ROcreed{
-	pixel_y = 30;
-	pixel_x = -3
-	},
-/obj/item/device/flashlight/lamp{
-	pixel_y = -11;
-	pixel_x = 7
-	},
-/obj/structure/sign/calendar/ua{
-	pixel_y = 31;
-	pixel_x = 20
-	},
-/turf/open/floor/almayer/green/north,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "NI" = (
 /obj/structure/prop/tyrargo/boards/boards_2,
 /obj/effect/decal/strata_decals/mud_corner{
@@ -6234,10 +4192,6 @@
 	},
 /turf/open/gm/dirt/dark_brown,
 /area/clash_arena/tdm_jungle/battlefield)
-"NN" = (
-/obj/structure/machinery/door/airlock/almayer/marine/bravo/spec,
-/turf/open/floor/almayer/test_floor4,
-/area/clash_arena/tdm_jungle/uscm_base)
 "NO" = (
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
 	dir = 1
@@ -6258,36 +4212,6 @@
 	},
 /turf/open/auto_turf/tyrargo_grass,
 /area/clash_arena/tdm_jungle/battlefield)
-"NW" = (
-/obj/structure/machinery/cryopod/right{
-	layer = 3.1;
-	pixel_y = 13
-	},
-/turf/open/floor/almayer/cargo,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"NX" = (
-/obj/structure/machinery/door/poddoor/railing/upp{
-	dir = 2
-	},
-/turf/open/floor/almayer,
-/area/clash_arena/tdm_jungle/upp_base)
-"NY" = (
-/obj/structure/machinery/cm_vending/clothing/smartgun/bravo,
-/turf/open/floor/almayer/plate,
-/area/clash_arena/tdm_jungle/uscm_base)
-"Ob" = (
-/obj/structure/bed/chair{
-	dir = 8;
-	pixel_y = 3
-	},
-/turf/open/floor/interior/wood,
-/area/clash_arena/tdm_jungle/uscm_base)
-"Oc" = (
-/obj/structure/surface/table/almayer,
-/obj/item/storage/fancy/cigarettes/lucky_strikes,
-/obj/item/packageWrap,
-/turf/open/floor/almayer/green/northwest,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "Od" = (
 /obj/structure/flora/tree/tyrargo/tree_2,
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
@@ -6295,10 +4219,6 @@
 	},
 /turf/open/auto_turf/tyrargo_grass,
 /area/clash_arena/tdm_jungle/battlefield)
-"Og" = (
-/obj/structure/closet/secure_closet,
-/turf/open/floor/strata/green3,
-/area/clash_arena/tdm_jungle/upp_base)
 "Oh" = (
 /obj/effect/decal/strata_decals/grasses,
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
@@ -6306,16 +4226,6 @@
 	},
 /turf/open/gm/coast/dirt/forestbeachcorner/north_west,
 /area/clash_arena/tdm_jungle/battlefield)
-"Oi" = (
-/obj/structure/barricade/handrail{
-	pixel_x = 2
-	},
-/obj/structure/barricade/handrail{
-	dir = 8;
-	layer = 3.1
-	},
-/turf/open/floor/strata/multi_tiles/southeast,
-/area/clash_arena/tdm_jungle/upp_base)
 "Oj" = (
 /obj/effect/decal/cleanable/dirt,
 /obj/structure/machinery/light{
@@ -6323,20 +4233,6 @@
 	},
 /turf/open/floor/interior/wood,
 /area/clash_arena/tdm_jungle/uscm_base)
-"Op" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "SW-out";
-	pixel_x = -1
-	},
-/obj/effect/decal/warning_stripes{
-	icon_state = "W";
-	pixel_x = -1
-	},
-/turf/open/floor/strata/floor3/east,
-/area/clash_arena/tdm_jungle/upp_base)
-"Os" = (
-/turf/open/floor/strata/red4/west,
-/area/clash_arena/tdm_jungle/upp_base)
 "Ot" = (
 /obj/effect/decal/strata_decals/grasses,
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
@@ -6344,17 +4240,6 @@
 	},
 /turf/open/gm/river/desert/tyrargo/deep,
 /area/clash_arena/tdm_jungle/battlefield)
-"OD" = (
-/obj/structure/sign/ROsign{
-	layer = 3;
-	name = "\improper UPP Requisitions Office Guidelines"
-	},
-/turf/closed/wall/upp_ship/reinforced,
-/area/clash_arena/tdm_jungle/upp_base)
-"OF" = (
-/obj/structure/machinery/cm_vending/sorted/tech/tool_storage/antag,
-/turf/open/floor/strata/orange_edge/north,
-/area/clash_arena/tdm_jungle/upp_base)
 "OG" = (
 /obj/structure/flora/bush/ausbushes/var3/fullgrass{
 	pixel_x = -29;
@@ -6367,55 +4252,15 @@
 	},
 /turf/open/auto_turf/tyrargo_grass/layer0_mud_alt,
 /area/clash_arena/tdm_jungle/battlefield)
-"OH" = (
-/obj/structure/closet/secure_closet/cargotech,
-/obj/item/clothing/accessory/storage/webbing,
-/obj/structure/machinery/light{
-	dir = 1
-	},
-/turf/open/floor/almayer/green/north,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"OM" = (
-/obj/structure/machinery/cm_vending/sorted/attachments/upp_squad,
-/turf/open/floor/corsat/spiralplate,
-/area/clash_arena/tdm_jungle/upp_base)
-"OR" = (
-/obj/structure/machinery/light{
-	dir = 4
-	},
-/turf/open/floor/almayer/red/east,
-/area/clash_arena/tdm_jungle/uscm_base)
 "OU" = (
 /obj/effect/decal/strata_decals/grasses,
 /obj/structure/flora/grass/tallgrass/jungle,
 /turf/open/auto_turf/tyrargo_grass,
 /area/clash_arena/tdm_jungle/battlefield)
-"OV" = (
-/obj/structure/machinery/light{
-	dir = 8
-	},
-/obj/effect/decal/cleanable/dirt,
-/obj/structure/bed/hybrisa/bunkbed3,
-/turf/open/floor/interior/wood,
-/area/clash_arena/tdm_jungle/uscm_base)
-"OZ" = (
-/obj/structure/machinery/cm_vending/sorted/cargo_guns/upp_squad,
-/turf/open/floor/strata/red3/north,
-/area/clash_arena/tdm_jungle/upp_base)
-"Pb" = (
-/turf/open/floor/almayer/green/southeast,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "Pc" = (
 /obj/structure/flora/bush/ausbushes/var3/sparsegrass,
 /turf/open/floor/grass,
 /area/space)
-"Pf" = (
-/obj/structure/sign/calendar/upp{
-	pixel_x = 1;
-	pixel_y = -2
-	},
-/turf/closed/wall/upp_ship/reinforced/outer,
-/area/clash_arena/tdm_jungle/upp_base)
 "Ph" = (
 /obj/structure/flora/grass/tallgrass/jungle,
 /obj/structure/flora/grass/tallgrass/jungle,
@@ -6440,40 +4285,11 @@
 	},
 /turf/open/auto_turf/snow/brown_base/layer3,
 /area/clash_arena/tdm_jungle/battlefield)
-"Po" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "S"
-	},
-/obj/structure/machinery/door/poddoor/railing/upp,
-/turf/open/floor/almayer/cargo_arrow,
-/area/clash_arena/tdm_jungle/upp_base)
-"Pq" = (
-/obj/structure/surface/table/almayer,
-/obj/item/tool/pen{
-	pixel_y = -17
-	},
-/obj/item/paper_bin/uscm{
-	pixel_y = -16
-	},
-/obj/structure/machinery/faxmachine/uscm/almayer{
-	desc = "The beloved fax machine of the Requisitions department for all your equipment-requesting needs";
-	sub_name = "Requisitions";
-	gender = "female";
-	radio_alert_tag = ":u"
-	},
-/turf/open/floor/almayer/plate,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "Pr" = (
 /obj/structure/flora/tree/tyrargo,
 /obj/structure/prop/colorable_rock/colorable/alt,
 /turf/open/auto_turf/snow/layer2,
 /area/clash_arena/tdm_jungle/battlefield)
-"Pu" = (
-/obj/structure/machinery/door/airlock/almayer/marine/requisitions{
-	name = "\improper Requisitions Storage"
-	},
-/turf/open/floor/almayer/test_floor4,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "Pv" = (
 /obj/effect/decal/strata_decals/grasses,
 /obj/structure/barricade/sandbags/weak_wired{
@@ -6481,34 +4297,6 @@
 	},
 /turf/open/auto_turf/tyrargo_grass/layer0_mud_alt,
 /area/clash_arena/tdm_jungle/battlefield)
-"Px" = (
-/obj/structure/machinery/chem_dispenser/corpsman/arena{
-	pixel_y = 3
-	},
-/turf/open/floor/strata/cyan4,
-/area/clash_arena/tdm_jungle/upp_base)
-"Py" = (
-/obj/structure/surface/rack,
-/obj/item/storage/belt/marine/upp/full,
-/obj/item/storage/belt/marine/upp/full,
-/obj/item/storage/belt/marine/upp/full,
-/obj/item/storage/belt/marine/upp/full,
-/turf/open/floor/prison/floor_marked/west,
-/area/clash_arena/tdm_jungle/upp_base)
-"PA" = (
-/obj/structure/machinery/door/poddoor/railing/upp{
-	dir = 8
-	},
-/turf/open/floor/almayer/cargo_arrow/east,
-/area/clash_arena/tdm_jungle/upp_base)
-"PC" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "S";
-	pixel_y = -1
-	},
-/obj/structure/closet/crate/supply,
-/turf/open/floor/strata/floor3/east,
-/area/clash_arena/tdm_jungle/upp_base)
 "PD" = (
 /obj/structure/flora/tree/tyrargo/tree_2,
 /turf/open/auto_turf/snow/layer2,
@@ -6519,10 +4307,6 @@
 /obj/structure/flora/tree/tyrargo/tree_2,
 /turf/open/auto_turf/tyrargo_grass,
 /area/clash_arena/tdm_jungle/battlefield)
-"PH" = (
-/obj/structure/machinery/cm_vending/sorted/uniform_supply/upp_uniform,
-/turf/open/floor/strata/green3/west,
-/area/clash_arena/tdm_jungle/upp_base)
 "PI" = (
 /obj/structure/barricade/sandbags/weak_wired{
 	pixel_x = 0;
@@ -6549,13 +4333,6 @@
 	},
 /turf/closed/wall/strata_ice/forest/rock,
 /area/clash_arena/tdm_jungle/battlefield)
-"PS" = (
-/obj/structure/machinery/computer/supply,
-/obj/structure/sign/safety/galley{
-	pixel_x = -17
-	},
-/turf/open/floor/almayer,
-/area/clash_arena/tdm_jungle/uscm_base)
 "PZ" = (
 /obj/effect/decal/strata_decals/grasses,
 /turf/open/auto_turf/snow/brown_base,
@@ -6590,16 +4367,16 @@
 	},
 /turf/open/auto_turf/tyrargo_grass/layer0_mud,
 /area/clash_arena/tdm_jungle/battlefield)
-"Qt" = (
-/obj/structure/surface/table/reinforced/rostock_blend/west,
-/obj/structure/machinery/door/poddoor/shutters/almayer{
-	id = "cargdoor";
-	name = "Cargo Access"
-	},
-/turf/open/floor/plating,
-/area/clash_arena/tdm_jungle/upp_base)
 "Qu" = (
-/turf/open/floor/corsat/spiralplate,
+/obj/effect/decal/warning_stripes{
+	icon_state = "N";
+	pixel_y = 3
+	},
+/obj/effect/decal/warning_stripes{
+	icon_state = "S";
+	pixel_y = -1
+	},
+/turf/open/floor/kutjevo/colors/red/tile,
 /area/clash_arena/tdm_jungle/upp_base)
 "Qw" = (
 /turf/open/floor/almayer/floor,
@@ -6615,15 +4392,6 @@
 /obj/structure/platform/metal/almayer_smooth,
 /turf/open/floor/grass,
 /area/space)
-"QC" = (
-/obj/structure/machinery/light{
-	dir = 1
-	},
-/obj/structure/surface/table/almayer,
-/obj/item/clipboard,
-/obj/item/tool/pen,
-/turf/open/floor/strata/floor3/east,
-/area/clash_arena/tdm_jungle/upp_base)
 "QD" = (
 /obj/structure/flora/bush/ausbushes/var3/fullgrass,
 /obj/structure/barricade/sandbags/weak_wired{
@@ -6631,22 +4399,6 @@
 	},
 /turf/open/auto_turf/tyrargo_grass/layer0_mud_alt,
 /area/clash_arena/tdm_jungle/battlefield)
-"QE" = (
-/obj/structure/machinery/power/apc/almayer/east,
-/turf/open/floor/almayer/plating_striped/west,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"QF" = (
-/obj/effect/landmark/start/cargo,
-/obj/structure/machinery/light,
-/obj/effect/landmark/late_join/cargo,
-/turf/open/floor/plating/plating_catwalk,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"QI" = (
-/obj/structure/bed/chair{
-	dir = 4
-	},
-/turf/open/floor/almayer,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "QK" = (
 /obj/structure/flora/grass/tallgrass/jungle{
 	pixel_x = 0;
@@ -6664,45 +4416,6 @@
 	},
 /turf/open/gm/river/desert/deep/toxic,
 /area/clash_arena/tdm_jungle/battlefield)
-"QP" = (
-/obj/structure/largecrate/supply/supplies/mre,
-/obj/structure/machinery/light/small{
-	dir = 8
-	},
-/turf/open/floor/almayer/cargo,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"QR" = (
-/obj/structure/surface/rack{
-	density = 0;
-	pixel_x = 16
-	},
-/obj/item/clothing/suit/storage/marine/light/vest,
-/obj/item/clothing/suit/storage/marine/light/vest,
-/turf/open/floor/almayer/plating_stripedcorner/east,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"QU" = (
-/obj/structure/bed/chair{
-	dir = 1
-	},
-/obj/effect/decal/warning_stripes{
-	icon_state = "S"
-	},
-/turf/open/floor/plating/plating_catwalk,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"QW" = (
-/obj/structure/stairs/perspective{
-	icon_state = "p_stair_sn_full_cap"
-	},
-/obj/structure/platform_decoration/metal/strata/east,
-/turf/open/floor/strata/floor3/east,
-/area/clash_arena/tdm_jungle/upp_base)
-"QY" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "E";
-	pixel_x = 1
-	},
-/turf/open/floor/almayer/green/east,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "Re" = (
 /obj/structure/prop/colorable_rock/colorable/alt{
 	color = "#8D8468";
@@ -6717,17 +4430,6 @@
 	},
 /turf/open/gm/coast/dirt/forestbeachcorner/south_east,
 /area/clash_arena/tdm_jungle/battlefield)
-"Rl" = (
-/obj/structure/machinery/door/poddoor/railing{
-	dir = 8;
-	id = "supply_elevator_railing"
-	},
-/turf/open/floor/almayer/cargo_arrow/east,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"Rm" = (
-/obj/structure/machinery/light,
-/turf/open/floor/almayer,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "Rp" = (
 /obj/structure/flora/tree/tyrargo/tree_6,
 /turf/open/auto_turf/tyrargo_grass,
@@ -6803,13 +4505,6 @@
 /obj/structure/window/framed/almayer,
 /turf/open/floor/plating,
 /area/clash_arena/tdm_jungle/uscm_base)
-"RM" = (
-/obj/structure/machinery/cm_vending/clothing/specialist/bravo,
-/turf/open/floor/almayer/plate,
-/area/clash_arena/tdm_jungle/uscm_base)
-"RN" = (
-/turf/open/floor/almayer/orangecorner/west,
-/area/clash_arena/tdm_jungle/uscm_base)
 "RO" = (
 /obj/structure/platform_decoration/stone/tyrargo/west,
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
@@ -6820,25 +4515,11 @@
 	},
 /turf/open/gm/dirt/dark_brown,
 /area/clash_arena/tdm_jungle/battlefield)
-"RP" = (
-/obj/structure/surface/table/almayer,
-/obj/item/pizzabox/margherita{
-	pixel_y = 8
-	},
-/obj/structure/sign/calendar{
-	pixel_y = 27
-	},
-/turf/open/floor/almayer/green/north,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "RS" = (
 /obj/structure/flora/tree/tyrargo/tree_4,
 /obj/effect/decal/strata_decals/grasses,
 /turf/open/auto_turf/tyrargo_grass,
 /area/clash_arena/tdm_jungle/battlefield)
-"RX" = (
-/obj/structure/machinery/door/airlock/multi_tile/upp/req,
-/turf/open/floor/corsat/marked,
-/area/clash_arena/tdm_jungle/upp_base)
 "Sb" = (
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
 	dir = 0
@@ -6867,10 +4548,12 @@
 /turf/open/gm/river/desert/deep/toxic,
 /area/clash_arena/tdm_jungle/battlefield)
 "Sk" = (
-/obj/structure/bed/chair{
-	dir = 4
+/obj/effect/landmark/start/marine/alpha,
+/obj/effect/landmark/late_join/alpha,
+/obj/structure/machinery/light{
+	dir = 1
 	},
-/turf/open/floor/almayer/cargo,
+/turf/open/floor/interior/wood,
 /area/clash_arena/tdm_jungle/uscm_base)
 "Sn" = (
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
@@ -6891,22 +4574,12 @@
 	},
 /turf/open/gm/river/desert/deep/toxic,
 /area/clash_arena/tdm_jungle/battlefield)
-"Sw" = (
-/obj/structure/machinery/line_nexter{
-	id = "uppline2"
-	},
-/turf/open/floor/strata/green3/southwest,
-/area/clash_arena/tdm_jungle/upp_base)
 "SB" = (
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
 	dir = 0
 	},
 /turf/open/gm/river/desert/tyrargo/deep,
 /area/clash_arena/tdm_jungle/battlefield)
-"SE" = (
-/obj/structure/machinery/cm_vending/clothing/engi/alpha,
-/turf/open/floor/almayer/plate,
-/area/clash_arena/tdm_jungle/uscm_base)
 "SF" = (
 /obj/structure/prop/colorable_rock/colorable/alt{
 	color = "#8D8468";
@@ -6928,12 +4601,6 @@
 "SK" = (
 /obj/structure/blocker/clash_gate/uscm,
 /turf/open/floor/almayer/test_floor4,
-/area/clash_arena/tdm_jungle/uscm_base)
-"SO" = (
-/obj/structure/sign/poster{
-	pixel_y = 32
-	},
-/turf/open/floor/almayer/red/east,
 /area/clash_arena/tdm_jungle/uscm_base)
 "SR" = (
 /obj/structure/flora/tree/tyrargo/tree_3,
@@ -6957,10 +4624,6 @@
 /obj/structure/prop/colorable_rock/colorable/alt,
 /turf/open/auto_turf/snow/brown_base/layer3,
 /area/clash_arena/tdm_jungle/battlefield)
-"Tf" = (
-/obj/vehicle/powerloader,
-/turf/open/floor/almayer/cargo,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "Tk" = (
 /obj/structure/barricade/handrail/kutjevo{
 	explo_proof = 1;
@@ -6976,23 +4639,6 @@
 	},
 /turf/open/gm/river/tyrargo,
 /area/clash_arena/tdm_jungle/battlefield)
-"Tp" = (
-/obj/structure/bed/chair{
-	dir = 1
-	},
-/obj/effect/decal/warning_stripes{
-	icon_state = "S"
-	},
-/turf/open/floor/almayer/green/east,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"Tt" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "NW-out";
-	pixel_y = 3
-	},
-/obj/structure/machinery/light,
-/turf/open/floor/strata/floor3/east,
-/area/clash_arena/tdm_jungle/upp_base)
 "Tx" = (
 /obj/structure/prop/tyrargo/boards/boards_1{
 	pixel_x = -16;
@@ -7004,14 +4650,6 @@
 "Ty" = (
 /turf/open/gm/grass/grassbeach/north,
 /area/space)
-"Tz" = (
-/obj/structure/fence/slim/upp/door,
-/turf/open/floor/strata/green3/northeast,
-/area/clash_arena/tdm_jungle/upp_base)
-"TA" = (
-/obj/structure/machinery/door/airlock/almayer/marine/alpha/sl,
-/turf/open/floor/almayer/test_floor4,
-/area/clash_arena/tdm_jungle/uscm_base)
 "TF" = (
 /turf/open/auto_turf/snow/brown_base,
 /area/clash_arena/tdm_jungle/battlefield)
@@ -7047,21 +4685,6 @@
 	},
 /turf/open/gm/coast/dirt/forestbeachcorner/north_west,
 /area/clash_arena/tdm_jungle/battlefield)
-"Ue" = (
-/obj/structure/surface/table/reinforced/prison,
-/obj/item/storage/toolbox/mechanical{
-	pixel_x = 1;
-	pixel_y = 7
-	},
-/obj/item/storage/toolbox/emergency{
-	pixel_x = -3
-	},
-/turf/open/floor/almayer,
-/area/clash_arena/tdm_jungle/uscm_base)
-"Ug" = (
-/obj/structure/machinery/cm_vending/sorted/attachments/upp_squad,
-/turf/open/floor/strata/red3/north,
-/area/clash_arena/tdm_jungle/upp_base)
 "Uh" = (
 /obj/structure/prop/colorable_rock/colorable/alt{
 	color = "#8D8468";
@@ -7083,38 +4706,26 @@
 /obj/structure/platform/stone/tyrargo/north,
 /turf/open/gm/dirt/dark_brown,
 /area/clash_arena/tdm_jungle/battlefield)
-"Uo" = (
-/obj/structure/sign/safety/storage{
-	pixel_x = -17
-	},
-/obj/structure/disposalpipe/up/almayer{
-	dir = 8;
-	id = "almayerlink_morgue1_req"
-	},
-/turf/open/floor/almayer/green/west,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "Up" = (
 /turf/open/auto_turf/strata_grass/layer1,
 /area/clash_arena/tdm_jungle/battlefield)
 "Uu" = (
-/obj/structure/machinery/cm_vending/sorted/cargo_ammo/squad{
+/obj/structure/machinery/light{
+	dir = 4
+	},
+/obj/structure/machinery/cm_vending/sorted/cargo_guns/squad{
 	req_access = null;
 	req_one_access = null;
 	req_one_access_txt = "15;16;21";
-	vend_x_offset = 0
+	vend_x_offset = 0;
+	vend_y_offset = 0
 	},
-/turf/open/floor/almayer/plate,
+/turf/open/floor/almayer/floor,
 /area/clash_arena/tdm_jungle/uscm_base)
 "Ux" = (
-/obj/structure/machinery/chem_dispenser/corpsman/arena{
-	pixel_y = 3
-	},
-/turf/open/floor/almayer/red/north,
-/area/clash_arena/tdm_jungle/uscm_base)
-"UF" = (
-/obj/structure/machinery/cm_vending/clothing/antag/upp,
-/turf/open/floor/strata/cyan3,
-/area/clash_arena/tdm_jungle/upp_base)
+/obj/effect/landmark/clash_objective/domination_zone/c,
+/turf/open/auto_turf/tyrargo_grass/layer0_mud_alt,
+/area/clash_arena/tdm_jungle/battlefield/zone_3)
 "UH" = (
 /obj/structure/prop/tyrargo/boards/boards_1{
 	pixel_x = -2;
@@ -7138,9 +4749,6 @@
 	},
 /turf/open/gm/river/desert/tyrargo/deep,
 /area/clash_arena/tdm_jungle/battlefield)
-"UI" = (
-/turf/open/floor/almayer/greencorner/east,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "UK" = (
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
 	dir = 5
@@ -7151,11 +4759,6 @@
 /obj/effect/decal/strata_decals/grasses,
 /turf/open/gm/river/desert/tyrargo/deep,
 /area/clash_arena/tdm_jungle/battlefield)
-"UL" = (
-/obj/structure/surface/rack,
-/obj/item/defenses/handheld/sentry/upp,
-/turf/open/floor/prison/floor_marked/west,
-/area/clash_arena/tdm_jungle/upp_base)
 "UO" = (
 /obj/structure/flora/tree/tyrargo/tree_2,
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
@@ -7164,9 +4767,8 @@
 /turf/open/gm/dirt/dark_brown,
 /area/clash_arena/tdm_jungle/battlefield)
 "UP" = (
-/obj/effect/landmark/clash_objective/domination_zone/c,
 /turf/open/auto_turf/tyrargo_grass,
-/area/clash_arena/tdm_jungle/battlefield)
+/area/clash_arena/tdm_jungle/battlefield/zone_3)
 "US" = (
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
 	dir = 8
@@ -7183,16 +4785,6 @@
 	},
 /turf/open/auto_turf/tyrargo_grass/layer1,
 /area/clash_arena/tdm_jungle/battlefield)
-"UV" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "W";
-	pixel_x = -1
-	},
-/obj/effect/decal/warning_stripes{
-	icon_state = "E"
-	},
-/turf/open/floor/strata/floor3/east,
-/area/clash_arena/tdm_jungle/upp_base)
 "UW" = (
 /obj/effect/decal/strata_decals/grasses,
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
@@ -7200,10 +4792,6 @@
 	},
 /turf/open/gm/river/desert/tyrargo/deep,
 /area/clash_arena/tdm_jungle/battlefield)
-"UY" = (
-/obj/structure/machinery/door/airlock/almayer/marine/bravo/smart,
-/turf/open/floor/almayer/test_floor4,
-/area/clash_arena/tdm_jungle/uscm_base)
 "Ve" = (
 /obj/structure/barricade/sandbags/weak_wired{
 	dir = 4;
@@ -7227,9 +4815,6 @@
 	},
 /turf/open/auto_turf/tyrargo_grass,
 /area/clash_arena/tdm_jungle/battlefield)
-"Vj" = (
-/turf/open/floor/almayer/plating_striped/north,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "Vl" = (
 /obj/structure/platform/stone/tyrargo/north,
 /turf/open/auto_turf/snow/layer2,
@@ -7245,16 +4830,6 @@
 	},
 /turf/open/gm/grass,
 /area/space)
-"Vr" = (
-/obj/structure/largecrate/random/mini/chest{
-	pixel_x = 4
-	},
-/obj/effect/decal/warning_stripes{
-	icon_state = "E";
-	pixel_x = 1
-	},
-/turf/open/floor/almayer,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "Vw" = (
 /obj/effect/decal/strata_decals/grasses,
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
@@ -7269,30 +4844,10 @@
 	},
 /turf/open/floor/almayer/test_floor4,
 /area/clash_arena/tdm_jungle/uscm_base)
-"VC" = (
-/obj/structure/flora/pottedplant{
-	icon_state = "pottedplant_22"
-	},
-/turf/open/floor/almayer/green/southwest,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"VH" = (
-/obj/structure/surface/rack,
-/obj/item/explosive/plastic,
-/obj/item/explosive/plastic,
-/turf/open/floor/prison/floor_marked/west,
-/area/clash_arena/tdm_jungle/upp_base)
 "VK" = (
 /obj/structure/flora/tree/tyrargo/tree_2,
 /turf/open/auto_turf/tyrargo_grass/layer0_mud,
 /area/clash_arena/tdm_jungle/battlefield)
-"VM" = (
-/obj/structure/machinery/cm_vending/clothing/leader/alpha,
-/turf/open/floor/almayer/plate,
-/area/clash_arena/tdm_jungle/uscm_base)
-"VN" = (
-/obj/structure/machinery/door/airlock/almayer/marine/alpha/engineer,
-/turf/open/floor/almayer/test_floor4,
-/area/clash_arena/tdm_jungle/uscm_base)
 "VP" = (
 /obj/structure/prop/tyrargo/boards/boards_1{
 	pixel_x = -2;
@@ -7309,12 +4864,6 @@
 	},
 /turf/open/gm/river/red,
 /area/clash_arena/tdm_jungle/battlefield)
-"VU" = (
-/obj/structure/barricade/handrail{
-	pixel_x = 2
-	},
-/turf/open/floor/strata/green3/northeast,
-/area/clash_arena/tdm_jungle/upp_base)
 "VV" = (
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
 	dir = 1
@@ -7324,33 +4873,13 @@
 	},
 /turf/open/auto_turf/tyrargo_grass,
 /area/clash_arena/tdm_jungle/battlefield)
-"VW" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "SW-out";
-	pixel_x = -1;
-	pixel_y = -1
-	},
-/turf/open/floor/strata/red3/west,
-/area/clash_arena/tdm_jungle/upp_base)
-"VY" = (
-/obj/structure/closet/crate/ammo,
-/obj/structure/machinery/light/small,
-/obj/item/ammo_box/magazine/empty,
-/obj/item/ammo_box/magazine/empty,
-/obj/effect/decal/cleanable/cobweb2/dynamic,
-/turf/open/floor/almayer/test_floor5,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"VZ" = (
-/obj/structure/machinery/light,
-/turf/open/floor/almayer/green,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "Wc" = (
 /obj/effect/decal/warning_stripes{
 	icon_state = "SW-out";
 	pixel_x = -1;
 	pixel_y = -1
 	},
-/turf/open/floor/strata/red3/southwest,
+/turf/open/floor/corsat/red/west,
 /area/clash_arena/tdm_jungle/upp_base)
 "Wd" = (
 /obj/structure/prop/brazier/campfire,
@@ -7362,13 +4891,6 @@
 	},
 /turf/open/gm/dirt/dark_brown,
 /area/clash_arena/tdm_jungle/battlefield)
-"Wm" = (
-/obj/structure/surface/rack,
-/obj/item/stack/sheet/metal/large_stack,
-/obj/item/stack/sheet/metal/large_stack,
-/obj/item/stack/sheet/metal/large_stack,
-/turf/open/floor/prison/floor_marked/west,
-/area/clash_arena/tdm_jungle/upp_base)
 "Wn" = (
 /obj/structure/flora/tree/tyrargo/tree_2,
 /turf/open/auto_turf/tyrargo_grass/layer1,
@@ -7400,40 +4922,13 @@
 /obj/effect/decal/strata_decals/grasses,
 /turf/open/auto_turf/tyrargo_grass/layer0_mud_alt,
 /area/clash_arena/tdm_jungle/battlefield)
-"WL" = (
-/obj/structure/machinery/cm_vending/gear/tl{
-	density = 0;
-	pixel_x = -32;
-	vend_x_offset = 1
-	},
-/turf/open/floor/almayer/orange/southwest,
-/area/clash_arena/tdm_jungle/uscm_base)
-"WM" = (
-/obj/structure/window/framed/almayer/hull,
-/turf/open/floor/plating,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"WN" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "SW-out";
-	pixel_y = -1;
-	pixel_x = -1
-	},
-/obj/effect/decal/warning_stripes{
-	icon_state = "SE-out";
-	pixel_y = -1
-	},
-/turf/open/floor/strata/floor2,
-/area/clash_arena/tdm_jungle/upp_base)
 "WS" = (
 /obj/structure/prop/tyrargo/boards/boards_1{
 	pixel_x = 13;
 	pixel_y = 2
 	},
+/obj/structure/prop/tyrargo/boards/boards_2,
 /turf/open/auto_turf/tyrargo_grass/layer0_mud,
-/area/clash_arena/tdm_jungle/battlefield)
-"WY" = (
-/obj/structure/flora/bush/ausbushes/var3/sparsegrass,
-/turf/closed/wall/strata_ice/forest/rock,
 /area/clash_arena/tdm_jungle/battlefield)
 "Xa" = (
 /obj/structure/barricade/handrail/kutjevo,
@@ -7443,18 +4938,7 @@
 /obj/effect/decal/strata_decals/grasses,
 /obj/effect/landmark/clash_npc/uscm/fill,
 /turf/open/auto_turf/tyrargo_grass,
-/area/clash_arena/tdm_jungle/battlefield)
-"Xg" = (
-/obj/structure/machinery/cm_vending/gear/spec,
-/obj/structure/sign/safety/hazard{
-	pixel_x = 15;
-	pixel_y = -25
-	},
-/obj/structure/sign/safety/ammunition{
-	pixel_y = -25
-	},
-/turf/open/floor/almayer/plate,
-/area/clash_arena/tdm_jungle/uscm_base)
+/area/clash_arena/tdm_jungle/battlefield/zone_3)
 "Xh" = (
 /obj/structure/prop/colorable_rock/colorable/alt{
 	color = "#8D8468";
@@ -7472,48 +4956,16 @@
 	},
 /turf/open/gm/river/desert/tyrargo/deep,
 /area/clash_arena/tdm_jungle/battlefield)
-"Xk" = (
-/obj/structure/barricade/handrail{
-	pixel_x = 2
-	},
-/turf/open/floor/strata/green3/northwest,
-/area/clash_arena/tdm_jungle/upp_base)
-"Xl" = (
-/turf/open/floor/strata/floor3,
-/area/clash_arena/tdm_jungle/upp_base)
-"Xm" = (
-/turf/open/floor/strata/orange_edge/west,
-/area/clash_arena/tdm_jungle/upp_base)
 "Xn" = (
 /obj/structure/prop/colorable_rock/colorable/alt,
 /turf/open/auto_turf/snow/brown_base/layer3,
 /area/clash_arena/tdm_jungle/battlefield)
-"Xp" = (
-/obj/structure/barricade/handrail{
-	dir = 4;
-	pixel_x = 2
-	},
-/turf/open/floor/strata/multi_tiles/west,
-/area/clash_arena/tdm_jungle/upp_base)
 "Xq" = (
-/obj/structure/machinery/door/window/eastleft{
-	req_one_access_txt = "2;21"
+/obj/structure/machinery/light{
+	dir = 8
 	},
-/obj/structure/machinery/door/window/westright,
-/obj/structure/machinery/door/poddoor/shutters/almayer{
-	dir = 4;
-	id = "ROlobby1";
-	name = "\improper RO Line 1"
-	},
-/obj/structure/machinery/door/firedoor/border_only/almayer,
-/obj/structure/surface/table/reinforced/almayer_blend/north,
-/obj/item/desk_bell{
-	anchored = 1;
-	pixel_x = -6;
-	pixel_y = -8
-	},
-/turf/open/floor/almayer/test_floor4,
-/area/clash_arena/tdm_jungle/uscm_base/req)
+/turf/open/floor/corsat/plate,
+/area/clash_arena/tdm_jungle/upp_base)
 "Xr" = (
 /obj/effect/decal/strata_decals/grasses,
 /obj/structure/barricade/sandbags/weak_wired{
@@ -7523,20 +4975,6 @@
 	},
 /turf/open/auto_turf/tyrargo_grass,
 /area/clash_arena/tdm_jungle/battlefield)
-"Xt" = (
-/obj/structure/barricade/handrail{
-	dir = 8;
-	layer = 3.1
-	},
-/turf/open/floor/strata/multi_tiles/west,
-/area/clash_arena/tdm_jungle/upp_base)
-"Xx" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "SE-out";
-	pixel_x = 1
-	},
-/turf/open/floor/plating/plating_catwalk,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "Xy" = (
 /obj/structure/flora/bush/ausbushes/var3/sparsegrass,
 /obj/structure/flora/tree/tyrargo/tree_2,
@@ -7557,18 +4995,6 @@
 	},
 /turf/open/gm/coast/dirt/forestbeachcorner/north_west,
 /area/clash_arena/tdm_jungle/battlefield)
-"XD" = (
-/turf/open/floor/strata/red3/south,
-/area/clash_arena/tdm_jungle/upp_base)
-"XF" = (
-/obj/structure/sign/safety/maint{
-	pixel_x = 15;
-	pixel_y = 25
-	},
-/obj/structure/bed,
-/obj/item/bedsheet/mime,
-/turf/open/floor/interior/wood,
-/area/clash_arena/tdm_jungle/uscm_base)
 "XI" = (
 /obj/structure/machinery/cryopod{
 	layer = 3.1;
@@ -7621,9 +5047,6 @@
 /obj/effect/decal/strata_decals/grasses,
 /turf/open/gm/river/desert/tyrargo/deep,
 /area/clash_arena/tdm_jungle/battlefield)
-"XV" = (
-/turf/open/floor/strata/cyan3/north,
-/area/clash_arena/tdm_jungle/upp_base)
 "XW" = (
 /obj/structure/prop/tyrargo/boards/boards_1{
 	pixel_x = 2;
@@ -7631,39 +5054,12 @@
 	},
 /turf/open/auto_turf/tyrargo_grass/layer0_mud_alt,
 /area/clash_arena/tdm_jungle/battlefield)
-"Ya" = (
-/obj/structure/machinery/light,
-/turf/open/floor/almayer/orange,
-/area/clash_arena/tdm_jungle/uscm_base)
-"Yb" = (
-/obj/structure/surface/table/almayer,
-/obj/item/paper_bin{
-	pixel_y = 5
-	},
-/obj/item/tool/pen,
-/obj/item/prop/magazine/book{
-	desc = "A booklet provided to anyone ranging from conscripts to normal citizenry. The first page is stamped with the Party's insignia and reminds you that the Party has your best interest in heart; the following pages immensely simplify the Party's doctrine, grossly propagandizes Socialism, and greatly vilifies the United Americas.";
-	name = "UPP Party Doctrine Booklet";
-	pixel_x = 8;
-	pixel_y = 1
-	},
-/turf/open/floor/strata/orange_icorner,
-/area/clash_arena/tdm_jungle/upp_base)
 "Yd" = (
 /turf/closed/wall/strata_ice/jungle,
 /area/clash_arena/tdm_jungle/battlefield)
 "Yg" = (
 /turf/open/gm/coast/dirt/forestbeachcorner2/north_east,
 /area/clash_arena/tdm_jungle/battlefield)
-"Yj" = (
-/obj/structure/fence/slim/upp/door,
-/turf/open/floor/strata/green3/northwest,
-/area/clash_arena/tdm_jungle/upp_base)
-"Yp" = (
-/obj/structure/prop/cash_register/broken,
-/obj/structure/machinery/light/small,
-/turf/open/floor/almayer/test_floor5,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "Yq" = (
 /obj/structure/flora/tree/tyrargo/tree_2,
 /turf/open/auto_turf/tyrargo_grass,
@@ -7686,70 +5082,19 @@
 	},
 /turf/open/gm/river/desert/tyrargo/deep,
 /area/clash_arena/tdm_jungle/battlefield)
-"Yv" = (
-/obj/structure/machinery/cryopod/right,
-/turf/open/floor/almayer/cargo,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"Yw" = (
-/obj/structure/machinery/light{
-	dir = 4
-	},
-/turf/open/floor/almayer/green/east,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"Yx" = (
-/turf/open/floor/strata/orange_edge/north,
-/area/clash_arena/tdm_jungle/upp_base)
 "Yy" = (
 /obj/structure/flora/bush/ausbushes/var3/fullgrass,
 /turf/open/gm/river/red,
 /area/clash_arena/tdm_jungle/battlefield)
-"Yz" = (
-/obj/structure/machinery/cm_vending/sorted/cargo_guns/squad{
-	req_access = null;
-	req_one_access = null;
-	req_one_access_txt = "15;16;21";
-	vend_x_offset = 0;
-	vend_y_offset = 0
-	},
-/obj/structure/machinery/light,
-/turf/open/floor/almayer/plate,
-/area/clash_arena/tdm_jungle/uscm_base)
-"YD" = (
-/obj/structure/barricade/handrail{
-	dir = 8
-	},
-/turf/open/floor/almayer/test_floor5,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"YG" = (
-/obj/structure/sign/safety/synth_storage{
-	pixel_y = 32
-	},
-/obj/structure/platform_decoration/metal/strata/west,
-/turf/open/floor/strata/floor2,
-/area/clash_arena/tdm_jungle/upp_base)
-"YH" = (
-/obj/structure/surface/rack,
-/turf/open/floor/prison/floor_marked/west,
-/area/clash_arena/tdm_jungle/upp_base)
 "YI" = (
 /obj/effect/decal/siding,
 /turf/open/auto_turf/tyrargo_grass/layer1,
 /area/clash_arena/tdm_jungle/battlefield)
 "YK" = (
-/obj/structure/machinery/cm_vending/sorted/tech/tool_storage/antag,
-/turf/open/floor/strata/orange_icorner/west,
-/area/clash_arena/tdm_jungle/upp_base)
-"YU" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "NE-out";
-	pixel_x = 2;
-	pixel_y = 3
+/obj/structure/machinery/light{
+	dir = 4
 	},
-/obj/effect/decal/warning_stripes{
-	icon_state = "NW-out";
-	pixel_y = 3
-	},
-/turf/open/floor/strata/floor3/east,
+/turf/open/floor/corsat/plate,
 /area/clash_arena/tdm_jungle/upp_base)
 "YV" = (
 /obj/structure/barricade/handrail/kutjevo{
@@ -7801,7 +5146,6 @@
 /turf/open/gm/coast/dirt/forestbeachcorner2/south_east,
 /area/clash_arena/tdm_jungle/battlefield)
 "Zm" = (
-/obj/structure/sign/poster/upp,
 /turf/closed/wall/upp_ship/reinforced,
 /area/clash_arena/tdm_jungle/upp_base)
 "Zn" = (
@@ -7811,17 +5155,11 @@
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
 	dir = 6
 	},
+/obj/effect/decal/strata_decals/tyrargo_mud_corner{
+	dir = 1
+	},
 /turf/open/auto_turf/tyrargo_grass,
 /area/clash_arena/tdm_jungle/battlefield)
-"Zp" = (
-/obj/structure/window/framed/upp_ship/reinforced,
-/obj/structure/machinery/door/poddoor/shutters/almayer{
-	id = "cargdoor";
-	name = "Cargo Access";
-	dir = 4
-	},
-/turf/open/floor/plating,
-/area/clash_arena/tdm_jungle/upp_base)
 "Zq" = (
 /obj/structure/prop/tyrargo/boards/boards_2{
 	pixel_x = 23;
@@ -7852,22 +5190,22 @@
 /turf/open/auto_turf/tyrargo_grass,
 /area/clash_arena/tdm_jungle/battlefield)
 "Zz" = (
-/obj/structure/machinery/door_control{
-	id = "crate_room";
-	name = "storage shutters";
-	pixel_x = -25;
+/obj/structure/window/framed/upp_ship,
+/obj/structure/sign/poster/upp,
+/turf/open/floor/strata/floor2,
+/area/clash_arena/tdm_jungle/upp_base)
+"ZA" = (
+/obj/effect/decal/warning_stripes{
+	icon_state = "NE-out";
+	pixel_x = 2;
+	pixel_y = 3
+	},
+/obj/effect/decal/warning_stripes{
+	icon_state = "SE-out";
+	pixel_x = 2;
 	pixel_y = -1
 	},
-/obj/structure/largecrate/random/case/double,
-/turf/open/floor/almayer/cargo,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"ZA" = (
-/obj/structure/flora/tree/tyrargo/tree_2,
-/obj/structure/flora/tree/tyrargo/tree_2,
-/turf/open/auto_turf/tyrargo_grass,
-/area/clash_arena/tdm_jungle/battlefield)
-"ZE" = (
-/turf/open/floor/strata/cyan4/west,
+/turf/open/floor/corsat/squares,
 /area/clash_arena/tdm_jungle/upp_base)
 "ZH" = (
 /obj/effect/decal/strata_decals/grasses,
@@ -7884,14 +5222,6 @@
 	},
 /turf/open/auto_turf/tyrargo_grass,
 /area/clash_arena/tdm_jungle/battlefield)
-"ZP" = (
-/obj/structure/machinery/light,
-/obj/structure/disposalpipe/up/almayer{
-	dir = 2;
-	id = "almayerlink_med1_req"
-	},
-/turf/open/floor/almayer/plating/northeast,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "ZR" = (
 /obj/structure/flora/tree/tyrargo/tree_2,
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
@@ -7899,22 +5229,6 @@
 	},
 /turf/open/auto_turf/tyrargo_grass,
 /area/clash_arena/tdm_jungle/battlefield)
-"ZT" = (
-/obj/structure/machinery/vending/coffee,
-/obj/structure/sign/safety/coffee{
-	pixel_x = 8;
-	pixel_y = 32
-	},
-/turf/open/floor/almayer/green/northwest,
-/area/clash_arena/tdm_jungle/uscm_base/req)
-"ZU" = (
-/obj/structure/machinery/door/airlock/almayer/generic{
-	access_modified = 1;
-	name = "Storage";
-	req_one_access_txt = "19;21"
-	},
-/turf/open/floor/almayer/test_floor4,
-/area/clash_arena/tdm_jungle/uscm_base/req)
 "ZZ" = (
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
 	dir = 6
@@ -23557,24 +20871,24 @@ jJ
 jJ
 jJ
 jJ
-fU
-fU
-fU
-fU
-fU
-fU
-fU
-fU
-fU
-fU
-fU
-fU
-fU
-fU
-fU
-fU
-fU
-fU
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -23759,24 +21073,24 @@ jJ
 jJ
 jJ
 jJ
-fU
-jI
-Fc
-cb
-Yj
-Xk
-pv
-rW
-OD
-Mk
-cD
-PH
-HX
-YG
-jF
-jF
-CT
-fU
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -23961,24 +21275,24 @@ jJ
 jJ
 jJ
 jJ
-vT
-jF
-Fc
-cb
-dN
-Jl
-Jl
-cb
-pV
-iH
-rB
-yl
-dr
-lA
-jF
-jF
-jF
-fU
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -24163,24 +21477,24 @@ jJ
 jJ
 jJ
 jJ
-fU
-jF
-Fc
-cb
-LP
-Xp
-at
-EC
-Qt
-gJ
-oH
-yl
-wA
-bx
-jF
-jF
-jF
-fU
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -24365,24 +21679,24 @@ jJ
 jJ
 jJ
 jJ
-vT
-jF
-Fc
-cb
-Xl
-Xl
-Xl
-Xl
-uc
-gQ
-pK
-eF
-wA
-Eh
-jF
-jF
-jF
-fU
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -24567,24 +21881,24 @@ jJ
 jJ
 jJ
 jJ
-fU
-jF
-Fc
-cb
-LP
-Xt
-Oi
-Sw
-Dc
-qY
-oH
-yl
-wA
-zZ
-Hd
-If
-gg
-fU
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -24769,24 +22083,24 @@ jJ
 jJ
 jJ
 jJ
-fU
-dZ
-Fc
-cb
-tR
-Jl
-Jl
-KD
-pV
-gu
-rB
-yl
-wA
-ze
-yl
-ud
-Py
-fU
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -24971,24 +22285,24 @@ jJ
 jJ
 jJ
 jJ
-fU
-jF
-Fc
-cb
-Tz
-VU
-Kd
-AG
-Pf
-QC
-yl
-yl
-wA
-QW
-yl
-ud
-as
-fU
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -25173,24 +22487,24 @@ jJ
 jJ
 jJ
 jJ
-vT
-jI
-Fc
-wA
-fU
-Zp
-Zp
-Zp
-fU
-vG
-mh
-mh
-aQ
-xE
-yl
-WN
-xZ
-Ho
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -25376,23 +22690,23 @@ fU
 fU
 fU
 fU
-jF
-Fc
-wA
-jX
-Yb
-Xm
-Xm
-Ck
-uE
-uE
-uE
-uE
-aK
-yl
-ud
-YH
 fU
+fU
+fU
+fU
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -25565,9 +22879,9 @@ RA
 zo
 eV
 us
-HX
-rB
-km
+mv
+mv
+Bt
 so
 LK
 so
@@ -25578,23 +22892,23 @@ jz
 IB
 tP
 AU
-jF
-Fc
+ad
+Xq
 wA
-wN
-yl
-yl
-yl
-yl
-yl
-yl
-yl
-yl
-yl
-yl
-ud
-YH
 fU
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -25768,35 +23082,35 @@ oF
 oF
 oF
 rB
-jF
+Jo
 Wc
 gk
 gk
 gk
 xJ
-VW
+Wc
 gk
 gk
 gk
 xJ
 Bz
 Jo
-mh
+Jo
 aQ
-jX
-Kj
-Fc
-uO
-uO
-uO
-uO
-uO
-uO
-uO
-uO
-Ir
-UV
 fU
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -25970,35 +23284,35 @@ oF
 oF
 oF
 rB
-jF
-tH
-sG
-sG
-sG
+wA
+fq
+gb
+gb
+ZA
 gb
 tH
+gb
+gb
 sG
-sG
-sG
-eY
+wA
 sv
-XD
-Fc
+wA
+mv
 mt
 fU
-fU
-LV
-bt
-gc
-gc
-JK
-gc
-gc
-IK
-Wm
-Wm
-Wm
-fU
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -26173,34 +23487,34 @@ di
 XI
 ff
 ff
-km
-ru
-lk
-Qu
-Cz
 SJ
 ru
 lk
 Qu
-pn
-AU
-XD
-Fc
+aK
+gc
+ru
+lk
+Cz
+uj
+KS
+wA
+mv
 jF
-jX
-Fc
-ud
-NX
-fT
-fT
-fT
-fT
-fT
-oK
-qP
-qP
-qP
 fU
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -26375,34 +23689,34 @@ bP
 us
 ff
 ff
-km
-ru
-lk
-Qu
-Cz
 SJ
 ru
 lk
 Qu
+Ai
+gc
+ru
+lk
+Cz
 pn
-Bz
-XD
-Fc
+Zz
+wA
+mv
 jF
-jX
-Fc
-td
-NX
-fT
-fT
-fT
-fT
-fT
-oK
-kY
-kY
-kY
 fU
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -26576,35 +23890,35 @@ oF
 oF
 oF
 rB
-jF
-HF
-hJ
-hJ
-hJ
+wA
+fB
+dK
+dK
+bS
 dK
 HF
+dK
+dK
 hJ
-hJ
-hJ
-YU
-sv
-XD
-Fc
+wA
+Bz
+wA
+mv
 jF
 fU
-Bv
-PC
-qW
-fT
-fT
-ys
-fT
-fT
-Po
-kY
-kY
-kY
-Ho
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -26778,35 +24092,35 @@ oF
 oF
 oF
 rB
-jF
+kC
 km
-Aj
 qF
-Aj
-Cz
-pj
-so
-OM
-so
-pn
-Zm
-XD
-Fc
+qF
+qF
+bc
+km
+qF
+qF
+qF
+bc
+sv
+wA
+mv
 jF
-jX
-Fc
-ud
-NX
-fT
-fT
-fT
-fT
-fT
-oK
-kY
-kY
-kY
 fU
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -26979,36 +24293,36 @@ zj
 Au
 di
 XI
-oH
-oH
+YK
+mv
+Bt
+JJ
+ag
+qP
+cF
 Bt
 kj
-kj
+we
 kj
 cF
-Jc
-kj
-kj
-kj
-Tt
 Zm
-lY
-Fc
-jF
+ad
 jX
-Fc
-ud
-NX
-fT
-fT
-fT
-fT
-fT
-oK
-qc
-VH
-KM
+jF
 fU
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -27180,37 +24494,37 @@ fU
 fU
 fU
 fU
-aw
+fU
+fU
+fU
+fU
 Fc
 Fc
 Fc
+bF
+dU
 Fc
 Fc
 Fc
-Fc
-Fc
-Fc
-Fc
-Fc
-Fc
-Bz
-XD
-Fc
+bF
+fU
+wA
+mv
 jF
 fU
-HX
-LV
-pi
-gL
-gL
-PA
-gL
-gL
-qL
-UL
-nv
-qq
-fU
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -27381,38 +24695,38 @@ jJ
 jJ
 jJ
 jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+vT
+wA
+mv
+mt
 fU
-Px
-jF
-yn
-Nx
-ci
-jF
-kt
-jF
-Jo
-ER
-sn
-jF
-Lk
-sv
-XD
-Fc
-jF
-fU
-el
-Fc
-vu
-vu
-vu
-vu
-vu
-vu
-vu
-Op
-vu
-vu
-fU
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -27583,38 +24897,38 @@ jJ
 jJ
 jJ
 jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+JA
+wA
+mv
+jF
 fU
-hV
-jF
-dl
-HX
-Ug
-jF
-oo
-jF
-dM
-HX
-aC
-jF
-DL
-AU
-XD
-Fc
-jF
-fU
-rT
-Iz
-Iz
-dm
-Iz
-kQ
-hS
-yl
-yl
-HE
-HE
-HE
-fU
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -27785,38 +25099,38 @@ jJ
 jJ
 jJ
 jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 fU
-hV
+wA
+mv
 jF
-dl
-HX
-OZ
-jF
-oo
-jF
-gX
-HX
-OF
-jF
-dT
-AU
-XD
-Fc
-jF
 fU
-fU
-fU
-fU
-fU
-fU
-fU
-HE
-HE
-HE
-HE
-HE
-HE
-fU
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -27987,38 +25301,38 @@ jJ
 jJ
 jJ
 jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 fU
-XV
-jF
-UF
-HX
-wB
-jF
-oo
-jF
-Jd
-HX
-aC
-jF
-jn
-JA
-XD
-Fc
+wA
+mv
 jF
 fU
-fU
-dW
-ee
-bP
-ek
-vT
-zh
-HE
-HE
-HE
-iM
-HX
-fU
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -28189,38 +25503,38 @@ jJ
 jJ
 jJ
 jJ
-fU
-XV
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+vT
+wA
+mv
 jF
-do
-HX
-JJ
-jF
-Fc
-jF
-XD
-Fc
-Yx
-jF
-IF
 fU
-XD
-Fc
-jF
-fU
-fU
-dp
-dp
-dp
-dp
-RX
-HE
-HE
-HE
-HE
-Og
-HX
-fU
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -28391,38 +25705,38 @@ jJ
 jJ
 jJ
 jJ
-fU
-CN
-jF
-ZE
-jF
-zT
-ie
-ie
-ie
-Os
-Fc
-qw
-xq
-YK
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 vT
 lY
 mv
 jF
 fU
-fU
-dp
-dp
-cM
-cM
-sv
-HE
-HE
-HE
-HE
-wA
-HX
-fU
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -28593,18 +25907,18 @@ jJ
 jJ
 jJ
 jJ
-fU
-fU
-fU
-fU
-fU
-fU
-fU
-fU
-fU
-fU
-fU
-fU
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 fU
 fU
 fU
@@ -28613,18 +25927,18 @@ Wo
 dA
 fU
 fU
-em
-en
-di
-ep
 fU
-CL
-mh
-GZ
-mh
-aQ
-HX
-fU
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -28810,23 +26124,23 @@ jJ
 fU
 vT
 kt
-kt
-kt
-kt
-kt
+Jo
+Jo
+Jo
+aQ
 fU
 fU
-fU
-fU
-fU
-fU
-fU
-fU
-fU
-fU
-fU
-fU
-fU
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -29010,13 +26324,13 @@ jJ
 jJ
 jJ
 fU
-Fc
+mv
 oH
 oH
 oH
 oH
 oH
-Fc
+mv
 fU
 jJ
 jJ
@@ -29213,12 +26527,12 @@ aS
 aS
 fU
 JG
-Fc
-Fc
 oH
-Fc
-Fc
+mv
 oH
+mv
+oH
+mv
 fU
 aS
 aS
@@ -35063,9 +32377,9 @@ jJ
 aS
 aS
 aS
-XQ
-Up
-HI
+aL
+yN
+ds
 qv
 mj
 bd
@@ -35078,8 +32392,8 @@ TF
 TF
 wL
 nG
-Jq
-qd
+eF
+cU
 yj
 eR
 va
@@ -35265,11 +32579,11 @@ jJ
 aS
 aS
 aS
-XQ
+aL
 FR
 Fu
 ds
-Fz
+Cm
 Sb
 cW
 zd
@@ -35280,8 +32594,8 @@ Ce
 zd
 wL
 nG
-Jq
-qd
+eF
+cU
 YI
 ZZ
 BE
@@ -35468,10 +32782,10 @@ aS
 aS
 aS
 et
-TF
-AN
-HI
-Fz
+bX
+eo
+ds
+Cm
 Sb
 bd
 cW
@@ -35482,8 +32796,8 @@ bd
 cW
 Rr
 nG
-Jq
-qd
+eF
+cU
 FN
 ji
 bd
@@ -35497,7 +32811,7 @@ ml
 ho
 mj
 yE
-Yd
+eD
 aS
 jJ
 jJ
@@ -35685,7 +32999,7 @@ bd
 Tk
 nG
 IG
-qd
+cU
 qy
 bd
 bd
@@ -35697,9 +33011,9 @@ bd
 kB
 ml
 FB
-cZ
-Fz
-Yd
+bR
+kN
+eD
 aS
 jJ
 jJ
@@ -35886,8 +33200,8 @@ bd
 bd
 Tk
 nG
-Jq
-qd
+eF
+cU
 qy
 bd
 bd
@@ -35897,11 +33211,11 @@ bd
 bd
 Zl
 sY
-cZ
+bR
 Bd
-Fz
-vD
-Yd
+kN
+UP
+eD
 aS
 jJ
 jJ
@@ -36088,8 +33402,8 @@ Hg
 He
 oL
 nG
-Jq
-qd
+eF
+cU
 qS
 Cd
 Cd
@@ -36099,11 +33413,11 @@ bd
 Zl
 Ns
 Xb
-vD
-yR
-BD
-vD
-Yd
+UP
+Ux
+Dt
+UP
+eD
 aS
 jJ
 jJ
@@ -36290,8 +33604,8 @@ Fz
 Fz
 AS
 nG
-Jq
-qd
+eF
+cU
 ko
 Cn
 Fz
@@ -36302,10 +33616,10 @@ cW
 GD
 mX
 UP
-Zx
-vD
-WF
-Yd
+MJ
+UP
+EA
+eD
 aS
 jJ
 jJ
@@ -36492,8 +33806,8 @@ Fz
 Fz
 AS
 nG
-Jq
-qd
+eF
+cU
 LL
 nc
 Fz
@@ -36503,11 +33817,11 @@ Xh
 bd
 cW
 rg
-Fz
-Fz
-Fz
-cZ
-Yd
+kN
+kN
+kN
+bR
+eD
 aS
 jJ
 jJ
@@ -36709,7 +34023,7 @@ sO
 AH
 AH
 iJ
-Yd
+eD
 aS
 jJ
 jJ
@@ -38717,7 +36031,7 @@ nf
 cZ
 vD
 ZH
-vD
+ZH
 lB
 cZ
 cZ
@@ -38911,7 +36225,7 @@ DJ
 Vl
 qZ
 Jw
-Mr
+Jq
 qd
 Zl
 Bp
@@ -39121,7 +36435,7 @@ vD
 cZ
 cZ
 NR
-Xr
+iH
 vD
 vD
 ZH
@@ -39731,7 +37045,7 @@ AY
 vD
 ZH
 lB
-Vw
+Dp
 nQ
 Fz
 Lr
@@ -39927,14 +37241,14 @@ CD
 ZH
 ZH
 oj
-vD
+ZH
 vD
 ZH
 vD
 ZH
 ZH
 nQ
-cZ
+Fz
 Fz
 qu
 gv
@@ -40131,11 +37445,11 @@ PZ
 qk
 vD
 vD
-vD
+ZH
 vD
 vD
 ls
-Js
+Co
 Lr
 ZI
 gv
@@ -40334,11 +37648,11 @@ vD
 ZH
 fO
 vD
-SR
+ao
 vD
-KW
-nI
-KR
+La
+IQ
+lB
 ZH
 gv
 Fz
@@ -40740,8 +38054,8 @@ nQ
 cZ
 ZH
 ZH
-cZ
-cZ
+Fz
+Fz
 qm
 vD
 ZH
@@ -40942,14 +38256,14 @@ Co
 cZ
 ZH
 sU
-cZ
+Fz
 Fz
 ZH
 ZH
 vD
 vD
 vD
-vD
+ZH
 aS
 jJ
 jJ
@@ -41347,8 +38661,8 @@ vD
 sU
 Fz
 Zn
-lB
-lB
+IQ
+qu
 ZH
 ZH
 oa
@@ -41548,9 +38862,9 @@ ZH
 vh
 Fz
 lW
-fO
-vD
-AY
+Uh
+Fz
+vx
 vD
 ZH
 vD
@@ -41750,9 +39064,9 @@ gv
 Fz
 Fz
 kU
-vD
-Zx
-AY
+gv
+Fz
+vx
 vD
 vD
 vD
@@ -42161,7 +39475,7 @@ Zw
 KW
 Fz
 Fz
-vD
+ZH
 aS
 jJ
 jJ
@@ -42349,7 +39663,7 @@ Fz
 kU
 vD
 vD
-vD
+ZH
 gv
 Fz
 Fz
@@ -42559,8 +39873,8 @@ Fz
 kU
 Fz
 Fz
+Fz
 kU
-ey
 ey
 ey
 ey
@@ -42761,9 +40075,9 @@ Fz
 MA
 Fz
 Fz
+Fz
 kU
 ey
-jJ
 jJ
 jJ
 jJ
@@ -42957,15 +40271,15 @@ vD
 Gl
 vD
 vD
-gv
+AA
 Fz
-Fz
+vD
 kU
+vD
 Fz
-Fz
-kU
+Lr
+vD
 ey
-jJ
 jJ
 jJ
 jJ
@@ -43163,11 +40477,11 @@ SK
 MH
 Ec
 Ec
+Ec
 SK
 MH
 Ec
 Ec
-jJ
 jJ
 jJ
 jJ
@@ -43352,24 +40666,24 @@ zx
 sK
 UO
 vD
-Yq
-Ej
-VK
-kU
-Yq
-ZA
-Yq
+aS
+aS
+aS
+aS
+aS
+aS
+aS
 Ec
-wT
+KR
+fo
 ye
 kz
-kz
+oK
 kz
 wF
-kz
-wT
+fo
+KR
 Ec
-jJ
 jJ
 jJ
 jJ
@@ -43554,24 +40868,24 @@ zx
 Bf
 Yq
 Yq
-Yq
-vD
-Yq
-Jr
-uj
-Xy
-DU
-Cv
+aS
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+Ec
 kz
+CI
 ye
 kz
-kz
+ty
 kz
 wF
-kz
+CI
 kz
 Ec
-jJ
 jJ
 jJ
 jJ
@@ -43757,23 +41071,23 @@ aS
 et
 aS
 aS
-aS
-Yq
-kU
-vD
-Yq
-DU
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 Ec
 wT
+fo
 ye
 kz
-kz
+kM
 kz
 wF
-kz
+fo
 wT
 Ec
-jJ
 jJ
 jJ
 jJ
@@ -43959,23 +41273,23 @@ aS
 et
 aS
 aS
-aS
-aS
-Eq
-WY
-PF
-DU
-Ec
-Ec
-SK
-MH
-Ec
-Ec
-SK
-MH
-Ec
-Ec
 jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+Ec
+Ec
+SK
+MH
+Ec
+Ec
+Ec
+SK
+MH
+Ec
+Ec
 jJ
 jJ
 jJ
@@ -44163,21 +41477,21 @@ jJ
 jJ
 jJ
 jJ
-aS
-aS
-aS
+jJ
+jJ
+jJ
+jJ
 Ec
-Ec
-kz
+AG
+fo
 ye
 kz
-kz
+oK
 kz
 wF
-kz
+fo
+lt
 Ec
-Ec
-jJ
 jJ
 jJ
 jJ
@@ -44366,20 +41680,20 @@ jJ
 jJ
 jJ
 jJ
-aS
-aS
-Ec
-cx
-kz
+jJ
+jJ
+jJ
+wn
+DO
+CI
 ye
 kz
-Ue
+kM
 kz
 wF
-kz
-yu
+CI
+DO
 Ec
-jJ
 jJ
 jJ
 jJ
@@ -44568,20 +41882,20 @@ jJ
 jJ
 jJ
 jJ
-aS
-aS
+jJ
+jJ
+jJ
 Ec
-tI
-kz
+gX
+fo
 ye
 kz
-tZ
+kM
 kz
 wF
-kz
-fZ
+fo
+gX
 Ec
-jJ
 jJ
 jJ
 jJ
@@ -44770,20 +42084,20 @@ jJ
 jJ
 jJ
 jJ
-aS
-aS
+jJ
+jJ
+jJ
 Ec
-bS
-kz
+fG
+fo
 ye
 kz
-tZ
+kM
 kz
 wF
-kz
-bS
+fo
+fG
 Ec
-jJ
 jJ
 jJ
 jJ
@@ -44972,20 +42286,20 @@ jJ
 jJ
 jJ
 jJ
-aS
-aS
-Ec
+jJ
+jJ
+jJ
 aP
 bf
+fo
 ye
-kz
-tZ
+Qw
+kM
 kz
 wF
-Jh
-aP
+fo
+bf
 Ec
-jJ
 jJ
 jJ
 jJ
@@ -45174,20 +42488,20 @@ jJ
 jJ
 jJ
 jJ
-aS
-aS
+jJ
+jJ
+jJ
 Ec
-bS
-kz
+Fv
+CI
 ye
-kz
-Ue
+Qw
+kM
 kz
 wF
-kz
-Uu
+CI
+Fv
 Ec
-jJ
 jJ
 jJ
 jJ
@@ -45376,20 +42690,20 @@ jJ
 jJ
 jJ
 jJ
-aS
-aS
-Ec
-tI
-kz
-ye
-fo
-fo
-fo
-wF
-kz
-Yz
-Ec
 jJ
+jJ
+jJ
+Ec
+Uu
+fo
+ye
+Qw
+kM
+kz
+wF
+fo
+zY
+Ec
 jJ
 jJ
 jJ
@@ -45581,21 +42895,21 @@ jJ
 Ec
 Ec
 Ec
-cx
-kz
-ye
-ax
-CM
-te
-wF
-kz
-yu
+Ec
+Ec
+ww
+Vz
 Ec
 Ec
 Ec
-jJ
-jJ
-jJ
+ww
+sB
+Ec
+Kj
+Ec
+Ec
+Ec
+Ec
 jJ
 jJ
 jJ
@@ -45781,23 +43095,23 @@ jJ
 jJ
 jJ
 Ec
-Jt
-Jt
-aP
-wG
-ye
-hR
-Jt
-bX
-wF
-Io
-aP
-Jt
-Jt
+MI
+cD
+zI
+GX
+kM
+kM
+Oj
+RI
+lf
+GX
+br
+lf
+lf
+lf
+lf
+lf
 Ec
-jJ
-jJ
-jJ
 jJ
 jJ
 jJ
@@ -45984,22 +43298,22 @@ jJ
 jJ
 Ec
 Aq
-zS
-aP
-Ds
-ye
-fo
-fo
-fo
-wF
-Ya
-aP
-Nr
-WL
+Wp
+go
+kM
+kM
+kM
+kM
+RI
+rJ
+kM
+kM
+qG
+qG
+hF
+Sh
+LV
 Ec
-jJ
-jJ
-jJ
 jJ
 jJ
 jJ
@@ -46182,26 +43496,26 @@ jJ
 jJ
 jJ
 jJ
-jJ
-jJ
 Ec
-zI
-aL
-BP
-wG
-ye
-ax
-CM
-te
-wF
-CI
-NB
-uY
-Ba
 Ec
-jJ
-jJ
-jJ
+Ec
+Ec
+Ec
+Ec
+Zb
+kM
+kM
+kM
+RI
+FH
+kM
+kM
+kM
+vS
+vS
+vS
+vS
+Ec
 jJ
 jJ
 jJ
@@ -46384,26 +43698,26 @@ jJ
 jJ
 jJ
 jJ
-jJ
 Ec
+XN
+XN
+la
+XN
+XN
+GX
+kM
+kM
+kM
 Ec
-Jt
-Jt
-aP
-wG
-ye
-hR
-Jt
-bX
-wF
-Io
-aP
-Jt
-Jt
+lf
+GX
+kM
+br
+lf
+lf
+lf
+lf
 Ec
-Ec
-jJ
-jJ
 jJ
 jJ
 jJ
@@ -46586,26 +43900,26 @@ jJ
 jJ
 jJ
 jJ
-jJ
 Ec
-gA
-CI
-ao
-CI
-CI
-ye
-fo
-fo
-fo
-wF
-CI
-CI
-UY
-kz
-NY
+CC
+CC
+yM
+Pl
+hg
+kM
+kM
+kM
+wN
 Ec
-jJ
-jJ
+Zb
+eM
+kM
+br
+lf
+lf
+lf
+lf
+Ec
 jJ
 jJ
 jJ
@@ -46788,26 +44102,26 @@ jJ
 jJ
 jJ
 jJ
-jJ
 Ec
-lC
-OR
-aP
-uw
-hy
-ye
-ax
-CM
-te
-wF
-iX
-Ke
-Jt
-eC
-JP
+qL
+ir
+ir
+TO
+TO
+kM
+kM
+kM
+kM
 Ec
-jJ
-jJ
+lf
+GX
+kM
+kM
+cy
+cy
+uC
+uC
+Ec
 jJ
 jJ
 jJ
@@ -46990,26 +44304,26 @@ jJ
 jJ
 jJ
 jJ
-jJ
 Ec
-aP
-aP
-aP
-hm
-wG
-ye
-hR
-Jt
-bX
-wF
-Io
-aP
-aP
-aP
-aP
+XN
+XN
+Li
+XN
+XN
+GX
+kM
+kM
+kM
+RI
+fW
+kM
+kM
+kM
+cy
+uC
+uC
+uC
 Ec
-jJ
-jJ
 jJ
 jJ
 jJ
@@ -47192,26 +44506,26 @@ jJ
 jJ
 jJ
 jJ
-jJ
 Ec
-Fg
-KS
-kL
-aP
+Jt
+Jt
+Jt
+Jt
+Jt
 wG
-ye
-fo
-fo
-fo
-wF
-Ya
-aP
-cs
-db
-Fg
+kM
+kM
+kM
+RI
+kM
+kM
+kM
+br
+lf
+lf
+lf
+lf
 Ec
-jJ
-jJ
 jJ
 jJ
 jJ
@@ -47394,26 +44708,26 @@ jJ
 jJ
 jJ
 jJ
-jJ
 Ec
+XN
+XN
+la
+XN
+XN
+GX
+kM
+kM
+kM
+RI
+kM
+kM
+kM
+br
 lf
-CI
 lf
-aP
-Ds
-ye
-ax
-CM
-te
-wF
-Io
-aP
 lf
-kz
 lf
 Ec
-jJ
-jJ
 jJ
 jJ
 jJ
@@ -47596,26 +44910,26 @@ jJ
 jJ
 jJ
 jJ
-jJ
 Ec
-Ux
-CI
-fo
-MI
-CI
-ye
-hR
-Jt
-bX
-wF
-CI
-Db
-fo
-kz
-HH
+pm
+pm
+MK
+MK
+CC
+kM
+kM
+kM
+kM
 Ec
-jJ
-jJ
+kM
+kM
+kM
+kM
+uC
+cy
+uC
+uC
+Ec
 jJ
 jJ
 jJ
@@ -47798,26 +45112,26 @@ jJ
 jJ
 jJ
 jJ
-jJ
 Ec
-lf
-CI
-lf
-aP
-wG
-ye
-fo
-fo
-fo
-wF
-Io
-aP
-lf
-kz
-lf
+Sk
+pm
+pm
+MK
+MK
+kM
+kM
+kM
+kM
 Ec
-jJ
-jJ
+kM
+kM
+kM
+kM
+uC
+uC
+cy
+vu
+Ec
 jJ
 jJ
 jJ
@@ -48000,26 +45314,26 @@ jJ
 jJ
 jJ
 jJ
-jJ
 Ec
-Fg
-OR
-kL
-aP
-wG
-ye
-ax
-CM
-te
-wF
-Io
-aP
-cs
-eC
-Fg
+XN
+XN
+Li
+XN
+XN
+GX
+kM
+kM
+kM
 Ec
-jJ
-jJ
+kM
+kM
+kM
+kM
+lf
+Fg
+lf
+lf
+Ec
 jJ
 jJ
 jJ
@@ -48202,26 +45516,26 @@ jJ
 jJ
 jJ
 jJ
-jJ
 Ec
-aP
-aP
-aP
-aP
-wG
-ye
-hR
-Jt
-bX
-wF
-Io
-aP
-aP
-aP
-aP
 Ec
-jJ
-jJ
+Ec
+Ec
+Ec
+Ec
+Ec
+kM
+kM
+wN
+Ec
+Zb
+kM
+kM
+kM
+Ec
+Ec
+Ec
+Ec
+Ec
 jJ
 jJ
 jJ
@@ -48405,23 +45719,23 @@ jJ
 jJ
 jJ
 jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 Ec
-kN
-KS
-SE
-aP
-wG
-ye
-fo
-fo
-fo
-wF
-Io
-aP
-ed
-db
-kN
+IS
+kM
+bM
 Ec
+kM
+IS
+kM
+bM
+Ec
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -48607,23 +45921,23 @@ jJ
 jJ
 jJ
 jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 Ec
-kN
-CI
-SE
-aP
-wG
-ye
-ax
-CM
-te
-wF
-Io
-aP
-IN
-CI
-fo
+xo
+Mh
+it
 Ec
+kM
+GX
+Qk
+br
+Ec
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -48809,23 +46123,23 @@ jJ
 jJ
 jJ
 jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 Ec
-IN
-CI
-fo
-VN
-CI
-ye
-hR
-Jt
-bX
-wF
-CI
-BK
-fo
-CI
-IN
 Ec
+Ec
+Ec
+Ec
+Ec
+Ec
+Ec
+Ec
+Ec
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -49011,23 +46325,23 @@ jJ
 jJ
 jJ
 jJ
-Ec
-kN
-OR
-SE
-aP
-Ds
-ye
-fo
-fo
-fo
-wF
-Ya
-aP
-ed
-eC
-kN
-Ec
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -49213,23 +46527,23 @@ jJ
 jJ
 jJ
 jJ
-Ec
-aP
-aP
-aP
-aP
-wG
-ye
-ax
-CM
-te
-wF
-Io
-aP
-aP
-aP
-aP
-Ec
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -49415,23 +46729,23 @@ jJ
 jJ
 jJ
 jJ
-Ec
-DZ
-ld
-aP
-As
-Fv
-ye
-hR
-Jt
-bX
-wF
-RN
-gV
-aP
-RM
-Xg
-Ec
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -49617,23 +46931,23 @@ jJ
 jJ
 jJ
 jJ
-Ec
-Ds
-CI
-mu
-kz
-CI
-ye
-fo
-fo
-fo
-wF
-CI
-kz
-NN
-CI
-Ya
-Ec
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -49819,23 +47133,23 @@ jJ
 jJ
 jJ
 jJ
-Ec
-aP
-aP
-aP
-kz
-kz
-ye
-ax
-CM
-te
-wF
-kz
-kz
-aP
-aP
-aP
-Ec
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -50021,23 +47335,23 @@ jJ
 jJ
 jJ
 jJ
-Ec
-Ds
-CI
-TA
-kz
-CI
-ye
-hR
-Jt
-bX
-wF
-CI
-kz
-lt
-CI
-Ya
-Ec
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -50223,23 +47537,23 @@ jJ
 jJ
 jJ
 jJ
-Ec
-bY
-VM
-aP
-SO
-hy
-ye
-mC
-fo
-mC
-wF
-iX
-MN
-aP
-ug
-bY
-Ec
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -50425,32 +47739,32 @@ jJ
 jJ
 jJ
 jJ
-Ec
-Ec
-Ec
-Ec
-aP
-ww
-Vz
-pg
-aP
-pg
-ww
-Vz
-aP
-aP
-aP
-aP
-cg
-cI
-cI
-Ec
-Ec
-Ec
-Ec
-Ec
-Ec
-Ec
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -50630,42 +47944,42 @@ jJ
 jJ
 jJ
 jJ
-Ec
-Ew
-DO
-ye
-eP
-ej
-eP
-wF
-fo
-PS
-HD
-ui
-Sk
-kz
-kz
-eB
-eB
-eB
-eB
-eB
-eB
-BG
-Ec
-Ec
-Ec
-Ec
-Ec
-Ec
-Ec
-Ec
-Ec
-Ec
-Ec
-Ec
-Ec
-Ec
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -50832,42 +48146,42 @@ jJ
 jJ
 jJ
 jJ
-wn
-Qw
-Qw
-ye
-Qw
-Qw
-Qw
-wF
-CI
-kz
-CI
-CI
-kz
-CI
-CI
-eB
-eB
-eB
-eB
-eB
-eB
-eB
-eB
-eB
-eB
-eB
-eB
-eB
-eB
-eB
-eB
-eB
-eB
-eB
-BG
-Ec
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -51034,42 +48348,42 @@ jJ
 jJ
 jJ
 jJ
-Ec
-Qw
-Qw
-ye
-jh
-jh
-jh
-wF
-jh
-jh
-jh
-jh
-jh
-jh
-jh
-fq
-fq
-fq
-fq
-fq
-fq
-fq
-fs
-fq
-fs
-fq
-fq
-fq
-fq
-fq
-fq
-fq
-fq
-UI
-eB
-Ec
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -51236,42 +48550,42 @@ jJ
 jJ
 jJ
 jJ
-Ec
-bo
-Qw
-ye
-Qw
-hn
-Qw
-wF
-Qw
-Qw
-hn
-Qw
-Qw
-Qw
-Qw
-FO
-FO
-vX
-EJ
-YD
-YD
-YD
-EG
-aU
-uS
-YD
-YD
-YD
-EJ
-vX
-FO
-FO
-FO
-ft
-Rm
-Ec
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -51435,45 +48749,45 @@ jJ
 jJ
 jJ
 jJ
-Ec
-Ec
-Ec
-Ec
-Ec
-ww
-Vz
-cU
-Ec
-cU
-ww
-sB
-Ec
-Ec
-Ec
-Ec
-Ec
-Ec
-bV
-bV
-bV
-bV
-bV
-bc
-bc
-Xq
-lb
-La
-pF
-pF
-bV
-bV
-bV
-bV
-bV
-bV
-ft
-eB
-Ec
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -51637,45 +48951,45 @@ jJ
 jJ
 jJ
 jJ
-Ec
-XF
-bk
-Hw
-GX
-kM
-kM
-Oj
-RI
-OV
-GX
-br
-Li
-XN
-la
-XN
-XN
-Ec
-fn
-kf
-QP
-Zz
-Gi
-Pq
-Gg
-cc
-oX
-cc
-yA
-ea
-Gi
-Km
-MJ
-uL
-Dt
-bV
-ft
-eB
-Ec
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -51839,45 +49153,45 @@ jJ
 jJ
 jJ
 jJ
-Ec
-cr
-Wp
-go
-kM
-kM
-kM
-kM
-RI
-rJ
-kM
-kM
-qG
-qG
-hF
-Sh
-hF
-Ec
-Hb
-fh
-fh
-eB
-Gi
-MY
-dh
-fh
-AW
-fh
-dh
-MY
-Gi
-ft
-fh
-fh
-vK
-bV
-ft
-eB
-Ec
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -52039,47 +49353,47 @@ jJ
 jJ
 jJ
 jJ
-Ec
-Ec
-Ec
-Ec
-Ec
-Zb
-kM
-kM
-kM
-kM
-RI
-FH
-kM
-kM
-kM
-vS
-vS
-vS
-vS
-Ec
-fG
-fh
-fh
-eU
-uD
-nC
-nC
-nC
-nC
-nC
-nC
-nC
-cu
-dh
-dh
-fh
-LX
-bV
-ft
-eB
-Ec
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -52241,47 +49555,47 @@ jJ
 jJ
 jJ
 jJ
-Ec
-XN
-XN
-la
-XN
-XN
-kM
-kM
-kM
-kM
-Ec
-XN
-GX
-kM
-br
-XN
-XN
-XN
-XN
-Ec
-Ee
-eB
-fs
-Tf
-ch
-GW
-eD
-kb
-eD
-kb
-eD
-kb
-ch
-MO
-dh
-fq
-Ai
-bV
-ft
-eB
-Ec
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -52443,47 +49757,47 @@ jJ
 jJ
 jJ
 jJ
-Ec
-CC
-CC
-yM
-Pl
-hg
-kM
-kM
-kM
-kM
-Ec
-kM
-eM
-kM
-br
-XN
-la
-XN
-XN
-Ec
-Gi
-Gi
-ZU
-ch
-ch
-aa
-eD
-kb
-eD
-kb
-eD
-ZP
-ch
-Gi
-Pu
-WM
-WM
-bV
-ft
-eB
-Ec
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -52645,47 +49959,47 @@ jJ
 jJ
 jJ
 jJ
-Ec
-TO
-ir
-ir
-TO
-TO
-kM
-kM
-kM
-dd
-Ec
-la
-GX
-kM
-kM
-cy
-cy
-uC
-uC
-Ec
-Oc
-iv
-dh
-CS
-EA
-kb
-eD
-kb
-eD
-kb
-eD
-kb
-Uo
-aH
-dh
-zs
-Bl
-yO
-ft
-Rm
-Ec
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -52847,47 +50161,47 @@ jJ
 jJ
 jJ
 jJ
-Ec
-XN
-XN
-Li
-XN
-XN
-kM
-kM
-bC
-au
-RI
-fW
-kM
-kM
-kM
-cy
-uC
-uC
-uC
-Ec
-dh
-fh
-fh
-dh
-dh
-fB
-fB
-fB
-fB
-fB
-fB
-fB
-dh
-dh
-fh
-fh
-dh
-LA
-eB
-eB
-Ec
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -53049,47 +50363,47 @@ jJ
 jJ
 jJ
 jJ
-Ec
-Jt
-Jt
-Jt
-Jt
-Jt
-kM
-kM
-bC
-au
-RI
-kM
-kM
-kM
-br
-XN
-la
-XN
-XN
-Ec
-ym
-nC
-nC
-nC
-dj
-sk
-Ab
-Ab
-lw
-Ab
-Ab
-px
-Vj
-dh
-dh
-Hi
-Pb
-yO
-ft
-eB
-Ec
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -53251,47 +50565,47 @@ jJ
 jJ
 jJ
 jJ
-Ec
-XN
-XN
-la
-XN
-XN
-kM
-kM
-kM
-Ob
-RI
-kM
-kM
-kM
-br
-XN
-XN
-XN
-XN
-Ec
-uy
-Vj
-kb
-eD
-dj
-cd
-cT
-cT
-cT
-cT
-cT
-Br
-Vj
-dh
-dh
-VZ
-bV
-bV
-ft
-eB
-Ec
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -53453,47 +50767,47 @@ jJ
 jJ
 jJ
 jJ
-Ec
-pm
-pm
-MK
-MK
-CC
-kM
-kM
-kM
-kM
-Ec
-kM
-kM
-kM
-kM
-uC
-cy
-uC
-uC
-Ec
-kb
-Vj
-kb
-fP
-dj
-cd
-cT
-cT
-cT
-cT
-cT
-Br
-Vj
-nC
-nC
-nC
-Jk
-Gj
-fu
-eB
-Ec
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -53655,47 +50969,47 @@ jJ
 jJ
 jJ
 jJ
-Ec
-MK
-pm
-pm
-MK
-MK
-kM
-IS
-kM
-bM
-Ec
-IS
-kM
-bM
-kM
-uC
-uC
-cy
-cy
-Ec
-bF
-kb
-kb
-kb
-dj
-DK
-cT
-cT
-kC
-cT
-cT
-IL
-Vj
-kP
-kP
-kP
-tt
-nk
-eB
-eB
-Ec
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -53857,47 +51171,47 @@ jJ
 jJ
 jJ
 jJ
-Ec
-XN
-XN
-Li
-XN
-XN
-kM
-xo
-Mh
-it
-Ec
-GX
-Qk
-br
-kM
-XN
-XN
-XN
-Li
-Ec
-kb
-Vj
-kb
-eD
-dj
-cd
-cT
-cT
-cT
-cT
-cT
-Br
-Vj
-Mi
-GG
-fB
-lQ
-we
-vx
-BG
-Ec
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -54059,47 +51373,47 @@ jJ
 jJ
 jJ
 jJ
-Ec
-Ec
-Ec
-Ec
-Ec
-Ec
-Ec
-Ec
-Ec
-Ec
-Ec
-Ec
-Ec
-Ec
-Ec
-Ec
-Ec
-Ec
-Ec
-Ec
-uy
-Vj
-kb
-eD
-dj
-cd
-cT
-cT
-cT
-cT
-cT
-Br
-Vj
-th
-bl
-bl
-bl
-bV
-Ec
-Ec
-Ec
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -54280,25 +51594,25 @@ jJ
 jJ
 jJ
 jJ
-Ec
-BU
-fB
-fB
-fB
-dj
-gy
-bO
-bO
-Rl
-bO
-bO
-xp
-Vj
-dh
-xK
-yN
-ct
-Ec
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -54482,25 +51796,25 @@ jJ
 jJ
 jJ
 jJ
-Ec
-jA
-fh
-fh
-dh
-dh
-nC
-eK
-nC
-nC
-eK
-QE
-wj
-kb
-dh
-xK
-QR
-ur
-Ec
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -54684,25 +51998,25 @@ jJ
 jJ
 jJ
 jJ
-Ec
-Gi
-Gi
-nl
-Gi
-Gi
-ch
-ch
-Jn
-av
-ch
-ch
-ch
-cj
-cj
-bl
-bl
-bl
-Ec
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -54886,25 +52200,25 @@ jJ
 jJ
 jJ
 jJ
-Ec
-ZT
-aH
-dh
-aH
-VC
-ch
-vR
-fu
-eL
-aH
-GR
-ch
-Kn
-zf
-ne
-Cm
-VY
-Ec
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -55088,25 +52402,25 @@ jJ
 jJ
 jJ
 jJ
-Ec
-xU
-QI
-tr
-eB
-qi
-ch
-ro
-dh
-fh
-wM
-Cw
-eo
-Jn
-ty
-xv
-xB
-xQ
-yG
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -55290,25 +52604,25 @@ jJ
 jJ
 jJ
 jJ
-Ec
-NF
-dU
-Mq
-eB
-Ki
-ch
-OH
-Xx
-ag
-QY
-cQ
-dh
-Jn
-Vr
-AA
-mz
-ad
-yG
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -55492,25 +52806,25 @@ jJ
 jJ
 jJ
 jJ
-Ec
-KQ
-eB
-hr
-eB
-MM
-ch
-RP
-QU
-mD
-nu
-QF
-ch
-tA
-pr
-EK
-bR
-Yp
-Ec
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -55694,25 +53008,25 @@ jJ
 jJ
 jJ
 jJ
-Ec
-Hv
-mB
-Yw
-fq
-Pb
-ch
-qH
-Tp
-fp
-Yv
-NW
-Jt
-Jt
-Jt
-Jt
-Jt
-Jt
-Ec
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ
@@ -55896,25 +53210,25 @@ jJ
 jJ
 jJ
 jJ
-Ec
-Ec
-Ec
-Ec
-Ec
-Ec
-Ec
-Ec
-Ec
-Ec
-Ec
-Ec
-Ec
-Ec
-Ec
-Ec
-zY
-Ec
-Ec
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
+jJ
 jJ
 jJ
 jJ

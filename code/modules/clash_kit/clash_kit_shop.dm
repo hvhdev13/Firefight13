@@ -1,15 +1,11 @@
 GLOBAL_LIST_EMPTY(clash_kit_shops)
 GLOBAL_LIST_EMPTY(clash_kit_budgets)
+GLOBAL_LIST_EMPTY(clash_item_contents)
+GLOBAL_LIST_INIT(clash_role_shop_ammo, list(
+	JOB_SQUAD_SMARTGUN = list(/obj/item/ammo_magazine/smartgun = 10),
+))
 
 /mob/living/carbon/human/var/list/clash_kit_extras = list()
-
-GLOBAL_LIST_INIT(clash_support_shop, list(
-	list("SUPPORT GEAR", 0, null, null, null),
-	list("Smoke Grenade", 5, /obj/item/explosive/grenade/smokebomb, null, VENDOR_ITEM_REGULAR),
-	list("Webbing", 10, /obj/item/clothing/accessory/storage/webbing, null, VENDOR_ITEM_REGULAR),
-	list("Shoulder Holster", 10, /obj/item/clothing/accessory/storage/holster, null, VENDOR_ITEM_REGULAR),
-	list("Large General Pouch", 10, /obj/item/storage/pouch/general/large, null, VENDOR_ITEM_REGULAR),
-))
 
 /proc/get_clash_shop_sources(job)
 	switch(job)
@@ -27,8 +23,6 @@ GLOBAL_LIST_INIT(clash_support_shop, list(
 			return list(list(GLOB.cm_vending_gear_tl, CLASH_SHOP_POINTS), list(GLOB.cm_vending_clothing_tl, CLASH_SHOP_POINTS))
 		if(JOB_SQUAD_LEADER)
 			return list(list(GLOB.cm_vending_gear_leader, CLASH_SHOP_POINTS), list(GLOB.cm_vending_clothing_leader, CLASH_SHOP_POINTS))
-		if(JOB_CARGO_TECH, JOB_UPP_SUPPLY)
-			return list(list(GLOB.clash_support_shop, CLASH_SHOP_POINTS))
 	if(clash_kit_faction_for_job(job) != FACTION_UPP)
 		return list()
 	var/datum/job/role = GLOB.RoleAuthority.roles_by_name[job]
@@ -36,6 +30,29 @@ GLOBAL_LIST_INIT(clash_support_shop, list(
 	if(!preset)
 		return list()
 	return list(list(preset.get_antag_gear_equipment(), CLASH_SHOP_POINTS), list(preset.get_antag_clothing_equipment(), CLASH_SHOP_POINTS))
+
+/proc/clash_list_contents(obj/item/holder)
+	. = list()
+	if(!isstorage(holder))
+		return
+	var/list/counts = list()
+	for(var/obj/item/thing in holder.contents)
+		var/thing_name = capitalize(strip_improper(thing.name))
+		counts[thing_name] = (counts[thing_name] || 0) + 1
+	for(var/thing_name in counts)
+		. += counts[thing_name] > 1 ? "[thing_name] x[counts[thing_name]]" : thing_name
+
+/proc/clash_type_contents(item_type)
+	if(!ispath(item_type, /obj/item/storage))
+		return list()
+	if(isnull(GLOB.clash_item_contents[item_type]))
+		var/obj/item/storage/sample = new item_type
+		GLOB.clash_item_contents[item_type] = clash_list_contents(sample)
+		qdel(sample)
+	return GLOB.clash_item_contents[item_type]
+
+/proc/clash_is_extended_magazine(item_type)
+	return ispath(item_type, /obj/item/ammo_magazine) && findtext("[item_type]/", "/extended/")
 
 /proc/get_clash_shop(job)
 	if(GLOB.clash_kit_shops[job])
@@ -52,6 +69,11 @@ GLOBAL_LIST_INIT(clash_support_shop, list(
 			var/list/item = list("id" = "[ammo_type]", "name" = capitalize(strip_improper(initial(ammo_type.name))), "cost" = CLASH_SHOP_AMMO_COST, "pool" = CLASH_SHOP_POINTS, "icon" = "[initial(ammo_type.icon)]", "icon_state" = initial(ammo_type.icon_state))
 			ammo_items += list(item)
 			by_id["[ammo_type]"] = item
+	var/list/role_ammo = GLOB.clash_role_shop_ammo[job]
+	for(var/obj/item/ammo_type as anything in role_ammo)
+		var/list/item = list("id" = "[ammo_type]", "name" = capitalize(strip_improper(initial(ammo_type.name))), "cost" = role_ammo[ammo_type], "pool" = CLASH_SHOP_POINTS, "icon" = "[initial(ammo_type.icon)]", "icon_state" = initial(ammo_type.icon_state))
+		ammo_items += list(item)
+		by_id["[ammo_type]"] = item
 	if(length(ammo_items))
 		sections += list(list("name" = "Weapon ammo", "items" = ammo_items))
 	for(var/list/source in get_clash_shop_sources(job))
@@ -66,10 +88,10 @@ GLOBAL_LIST_INIT(clash_support_shop, list(
 				sections += list(section)
 				continue
 			var/id = "[entry_type]"
-			if(!section || entry[4] || entry[2] <= 0 || !ispath(entry_type, /obj/item) || by_id[id] || (ispath(entry_type, /obj/item/ammo_magazine) && findtext("[entry_type]/", "/ap/")))
+			if(!section || entry[4] || entry[2] <= 0 || !ispath(entry_type, /obj/item) || by_id[id] || (ispath(entry_type, /obj/item/ammo_magazine) && findtext("[entry_type]/", "/ap/")) || clash_is_extended_magazine(entry_type))
 				continue
 			var/obj/item/sample = entry_type
-			var/list/item = list("id" = id, "name" = entry[1], "cost" = entry[2], "pool" = source[2], "icon" = "[initial(sample.icon)]", "icon_state" = initial(sample.icon_state))
+			var/list/item = list("id" = id, "name" = entry[1], "cost" = entry[2], "pool" = source[2], "icon" = "[initial(sample.icon)]", "icon_state" = initial(sample.icon_state), "contents" = clash_type_contents(entry_type))
 			section["items"] += list(item)
 			by_id[id] = item
 	for(var/list/section as anything in sections.Copy())
@@ -183,7 +205,7 @@ GLOBAL_LIST_INIT(clash_support_shop, list(
 		var/used = 0
 		for(var/obj/item/thing as anything in holder.contents)
 			used += thing.get_storage_cost()
-			items += list(list("type" = "[thing.type]", "name" = thing.name, "icon" = "[thing.icon]", "icon_state" = thing.icon_state, "extra" = (thing in extras)))
+			items += list(list("type" = "[thing.type]", "name" = thing.name, "icon" = "[thing.icon]", "icon_state" = thing.icon_state, "extra" = (thing in extras), "contents" = clash_list_contents(thing)))
 		var/label = istype(holder, /obj/item/storage/internal) ? "[holder.name] pockets" : holder.name
 		var/capacity = isnull(holder.storage_slots) ? "[used]/[holder.max_storage_space]" : "[length(holder.contents)]/[holder.storage_slots]"
 		var/list/entry = list("name" = capitalize(label), "capacity" = capacity, "items" = items, "type" = "[holder.type]")

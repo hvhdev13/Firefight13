@@ -21,12 +21,16 @@ GLOBAL_VAR(clash_bot_respawn_delay)
 	var/faction
 
 /obj/effect/landmark/clash_bot_rally/uscm
-	name = "Clash bot rally point (USCM)"
+	name = "TDM bot rally (USCM)"
+	icon_state = "x3"
+	color = "#4a8cff"
 	rally_id = null
 	faction = FACTION_MARINE
 
 /obj/effect/landmark/clash_bot_rally/upp
-	name = "Clash bot rally point (UPP)"
+	name = "TDM bot rally (UPP)"
+	icon_state = "x3"
+	color = "#ff4a4a"
 	rally_id = null
 	faction = FACTION_UPP
 
