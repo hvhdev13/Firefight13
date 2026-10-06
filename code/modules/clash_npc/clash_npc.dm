@@ -11,7 +11,7 @@ GLOBAL_VAR(clash_bot_fill_timer)
 GLOBAL_LIST_EMPTY(clash_bot_gear)
 GLOBAL_VAR(clash_bot_litter_timer)
 GLOBAL_LIST_INIT(clash_bot_caps, list(FACTION_MARINE = 10, FACTION_UPP = 10, FACTION_CLF = 10))
-GLOBAL_LIST_INIT(clash_bot_fill_targets, list(FACTION_MARINE = 10, FACTION_UPP = 10, FACTION_CLF = 0))
+GLOBAL_LIST_INIT(clash_bot_fill_targets, list(FACTION_MARINE = 5, FACTION_UPP = 5, FACTION_CLF = 0))
 GLOBAL_LIST_EMPTY(clash_bot_sides_off)
 GLOBAL_VAR(clash_bot_respawn_delay)
 
