@@ -22,7 +22,7 @@
 /datum/game_mode/extended/faction_clash/hvh/cm_vs_upp/can_start(bypass_checks = FALSE)
 	var/datum/map_config/ground = SSmapping.configs[GROUND_MAP]
 	if(ground.disable_ship_map)
-		var/fallback = ground.force_mode || GAMEMODE_TDM
+		var/fallback = ground.force_mode || GAMEMODE_KOTH
 		message_admins("Faction Clash cannot run on [ground.map_name] because it has no ships. The mode is now [fallback].")
 		to_chat(world, SPAN_BOLDNOTICE("Faction Clash needs a map with ships. This round will be [fallback] instead."))
 		GLOB.master_mode = fallback
