@@ -1128,6 +1128,7 @@ GLOBAL_VAR(clash_start_mode)
 	for(var/hivenumber in GLOB.hive_datum)
 		var/datum/hive_status/hive = GLOB.hive_datum[hivenumber]
 		hive.UnregisterSignal(SSdcs, COMSIG_GLOB_POST_SETUP)
+	SSradio.faction_coms_clarity[FACTION_MARINE] = 100
 	respawn_timer_id = addtimer(CALLBACK(src, PROC_REF(update_respawn_huds)), 1 SECONDS, TIMER_LOOP|TIMER_STOPPABLE)
 	if(idle_limit)
 		idle_timer_id = addtimer(CALLBACK(src, PROC_REF(check_idle)), 30 SECONDS, TIMER_LOOP|TIMER_STOPPABLE)

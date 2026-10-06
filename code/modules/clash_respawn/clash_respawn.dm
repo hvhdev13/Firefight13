@@ -6,12 +6,21 @@
 #define RESPAWN_STATE_READY "ready"
 #define RESPAWN_STATE_HOVER "hover"
 
-GLOBAL_LIST_EMPTY(clash_respawn_button_icons)
+GLOBAL_VAR(clash_respawn_button_sheet)
 
-/proc/get_clash_respawn_button_icon(state, fill_step = 0)
-	var/key = state == RESPAWN_STATE_COOLDOWN ? "[state]-[fill_step]" : state
-	if(GLOB.clash_respawn_button_icons[key])
-		return GLOB.clash_respawn_button_icons[key]
+/proc/get_clash_respawn_button_sheet()
+	if(GLOB.clash_respawn_button_sheet)
+		return GLOB.clash_respawn_button_sheet
+	var/icon/sheet = icon('icons/effects/effects.dmi', "nothing")
+	sheet.Scale(RESPAWN_BUTTON_WIDTH, RESPAWN_BUTTON_HEIGHT)
+	for(var/fill_step in 0 to RESPAWN_FILL_STEPS - 1)
+		sheet.Insert(build_clash_respawn_button(RESPAWN_STATE_COOLDOWN, fill_step), "[RESPAWN_STATE_COOLDOWN]-[fill_step]")
+	sheet.Insert(build_clash_respawn_button(RESPAWN_STATE_READY), RESPAWN_STATE_READY)
+	sheet.Insert(build_clash_respawn_button(RESPAWN_STATE_HOVER), RESPAWN_STATE_HOVER)
+	GLOB.clash_respawn_button_sheet = fcopy_rsc(sheet)
+	return GLOB.clash_respawn_button_sheet
+
+/proc/build_clash_respawn_button(state, fill_step = 0)
 	var/fill_light
 	var/fill_dark
 	var/bevel
@@ -53,12 +62,10 @@ GLOBAL_LIST_EMPTY(clash_respawn_button_icons)
 	button.DrawBox(rgb(19, 22, 25), RESPAWN_BUTTON_WIDTH - 1, 2, RESPAWN_BUTTON_WIDTH - 1, RESPAWN_BUTTON_HEIGHT - 1)
 	button.DrawBox(accent, 3, 3, 5, RESPAWN_BUTTON_HEIGHT - 2)
 	button.DrawBox(accent, RESPAWN_BUTTON_WIDTH - 5, 3, RESPAWN_BUTTON_WIDTH - 3, RESPAWN_BUTTON_HEIGHT - 2)
-	GLOB.clash_respawn_button_icons[key] = button
 	return button
 
 /atom/movable/screen/clash_respawn
 	name = "Respawn"
-	icon = null
 	screen_loc = "CENTER-2:8,CENTER-3"
 	maptext_width = RESPAWN_BUTTON_WIDTH
 	maptext_height = RESPAWN_BUTTON_HEIGHT
@@ -70,6 +77,10 @@ GLOBAL_LIST_EMPTY(clash_respawn_button_icons)
 	var/shown_step
 	var/counted_down = FALSE
 	var/shown_revivable
+
+/atom/movable/screen/clash_respawn/Initialize(mapload, ...)
+	. = ..()
+	icon = get_clash_respawn_button_sheet()
 
 /proc/clash_revivable_body(mob/viewer)
 	if(isobserver(viewer))
@@ -139,7 +150,7 @@ GLOBAL_LIST_EMPTY(clash_respawn_button_icons)
 /atom/movable/screen/clash_respawn/proc/show_state(new_state)
 	var/entering = state != new_state
 	state = new_state
-	icon = get_clash_respawn_button_icon(state, shown_step)
+	icon_state = state == RESPAWN_STATE_COOLDOWN ? "[state]-[shown_step]" : state
 	var/kits = clash_uses_kits()
 	switch(state)
 		if(RESPAWN_STATE_COOLDOWN)
