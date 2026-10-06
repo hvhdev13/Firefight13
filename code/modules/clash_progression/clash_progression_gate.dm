@@ -185,7 +185,9 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 		if(CLASH_GATE_CARRIER)
 			if(progress.carrier_step(gate["family"]) >= gate["step"] || (gate["level"] && progress.faction_level(faction) >= gate["level"]))
 				return null
-			var/xp_text = "[clash_number_text(gate["xp"])] [GLOB.clash_family_names[gate["family"]]] XP"
+			var/list/entry = progress.carriers[gate["family"]]
+			var/to_go = max(0, gate["xp"] - (entry ? entry["xp"] : 0))
+			var/xp_text = "[clash_number_text(gate["xp"])] [GLOB.clash_family_names[gate["family"]]] XP ([clash_number_text(to_go)] to go)"
 			return gate["level"] ? "Unlocks at [clash_side_name(faction)] level [gate["level"]] or [xp_text]" : "Unlocks at [xp_text]"
 	return null
 
@@ -268,6 +270,8 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 	var/datum/clash_kit/filtered = new
 	filtered.name = kit.name
 	filtered.extras = kit.extras
+	filtered.extra_slots = kit.extra_slots
+	filtered.moves = kit.moves
 	filtered.removed = kit.removed
 	filtered.fills = kit.fills
 	for(var/slot in kit.choices)

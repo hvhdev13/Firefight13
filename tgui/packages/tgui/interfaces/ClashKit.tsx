@@ -55,6 +55,9 @@ interface PackItem {
   icon: string;
   icon_state: string;
   extra: BooleanLike;
+  extra_index: number;
+  unassigned: BooleanLike;
+  fits: string[];
   contents?: string[];
 }
 
@@ -63,15 +66,25 @@ interface PackContainer {
   capacity: string;
   items: PackItem[];
   type: string;
+  slot: string;
   shells?: string[];
   fill?: string;
 }
 
 interface Extra {
   id: string;
+  index: number;
   name: string;
+  icon: string | null;
+  icon_state: string | null;
+  slot: string | null;
   status: 'ok' | 'room' | 'points' | 'gone' | 'locked' | 'pending';
 }
+
+type PackDrag = { fits: string[] } & (
+  | { extra: number }
+  | { type: string; from: string }
+);
 
 interface ShopItem {
   id: string;
@@ -108,14 +121,6 @@ interface GunProgress {
   kills_to_go?: number;
 }
 
-interface CarrierProgress {
-  family: string;
-  step: number;
-  steps: number;
-  next?: string;
-  xp_to_go?: number;
-}
-
 interface KitProgress {
   side: string;
   faction_level: number;
@@ -132,7 +137,6 @@ interface KitProgress {
   shop_locks: Record<string, string>;
   gun?: GunProgress;
   sidearm_gun?: GunProgress;
-  carriers: CarrierProgress[];
 }
 
 interface StaticData {
@@ -306,29 +310,6 @@ const WeaponPreview = (props: {
     </>
   );
 };
-
-const CarrierList = (props: { readonly carriers: CarrierProgress[] }) => (
-  <Box className="ClashKit__packHolder">
-    <Box className="ClashKit__packHead">Ammo carriers</Box>
-    {props.carriers.map((carrier) => (
-      <Box key={carrier.family} className="ClashKit__packItem">
-        <Stack align="center">
-          <Stack.Item grow>
-            {carrier.family} ammo
-            <Box as="span" className="ClashKit__optionAmmo">
-              {carrier.step} of {carrier.steps} carriers unlocked
-            </Box>
-          </Stack.Item>
-          <Stack.Item className="ClashKit__optionBlurb">
-            {carrier.next
-              ? `Next: ${carrier.next} in ${xpText(carrier.xp_to_go ?? 0)} XP`
-              : 'All unlocked'}
-          </Stack.Item>
-        </Stack>
-      </Box>
-    ))}
-  </Box>
-);
 
 type Sprite = {
   url: string;
@@ -529,15 +510,231 @@ const ItemIcon = (props: { readonly icon: string; readonly state: string }) => (
   </Box>
 );
 
+const dropProps = (
+  accepts: boolean,
+  over: boolean,
+  setOver: (over: boolean) => void,
+  onDrop: () => void,
+) => ({
+  onDragOver: (event: React.DragEvent) => {
+    if (!accepts) return;
+    event.preventDefault();
+    if (!over) setOver(true);
+  },
+  onDragLeave: () => setOver(false),
+  onDrop: (event: React.DragEvent) => {
+    event.preventDefault();
+    setOver(false);
+    if (accepts) onDrop();
+  },
+});
+
+const PackRow = (props: {
+  readonly icon: string | null;
+  readonly iconState: string | null;
+  readonly name: string;
+  readonly bought?: boolean;
+  readonly contents?: string[];
+  readonly drag: PackDrag;
+  readonly setDrag: (drag: PackDrag | null) => void;
+  readonly removeTip: string;
+  readonly onRemove: () => void;
+}) => {
+  const {
+    icon,
+    iconState,
+    name,
+    bought,
+    contents,
+    drag,
+    setDrag,
+    removeTip,
+    onRemove,
+  } = props;
+  return (
+    <div
+      className="ClashKit__packItem ClashKit__packItem--drag"
+      draggable
+      onDragStart={(event) => {
+        event.dataTransfer.setData('text/plain', name);
+        setDrag(drag);
+      }}
+      onDragEnd={() => setDrag(null)}
+    >
+      <Stack align="center">
+        <Stack.Item>
+          {icon && iconState !== null ? (
+            <ItemIcon icon={icon} state={iconState} />
+          ) : (
+            <Box className="ClashKit__optionIcon" />
+          )}
+        </Stack.Item>
+        <Stack.Item grow>
+          {name}
+          <ContentsHint contents={contents} />
+          {bought && (
+            <Box as="span" className="ClashKit__packBought">
+              bought
+            </Box>
+          )}
+        </Stack.Item>
+        <Stack.Item>
+          <Button
+            icon="xmark"
+            color="transparent"
+            tooltip={removeTip}
+            onClick={onRemove}
+          />
+        </Stack.Item>
+      </Stack>
+    </div>
+  );
+};
+
+const UnassignedBox = (props: {
+  readonly items: PackItem[];
+  readonly drag: PackDrag | null;
+  readonly setDrag: (drag: PackDrag | null) => void;
+}) => {
+  const { act } = useBackend<Data>();
+  const { items, drag, setDrag } = props;
+  const [over, setOver] = useState(false);
+  const accepts = !!drag && 'extra' in drag;
+  if (!items.length && !accepts) return null;
+  return (
+    <div
+      className={classes([
+        'ClashKit__packHolder',
+        'ClashKit__packHolder--unassigned',
+        accepts && 'ClashKit__packHolder--target',
+        over && 'ClashKit__packHolder--drop',
+      ])}
+      {...dropProps(accepts, over, setOver, () => {
+        if (drag && 'extra' in drag) {
+          act('assign_extra', { index: drag.extra, to: '' });
+        }
+      })}
+    >
+      <Box className="ClashKit__packHead">
+        <Box as="span">Unassigned</Box>
+      </Box>
+      <Box className="ClashKit__packNote">
+        Drag bought gear onto a container. Anything left here is packed wherever
+        it fits.
+      </Box>
+      {items.map((item) => (
+        <PackRow
+          key={item.extra_index}
+          icon={item.icon}
+          iconState={item.icon_state}
+          name={item.name}
+          bought
+          contents={item.contents}
+          drag={{ extra: item.extra_index, fits: item.fits }}
+          setDrag={setDrag}
+          removeTip="Return it and get the points back"
+          onRemove={() => act('unbuy', { index: item.extra_index })}
+        />
+      ))}
+    </div>
+  );
+};
+
+const PackHolder = (props: {
+  readonly holder: PackContainer;
+  readonly drag: PackDrag | null;
+  readonly setDrag: (drag: PackDrag | null) => void;
+}) => {
+  const { act } = useBackend<Data>();
+  const { holder, drag, setDrag } = props;
+  const [over, setOver] = useState(false);
+  const shown = holder.items.filter((item) => !item.unassigned);
+  const accepts = !!drag && drag.fits.includes(holder.slot);
+  const source = !!drag && 'from' in drag && drag.from === holder.slot;
+  return (
+    <div
+      className={classes([
+        'ClashKit__packHolder',
+        drag &&
+          !source &&
+          (accepts
+            ? 'ClashKit__packHolder--target'
+            : 'ClashKit__packHolder--refuse'),
+        over && 'ClashKit__packHolder--drop',
+      ])}
+      {...dropProps(accepts, over, setOver, () => {
+        if (!drag) return;
+        if ('extra' in drag) {
+          act('assign_extra', { index: drag.extra, to: holder.slot });
+        } else {
+          act('move_item', {
+            type: drag.type,
+            from: drag.from,
+            to: holder.slot,
+          });
+        }
+      })}
+    >
+      <Box className="ClashKit__packHead">
+        <Box as="span">{holder.name}</Box>
+        {!!holder.shells && (
+          <Dropdown
+            width="110px"
+            options={holder.shells}
+            selected={holder.fill}
+            displayText={holder.fill}
+            onSelected={(value) =>
+              act('fill', { container: holder.type, shell: value })
+            }
+          />
+        )}
+        <Box as="span" className="ClashKit__optionsCount">
+          {holder.capacity}
+        </Box>
+      </Box>
+      {shown.length ? (
+        shown.map((item, itemIndex) => (
+          <PackRow
+            key={itemIndex}
+            icon={item.icon}
+            iconState={item.icon_state}
+            name={item.name}
+            bought={!!item.extra}
+            contents={item.contents}
+            drag={
+              item.extra
+                ? { extra: item.extra_index, fits: item.fits }
+                : { type: item.type, from: holder.slot, fits: item.fits }
+            }
+            setDrag={setDrag}
+            removeTip={
+              item.extra
+                ? 'Return it and get the points back'
+                : 'Leave it behind to make room'
+            }
+            onRemove={() =>
+              act('drop_item', {
+                type: item.type,
+                extra: item.extra ? 1 : 0,
+                extra_index: item.extra_index,
+              })
+            }
+          />
+        ))
+      ) : (
+        <Box className="ClashKit__packEmpty">Empty</Box>
+      )}
+    </div>
+  );
+};
+
 const PackView = () => {
   const { act, data } = useBackend<Data>();
-  const { pack, extras, removed, doll_pending, progress } = data;
-  const problems = extras
-    .map((extra, index) => ({ ...extra, index: index + 1 }))
-    .filter((extra) => EXTRA_PROBLEMS[extra.status]);
+  const { pack, extras, removed, doll_pending } = data;
+  const [drag, setDrag] = useState<PackDrag | null>(null);
+  const problems = extras.filter((extra) => EXTRA_PROBLEMS[extra.status]);
   return (
     <>
-      {progress && <CarrierList carriers={progress.carriers} />}
       {!!doll_pending && (
         <Box className="ClashKit__packNote">
           <Icon name="circle-notch" spin /> Repacking...
@@ -563,65 +760,25 @@ const PackView = () => {
           </Stack>
         </Box>
       ))}
-      {pack.map((holder, holderIndex) => (
-        <Box key={holderIndex} className="ClashKit__packHolder">
-          <Box className="ClashKit__packHead">
-            <Box as="span">{holder.name}</Box>
-            {!!holder.shells && (
-              <Dropdown
-                width="110px"
-                options={holder.shells}
-                selected={holder.fill}
-                displayText={holder.fill}
-                onSelected={(value) =>
-                  act('fill', { container: holder.type, shell: value })
-                }
-              />
-            )}
-            <Box as="span" className="ClashKit__optionsCount">
-              {holder.capacity}
-            </Box>
-          </Box>
-          {holder.items.length ? (
-            holder.items.map((item, itemIndex) => (
-              <Box key={itemIndex} className="ClashKit__packItem">
-                <Stack align="center">
-                  <Stack.Item>
-                    <ItemIcon icon={item.icon} state={item.icon_state} />
-                  </Stack.Item>
-                  <Stack.Item grow>
-                    {item.name}
-                    <ContentsHint contents={item.contents} />
-                    {!!item.extra && (
-                      <Box as="span" className="ClashKit__packBought">
-                        bought
-                      </Box>
-                    )}
-                  </Stack.Item>
-                  <Stack.Item>
-                    <Button
-                      icon="xmark"
-                      color="transparent"
-                      tooltip={
-                        item.extra
-                          ? 'Return it and get the points back'
-                          : 'Leave it behind to make room'
-                      }
-                      onClick={() =>
-                        act('drop_item', {
-                          type: item.type,
-                          extra: item.extra ? 1 : 0,
-                        })
-                      }
-                    />
-                  </Stack.Item>
-                </Stack>
-              </Box>
-            ))
-          ) : (
-            <Box className="ClashKit__packEmpty">Empty</Box>
-          )}
+      <UnassignedBox
+        items={pack.flatMap((holder) =>
+          holder.items.filter((item) => item.unassigned),
+        )}
+        drag={drag}
+        setDrag={setDrag}
+      />
+      {!!pack.length && (
+        <Box className="ClashKit__packNote">
+          Drag items between containers to choose where they go.
         </Box>
+      )}
+      {pack.map((holder) => (
+        <PackHolder
+          key={holder.slot}
+          holder={holder}
+          drag={drag}
+          setDrag={setDrag}
+        />
       ))}
       {!pack.length && !doll_pending && (
         <Box className="ClashKit__packEmpty">

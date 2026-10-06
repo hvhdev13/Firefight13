@@ -253,16 +253,17 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 /datum/clash_kit_screen/proc/get_doll_key(datum/clash_kit/kit)
 	var/datum/preferences/prefs = GLOB.preferences_datums[ckey]
 	var/datum/clash_kit/filtered = clash_filter_kit(kit, ckey, job)
-	return json_encode(list(job, filtered?.choices, kit?.extras, kit?.removed, kit?.fills, prefs?.gear))
+	return json_encode(list(job, filtered?.choices, kit?.extras, kit?.extra_slots, kit?.removed, kit?.fills, kit?.moves, prefs?.gear))
 
 /datum/clash_kit_screen/proc/describe_extras(datum/clash_kit/kit, list/statuses)
 	. = list()
 	if(!kit)
 		return
 	var/list/by_id = get_clash_shop(job)["by_id"]
+	kit.sync_extra_slots()
 	for(var/index in 1 to length(kit.extras))
 		var/list/item = by_id[kit.extras[index]]
-		. += list(list("id" = kit.extras[index], "name" = item ? item["name"] : "Not sold to this role", "status" = LAZYACCESS(statuses, index) || "pending"))
+		. += list(list("id" = kit.extras[index], "index" = index, "name" = item ? item["name"] : "Not sold to this role", "icon" = item?["icon"], "icon_state" = item?["icon_state"], "slot" = kit.extra_slots[index], "status" = LAZYACCESS(statuses, index) || "pending"))
 
 /datum/clash_kit_screen/proc/describe_removed(datum/clash_kit/kit)
 	. = list()
@@ -360,11 +361,11 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 			if(left < item["cost"])
 				to_chat(user, SPAN_WARNING("Not enough points left for [item["name"]]."))
 				return TRUE
-			kit.extras += item["id"]
+			kit.add_extra(item["id"])
 			var/list/trial = render_clash_kit_doll(kit, job, user.client, FALSE, GLOB.preferences_datums[ckey], ckey)
 			var/list/statuses = trial?["statuses"]
 			if(!length(statuses) || statuses[length(statuses)] != "ok")
-				kit.extras.Cut(length(kit.extras))
+				kit.remove_extra(length(kit.extras))
 				to_chat(user, SPAN_WARNING("[item["name"]] does not fit in your gear. Make room, or buy it from a vendor once you spawn."))
 				return TRUE
 			save_clash_kits(ckey)
@@ -373,7 +374,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 				return TRUE
 			for(var/index in length(kit.extras) to 1 step -1)
 				if(kit.extras[index] == params["id"])
-					kit.extras.Cut(index, index + 1)
+					kit.remove_extra(index)
 					save_clash_kits(ckey)
 					break
 		if("copy")
@@ -382,24 +383,23 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 			if(!kit || !(index in 1 to length(kits)) || index == kit_index)
 				return TRUE
 			var/datum/clash_kit/source = kits[index]
-			kit.choices = source.choices.Copy()
-			kit.extras = source.extras.Copy()
-			kit.removed = source.removed.Copy()
-			kit.fills = source.fills.Copy()
+			kit.copy_from(source)
 			save_clash_kits(ckey)
 			to_chat(user, SPAN_NOTICE("Copied [source.name] into [kit.name]."))
 		if("unbuy")
 			var/index = round(text2num(params["index"]))
 			if(!kit || !(index in 1 to length(kit.extras)))
 				return TRUE
-			kit.extras.Cut(index, index + 1)
+			kit.remove_extra(index)
 			save_clash_kits(ckey)
 		if("drop_item")
 			if(!kit || !params["type"])
 				return TRUE
-			var/extra_index = kit.extras.Find(params["type"])
+			var/extra_index = round(text2num(params["extra_index"]))
+			if(!(extra_index in 1 to length(kit.extras)) || kit.extras[extra_index] != params["type"])
+				extra_index = kit.extras.Find(params["type"])
 			if(extra_index && params["extra"])
-				kit.extras.Cut(extra_index, extra_index + 1)
+				kit.remove_extra(extra_index)
 			else if(pack_holds(params["type"]))
 				kit.removed += params["type"]
 			save_clash_kits(ckey)
@@ -407,6 +407,48 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 			if(!kit || !(params["shell"] in GLOB.clash_kit_shell_names) || !ispath(text2path(params["container"]), /obj/item/storage))
 				return TRUE
 			kit.fills[params["container"]] = params["shell"]
+			save_clash_kits(ckey)
+		if("assign_extra")
+			var/index = round(text2num(params["index"]))
+			var/target = params["to"]
+			if(!kit || !(index in 1 to length(kit.extras)) || (target && !istext(target)))
+				return TRUE
+			kit.sync_extra_slots()
+			var/previous = kit.extra_slots[index]
+			kit.extra_slots[index] = target || null
+			if(target)
+				var/list/trial = render_clash_kit_doll(kit, job, user.client, FALSE, GLOB.preferences_datums[ckey], ckey)
+				if(LAZYACCESS(trial?["statuses"], index) == "ok" && trial["placed"]["[index]"] != target)
+					kit.extra_slots[index] = previous
+					var/list/item = get_clash_shop(job)["by_id"][kit.extras[index]]
+					to_chat(user, SPAN_WARNING("[item ? item["name"] : "That"] does not fit there. Make room first."))
+					return TRUE
+			save_clash_kits(ckey)
+		if("move_item")
+			var/item_type = params["type"]
+			var/from = params["from"]
+			var/target = params["to"]
+			if(!kit || !istext(item_type) || !ispath(text2path(item_type), /obj/item) || !istext(from) || !istext(target) || from == target)
+				return TRUE
+			var/reverse = 0
+			for(var/index in length(kit.moves) to 1 step -1)
+				var/list/move = kit.moves[index]
+				if(move[1] == item_type && move[2] == target && move[3] == from)
+					reverse = index
+					break
+			if(reverse)
+				kit.moves.Cut(reverse, reverse + 1)
+				save_clash_kits(ckey)
+				return TRUE
+			kit.moves += list(list(item_type, from, target))
+			if(length(kit.moves) > CLASH_KIT_MOVE_LIMIT)
+				kit.moves.Cut(1, 2)
+			var/list/trial = render_clash_kit_doll(kit, job, user.client, FALSE, GLOB.preferences_datums[ckey], ckey)
+			if(length(kit.moves) in trial?["moves_failed"])
+				kit.moves.Cut(length(kit.moves))
+				var/obj/item/moving = text2path(item_type)
+				to_chat(user, SPAN_WARNING("[capitalize(initial(moving.name))] does not fit there. Make room first."))
+				return TRUE
 			save_clash_kits(ckey)
 		if("restore_item")
 			if(!kit || !(params["type"] in kit.removed))
@@ -435,10 +477,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 /datum/clash_kit_screen/proc/confirm_reset(mob/user, datum/clash_kit/kit)
 	if(tgui_alert(user, "Are you sure you want to reset your loadout?", "Reset loadout", list("Reset", "Cancel")) != "Reset")
 		return
-	kit.choices = list()
-	kit.extras = list()
-	kit.removed = list()
-	kit.fills = list()
+	kit.clear()
 	save_clash_kits(ckey)
 	SStgui.update_uis(src)
 	var/datum/clash_kit_screen/own = GLOB.clash_kit_screens[ckey]

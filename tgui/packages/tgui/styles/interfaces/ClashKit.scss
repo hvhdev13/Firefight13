@@ -439,6 +439,28 @@ $panel: rgba(0, 0, 0, 0.3);
     background: $panel;
   }
 
+  &__packHolder--drop {
+    border-color: var(--kit-accent);
+    box-shadow: 0 0 0 1px var(--kit-accent) inset;
+  }
+
+  &__packHolder--target {
+    border-style: dashed;
+    border-color: var(--kit-accent);
+  }
+
+  &__packHolder--refuse {
+    opacity: 0.4;
+  }
+
+  &__packHolder--unassigned {
+    border-style: dashed;
+  }
+
+  &__packItem--drag {
+    cursor: grab;
+  }
+
   &__packHead {
     display: flex;
     justify-content: space-between;

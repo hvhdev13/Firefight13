@@ -12,9 +12,39 @@ GLOBAL_LIST_EMPTY(clash_kit_issue_pending)
 	var/list/extras = list()
 	var/list/removed = list()
 	var/list/fills = list()
+	var/list/extra_slots = list()
+	var/list/moves = list()
 
 /datum/clash_kit/proc/get_option(slot)
 	return get_clash_kit_option(choices[slot])
+
+/datum/clash_kit/proc/sync_extra_slots()
+	extra_slots.len = length(extras)
+
+/datum/clash_kit/proc/add_extra(id)
+	extras += id
+	sync_extra_slots()
+
+/datum/clash_kit/proc/remove_extra(index)
+	sync_extra_slots()
+	extras.Cut(index, index + 1)
+	extra_slots.Cut(index, index + 1)
+
+/datum/clash_kit/proc/copy_from(datum/clash_kit/source)
+	choices = source.choices.Copy()
+	extras = source.extras.Copy()
+	extra_slots = source.extra_slots.Copy()
+	removed = source.removed.Copy()
+	fills = source.fills.Copy()
+	moves = source.moves.Copy()
+
+/datum/clash_kit/proc/clear()
+	choices = list()
+	extras = list()
+	extra_slots = list()
+	removed = list()
+	fills = list()
+	moves = list()
 
 GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 
@@ -103,7 +133,8 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 	for(var/job in by_job)
 		var/list/stored = list()
 		for(var/datum/clash_kit/kit as anything in by_job[job])
-			stored += list(list("name" = kit.name, "choices" = kit.choices, "extras" = kit.extras, "removed" = kit.removed, "fills" = kit.fills))
+			kit.sync_extra_slots()
+			stored += list(list("name" = kit.name, "choices" = kit.choices, "extras" = kit.extras, "extra_slots" = kit.extra_slots, "removed" = kit.removed, "fills" = kit.fills, "moves" = kit.moves))
 		payload[job] = stored
 	var/savefile/save = new(clash_kit_path(ckey))
 	save.cd = "/"
@@ -144,9 +175,18 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 					id = clash_kit_option_id(clash_kit_faction_for_job(job), slot, text2path(id))
 				if(get_clash_kit_option(id))
 					kit.choices[slot] = id
-			for(var/extra in stored["extras"])
-				if(ispath(text2path(extra), /obj/item))
-					kit.extras += extra
+			var/list/stored_slots = stored["extra_slots"]
+			var/list/stored_extras = stored["extras"]
+			for(var/index in 1 to length(stored_extras))
+				if(!ispath(text2path(stored_extras[index]), /obj/item))
+					continue
+				kit.add_extra(stored_extras[index])
+				var/wanted = LAZYACCESS(stored_slots, index)
+				if(istext(wanted))
+					kit.extra_slots[length(kit.extra_slots)] = wanted
+			for(var/list/move in stored["moves"])
+				if(length(move) == 3 && ispath(text2path(move[1]), /obj/item) && istext(move[2]) && istext(move[3]))
+					kit.moves += list(move)
 			for(var/unwanted in stored["removed"])
 				if(ispath(text2path(unwanted), /obj/item))
 					kit.removed += unwanted
@@ -609,6 +649,7 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 		clash_give_extra_grenade(wearer)
 	clash_kit_fill_ammo(wearer, kit, mode)
 	. = stock_clash_kit(wearer, kit, job, mode, ckey)
+	wearer.clash_kit_move_failed = apply_clash_kit_moves(wearer, kit)
 	wearer.regenerate_icons()
 
 /proc/clash_cosmetic_paths(datum/preferences/prefs)
@@ -783,8 +824,9 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 		clash_raise_vendor_points(model, ckey, job)
 		var/list/statuses = apply_clash_kit(model, kit, CLASH_KIT_PREVIEW, job, prefs, ckey)
 		if(!draw)
+			. = list("statuses" = statuses, "placed" = model.clash_kit_placed, "moves_failed" = model.clash_kit_move_failed)
 			qdel(model)
-			return list("statuses" = statuses)
+			return
 		for(var/obj/limb/limb in model.limbs)
 			limb.blocks_emissive = EMISSIVE_BLOCK_NONE
 		model.regenerate_icons()

@@ -119,7 +119,6 @@
 		"shop_locks" = shop_locks,
 		"gun" = clash_gun_progress(progress, clash_track_type(gun_type)),
 		"sidearm_gun" = clash_gun_progress(progress, clash_track_type(sidearm_type)),
-		"carriers" = clash_carrier_progress(progress, faction),
 	)
 
 /proc/clash_option_rank(datum/clash_progress/progress, datum/clash_kit_option/option, class, primary_type)
@@ -164,38 +163,6 @@
 		names |= initial(attachment_type.name)
 	.["next"] = length(names) ? capitalize(english_list(names)) : "Your name engraved on it"
 	.["kills_to_go"] = CEILING(max(0, unlock["xp"] - xp) / CLASH_XP_PER_KILL_ESTIMATE, 1)
-
-/proc/clash_carrier_progress(datum/clash_progress/progress, faction)
-	. = list()
-	build_clash_option_gates()
-	for(var/family in GLOB.clash_carrier_tracks)
-		var/list/steps = GLOB.clash_carrier_tracks[family]
-		var/list/names = list()
-		var/offered = FALSE
-		for(var/list/carrier_step as anything in steps)
-			var/name
-			for(var/index in 2 to length(carrier_step))
-				var/datum/clash_kit_option/option = clash_item_option(faction, carrier_step[index])
-				if(!option)
-					continue
-				offered = TRUE
-				var/list/gate = GLOB.clash_option_gates[clash_gate_key(faction, carrier_step[index])]
-				if(!(gate?["level"] && progress.faction_level(faction) >= gate["level"]))
-					name = option.name
-					break
-			names += list(name)
-		if(!offered)
-			continue
-		var/step = progress.carrier_step(family)
-		var/list/entry = progress.carriers[family]
-		var/list/row = list("family" = capitalize(GLOB.clash_family_names[family]), "step" = step, "steps" = length(steps))
-		for(var/next in step + 1 to length(steps))
-			if(!names[next])
-				continue
-			row["next"] = names[next]
-			row["xp_to_go"] = max(0, steps[next][1] - (entry ? entry["xp"] : 0))
-			break
-		. += list(row)
 
 /proc/clash_career_progress(ckey)
 	var/datum/clash_progress/progress = clash_progress_of(ckey)
