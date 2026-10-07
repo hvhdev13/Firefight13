@@ -10,6 +10,8 @@
 #define CLASH_ADRENALINE_SPEED 1.2
 #define CLASH_FAST_COVER_MULT 0.5
 #define CLASH_QUICK_FIX_MULT 0.5
+#define CLASH_BIPOD_DEPLOY_TIME (1.5 SECONDS)
+#define CLASH_QUICK_BRACE_TIME (1 SECONDS)
 
 /datum/clash_perk
 	var/name
@@ -218,6 +220,13 @@
 	level = 12
 	icon_type = /obj/item/device/motiondetector
 
+/datum/clash_perk/quick_brace
+	name = "Quick Brace"
+	desc = "Your bipod deploys on the ground in 1 second (from 1.5)"
+	class = CLASH_CLASS_HEAVY
+	level = 14
+	icon_type = /obj/item/attachable/bipod/m41ae2
+
 /datum/clash_perk/flak
 	name = "Flak"
 	desc = "Explosions never tear off your limbs"
@@ -371,6 +380,9 @@ GLOBAL_LIST_INIT(clash_perks, build_clash_perks())
 	recalculate_move_delay = TRUE
 	remove_filter("clash_adrenaline")
 
+/proc/clash_bipod_deploy_time(mob/living/user)
+	return clash_has_perk(user, /datum/clash_perk/quick_brace) ? CLASH_QUICK_BRACE_TIME : CLASH_BIPOD_DEPLOY_TIME
+
 /proc/clash_cover_build_mult(mob/living/carbon/human/builder, result_type)
 	return ispath(result_type, /obj/structure/barricade) && clash_has_perk(builder, /datum/clash_perk/fast_cover) ? CLASH_FAST_COVER_MULT : 1
 
@@ -401,3 +413,5 @@ GLOBAL_LIST_INIT(clash_perks, build_clash_perks())
 #undef CLASH_ADRENALINE_SPEED
 #undef CLASH_FAST_COVER_MULT
 #undef CLASH_QUICK_FIX_MULT
+#undef CLASH_BIPOD_DEPLOY_TIME
+#undef CLASH_QUICK_BRACE_TIME

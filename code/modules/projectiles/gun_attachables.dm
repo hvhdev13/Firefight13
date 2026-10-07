@@ -4033,7 +4033,7 @@ Defined in conflicts.dm of the #defines folder.
 		var/obj/support = check_bipod_support(gun, user)
 		if(!support&&!bipod_deployed)
 			to_chat(user, SPAN_NOTICE("You start deploying [src] on the ground."))
-			if(!do_after(user, 15, INTERRUPT_ALL, BUSY_ICON_HOSTILE, gun, INTERRUPT_DIFF_LOC))
+			if(!do_after(user, clash_bipod_deploy_time(user), INTERRUPT_ALL, BUSY_ICON_HOSTILE, gun, INTERRUPT_DIFF_LOC))
 				return FALSE
 
 		bipod_deployed = !bipod_deployed
