@@ -206,3 +206,87 @@
 	icon = 'icons/turf/areas.dmi'
 	icon_state = "dk_yellow"
 	clash_zone = TRUE
+
+/area/clash_arena/tdm_kutjevo/battlefield/indoors
+	ceiling = CEILING_METAL
+	clash_indoors = TRUE
+
+/area/clash_arena/tdm_kutjevo/battlefield/zone_1/indoors
+	ceiling = CEILING_METAL
+	clash_indoors = TRUE
+
+/area/clash_arena/tdm_kutjevo/battlefield/zone_2/indoors
+	ceiling = CEILING_METAL
+	clash_indoors = TRUE
+
+/area/clash_arena/tdm_kutjevo/battlefield/zone_3/indoors
+	ceiling = CEILING_METAL
+	clash_indoors = TRUE
+
+/area/clash_arena/tdm_kutjevo/battlefield/zone_4/indoors
+	ceiling = CEILING_METAL
+	clash_indoors = TRUE
+
+/area/clash_arena/tdm_kutjevo/battlefield/zone_5/indoors
+	ceiling = CEILING_METAL
+	clash_indoors = TRUE
+
+/area/clash_arena/tdm_kutjevo/battlefield/zone_6/indoors
+	ceiling = CEILING_METAL
+	clash_indoors = TRUE
+
+/area/clash_arena/tdm_deathmatch2000/battlefield/indoors
+	ceiling = CEILING_METAL
+	clash_indoors = TRUE
+
+/area/clash_arena/tdm_deathmatch2000/battlefield/zone_1/indoors
+	ceiling = CEILING_METAL
+	clash_indoors = TRUE
+
+/area/clash_arena/tdm_deathmatch2000/battlefield/zone_2/indoors
+	ceiling = CEILING_METAL
+	clash_indoors = TRUE
+
+/area/clash_arena/tdm_deathmatch2000/battlefield/zone_3/indoors
+	ceiling = CEILING_METAL
+	clash_indoors = TRUE
+
+/area/clash_arena/tdm_deathmatch2000/battlefield/zone_4/indoors
+	ceiling = CEILING_METAL
+	clash_indoors = TRUE
+
+/area/clash_arena/tdm_deathmatch2000/battlefield/zone_5/indoors
+	ceiling = CEILING_METAL
+	clash_indoors = TRUE
+
+/area/clash_arena/tdm_deathmatch2000/battlefield/zone_6/indoors
+	ceiling = CEILING_METAL
+	clash_indoors = TRUE
+
+/area/clash_arena/tdm_forest/battlefield/indoors
+	ceiling = CEILING_METAL
+	clash_indoors = TRUE
+
+/area/clash_arena/tdm_forest/battlefield/zone_1/indoors
+	ceiling = CEILING_METAL
+	clash_indoors = TRUE
+
+/area/clash_arena/tdm_forest/battlefield/zone_2/indoors
+	ceiling = CEILING_METAL
+	clash_indoors = TRUE
+
+/area/clash_arena/tdm_forest/battlefield/zone_3/indoors
+	ceiling = CEILING_METAL
+	clash_indoors = TRUE
+
+/area/clash_arena/tdm_forest/battlefield/zone_4/indoors
+	ceiling = CEILING_METAL
+	clash_indoors = TRUE
+
+/area/clash_arena/tdm_forest/battlefield/zone_5/indoors
+	ceiling = CEILING_METAL
+	clash_indoors = TRUE
+
+/area/clash_arena/tdm_forest/battlefield/zone_6/indoors
+	ceiling = CEILING_METAL
+	clash_indoors = TRUE

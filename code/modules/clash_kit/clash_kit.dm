@@ -214,7 +214,67 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 			full_kit.load_gear(fighter, fighter.client)
 		catch(var/exception/error)
 			stack_trace("Clash kit could not issue [job] their full kit: [error]")
+	clash_issue_specialist_armor(fighter)
+	clash_issue_machinegunner_kit(fighter)
+	clash_swap_c4_pouches(fighter)
 	clash_kit_default_webbing(fighter)
+
+/proc/clash_issue_specialist_armor(mob/living/carbon/human/fighter)
+	var/found = FALSE
+	for(var/obj/item/spec_kit/token in fighter.get_contents())
+		found = TRUE
+		if(token.loc == fighter)
+			fighter.temp_drop_inv_item(token, TRUE)
+		qdel(token)
+	if(!found)
+		return
+	var/list/armor_set = list(
+		WEAR_JACKET = /obj/item/clothing/suit/storage/marine/specialist,
+		WEAR_HEAD = /obj/item/clothing/head/helmet/marine/specialist,
+		WEAR_HANDS = /obj/item/clothing/gloves/marine/specialist,
+	)
+	for(var/wear_slot in armor_set)
+		clash_kit_replace_worn(fighter, wear_slot, armor_set[wear_slot])
+
+/proc/clash_issue_machinegunner_kit(mob/living/carbon/human/fighter)
+	var/found = FALSE
+	for(var/obj/item/weapon/gun/smartgun/smartgun in fighter.get_contents())
+		found = TRUE
+		if(smartgun.loc == fighter)
+			fighter.temp_drop_inv_item(smartgun, TRUE)
+		qdel(smartgun)
+	if(!found)
+		return
+	for(var/obj/item/ammo_magazine/smartgun/drum in fighter.get_contents())
+		qdel(drum)
+	clash_kit_replace_worn(fighter, WEAR_JACKET, /obj/item/clothing/suit/storage/marine/medium)
+	clash_kit_replace_worn(fighter, WEAR_WAIST, /obj/item/storage/belt/gun/m4a3)
+	var/obj/item/weapon/gun/rifle/lmg/machinegun = new(fighter)
+	if(!fighter.equip_to_slot_if_possible(machinegun, WEAR_J_STORE, TRUE, FALSE, TRUE))
+		clash_kit_hand_or_floor(fighter, machinegun)
+
+/proc/clash_swap_c4_pouches(mob/living/carbon/human/fighter)
+	for(var/wear_slot in list(WEAR_L_STORE, WEAR_R_STORE))
+		var/obj/item/storage/pouch/explosive/C4/pouch = fighter.get_item_by_slot(wear_slot)
+		if(!istype(pouch))
+			continue
+		QDEL_LIST(pouch.contents)
+		clash_kit_replace_worn(fighter, wear_slot, /obj/item/storage/pouch/general/medium)
+
+/proc/clash_kit_heavy_pouch(mob/living/carbon/human/wearer, job)
+	var/obj/item/weapon/gun/primary = clash_kit_primary_of(wearer)
+	var/ammo_type = primary && clash_job_is_heavy(job) && clash_kit_magazine_for(primary)
+	if(!ammo_type)
+		return
+	for(var/wear_slot in list(WEAR_L_STORE, WEAR_R_STORE))
+		var/obj/item/storage/pouch/general/pouch = wearer.get_item_by_slot(wear_slot)
+		if(istype(pouch) && !length(pouch.contents))
+			clash_kit_top_up(pouch, ammo_type, wearer)
+
+/proc/clash_kit_smartgun_rig(mob/living/carbon/human/wearer, datum/clash_kit/kit)
+	clash_kit_replace_worn(wearer, WEAR_JACKET, /obj/item/clothing/suit/storage/marine/smartgunner)
+	if(!kit.get_option(KIT_SLOT_BELT))
+		clash_kit_replace_worn(wearer, WEAR_WAIST, /obj/item/storage/belt/gun/smartgunner)
 
 /proc/clash_kit_default_webbing(mob/living/carbon/human/fighter)
 	var/obj/item/clothing/under/uniform = fighter.w_uniform
@@ -575,7 +635,7 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 	clash_swap_issued_flare_pouches(wearer)
 	for(var/slot in GLOB.clash_kit_worn_slots)
 		var/datum/clash_kit_option/option = kit.get_option(slot)
-		if(!option || option.faction != faction)
+		if(!option || option.faction != faction || (slot == KIT_SLOT_ARMOR && ispath(primary?.item_type, /obj/item/weapon/gun/smartgun)))
 			continue
 		var/wear_slot = GLOB.clash_kit_slots[slot]["wear"]
 		var/obj/item/worn = wearer.get_item_by_slot(wear_slot)
@@ -591,6 +651,8 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 	var/obj/item/weapon/gun/main_gun
 	if(primary)
 		clash_kit_purge_guns(wearer, FALSE)
+		if(ispath(primary.item_type, /obj/item/weapon/gun/smartgun))
+			clash_kit_smartgun_rig(wearer, kit)
 		main_gun = new primary.item_type(wearer)
 		if(!wearer.equip_to_slot_if_possible(main_gun, WEAR_J_STORE, TRUE, FALSE, TRUE) && !wearer.equip_to_appropriate_slot(main_gun))
 			clash_kit_hand_or_floor(wearer, main_gun)
@@ -647,6 +709,7 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 	clash_strip_locked_grenades(wearer, ckey, job)
 	if(mode != CLASH_KIT_RESET && clash_has_perk(wearer, /datum/clash_perk/extra_grenade))
 		clash_give_extra_grenade(wearer)
+	clash_kit_heavy_pouch(wearer, job)
 	clash_kit_fill_ammo(wearer, kit, mode)
 	. = stock_clash_kit(wearer, kit, job, mode, ckey)
 	wearer.clash_kit_move_failed = apply_clash_kit_moves(wearer, kit)

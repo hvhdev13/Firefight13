@@ -127,7 +127,7 @@
 	for(var/title in GLOB.clash_role_levels)
 		if(GLOB.clash_role_levels[title] == level && (title in GLOB.clash_arena_roles) && clash_kit_faction_for_job(title) == faction)
 			found = TRUE
-			clash_notify_unlock(ckey, CLASH_UNLOCK_ROLE, title, source)
+			clash_notify_unlock(ckey, CLASH_UNLOCK_ROLE, clash_role_name(title), source)
 	if(notify_perks(null, level, source))
 		found = TRUE
 	if(!found)
@@ -150,6 +150,10 @@
 				clash_notify_unlock(ckey, CLASH_UNLOCK_SHOP, tier[2] == INFINITY ? "Every Shop item" : "Shop items up to [tier[2]] points", source)
 	if(notify_perks(class, level, source))
 		found = TRUE
+	for(var/list/rung as anything in GLOB.clash_class_weapons[class])
+		if(rung[1] == level && clash_item_option(faction, rung[2]))
+			found = TRUE
+			clash_notify_unlock(ckey, CLASH_UNLOCK_GUN, clash_item_name(faction, rung[2]), source, rung[2])
 	if(class == CLASH_CLASS_ENGINEER)
 		for(var/tier in GLOB.clash_sentry_tiers)
 			var/list/stats = GLOB.clash_sentry_tiers[tier]
@@ -219,6 +223,12 @@
 
 /proc/clash_job_is_engineer(job)
 	return GLOB.clash_job_classes[job] == CLASH_CLASS_ENGINEER
+
+/proc/clash_is_heavy(mob/living/carbon/human/fighter)
+	return clash_job_is_heavy(fighter.job)
+
+/proc/clash_job_is_heavy(job)
+	return GLOB.clash_job_classes[job] == CLASH_CLASS_HEAVY
 
 /proc/clash_engineer_level(ckey)
 	if(!clash_progression_gating())
@@ -331,6 +341,7 @@
 /mob/living/carbon/human/var/clash_surgery_xp = 0
 /mob/living/carbon/human/var/clash_heal_carry = 0
 /mob/living/carbon/human/var/clash_repair_carry = 0
+/mob/living/carbon/human/var/clash_suppression_carry = 0
 /obj/limb/var/clash_splint_paid = FALSE
 /obj/structure/barricade/var/clash_builder_ckey
 /obj/structure/barricade/var/clash_builder_faction
@@ -372,6 +383,20 @@
 	for(var/mob/living/carbon/human/leader in range(CLASH_XP_LEADER_RANGE, killer))
 		if(leader != killer && leader.stat == CONSCIOUS && leader.faction == killer.faction && GLOB.clash_job_classes[leader.job] == CLASH_CLASS_LEADER)
 			clash_award_xp(leader, CLASH_XP_LEADER_ASSIST, CLASH_XP_SOURCE_LEADER)
+
+/proc/clash_progress_suppression(mob/living/carbon/human/heavy, gained, mob/living/carbon/human/target)
+	if(heavy.statistic_exempt || !clash_progression_active())
+		return
+	heavy.clash_suppression_carry += target.statistic_exempt ? gained * CLASH_BOT_DAMAGE_SHARE : gained
+	addtimer(CALLBACK(heavy, TYPE_PROC_REF(/mob/living/carbon/human, clash_pay_suppression)), CLASH_XP_SUPPRESSION_PAYOUT, TIMER_UNIQUE)
+
+/mob/living/carbon/human/proc/clash_pay_suppression()
+	var/xp = round(clash_suppression_carry / CLASH_XP_SUPPRESSION_POINTS)
+	clash_suppression_carry -= xp * CLASH_XP_SUPPRESSION_POINTS
+	clash_award_support_xp(src, xp, CLASH_XP_SOURCE_SUPPRESSION, CLASH_XP_SOURCE_SUPPRESSION, CLASH_XP_SUPPRESSION_CAP)
+
+/proc/clash_progress_suppression_assist(list/heavy)
+	clash_grant_support_xp(heavy["ckey"], heavy["faction"], GLOB.clash_job_classes[heavy["job"]], CLASH_XP_SUPPRESSION_ASSIST, CLASH_XP_SOURCE_SUPPRESSION_ASSIST, CLASH_XP_SOURCE_SUPPRESSION, CLASH_XP_SUPPRESSION_CAP)
 
 /proc/clash_hurt_by_enemy(mob/living/carbon/human/patient)
 	if(!patient.clash_enemy_hurt && (patient.clash_heal_pool > 0 || clash_enemy_share(patient.last_damage_data?.resolve_mob(), patient.faction, 1)))

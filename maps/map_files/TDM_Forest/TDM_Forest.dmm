@@ -506,7 +506,7 @@
 	explo_proof = 1;
 	turf_flags = 16
 	},
-/area/clash_arena/tdm_forest/battlefield)
+/area/clash_arena/tdm_forest/battlefield/indoors)
 "eG" = (
 /obj/structure/flora/bush/ausbushes/var3/brflowers{
 	desc = "Just like a real plant, but fake!";
@@ -722,7 +722,7 @@
 	explo_proof = 1;
 	turf_flags = 16
 	},
-/area/clash_arena/tdm_forest/battlefield/zone_1)
+/area/clash_arena/tdm_forest/battlefield/zone_1/indoors)
 "gB" = (
 /obj/effect/decal/strata_decals/grasses,
 /obj/structure/largecrate/random/barrel/green,
@@ -1456,7 +1456,7 @@
 	explo_proof = 1;
 	turf_flags = 16
 	},
-/area/clash_arena/tdm_forest/battlefield)
+/area/clash_arena/tdm_forest/battlefield/indoors)
 "nG" = (
 /obj/structure/machinery/cm_vending/sorted/cargo_ammo/squad{
 	req_access = null;
@@ -1758,7 +1758,7 @@
 	explo_proof = 1;
 	turf_flags = 16
 	},
-/area/clash_arena/tdm_forest/battlefield)
+/area/clash_arena/tdm_forest/battlefield/indoors)
 "qe" = (
 /obj/structure/barricade/sandbags/weak_wired{
 	pixel_x = 0;
@@ -1942,7 +1942,7 @@
 	explo_proof = 1;
 	turf_flags = 16
 	},
-/area/clash_arena/tdm_forest/battlefield/zone_1)
+/area/clash_arena/tdm_forest/battlefield/zone_1/indoors)
 "rm" = (
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
 	dir = 0
@@ -3629,7 +3629,7 @@
 	explo_proof = 1;
 	turf_flags = 16
 	},
-/area/clash_arena/tdm_forest/battlefield)
+/area/clash_arena/tdm_forest/battlefield/indoors)
 "Jr" = (
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
 	dir = 0
@@ -4395,7 +4395,7 @@
 	explo_proof = 1;
 	turf_flags = 16
 	},
-/area/clash_arena/tdm_forest/battlefield/zone_1)
+/area/clash_arena/tdm_forest/battlefield/zone_1/indoors)
 "QK" = (
 /obj/structure/flora/grass/tallgrass/jungle{
 	pixel_x = 0;
@@ -4986,7 +4986,7 @@
 	explo_proof = 1;
 	turf_flags = 16
 	},
-/area/clash_arena/tdm_forest/battlefield/zone_1)
+/area/clash_arena/tdm_forest/battlefield/zone_1/indoors)
 "Xr" = (
 /obj/effect/decal/strata_decals/grasses,
 /obj/structure/barricade/sandbags/weak_wired{

@@ -14,7 +14,7 @@
 				names += clash_item_name(faction, rung[2])
 		for(var/title in GLOB.clash_role_levels)
 			if(GLOB.clash_role_levels[title] == next && (title in GLOB.clash_arena_roles) && clash_kit_faction_for_job(title) == faction)
-				names += "[title] role"
+				names += "[clash_role_name(title)] role"
 		for(var/perk_type in GLOB.clash_perks)
 			var/datum/clash_perk/perk = GLOB.clash_perks[perk_type]
 			if(!perk.class && perk.level == next)
@@ -135,6 +135,8 @@
 			return clash_class_gear_level(class, gate["gear"]) || CLASH_LEVEL_CAP
 		if(CLASH_GATE_TWIN)
 			return max(gate["level"], clash_class_gear_level(class, gate["gear"]) || CLASH_LEVEL_CAP)
+		if(CLASH_GATE_CLASS_LEVEL)
+			return gate["level"]
 		if(CLASH_GATE_CARRIER)
 			var/by_xp = progress.level_from_xp(gate["xp"], CLASH_FACTION_XP_BASE)
 			return gate["level"] ? min(gate["level"], by_xp) : by_xp

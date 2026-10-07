@@ -144,6 +144,7 @@ interface StaticData {
   menus: Record<string, Record<string, Option[]>>;
   roles: RoleGroup[];
   kit_count: number;
+  role_names: Record<string, string>;
 }
 
 interface Data extends StaticData {
@@ -164,6 +165,7 @@ interface Data extends StaticData {
   revivable: BooleanLike;
   sentry_slot: BooleanLike;
   job_class: string;
+  class_primaries: BooleanLike;
   hint: string | null;
   pack: PackContainer[];
   extras: Extra[];
@@ -1149,6 +1151,7 @@ export const ClashKit = () => {
     slots,
     menus,
     roles,
+    role_names,
     job,
     faction,
     kits,
@@ -1164,6 +1167,7 @@ export const ClashKit = () => {
     revivable,
     sentry_slot,
     job_class,
+    class_primaries,
     hint,
     progress,
   } = data;
@@ -1205,8 +1209,10 @@ export const ClashKit = () => {
   const current = slotById[selectedSlot];
   const ranks = progress?.ranks ?? {};
   const slotOptions = (id: string) =>
-    (menus[faction]?.[id] ?? []).filter(
-      (option) => !option.only_class || option.only_class === job_class,
+    (menus[faction]?.[id] ?? []).filter((option) =>
+      id === 'primary' && class_primaries
+        ? option.only_class === job_class
+        : !option.only_class || option.only_class === job_class,
     );
   const hasClassPerks = slotOptions('class_perk').length > 0;
   useEffect(() => {
@@ -1233,20 +1239,21 @@ export const ClashKit = () => {
         )
         .sort((a, b) => b.type.length - a.type.length)[0]
     : undefined;
+  const jobName = role_names[job] ?? job;
   const waiting = deploy_state === 'dead' && waitLeft > 0;
   const deployLabel = deploy_block
     ? 'Cannot deploy'
     : waiting
       ? `Deploy in ${clock(waitLeft)}`
-      : `Deploy as ${job}`;
+      : `Deploy as ${jobName}`;
   const isUpp = faction === 'UPP';
   const roleOptions = (
     roles.find((group) => group.faction === faction)?.jobs ?? []
   ).map((title) => ({
     value: title,
     displayText: progress?.role_locks[title]
-      ? `${title} (${progress.role_locks[title]})`
-      : title,
+      ? `${role_names[title] ?? title} (${progress.role_locks[title]})`
+      : (role_names[title] ?? title),
   }));
   const fresh = progress?.fresh ?? [];
   const locks = progress?.locks ?? {};
@@ -1317,7 +1324,7 @@ export const ClashKit = () => {
                   width="250px"
                   options={roleOptions}
                   selected={job}
-                  displayText={job}
+                  displayText={jobName}
                   onSelected={(value) => act('role', { job: value })}
                 />
               </Stack.Item>
@@ -1380,7 +1387,7 @@ export const ClashKit = () => {
                     </Box>
                   )}
                   <Box className="ClashKit__dollSub">
-                    Your {job} class
+                    Your {jobName} class
                     {kits.length > 1 && (
                       <Dropdown
                         ml={1}

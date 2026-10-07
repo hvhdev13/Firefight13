@@ -126,3 +126,8 @@
 	var/line = "<span class='game say'><b>\[ALL\]</b> <span style='color: [clash_mode.faction_color(faction)]'><b>[html_encode(real_name)]</b></span>: [message]</span>"
 	for(var/client/listener as anything in GLOB.clients)
 		to_chat(listener, line)
+
+/obj/item/weapon/twohanded/offhand/unwield(mob/user)
+	if(QDELETED(src))
+		return
+	return ..()

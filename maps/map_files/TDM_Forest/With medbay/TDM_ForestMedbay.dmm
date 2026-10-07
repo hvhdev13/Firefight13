@@ -987,7 +987,7 @@
 	pixel_y = 0
 	},
 /turf/open/floor/strata/fake_wood,
-/area/clash_arena/tdm_forest/battlefield)
+/area/clash_arena/tdm_forest/battlefield/indoors)
 "eB" = (
 /turf/open/floor/almayer,
 /area/clash_arena/tdm_forest/uscm_base/req)
@@ -1713,7 +1713,7 @@
 	no_panel = 1
 	},
 /turf/open/floor/corsat/marked,
-/area/clash_arena/tdm_forest/battlefield)
+/area/clash_arena/tdm_forest/battlefield/indoors)
 "jm" = (
 /obj/effect/decal/strata_decals/grasses,
 /obj/structure/prop/tyrargo/boards/boards_1{
@@ -2428,7 +2428,7 @@
 	pixel_y = 0
 	},
 /turf/open/floor/strata/fake_wood,
-/area/clash_arena/tdm_forest/battlefield)
+/area/clash_arena/tdm_forest/battlefield/indoors)
 "nA" = (
 /obj/structure/machinery/cryopod{
 	pixel_y = 6
@@ -2441,7 +2441,7 @@
 "nG" = (
 /obj/structure/barricade/handrail/kutjevo,
 /turf/open/floor/strata/fake_wood,
-/area/clash_arena/tdm_forest/battlefield)
+/area/clash_arena/tdm_forest/battlefield/indoors)
 "nI" = (
 /obj/structure/barricade/handrail/kutjevo,
 /turf/open/auto_turf/strata_grass/layer1,
@@ -2940,7 +2940,7 @@
 	},
 /obj/structure/blocker/clash_gate/upp,
 /turf/open/floor/corsat/marked,
-/area/clash_arena/tdm_forest/battlefield)
+/area/clash_arena/tdm_forest/battlefield/indoors)
 "qy" = (
 /obj/effect/decal/siding,
 /turf/open/gm/river/tyrargo,
@@ -3454,7 +3454,7 @@
 /obj/effect/landmark/corpsespawner/upp,
 /obj/effect/decal/siding,
 /turf/open/floor/strata/fake_wood,
-/area/clash_arena/tdm_forest/battlefield)
+/area/clash_arena/tdm_forest/battlefield/indoors)
 "tQ" = (
 /obj/structure/flora/tree/tyrargo/tree_2,
 /turf/open/auto_turf/snow/brown_base/layer3,
@@ -3911,7 +3911,7 @@
 /area/clash_arena/tdm_forest/uscm_base)
 "wL" = (
 /turf/open/floor/strata/fake_wood,
-/area/clash_arena/tdm_forest/battlefield)
+/area/clash_arena/tdm_forest/battlefield/indoors)
 "wM" = (
 /obj/effect/decal/cleanable/blood/oil,
 /turf/open/floor/plating/plating_catwalk,
@@ -5558,7 +5558,7 @@
 "He" = (
 /obj/effect/decal/siding,
 /turf/open/floor/strata/fake_wood,
-/area/clash_arena/tdm_forest/battlefield)
+/area/clash_arena/tdm_forest/battlefield/indoors)
 "Hf" = (
 /turf/closed/wall/almayer{
 	damage_cap = 15000
@@ -8339,7 +8339,7 @@
 "YK" = (
 /obj/effect/landmark/corpsespawner/tyrargo/us_army_trooper,
 /turf/open/floor/strata/fake_wood,
-/area/clash_arena/tdm_forest/battlefield)
+/area/clash_arena/tdm_forest/battlefield/indoors)
 "YU" = (
 /obj/effect/decal/strata_decals/grasses,
 /obj/effect/landmark/corpsespawner/upp,

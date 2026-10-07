@@ -1453,7 +1453,6 @@
 		/obj/item/attachable/flashlight/grip,
 		/obj/item/attachable/flashlight,
 		/obj/item/attachable/flashlight/under_barrel,
-		/obj/item/attachable/bipod,
 		/obj/item/attachable/heavy_barrel,
 		/obj/item/attachable/extended_barrel/vented,
 		/obj/item/attachable/compensator,
@@ -1490,7 +1489,7 @@
 	fa_max_scatter = SCATTER_AMOUNT_TIER_4
 	accuracy_mult = BASE_ACCURACY_MULT
 	accuracy_mult_unwielded = BASE_ACCURACY_MULT - HIT_ACCURACY_MULT_TIER_10
-	scatter = SCATTER_AMOUNT_TIER_6
+	scatter = SCATTER_AMOUNT_TIER_3
 	burst_scatter_mult = SCATTER_AMOUNT_TIER_5
 	scatter_unwielded = SCATTER_AMOUNT_TIER_2
 	damage_mult = BASE_BULLET_DAMAGE_MULT

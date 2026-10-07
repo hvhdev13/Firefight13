@@ -5,6 +5,14 @@ GLOBAL_LIST_INIT(clash_role_shop_ammo, list(
 	JOB_SQUAD_SMARTGUN = list(/obj/item/ammo_magazine/smartgun = 10),
 ))
 
+GLOBAL_LIST_INIT(clash_shop_counterparts, list(
+	JOB_UPP = JOB_SQUAD_MARINE,
+	JOB_UPP_MEDIC = JOB_SQUAD_MEDIC,
+	JOB_UPP_ENGI = JOB_SQUAD_ENGI,
+	JOB_UPP_SPECIALIST = JOB_SQUAD_SMARTGUN,
+	JOB_UPP_LEADER = JOB_SQUAD_LEADER,
+))
+
 /mob/living/carbon/human/var/list/clash_kit_extras = list()
 /mob/living/carbon/human/var/list/clash_kit_placed = list()
 /mob/living/carbon/human/var/list/clash_kit_move_failed = list()
@@ -63,15 +71,15 @@ GLOBAL_LIST_INIT(clash_role_shop_ammo, list(
 	var/list/sections = list()
 	var/list/by_id = list()
 	var/list/ammo_items = list()
+	var/list/role_ammo = GLOB.clash_role_shop_ammo[job]
 	for(var/slot in list(KIT_SLOT_PRIMARY, KIT_SLOT_SIDEARM))
 		for(var/datum/clash_kit_option/option as anything in GLOB.clash_kit_menu[clash_kit_faction_for_job(job)]?[slot])
 			var/obj/item/ammo_type = option.ammo_type
-			if(!ammo_type || by_id["[ammo_type]"])
+			if(!ammo_type || by_id["[ammo_type]"] || role_ammo?[ammo_type] || (option.only_class && option.only_class != GLOB.clash_job_classes[job]))
 				continue
 			var/list/item = list("id" = "[ammo_type]", "name" = capitalize(strip_improper(initial(ammo_type.name))), "cost" = CLASH_SHOP_AMMO_COST, "pool" = CLASH_SHOP_POINTS, "icon" = "[initial(ammo_type.icon)]", "icon_state" = initial(ammo_type.icon_state))
 			ammo_items += list(item)
 			by_id["[ammo_type]"] = item
-	var/list/role_ammo = GLOB.clash_role_shop_ammo[job]
 	for(var/obj/item/ammo_type as anything in role_ammo)
 		var/list/item = list("id" = "[ammo_type]", "name" = capitalize(strip_improper(initial(ammo_type.name))), "cost" = role_ammo[ammo_type], "pool" = CLASH_SHOP_POINTS, "icon" = "[initial(ammo_type.icon)]", "icon_state" = initial(ammo_type.icon_state))
 		ammo_items += list(item)
@@ -99,8 +107,28 @@ GLOBAL_LIST_INIT(clash_role_shop_ammo, list(
 	for(var/list/section as anything in sections.Copy())
 		if(!length(section["items"]))
 			sections -= list(section)
+	var/list/optics = clash_shop_optics(sections)
+	var/counterpart = GLOB.clash_shop_counterparts[job]
+	if(!optics && counterpart)
+		var/list/borrowed = clash_shop_optics(get_clash_shop(counterpart)["sections"])
+		if(borrowed)
+			optics = list("name" = borrowed["name"], "items" = list())
+			for(var/list/item as anything in borrowed["items"])
+				var/list/copy = item.Copy()
+				optics["items"] += list(copy)
+				by_id[copy["id"]] = copy
+			sections += list(optics)
+	if(optics)
+		sections -= list(optics)
+		sections.Insert(1, list(optics))
 	GLOB.clash_kit_shops[job] = list("sections" = sections, "by_id" = by_id)
 	return GLOB.clash_kit_shops[job]
+
+/proc/clash_shop_optics(list/sections)
+	for(var/list/section as anything in sections)
+		if(findtext(section["name"], "OPTICS"))
+			return section
+	return null
 
 /proc/get_clash_kit_budget(job, ckey)
 	var/list/budget = GLOB.clash_kit_budgets[job] || list(MARINE_TOTAL_BUY_POINTS, MARINE_TOTAL_SNOWFLAKE_POINTS)

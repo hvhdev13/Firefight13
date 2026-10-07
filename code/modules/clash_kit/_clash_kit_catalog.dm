@@ -433,7 +433,10 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 	add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "M4RA battle rifle", /obj/item/weapon/gun/rifle/m4ra, "Hits hard at range. Semi auto", /obj/item/ammo_magazine/rifle/m4ra, 4)
 	add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "M37A2 pump shotgun", /obj/item/weapon/gun/shotgun/pump/m37a, "Wins the doorway. Buckshot", /obj/item/ammo_magazine/shotgun/buckshot, 4)
 	add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "M39 submachine gun", /obj/item/weapon/gun/smg/m39, "Fast handling, fast firing, short reach", /obj/item/ammo_magazine/smg/m39, 4)
-	add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "M41AE2 heavy pulse rifle", /obj/item/weapon/gun/rifle/lmg, "Big drum, steady fire. Fires wielded only", /obj/item/ammo_magazine/rifle/lmg, 4)
+	var/datum/clash_kit_option/lmg = add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "M41AE2 heavy pulse rifle", /obj/item/weapon/gun/rifle/lmg, "Big drum, steady fire. Fires wielded only", /obj/item/ammo_magazine/rifle/lmg, 4)
+	lmg.only_class = GLOB.clash_job_classes[JOB_SQUAD_SMARTGUN]
+	var/datum/clash_kit_option/smartgun = add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "M56A2 smartgun", /obj/item/weapon/gun/smartgun, "IFF rounds fly past your teammates. Needs the M56 harness", /obj/item/ammo_magazine/smartgun, 2)
+	smartgun.only_class = GLOB.clash_job_classes[JOB_SQUAD_SMARTGUN]
 	add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "M240A1 incinerator", /obj/item/weapon/gun/flamer/m240, "Burns out a room. Light the pilot first", /obj/item/ammo_magazine/flamer_tank, 4)
 	add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "XM88 heavy rifle", /obj/item/weapon/gun/lever_action/xm88, "Lever action, hits very hard", /obj/item/ammo_magazine/handful/lever_action/xm88, 4)
 	add_clash_kit_option(faction, KIT_SLOT_SIDEARM, "M4A3 service pistol", /obj/item/weapon/gun/pistol/m4a3, "Standard sidearm", /obj/item/ammo_magazine/pistol, 3)
@@ -476,6 +479,8 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 	add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "Type 23 shotgun", /obj/item/weapon/gun/shotgun/type23, "Wins the doorway. Heavy buckshot", /obj/item/ammo_magazine/shotgun/heavy/buckshot, 4)
 	var/datum/clash_kit_option/qyj = add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "QYJ-72 machine gun", /obj/item/weapon/gun/pkp, "Belt fed. Open the feed cover to reload", /obj/item/ammo_magazine/pkp, 4)
 	qyj.only_class = GLOB.clash_job_classes[JOB_UPP_SPECIALIST]
+	var/datum/clash_kit_option/rotary = add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "GSh-7.62 rotary machine gun", /obj/item/weapon/gun/minigun/upp, "Huge volume of fire. Slow drum change", /obj/item/ammo_magazine/minigun, 2)
+	rotary.only_class = GLOB.clash_job_classes[JOB_UPP_SPECIALIST]
 	add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "M240A1 incinerator", /obj/item/weapon/gun/flamer/m240, "Burns out a room. Light the pilot first", /obj/item/ammo_magazine/flamer_tank, 4)
 	add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "Type 88 marksman rifle", /obj/item/weapon/gun/rifle/sniper/svd, "Semi auto, long reach", /obj/item/ammo_magazine/sniper/svd, 4)
 	add_clash_kit_option(faction, KIT_SLOT_SIDEARM, "Type 73 pistol", /obj/item/weapon/gun/pistol/t73, "Standard sidearm", /obj/item/ammo_magazine/pistol/t73, 3)

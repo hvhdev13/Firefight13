@@ -504,7 +504,7 @@
 "oT" = (
 /obj/effect/landmark/clash_objective/clash_flag/upp,
 /turf/open/floor/strata/red2,
-/area/clash_arena/tdm_deathmatch2000/battlefield)
+/area/clash_arena/tdm_deathmatch2000/battlefield/indoors)
 "oW" = (
 /obj/effect/decal/warning_stripes{
 	icon_state = "SW-out";

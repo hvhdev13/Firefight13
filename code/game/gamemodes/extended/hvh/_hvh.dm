@@ -17,6 +17,7 @@
 #define CLASH_POSTROUND_TIME (2 MINUTES)
 #define CLASH_FINAL_REBOOT_DELAY (7 SECONDS)
 #define CLASH_ASSIST_WINDOW (10 SECONDS)
+#define CLASH_SUPPRESSION_ASSIST_WINDOW (5 SECONDS)
 #define CLASH_KILL_SOUND 'sound/weapons/gun_xm88_directhit_high.ogg'
 GLOBAL_LIST_INIT(clash_streak_steps, list(3, 5, 7, 10, 15, 20))
 GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
@@ -90,6 +91,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	var/score_label = "kills"
 	var/list/recent_damage = list()
 	var/list/last_attackers = list()
+	var/list/suppressed_by = list()
 	var/list/rivalries = list()
 	var/list/life_kills = list()
 	var/admin_tampered = FALSE
@@ -157,6 +159,8 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	GLOB.round_should_check_for_win = FALSE
 	restrict_uscm_squads()
 	unlock_upp_job_slots()
+	if(arena_rules)
+		unlock_uscm_arena_slots()
 
 /datum/game_mode/extended/faction_clash/hvh/proc/restrict_uscm_squads()
 	for(var/datum/squad/squad as anything in GLOB.RoleAuthority.squads)
@@ -177,6 +181,20 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		job.total_positions = -1
 		job.spawn_positions = -1
 		log_debug("HVH: [title] slots unlocked")
+
+/datum/game_mode/extended/faction_clash/hvh/proc/unlock_uscm_arena_slots()
+	for(var/title in GLOB.clash_arena_roles)
+		var/datum/job/job = GLOB.RoleAuthority.roles_by_name[title]
+		if(!job || job.total_positions == -1 || clash_kit_faction_for_job(title) != FACTION_MARINE)
+			continue
+		clamped_jobs[job] = list(job.total_positions, job.spawn_positions)
+		job.total_positions = -1
+		job.spawn_positions = -1
+		log_debug("HVH: [title] slots unlocked")
+	for(var/datum/squad/squad as anything in GLOB.RoleAuthority.squads)
+		if(squad.name in CLASH_USCM_SQUADS)
+			for(var/role in squad.roles_cap)
+				squad.roles_cap[role] = null
 
 /datum/game_mode/extended/faction_clash/hvh/proc/restore_upp_job_slots()
 	for(var/datum/job/job as anything in clamped_jobs)
@@ -405,7 +423,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	var/mob/living/carbon/human/fighter = ishuman(player) && player.real_name == name ? player : null
 	return list(
 		"name" = name,
-		"role" = fighter?.job,
+		"role" = fighter && clash_role_name(fighter.job),
 		"alive" = fighter && fighter.stat != DEAD,
 		"kills" = entry?["kills"] || 0,
 		"assists" = entry?["assists"] || 0,
@@ -592,6 +610,8 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	var/list/attackers = recent_damage[victim_name]
 	last_attackers[victim_name] = attackers
 	recent_damage -= victim_name
+	var/list/suppressors = suppressed_by[victim_name]
+	suppressed_by -= victim_name
 	if(!match_live)
 		return
 	for(var/name in attackers)
@@ -602,6 +622,25 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		entry["assists"] += 1
 		clash_progress_assist(hit)
 		. += name
+	if(!killer_name || !attackers?[killer_name])
+		return
+	for(var/name in suppressors)
+		var/list/heavy = suppressors[name]
+		if(name == killer_name || (name in .) || world.time - heavy["time"] > CLASH_SUPPRESSION_ASSIST_WINDOW)
+			continue
+		var/list/entry = get_score_entry(name, heavy["faction"], heavy["ckey"])
+		entry["assists"] += 1
+		clash_progress_suppression_assist(heavy)
+		. += name
+
+/datum/game_mode/extended/faction_clash/hvh/proc/note_suppression(mob/living/carbon/human/target, mob/living/carbon/human/shooter)
+	if(!match_live || round_finished || shooter.statistic_exempt)
+		return
+	var/list/suppressors = suppressed_by[target.real_name]
+	if(!suppressors)
+		suppressors = list()
+		suppressed_by[target.real_name] = suppressors
+	suppressors[shooter.real_name] = list("time" = world.time, "faction" = shooter.faction, "ckey" = shooter.mind?.ckey || shooter.ckey, "job" = shooter.job)
 
 /datum/game_mode/extended/faction_clash/hvh/proc/report_environment_death(mob/victim, cause)
 	var/next_unlock = clash_next_unlock_text(victim.mind?.ckey || victim.ckey, victim.faction, "<br>")
@@ -880,6 +919,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	kill_streaks = list()
 	last_killed_by = list()
 	recent_damage = list()
+	suppressed_by = list()
 	rivalries = list()
 	life_kills = list()
 	limit_callouts_made = list()

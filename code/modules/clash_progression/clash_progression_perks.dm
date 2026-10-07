@@ -183,6 +183,41 @@
 	level = 10
 	icon_type = /obj/item/ammo_magazine/rifle
 
+/datum/clash_perk/heavy_fire
+	name = "Heavy Fire"
+	desc = "Your near misses suppress 27 (from 18)"
+	class = CLASH_CLASS_HEAVY
+	level = 2
+	icon_type = /obj/item/ammo_magazine/rifle/lmg
+
+/datum/clash_perk/spotter
+	name = "Spotter"
+	desc = "Enemies you suppress past half show as red dots on your team's radar within 14 tiles for 3 seconds"
+	class = CLASH_CLASS_HEAVY
+	level = 4
+	icon_type = /obj/item/device/binoculars
+
+/datum/clash_perk/braced
+	name = "Braced"
+	desc = "While your bipod is deployed, enemy suppression on you is halved"
+	class = CLASH_CLASS_HEAVY
+	level = 6
+	icon_type = /obj/item/attachable/bipod
+
+/datum/clash_perk/wide_fire
+	name = "Wide Fire"
+	desc = "Your bullets suppress enemies up to 2.5 tiles from their path (from 1.5)"
+	class = CLASH_CLASS_HEAVY
+	level = 10
+	icon_type = /obj/item/ammo_magazine/pkp
+
+/datum/clash_perk/long_hold
+	name = "Long Hold"
+	desc = "Suppression you cause holds for 3 seconds before it fades (from 1.5)"
+	class = CLASH_CLASS_HEAVY
+	level = 12
+	icon_type = /obj/item/device/motiondetector
+
 /datum/clash_perk/flak
 	name = "Flak"
 	desc = "Explosions never tear off your limbs"
@@ -191,7 +226,7 @@
 
 /datum/clash_perk/steady_nerves
 	name = "Steady Nerves"
-	desc = "Suppression darkens your screen half as much"
+	desc = "Suppression darkens your screen and slows you half as much"
 	level = 4
 	icon_type = /obj/item/clothing/mask/cigarette
 
