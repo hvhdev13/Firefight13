@@ -34,17 +34,32 @@
 
 /obj/structure/blocker/clash_gate
 	name = "base shield"
-	desc = "A faction-keyed barrier. Friendly personnel and fire pass through, hostiles do not."
+	desc = "A faction-keyed barrier. Friendly personnel pass through, hostiles do not. Nothing fired, thrown or burning gets across."
 	icon_state = "purple_line"
 	density = FALSE
 	layer = ABOVE_OBJ_LAYER
 	var/faction
 
+/proc/clash_gate_stops(atom/movable/mover)
+	return mover.throwing || istype(mover, /obj/flamer_fire)
+
 /obj/structure/blocker/clash_gate/BlockedPassDirs(atom/movable/mover, target_dir)
-	return clash_is_intruder(mover, faction) ? BLOCKED_MOVEMENT : NO_BLOCKED_MOVEMENT
+	return clash_gate_stops(mover) || clash_is_intruder(mover, faction) ? BLOCKED_MOVEMENT : NO_BLOCKED_MOVEMENT
+
+/obj/structure/blocker/clash_gate/BlockedExitDirs(atom/movable/mover, target_dir)
+	return clash_gate_stops(mover) ? BLOCKED_MOVEMENT : NO_BLOCKED_MOVEMENT
 
 /obj/structure/blocker/clash_gate/get_projectile_hit_boolean(obj/projectile/bullet)
-	return clash_is_intruder(bullet.firer, faction)
+	return TRUE
+
+/obj/structure/blocker/clash_gate/Uncrossed(atom/movable/mover)
+	. = ..()
+	if(istype(mover, /obj/projectile))
+		var/obj/projectile/bullet = mover
+		bullet.speed = 0
+
+/obj/structure/blocker/clash_gate/get_explosion_resistance()
+	return 1000000
 
 /obj/structure/blocker/clash_gate/uscm
 	name = "USCM base shield"

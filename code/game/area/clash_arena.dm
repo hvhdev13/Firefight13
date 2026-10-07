@@ -141,67 +141,67 @@
 	icon_state = "dk_yellow"
 	clash_zone = TRUE
 
-/area/clash_arena/tdm_jungle/uscm_base
+/area/clash_arena/tdm_forest/uscm_base
 	clash_faction = FACTION_MARINE
 	name = "\improper USCM Staging"
 	ceiling = CEILING_METAL
 	minimap_color = MINIMAP_AREA_COMMAND
 
-/area/clash_arena/tdm_jungle/uscm_base/req
+/area/clash_arena/tdm_forest/uscm_base/req
 	name = "\improper USCM Requisitions"
 
-/area/clash_arena/tdm_jungle/uscm_base/medbay
+/area/clash_arena/tdm_forest/uscm_base/medbay
 	name = "\improper USCM Medical"
 	minimap_color = MINIMAP_AREA_MEDBAY
 
-/area/clash_arena/tdm_jungle/upp_base
+/area/clash_arena/tdm_forest/upp_base
 	clash_faction = FACTION_UPP
 	name = "\improper UPP Staging"
 	ceiling = CEILING_METAL
 	minimap_color = MINIMAP_AREA_COMMAND
 
-/area/clash_arena/tdm_jungle/upp_base/req
+/area/clash_arena/tdm_forest/upp_base/req
 	name = "\improper UPP Requisitions"
 
-/area/clash_arena/tdm_jungle/upp_base/medbay
+/area/clash_arena/tdm_forest/upp_base/medbay
 	name = "\improper UPP Medical"
 	minimap_color = MINIMAP_AREA_MEDBAY
 
-/area/clash_arena/tdm_jungle/battlefield
+/area/clash_arena/tdm_forest/battlefield
 	name = "\improper Contested Zone"
 	minimap_color = MINIMAP_AREA_ENGI
 
-/area/clash_arena/tdm_jungle/battlefield/zone_1
+/area/clash_arena/tdm_forest/battlefield/zone_1
 	name = "\improper Objective Zone 1"
 	icon = 'icons/turf/areas.dmi'
 	icon_state = "yellow"
 	clash_zone = TRUE
 
-/area/clash_arena/tdm_jungle/battlefield/zone_2
+/area/clash_arena/tdm_forest/battlefield/zone_2
 	name = "\improper Objective Zone 2"
 	icon = 'icons/turf/areas.dmi'
 	icon_state = "green"
 	clash_zone = TRUE
 
-/area/clash_arena/tdm_jungle/battlefield/zone_3
+/area/clash_arena/tdm_forest/battlefield/zone_3
 	name = "\improper Objective Zone 3"
 	icon = 'icons/turf/areas.dmi'
 	icon_state = "purple"
 	clash_zone = TRUE
 
-/area/clash_arena/tdm_jungle/battlefield/zone_4
+/area/clash_arena/tdm_forest/battlefield/zone_4
 	name = "\improper Objective Zone 4"
 	icon = 'icons/turf/areas.dmi'
 	icon_state = "blue"
 	clash_zone = TRUE
 
-/area/clash_arena/tdm_jungle/battlefield/zone_5
+/area/clash_arena/tdm_forest/battlefield/zone_5
 	name = "\improper Objective Zone 5"
 	icon = 'icons/turf/areas.dmi'
 	icon_state = "red"
 	clash_zone = TRUE
 
-/area/clash_arena/tdm_jungle/battlefield/zone_6
+/area/clash_arena/tdm_forest/battlefield/zone_6
 	name = "\improper Objective Zone 6"
 	icon = 'icons/turf/areas.dmi'
 	icon_state = "dk_yellow"

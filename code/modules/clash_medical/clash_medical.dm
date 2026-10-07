@@ -336,6 +336,9 @@ GLOBAL_LIST_INIT(clash_medic_stripped_items, list(
 	if(affecting.status & LIMB_SPLINTED)
 		to_chat(user, SPAN_WARNING("[user == patient ? "Your" : "[patient]'s"] [affecting.display_name] is already splinted!"))
 		return
+	if(!(affecting.status & LIMB_BROKEN))
+		patient.balloon_alert(user, "no broken bones")
+		return
 	if(user == patient && ((!user.hand && (affecting.name in list("r_arm", "r_hand"))) || (user.hand && (affecting.name in list("l_arm", "l_hand")))))
 		to_chat(user, SPAN_WARNING("You can't apply a splint to the [affecting.name == "r_hand" || affecting.name == "l_hand" ? "hand" : "arm"] you're using!"))
 		return

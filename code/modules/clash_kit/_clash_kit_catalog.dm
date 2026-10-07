@@ -474,7 +474,8 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 	add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "AK-4047", /obj/item/weapon/gun/rifle/ak4047, "Big magazine, big kick", /obj/item/ammo_magazine/rifle/ak4047, 4)
 	add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "Type 64 submachine gun", /obj/item/weapon/gun/smg/bizon, "Fast handling, helical magazine", /obj/item/ammo_magazine/smg/bizon, 4)
 	add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "Type 23 shotgun", /obj/item/weapon/gun/shotgun/type23, "Wins the doorway. Heavy buckshot", /obj/item/ammo_magazine/shotgun/heavy/buckshot, 4)
-	add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "QYJ-72 machine gun", /obj/item/weapon/gun/pkp, "Belt fed. Open the feed cover to reload", /obj/item/ammo_magazine/pkp, 4)
+	var/datum/clash_kit_option/qyj = add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "QYJ-72 machine gun", /obj/item/weapon/gun/pkp, "Belt fed. Open the feed cover to reload", /obj/item/ammo_magazine/pkp, 4)
+	qyj.only_class = GLOB.clash_job_classes[JOB_UPP_SPECIALIST]
 	add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "M240A1 incinerator", /obj/item/weapon/gun/flamer/m240, "Burns out a room. Light the pilot first", /obj/item/ammo_magazine/flamer_tank, 4)
 	add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "Type 88 marksman rifle", /obj/item/weapon/gun/rifle/sniper/svd, "Semi auto, long reach", /obj/item/ammo_magazine/sniper/svd, 4)
 	add_clash_kit_option(faction, KIT_SLOT_SIDEARM, "Type 73 pistol", /obj/item/weapon/gun/pistol/t73, "Standard sidearm", /obj/item/ammo_magazine/pistol/t73, 3)

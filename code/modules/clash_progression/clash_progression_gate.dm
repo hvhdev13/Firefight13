@@ -263,7 +263,7 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 	return list(min(CLASH_SHOP_BASE + round(CLASH_SHOP_LEVEL_STEP * level), CLASH_SHOP_CAP), CLASH_SHOP_SNOWFLAKE_BASE + CLASH_SHOP_SNOWFLAKE_STEP * level)
 
 /proc/clash_filter_kit(datum/clash_kit/kit, ckey, job)
-	if(!kit || !clash_progression_gating())
+	if(!kit)
 		return kit
 	var/faction = clash_kit_faction_for_job(job)
 	var/list/starting = GLOB.clash_starting_kits[faction]

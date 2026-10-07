@@ -34,7 +34,7 @@
     "tdm_match_minutes": 8,
     "tdm_respawn_seconds": 15,
     "tdm_kill_limit": 40,
-    "tdm_koth_point_limit": 90,
+    "tdm_koth_point_limit": 200,
     "tdm_countdown_seconds": 20,
     "tdm_spawn_protection_seconds": 5
 }

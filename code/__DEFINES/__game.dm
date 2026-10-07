@@ -39,7 +39,7 @@
 #define MAP_TDM_KUTJEVO_MINI "TDM Kutjevo Mini"
 #define MAP_TDM_KUTJEVO_SUPERMINI "TDM Kutjevo Super Mini"
 #define MAP_TDM_DEATHMATCH2000 "TDM Deathmatch 2000"
-#define MAP_TDM_JUNGLE "TDM Jungle"
+#define MAP_TDM_FOREST "TDM Forest"
 #define MAP_ICE_COLONY_V3 "Shivas Snowball" //Ice Rework, low pop enabled.
 #define MAP_RUNTIME "USS Runtime"
 #define MAP_LV522_CHANCES_CLAIM "LV-522 Chance's Claim"

@@ -95,7 +95,7 @@ What players see on a timed move:
 ## Painted zones
 
 - Paint the zone's tiles with an objective zone area: `/area/clash_arena/<map>/battlefield/zone_1`
-  to `zone_6` (`<map>` is `tdm_deathmatch2000`, `tdm_jungle` or `tdm_kutjevo`). In StrongDMM they show
+  to `zone_6` (`<map>` is `tdm_deathmatch2000`, `tdm_forest` or `tdm_kutjevo`). In StrongDMM they show
   as yellow, green, purple, blue, red and dark yellow. In game they read "Objective Zone 1" and so on.
 - Put the usual marker (`koth_primary`, `domination_zone/a` ...) on a tile inside that area. The zone
   is then exactly the area's tiles and the marker's `radius` is ignored. The label sits on the marker.
@@ -164,7 +164,7 @@ when they are further than 7 tiles, so the radar works as a compass.
 - After the code adds or renames a marker type, close StrongDMM and reopen the `.dme` before saving
   any map. StrongDMM drops types it does not know when it saves.
 - Score limits and match counts are not markers: they stay in the map json (`maps/<name>.json`):
-  `tdm_koth_point_limit` (default 120), `tdm_domination_point_limit` (default 300),
+  `tdm_koth_point_limit` (default 200), `tdm_domination_point_limit` (default 300),
   `tdm_capture_limit` (default 3), `tdm_matches` (default 3).
 - The mode list a map can be voted for is the json `gamemodes` list. Only list modes the map can
   support.

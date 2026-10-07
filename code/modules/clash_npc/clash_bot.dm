@@ -228,8 +228,10 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 	return clear_shot(get_turf(candidate), candidate)
 
 /datum/clash_bot/proc/clear_shot(turf/aim, mob/candidate)
+	if(locate(/obj/structure/blocker/clash_gate) in get_turf(body))
+		return FALSE
 	for(var/turf/line_turf as anything in get_line(body, aim, include_start_atom = FALSE))
-		if(line_turf.density || line_turf.opacity)
+		if(line_turf.density || line_turf.opacity || (locate(/obj/structure/blocker/clash_gate) in line_turf))
 			return FALSE
 		for(var/obj/thing in line_turf)
 			if(thing.opacity || (thing.density && thing.projectile_coverage >= PROJECTILE_COVERAGE_HIGH && line_turf != aim))

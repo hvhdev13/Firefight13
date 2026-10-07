@@ -196,7 +196,7 @@
 /datum/game_mode/extended/faction_clash/hvh/tdm/objective/koth
 	name = GAMEMODE_KOTH
 	config_tag = GAMEMODE_KOTH
-	point_limit = 120
+	point_limit = 200
 	zone_count = 1
 	zone_radius = 3
 	var/list/hill_spots = list()

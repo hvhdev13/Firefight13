@@ -98,5 +98,5 @@ map tdm_deathmatch2000
 	default
 endmap
 
-map tdm_jungle
+map tdm_forest
 endmap
