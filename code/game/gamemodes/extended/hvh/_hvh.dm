@@ -14,8 +14,7 @@
 #define CLASH_VOTES_MAP 2
 #define CLASH_VOTES_DONE 3
 #define CLASH_INTERMISSION (30 SECONDS)
-#define CLASH_POSTROUND_TIME (2 MINUTES)
-#define CLASH_FINAL_REBOOT_DELAY (7 SECONDS)
+#define CLASH_FINAL_REBOOT_DELAY (15 SECONDS)
 #define CLASH_ASSIST_WINDOW (10 SECONDS)
 #define CLASH_SUPPRESSION_ASSIST_WINDOW (5 SECONDS)
 #define CLASH_KILL_SOUND 'sound/weapons/gun_xm88_directhit_high.ogg'
@@ -148,7 +147,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		. += "[unit] last [round_time_limit / 600] minutes. The first team to [kill_limit] kills wins, otherwise the most kills when time runs out."
 	else
 		. += "[unit] last [round_time_limit / 600] minutes. The team with the most kills wins."
-	if(matches_per_round == 1)
+	if(!arena_rules)
 		. += "The votes for the next mode and map open with [CLASH_VOTE_LEAD / 600] minutes left, or as soon as a team wins."
 
 /datum/game_mode/extended/faction_clash/hvh/proc/get_welcome_tagline()
@@ -215,7 +214,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	for(var/seconds_left in 1 to 3)
 		if(round_time_limit > seconds_left SECONDS)
 			addtimer(CALLBACK(src, PROC_REF(match_countdown_beep), match, FALSE), round_time_limit - seconds_left SECONDS)
-	if(match_number >= matches_per_round)
+	if(!arena_rules && match_number >= matches_per_round)
 		vote_timer_id = addtimer(CALLBACK(src, PROC_REF(start_round_votes)), max(1, round_time_limit - CLASH_VOTE_LEAD), TIMER_STOPPABLE)
 	if(!radar_timer_id)
 		start_clash_radar()
@@ -347,7 +346,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	return entry
 
 /datum/game_mode/extended/faction_clash/hvh/proc/get_score_maptext()
-	var/list/lines = get_objective_maptext()
+	var/list/lines = round_finished ? list() : get_objective_maptext()
 	return "<span style='vertical-align: top'>[lines.Join("<br>")]</span>"
 
 /datum/game_mode/extended/faction_clash/hvh/proc/get_scoreboard_data(mob/viewer)
@@ -836,7 +835,6 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	if(match_number < matches_per_round && (match_wins[FACTION_MARINE] || 0) < wins_needed() && (match_wins[FACTION_UPP] || 0) < wins_needed())
 		begin_intermission()
 		return
-	start_round_votes()
 	archive_match()
 	player_scores = round_scores
 	faction_kills = round_faction_kills
@@ -848,6 +846,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	update_score_huds()
 	log_debug("HVH: round result [round_finished]")
 	roundend_ceasefire()
+	start_round_votes()
 
 /datum/game_mode/extended/faction_clash/hvh/proc/record_career()
 	clash_progress_round_end()
@@ -1206,8 +1205,6 @@ GLOBAL_VAR(clash_start_mode)
 		return FALSE
 	if(!arena_rules)
 		return TRUE
-	if(world.time < round_finished_at + CLASH_POSTROUND_TIME)
-		return FALSE
 	return round_vote_stage == CLASH_VOTES_DONE || world.time >= round_finished_at + CLASH_REBOOT_HOLD_LIMIT
 
 /datum/game_mode/extended/faction_clash/hvh/proc/roundend_ceasefire()

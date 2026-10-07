@@ -61,9 +61,14 @@ GLOBAL_LIST_EMPTY(clash_score_panel_icons)
 	label.appearance_flags = RESET_COLOR|RESET_ALPHA|KEEP_APART
 	return label
 
+/datum/game_mode/extended/faction_clash/hvh/proc/get_panel_score(faction)
+	if(!round_finished)
+		return get_match_score(faction)
+	return matches_per_round > 1 ? (match_wins[faction] || 0) : get_round_tiebreak(faction)
+
 /datum/game_mode/extended/faction_clash/hvh/proc/build_score_panel()
-	var/uscm = get_match_score(FACTION_MARINE)
-	var/upp = get_match_score(FACTION_UPP)
+	var/uscm = get_panel_score(FACTION_MARINE)
+	var/upp = get_panel_score(FACTION_UPP)
 	var/uscm_alive = count_side(FACTION_MARINE)
 	var/upp_alive = count_side(FACTION_UPP)
 	var/limit = get_score_limit()
