@@ -16,6 +16,8 @@
 #define CLASH_OD_CRITICAL_DAMAGE 16
 #define CLASH_SHRAPNEL_SLOW 0.4
 #define CLASH_SHRAPNEL_SLOW_MAX 1.6
+#define CLASH_STABILIZED_TIME (15 SECONDS)
+#define CLASH_INTERNAL_TOXIN 60
 
 GLOBAL_LIST_INIT(clash_med_bursts, list(
 	"bicaridine" = list(5, 5, 0, 0, 0),
@@ -24,7 +26,6 @@ GLOBAL_LIST_INIT(clash_med_bursts, list(
 	"dermaline" = list(5, 0, 7, 0, 0),
 	"tricordrazine" = list(5, 5, 5, 2.5, 2.5),
 	"anti_toxin" = list(5, 0, 0, 5, 0),
-	"anti_toxin_plus" = list(1, 0, 0, 1000, 0),
 ))
 
 GLOBAL_LIST_INIT(clash_med_overdose, list(
@@ -62,11 +63,7 @@ GLOBAL_LIST_INIT(clash_medic_belt_stock, list(
 	/obj/item/stack/medical/splint = 2,
 	/obj/item/reagent_container/hypospray/autoinjector/oxycodone = 2,
 	/obj/item/reagent_container/hypospray/autoinjector/clash_tramadol = 1,
-	/obj/item/reagent_container/hypospray/autoinjector/adrenaline = 1,
-	/obj/item/reagent_container/hypospray/autoinjector/dexalinp = 1,
-	/obj/item/reagent_container/hypospray/autoinjector/clash_antitox = 1,
-	/obj/item/reagent_container/hypospray/autoinjector/inaprovaline = 1,
-	/obj/item/reagent_container/hypospray/autoinjector/peridaxon = 1,
+	/obj/item/reagent_container/hypospray/autoinjector/clash_fixall = 2,
 	/obj/item/device/defibrillator/compact = 1,
 	/obj/item/device/healthanalyzer = 1,
 ))
@@ -252,18 +249,24 @@ GLOBAL_LIST_INIT(clash_medic_stripped_items, list(
 			return TRUE
 	return FALSE
 
+/proc/clash_limb_bleeding(obj/limb/limb)
+	return locate(/datum/effects/bleeding/external) in limb.bleeding_effects_list
+
 /proc/clash_limb_needs_care(obj/limb/limb)
-	return !(limb.status & (LIMB_ROBOT|LIMB_SYNTHSKIN|LIMB_DESTROYED)) && (limb.brute_dam + limb.burn_dam > 0 || clash_limb_untreated(limb))
+	return !(limb.status & (LIMB_ROBOT|LIMB_SYNTHSKIN|LIMB_DESTROYED)) && (limb.brute_dam + limb.burn_dam > 0 || clash_limb_untreated(limb) || clash_limb_bleeding(limb))
 
 /proc/clash_treat_target(mob/living/carbon/human/patient, obj/limb/selected)
 	if(selected && clash_limb_needs_care(selected))
 		return selected
 	var/obj/limb/worst
+	var/worst_bleeding
 	for(var/obj/limb/limb as anything in patient.limbs)
 		if(limb.get_incision_depth() || !clash_limb_needs_care(limb))
 			continue
-		if(!worst || limb.brute_dam + limb.burn_dam > worst.brute_dam + worst.burn_dam)
+		var/bleeding = !!clash_limb_bleeding(limb)
+		if(!worst || bleeding > worst_bleeding || (bleeding == worst_bleeding && limb.brute_dam + limb.burn_dam > worst.brute_dam + worst.burn_dam))
 			worst = limb
+			worst_bleeding = bleeding
 	return worst || selected
 
 /proc/clash_splint_target(mob/living/carbon/human/patient, obj/limb/selected)
@@ -379,7 +382,7 @@ GLOBAL_LIST_INIT(clash_medic_stripped_items, list(
 /obj/item/reagent_container/hypospray/autoinjector/clash_heal
 	name = "healing injector"
 	chemname = "tricordrazine"
-	desc = "An EZ autoinjector loaded with 2 doses of 8u of Tricordrazine. Rapidly heals both wounds and burns. It does not require any training to use."
+	desc = "An EZ autoinjector loaded with 2 doses of 8u of Tricordrazine. Rapidly heals both wounds and burns, and stabilizes organs and blood loss for 15 seconds. It does not require any training to use."
 	icon_state = "emptyskill"
 	amount_per_transfer_from_this = 8
 	volume = 16
@@ -424,6 +427,227 @@ GLOBAL_LIST_INIT(clash_medic_stripped_items, list(
 	for(var/id in mix)
 		reagents.add_reagent(id, volume * mix[id] / parts)
 	update_icon()
+
+/obj/item/reagent_container/hypospray/autoinjector/clash_heal/attack(mob/M, mob/user)
+	. = ..()
+	if(. && ishuman(M) && clash_fast_medicine())
+		var/mob/living/carbon/human/patient = M
+		patient.apply_status_effect(/datum/status_effect/clash_stabilized)
+
+/obj/item/reagent_container/hypospray/autoinjector/clash_fixall
+	name = "Fix-all injector"
+	chemname = "clash_fixall"
+	desc = "A single dose for medics. Restores lost blood, heals the organs, eyes and brain, and clears oxygen and toxin damage. It does not mend bones or stop bleeding."
+	icon_state = "empty_research_oneuse"
+	autoinjector_type = "autoinjector_oneuse"
+	amount_per_transfer_from_this = 1
+	volume = 1
+	uses_left = 1
+	skilllock = SKILL_MEDICAL_MEDIC
+	injectSFX = 'sound/items/air_release.ogg'
+	display_maptext = TRUE
+	maptext_label = "FX"
+
+/obj/item/reagent_container/hypospray/autoinjector/clash_fixall/attack(mob/M, mob/user)
+	var/needed = ishuman(M) && clash_has_internal_injuries(M)
+	. = ..()
+	if(. && ishuman(M))
+		M.reagents.del_reagent("clash_fixall")
+		clash_fix_all(M, user)
+		if(needed)
+			clash_progress_fix_all(M, user)
+
+/datum/reagent/medical/clash_fixall
+	name = "Fix-all"
+	id = "clash_fixall"
+	description = "Restores lost blood, heals every internal organ and clears oxygen and toxin damage at once."
+	reagent_state = LIQUID
+	color = "#f2c230"
+	chemclass = CHEM_CLASS_SPECIAL
+
+/datum/reagent/medical/clash_fixall/on_mob_life(mob/living/M, alien, delta_time)
+	if(ishuman(M))
+		clash_fix_all(M)
+	holder.del_reagent(id)
+
+/proc/clash_fix_all(mob/living/carbon/human/patient, mob/living/carbon/human/medic)
+	var/before = patient.getOxyLoss() + patient.getToxLoss()
+	patient.blood_volume = max(patient.blood_volume, BLOOD_VOLUME_NORMAL)
+	for(var/datum/internal_organ/organ as anything in patient.internal_organs)
+		organ.rejuvenate()
+	patient.setOxyLoss(0)
+	patient.setToxLoss(0)
+	patient.SetEyeBlur(0)
+	patient.SetEyeBlind(0)
+	clash_heal_feedback(patient, medic, before)
+	clash_update_internal_injuries(patient)
+
+/datum/reagent/medical/clash_stabilizer
+	name = "Stabilizer"
+	id = "clash_stabilizer"
+	description = "Keeps damaged organs from acting up while a healing injector works."
+	reagent_state = LIQUID
+	color = "#d87f2b"
+	custom_metabolism = 0
+	chemclass = CHEM_CLASS_SPECIAL
+	properties = list(PROPERTY_ORGANSTABILIZE = 1)
+
+/datum/status_effect/clash_stabilized
+	id = "clash_stabilized"
+	duration = CLASH_STABILIZED_TIME
+	tick_interval = 2 DECISECONDS
+	status_type = STATUS_EFFECT_REFRESH
+	alert_type = /atom/movable/screen/alert/status_effect/clash_stabilized
+	var/oxy_floor
+	var/tox_floor
+	var/shown_seconds
+
+/datum/status_effect/clash_stabilized/on_apply()
+	oxy_floor = owner.getOxyLoss()
+	tox_floor = owner.getToxLoss()
+	owner.reagents.add_reagent("clash_stabilizer", 1)
+	return TRUE
+
+/datum/status_effect/clash_stabilized/tick(seconds_between_ticks)
+	if(!owner.reagents.has_reagent("clash_stabilizer"))
+		owner.reagents.add_reagent("clash_stabilizer", 1)
+	var/oxy = owner.getOxyLoss()
+	if(oxy > oxy_floor)
+		owner.setOxyLoss(oxy_floor)
+	else
+		oxy_floor = oxy
+	var/tox = owner.getToxLoss()
+	if(tox > tox_floor)
+		owner.setToxLoss(tox_floor)
+	else
+		tox_floor = tox
+	update_alert()
+
+/datum/status_effect/clash_stabilized/on_remove()
+	owner.reagents?.del_reagent("clash_stabilizer")
+	var/mob/living/carbon/human/patient = owner
+	if(istype(patient))
+		patient.chem_effect_flags &= ~CHEM_EFFECT_ORGAN_STASIS
+
+/datum/status_effect/clash_stabilized/proc/update_alert()
+	var/seconds = ceil((duration - world.time) / (1 SECONDS))
+	if(!linked_alert || seconds == shown_seconds)
+		return
+	shown_seconds = seconds
+	linked_alert.maptext = "<span style='text-align: right; -dm-text-outline: 1px #0a0c0f; font-family: \"VCR OSD Mono\"; font-size: 8px; color: #ffffff'>[seconds]</span>"
+
+/atom/movable/screen/alert/status_effect/clash_stabilized
+	name = "Stabilized"
+	desc = "Organs and blood loss stabilized"
+	icon_state = "template"
+	maptext_width = 30
+	maptext_height = 10
+	maptext_y = 1
+
+/atom/movable/screen/alert/status_effect/clash_stabilized/Initialize(mapload, ...)
+	. = ..()
+	clash_injector_overlay(src, "emptyskill", "autoinjector_2", "#d87f2b")
+
+/atom/movable/screen/alert/clash_internal
+	name = "Internal injuries"
+	desc = "A medic's Fix-all injector can fix this."
+	icon_state = "template"
+
+/atom/movable/screen/alert/clash_internal/Initialize(mapload, ...)
+	. = ..()
+	clash_injector_overlay(src, "empty_research_oneuse", "autoinjector_oneuse_1", "#f2c230")
+
+/proc/clash_injector_overlay(atom/movable/screen/alert/alert, body_state, fill_state, fill_color)
+	var/image/filling = image('icons/obj/items/syringe.dmi', fill_state)
+	filling.color = fill_color
+	alert.overlays += image('icons/obj/items/syringe.dmi', body_state)
+	alert.overlays += filling
+
+/proc/clash_has_internal_injuries(mob/living/carbon/human/patient)
+	if(patient.stat == DEAD || (patient.species.flags & IS_SYNTHETIC))
+		return FALSE
+	if(patient.blood_volume <= BLOOD_VOLUME_SAFE || patient.getToxLoss() >= CLASH_INTERNAL_TOXIN)
+		return TRUE
+	for(var/organ_name in list("lungs", "brain", "eyes"))
+		var/datum/internal_organ/organ = patient.internal_organs_by_name[organ_name]
+		if(organ?.organ_status >= ORGAN_BRUISED)
+			return TRUE
+	for(var/organ_name in list("liver", "kidneys"))
+		var/datum/internal_organ/organ = patient.internal_organs_by_name[organ_name]
+		if(organ?.organ_status >= ORGAN_BROKEN)
+			return TRUE
+	return FALSE
+
+/proc/clash_update_internal_injuries(mob/living/carbon/human/patient)
+	if(!clash_is_bot(patient) && clash_has_internal_injuries(patient))
+		clash_status_add(patient, /datum/clash_status/internal_injuries)
+		patient.throw_alert("clash_internal", /atom/movable/screen/alert/clash_internal)
+		return
+	clash_status_remove(patient, /datum/clash_status/internal_injuries)
+	patient.clear_alert("clash_internal")
+
+/proc/clash_check_internal_injuries()
+	for(var/mob/living/carbon/human/fighter as anything in GLOB.alive_human_list)
+		clash_update_internal_injuries(fighter)
+	for(var/mob/living/carbon/human/fighter as anything in GLOB.clash_status_holders)
+		if(fighter.stat == DEAD)
+			clash_update_internal_injuries(fighter)
+
+/obj/limb/chest/remove_wound_bleeding()
+	if(!clash_fast_medicine())
+		return ..()
+
+/obj/limb/groin/remove_wound_bleeding()
+	if(!clash_fast_medicine())
+		return ..()
+
+/obj/limb/head/remove_wound_bleeding()
+	if(!clash_fast_medicine())
+		return ..()
+
+/obj/limb/arm/remove_wound_bleeding()
+	if(!clash_fast_medicine())
+		return ..()
+
+/obj/limb/hand/remove_wound_bleeding()
+	if(!clash_fast_medicine())
+		return ..()
+
+/obj/limb/leg/remove_wound_bleeding()
+	if(!clash_fast_medicine())
+		return ..()
+
+/obj/limb/foot/remove_wound_bleeding()
+	if(!clash_fast_medicine())
+		return ..()
+
+/obj/limb/chest/eschar()
+	if(!clash_fast_medicine())
+		return ..()
+
+/obj/limb/groin/eschar()
+	if(!clash_fast_medicine())
+		return ..()
+
+/obj/limb/head/eschar()
+	if(!clash_fast_medicine())
+		return ..()
+
+/obj/limb/arm/eschar()
+	if(!clash_fast_medicine())
+		return ..()
+
+/obj/limb/hand/eschar()
+	if(!clash_fast_medicine())
+		return ..()
+
+/obj/limb/leg/eschar()
+	if(!clash_fast_medicine())
+		return ..()
+
+/obj/limb/foot/eschar()
+	if(!clash_fast_medicine())
+		return ..()
 
 /obj/item/storage/pouch/firstaid/clash
 	desc = "A first-aid pouch with a healing injector, a tramadol injector, field dressings and splints."
@@ -474,17 +698,6 @@ GLOBAL_LIST_INIT(clash_medic_stripped_items, list(
 /obj/item/storage/belt/medical/lifesaver/upp/arena/fill_preset_inventory()
 	clash_fill_arena()
 
-/datum/reagent/medical/anti_toxin_plus
-	name = "Dylovene Plus"
-	id = "anti_toxin_plus"
-	description = "A fast form of Dylovene. One unit immediately clears every toxin from the body."
-	reagent_state = LIQUID
-	color = "#8fe03a"
-	overdose = LOWH_REAGENTS_OVERDOSE
-	overdose_critical = LOWH_REAGENTS_OVERDOSE_CRITICAL
-	chemclass = CHEM_CLASS_SPECIAL
-	properties = list(PROPERTY_ANTITOXIC = 2)
-
 /obj/item/storage/pouch/pressurized_reagent_canister/clash_unga
 	name = "Pressurized Reagent Canister Pouch (UNGA)"
 	desc = "A pressurized reagent canister pouch. It is used to refill custom injectors, and can also store one. May be refilled with a reagent tank or a Chemical Dispenser. This one came pre-filled with UNGA mix: bicaridine, kelotane, tricordrazine, meralyne, dermaline and oxycodone."
@@ -502,15 +715,6 @@ GLOBAL_LIST_INIT(clash_medic_stripped_items, list(
 	injector?.update_uses_left()
 	injector?.update_icon()
 	update_icon()
-
-/obj/item/reagent_container/hypospray/autoinjector/clash_antitox
-	name = "dylovene plus autoinjector"
-	chemname = "anti_toxin_plus"
-	desc = "Three 1u doses of Dylovene Plus. Each one clears every toxin from the body at once."
-	amount_per_transfer_from_this = 1
-	volume = 3
-	display_maptext = TRUE
-	maptext_label = "Dy+"
 
 /obj/item/storage/firstaid/regular/fill_preset_inventory()
 	if(!clash_fast_medicine())
@@ -557,3 +761,5 @@ GLOBAL_LIST_INIT(clash_medic_stripped_items, list(
 #undef CLASH_BURST_OXY
 #undef CLASH_SHRAPNEL_SLOW
 #undef CLASH_SHRAPNEL_SLOW_MAX
+#undef CLASH_STABILIZED_TIME
+#undef CLASH_INTERNAL_TOXIN

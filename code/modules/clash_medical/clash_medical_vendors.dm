@@ -9,6 +9,11 @@ GLOBAL_LIST_INIT(clash_arena_med_removed, list(
 	/obj/item/storage/belt/medical/full,
 	/obj/item/storage/belt/medical/lifesaver,
 	/obj/item/storage/belt/medical/lifesaver/upp,
+	/obj/item/reagent_container/hypospray/autoinjector/adrenaline,
+	/obj/item/reagent_container/hypospray/autoinjector/dexalinp,
+	/obj/item/reagent_container/hypospray/autoinjector/antitoxin,
+	/obj/item/reagent_container/hypospray/autoinjector/inaprovaline,
+	/obj/item/reagent_container/hypospray/autoinjector/peridaxon,
 ))
 
 GLOBAL_LIST_INIT(clash_arena_med_removed_families, list(
@@ -36,9 +41,14 @@ GLOBAL_LIST_INIT(clash_arena_med_swaps, list(
 	/obj/item/reagent_container/hypospray/autoinjector/meralyne = list("Healing Injector", /obj/item/reagent_container/hypospray/autoinjector/clash_heal),
 	/obj/item/reagent_container/hypospray/autoinjector/dermaline = list("Healing Injector", /obj/item/reagent_container/hypospray/autoinjector/clash_heal),
 	/obj/item/reagent_container/hypospray/autoinjector/tramadol = list("Tramadol Injector", /obj/item/reagent_container/hypospray/autoinjector/clash_tramadol),
-	/obj/item/reagent_container/hypospray/autoinjector/antitoxin = list("Dylovene+ Injector", /obj/item/reagent_container/hypospray/autoinjector/clash_antitox),
 	/obj/item/reagent_container/hypospray/autoinjector/tramadol/skillless = list("Tramadol Injector", /obj/item/reagent_container/hypospray/autoinjector/clash_tramadol),
 	/obj/item/reagent_container/hypospray/autoinjector/skillless/tramadol = list("Tramadol Injector", /obj/item/reagent_container/hypospray/autoinjector/clash_tramadol),
+	/obj/item/storage/pouch/pressurized_reagent_canister/revival_tricord = list("Pressurized Reagent Canister Pouch (UNGA)", /obj/item/storage/pouch/pressurized_reagent_canister/clash_unga),
+	/obj/item/storage/pouch/pressurized_reagent_canister/revival_peri = list("Pressurized Reagent Canister Pouch (UNGA)", /obj/item/storage/pouch/pressurized_reagent_canister/clash_unga),
+	/obj/item/storage/pouch/pressurized_reagent_canister/bicaridine = list("Pressurized Reagent Canister Pouch (UNGA)", /obj/item/storage/pouch/pressurized_reagent_canister/clash_unga),
+	/obj/item/storage/pouch/pressurized_reagent_canister/kelotane = list("Pressurized Reagent Canister Pouch (UNGA)", /obj/item/storage/pouch/pressurized_reagent_canister/clash_unga),
+	/obj/item/storage/pouch/pressurized_reagent_canister/tricordrazine = list("Pressurized Reagent Canister Pouch (UNGA)", /obj/item/storage/pouch/pressurized_reagent_canister/clash_unga),
+	/obj/item/storage/pouch/pressurized_reagent_canister/oxycodone = list("Pressurized Reagent Canister Pouch (UNGA)", /obj/item/storage/pouch/pressurized_reagent_canister/clash_unga),
 ))
 
 GLOBAL_LIST_INIT(clash_arena_medic_only, list(
@@ -53,10 +63,6 @@ GLOBAL_LIST_INIT(clash_arena_crate_swaps, list(
 	/obj/item/storage/pill_bottle/bicaridine = /obj/item/reagent_container/hypospray/autoinjector/clash_heal,
 	/obj/item/storage/pill_bottle/kelotane = /obj/item/reagent_container/hypospray/autoinjector/clash_heal,
 	/obj/item/storage/pill_bottle/tramadol = /obj/item/reagent_container/hypospray/autoinjector/clash_tramadol,
-	/obj/item/storage/pill_bottle/inaprovaline = /obj/item/reagent_container/hypospray/autoinjector/inaprovaline,
-	/obj/item/storage/pill_bottle/antitox = /obj/item/reagent_container/hypospray/autoinjector/clash_antitox,
-	/obj/item/storage/pill_bottle/dexalin = /obj/item/reagent_container/hypospray/autoinjector/dexalinp,
-	/obj/item/storage/pill_bottle/peridaxon = /obj/item/reagent_container/hypospray/autoinjector/peridaxon,
 	/obj/item/storage/firstaid/fire = /obj/item/storage/firstaid/regular,
 	/obj/item/storage/firstaid/o2 = /obj/item/storage/firstaid/regular,
 	/obj/item/storage/firstaid/toxin = /obj/item/storage/firstaid/regular,
@@ -66,6 +72,15 @@ GLOBAL_LIST_INIT(clash_arena_crate_removed, list(
 	/obj/item/storage/box/pillbottles,
 	/obj/item/storage/box/syringes,
 	/obj/item/reagent_container/glass/bottle,
+	/obj/item/storage/pill_bottle/inaprovaline,
+	/obj/item/storage/pill_bottle/antitox,
+	/obj/item/storage/pill_bottle/dexalin,
+	/obj/item/storage/pill_bottle/peridaxon,
+	/obj/item/reagent_container/hypospray/autoinjector/adrenaline,
+	/obj/item/reagent_container/hypospray/autoinjector/dexalinp,
+	/obj/item/reagent_container/hypospray/autoinjector/antitoxin,
+	/obj/item/reagent_container/hypospray/autoinjector/inaprovaline,
+	/obj/item/reagent_container/hypospray/autoinjector/peridaxon,
 ))
 
 /proc/clash_arena_med_supply()
@@ -154,11 +169,6 @@ GLOBAL_LIST_INIT(clash_arena_crate_removed, list(
 		list("UNGA Injector", floor(scale * 10), /obj/item/reagent_container/hypospray/autoinjector/clash_unga, VENDOR_ITEM_REGULAR),
 		list("Tramadol Injector", floor(scale * 15), /obj/item/reagent_container/hypospray/autoinjector/clash_tramadol, VENDOR_ITEM_REGULAR),
 		list("Autoinjector (Oxycodone)", floor(scale * 15), /obj/item/reagent_container/hypospray/autoinjector/oxycodone, VENDOR_ITEM_REGULAR),
-		list("Autoinjector (Epinephrine)", floor(scale * 15), /obj/item/reagent_container/hypospray/autoinjector/adrenaline, VENDOR_ITEM_REGULAR),
-		list("Autoinjector (Dexalin+)", floor(scale * 15), /obj/item/reagent_container/hypospray/autoinjector/dexalinp, VENDOR_ITEM_REGULAR),
-		list("Autoinjector (Dylovene+)", floor(scale * 15), /obj/item/reagent_container/hypospray/autoinjector/clash_antitox, VENDOR_ITEM_REGULAR),
-		list("Autoinjector (Inaprovaline)", floor(scale * 15), /obj/item/reagent_container/hypospray/autoinjector/inaprovaline, VENDOR_ITEM_REGULAR),
-		list("Autoinjector (Peridaxon)", floor(scale * 15), /obj/item/reagent_container/hypospray/autoinjector/peridaxon, VENDOR_ITEM_REGULAR),
 
 		list("MEDICAL UTILITIES", -1, null, null),
 		list("Emergency Defibrillator", floor(scale * 9), /obj/item/device/defibrillator, VENDOR_ITEM_REGULAR),
@@ -172,11 +182,13 @@ GLOBAL_LIST_INIT(clash_wey_med_refills, list(
 	/obj/item/reagent_container/hypospray/autoinjector/clash_heal,
 	/obj/item/reagent_container/hypospray/autoinjector/clash_tramadol,
 	/obj/item/reagent_container/hypospray/autoinjector/oxycodone,
-	/obj/item/reagent_container/hypospray/autoinjector/adrenaline,
-	/obj/item/reagent_container/hypospray/autoinjector/dexalinp,
-	/obj/item/reagent_container/hypospray/autoinjector/clash_antitox,
-	/obj/item/reagent_container/hypospray/autoinjector/inaprovaline,
-	/obj/item/reagent_container/hypospray/autoinjector/peridaxon,
+))
+
+GLOBAL_LIST_INIT(clash_medic_shop, list(
+	list("MEDIC SUPPLIES", 0, null, null, null),
+	list("Fix-all Injector", 8, /obj/item/reagent_container/hypospray/autoinjector/clash_fixall, null, VENDOR_ITEM_RECOMMENDED),
+	list("Reagent Canister Pouch (Empty)", 5, /obj/item/storage/pouch/pressurized_reagent_canister, null, VENDOR_ITEM_REGULAR),
+	list("Reagent Canister Pouch (UNGA)", 10, /obj/item/storage/pouch/pressurized_reagent_canister/clash_unga, null, VENDOR_ITEM_REGULAR),
 ))
 
 /obj/structure/machinery/cm_vending/sorted/medical/arena

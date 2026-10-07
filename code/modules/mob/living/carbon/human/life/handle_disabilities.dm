@@ -6,7 +6,7 @@
 			stuttering = max(10, stuttering)
 			return
 
-	if(stat != DEAD)
+	if(stat != DEAD && !has_status_effect(/datum/status_effect/clash_stabilized))
 		var/roll = rand(0, 200)
 		switch(roll)
 			if(0 to 3)

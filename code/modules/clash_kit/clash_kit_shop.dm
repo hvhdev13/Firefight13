@@ -86,7 +86,10 @@ GLOBAL_LIST_INIT(clash_shop_counterparts, list(
 		by_id["[ammo_type]"] = item
 	if(length(ammo_items))
 		sections += list(list("name" = "Weapon ammo", "items" = ammo_items))
-	for(var/list/source in get_clash_shop_sources(job))
+	var/list/sources = get_clash_shop_sources(job)
+	if(clash_job_is_medic(job))
+		sources += list(list(GLOB.clash_medic_shop, CLASH_SHOP_POINTS))
+	for(var/list/source in sources)
 		var/list/section
 		for(var/list/listed in source[1])
 			var/list/entry = clash_arena_med_entry(listed, clash_job_is_medic(job), FALSE)
