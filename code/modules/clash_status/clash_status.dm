@@ -1,5 +1,6 @@
 #define CLASH_STATUS_EVERYONE "everyone"
 #define CLASH_STATUS_TEAM "team"
+#define CLASH_STATUS_MEDIC "medic"
 #define CLASH_STATUS_X 24
 #define CLASH_STATUS_TOP_Y 8
 #define CLASH_STATUS_STEP 8
@@ -33,6 +34,21 @@ GLOBAL_LIST_INIT(clash_statuses, build_clash_statuses())
 		"...o...",
 	)
 	palette = list("o" = rgb(10, 12, 15, 230), "R" = rgb(225, 55, 45))
+
+/datum/clash_status/internal_injuries
+	name = "Needs Fix-all"
+	priority = 2
+	audience = CLASH_STATUS_MEDIC
+	pattern = list(
+		".oo.oo.",
+		"oPPoPPo",
+		"oPPPPPo",
+		"oPPPPPo",
+		".oPPPo.",
+		"..oPo..",
+		"...o...",
+	)
+	palette = list("o" = rgb(10, 12, 15, 230), "P" = rgb(235, 90, 160))
 
 /proc/build_clash_statuses()
 	. = list()
@@ -81,7 +97,7 @@ GLOBAL_LIST_INIT(clash_statuses, build_clash_statuses())
 	var/list/visible = list()
 	for(var/status_type in active)
 		var/datum/clash_status/status = GLOB.clash_statuses[status_type]
-		if(view == CLASH_STATUS_TEAM || status.audience == CLASH_STATUS_EVERYONE)
+		if(status.audience == CLASH_STATUS_EVERYONE || status.audience == view || (view == CLASH_STATUS_MEDIC && status.audience == CLASH_STATUS_TEAM))
 			visible += status
 	sortTim(visible, GLOBAL_PROC_REF(cmp_clash_status_priority))
 	var/slot = 0
@@ -95,10 +111,10 @@ GLOBAL_LIST_INIT(clash_statuses, build_clash_statuses())
 		slot++
 
 /datum/clash_status_holder/proc/refresh()
-	var/list/layouts = list(CLASH_STATUS_TEAM = layout(CLASH_STATUS_TEAM), CLASH_STATUS_EVERYONE = layout(CLASH_STATUS_EVERYONE))
+	var/list/layouts = list(CLASH_STATUS_MEDIC = layout(CLASH_STATUS_MEDIC), CLASH_STATUS_TEAM = layout(CLASH_STATUS_TEAM), CLASH_STATUS_EVERYONE = layout(CLASH_STATUS_EVERYONE))
 	for(var/key in images)
 		var/image/badge = images[key]
-		if(!(badge in layouts[CLASH_STATUS_TEAM]) && !(badge in layouts[CLASH_STATUS_EVERYONE]))
+		if(!(badge in layouts[CLASH_STATUS_MEDIC]) && !(badge in layouts[CLASH_STATUS_TEAM]) && !(badge in layouts[CLASH_STATUS_EVERYONE]))
 			badge.alpha = 0
 	for(var/client/viewer as anything in GLOB.clients)
 		show_to(viewer, layouts[clash_status_view(viewer, target)])
@@ -119,8 +135,10 @@ GLOBAL_LIST_INIT(clash_statuses, build_clash_statuses())
 	return first.priority - second.priority
 
 /proc/clash_status_view(client/viewer, mob/living/carbon/human/target)
-	if(isobserver(viewer.mob) || viewer.mob.faction == target.faction)
+	if(isobserver(viewer.mob))
 		return CLASH_STATUS_TEAM
+	if(viewer.mob.faction == target.faction)
+		return ishuman(viewer.mob) && clash_is_medic(viewer.mob) ? CLASH_STATUS_MEDIC : CLASH_STATUS_TEAM
 	return CLASH_STATUS_EVERYONE
 
 /proc/clash_status_has(mob/living/carbon/human/target, status_type)
@@ -167,6 +185,7 @@ SUBSYSTEM_DEF(clash_status)
 
 #undef CLASH_STATUS_EVERYONE
 #undef CLASH_STATUS_TEAM
+#undef CLASH_STATUS_MEDIC
 #undef CLASH_STATUS_X
 #undef CLASH_STATUS_TOP_Y
 #undef CLASH_STATUS_STEP

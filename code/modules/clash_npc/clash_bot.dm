@@ -366,7 +366,7 @@ GLOBAL_VAR_INIT(clash_bots_enabled, TRUE)
 
 /datum/clash_bot/proc/find_medicine()
 	for(var/obj/item/reagent_container/hypospray/autoinjector/shot in body.get_contents())
-		if(shot.uses_left > 0)
+		if(shot.uses_left > 0 && !istype(shot, /obj/item/reagent_container/hypospray/autoinjector/clash_fixall))
 			return shot
 	for(var/obj/item/stack/medical/dressing in body.get_contents())
 		return dressing

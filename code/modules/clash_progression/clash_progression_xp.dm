@@ -451,6 +451,10 @@
 	patient.clash_surgery_xp += CLASH_XP_SURGERY
 	clash_award_support_xp(user, CLASH_XP_SURGERY, CLASH_XP_SOURCE_SURGERY, CLASH_XP_SOURCE_HEALING, CLASH_XP_MEDICAL_CAP)
 
+/proc/clash_progress_fix_all(mob/living/carbon/human/patient, mob/living/carbon/human/medic)
+	if(clash_care_snapshot(patient, medic))
+		clash_award_support_xp(medic, CLASH_XP_FIX_ALL, CLASH_XP_SOURCE_FIX_ALL, CLASH_XP_SOURCE_HEALING, CLASH_XP_MEDICAL_CAP)
+
 /proc/clash_note_barricade_builder(obj/structure/barricade/barricade, mob/living/carbon/human/builder)
 	if(!ishuman(builder) || builder.statistic_exempt || !(builder.mind?.ckey || builder.ckey) || GLOB.clash_job_classes[builder.job] != CLASH_CLASS_ENGINEER)
 		return
