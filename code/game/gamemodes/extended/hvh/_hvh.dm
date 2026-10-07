@@ -159,6 +159,8 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	GLOB.round_should_check_for_win = FALSE
 	restrict_uscm_squads()
 	unlock_upp_job_slots()
+	if(arena_rules)
+		unlock_uscm_arena_slots()
 
 /datum/game_mode/extended/faction_clash/hvh/proc/restrict_uscm_squads()
 	for(var/datum/squad/squad as anything in GLOB.RoleAuthority.squads)
@@ -179,6 +181,20 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		job.total_positions = -1
 		job.spawn_positions = -1
 		log_debug("HVH: [title] slots unlocked")
+
+/datum/game_mode/extended/faction_clash/hvh/proc/unlock_uscm_arena_slots()
+	for(var/title in GLOB.clash_arena_roles)
+		var/datum/job/job = GLOB.RoleAuthority.roles_by_name[title]
+		if(!job || job.total_positions == -1 || clash_kit_faction_for_job(title) != FACTION_MARINE)
+			continue
+		clamped_jobs[job] = list(job.total_positions, job.spawn_positions)
+		job.total_positions = -1
+		job.spawn_positions = -1
+		log_debug("HVH: [title] slots unlocked")
+	for(var/datum/squad/squad as anything in GLOB.RoleAuthority.squads)
+		if(squad.name in CLASH_USCM_SQUADS)
+			for(var/role in squad.roles_cap)
+				squad.roles_cap[role] = null
 
 /datum/game_mode/extended/faction_clash/hvh/proc/restore_upp_job_slots()
 	for(var/datum/job/job as anything in clamped_jobs)
@@ -606,7 +622,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		entry["assists"] += 1
 		clash_progress_assist(hit)
 		. += name
-	if(!killer_name)
+	if(!killer_name || !attackers?[killer_name])
 		return
 	for(var/name in suppressors)
 		var/list/heavy = suppressors[name]

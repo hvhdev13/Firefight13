@@ -28,6 +28,8 @@
 	max_range = 17
 	accurate_range = 12
 	effective_range_max = 12
+	penetration = max(penetration, ARMOR_PENETRATION_TIER_2)
+	damage -= 1
 
 /datum/ammo/bullet/smartgun/armor_piercing
 	name = "\improper AP smartgun tracer bullet"
@@ -39,6 +41,10 @@
 	damage = 20
 	penetration = ARMOR_PENETRATION_TIER_8
 	damage_armor_punch = 1
+
+/datum/ammo/bullet/smartgun/armor_piercing/setup_faction_clash_values()
+	. = ..()
+	damage = 7
 
 /datum/ammo/bullet/smartgun/armor_piercing/alt
 	name = "\improper AP smartgun bullet"
@@ -252,6 +258,10 @@
 	else if(SSticker.current_state < GAME_STATE_PLAYING)
 		RegisterSignal(SSdcs, COMSIG_GLOB_MODE_PRESETUP, PROC_REF(setup_hvh_damage))
 
+/datum/ammo/bullet/minigun/setup_faction_clash_values()
+	. = ..()
+	effective_range_max = 8
+
 /datum/ammo/bullet/minigun/proc/setup_hvh_damage()
 	SIGNAL_HANDLER
 	if(MODE_HAS_FLAG(MODE_FACTION_CLASH))
@@ -284,3 +294,4 @@
 /datum/ammo/bullet/pkp/setup_faction_clash_values()
 	. = ..()
 	accurate_range = 14
+	damage -= 1

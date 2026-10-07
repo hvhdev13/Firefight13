@@ -94,6 +94,7 @@
 		target.clash_cowering = TRUE
 		target.clash_cower_tick()
 	clash_note_suppression(target, shooter, value - previous, value)
+	return TRUE
 
 /proc/clash_suppression_screen(mob/living/carbon/human/target, previous, value, hold, fade)
 	var/atom/movable/screen/fullscreen/screen = target.overlay_fullscreen("clash_suppression", /atom/movable/screen/fullscreen/clash_suppression, clamp(CEILING(value / 34, 1), 1, 3))
@@ -190,8 +191,8 @@
 		if(along < 1 || along > reach)
 			continue
 		if(abs(offset_x * line_y - offset_y * line_x) / length <= radius)
-			clash_suppress(target, amount, shooter)
-			target.clash_near_miss_cue()
+			if(clash_suppress(target, amount, shooter))
+				target.clash_near_miss_cue()
 
 /datum/element/clash_suppression
 
