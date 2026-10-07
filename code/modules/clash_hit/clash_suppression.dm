@@ -21,8 +21,6 @@
 #define CLASH_SUPPRESSION_SLOW 0.25
 #define CLASH_SPOTTER_THRESHOLD 50
 #define CLASH_SPOTTER_TIME (3 SECONDS)
-#define CLASH_COWER_SQUASH 0.05
-#define CLASH_COWER_SQUASH_STEP 0.01
 #define CLASH_SUPPRESSED_STATUS 50
 #define CLASH_COWER_JITTER 50
 #define CLASH_COWER_JITTER_PIXELS 2
@@ -38,7 +36,6 @@
 /mob/living/carbon/human/var/clash_spotted_until = 0
 /mob/living/carbon/human/var/clash_spotted_faction
 /mob/living/carbon/human/var/clash_cowering = FALSE
-/mob/living/carbon/human/var/clash_cower_squash = 0
 /mob/living/carbon/human/var/clash_cower_w = 0
 /mob/living/carbon/human/var/clash_dip_ready = 0
 
@@ -130,23 +127,16 @@
 /mob/living/carbon/human/proc/clash_cower_tick()
 	var/level = clash_suppression_now(src)
 	var/upright = stat == CONSCIOUS && body_position != LYING_DOWN
-	var/squash = upright ? round(CLASH_COWER_SQUASH * level / CLASH_SUPPRESSION_MAX, CLASH_COWER_SQUASH_STEP) : 0
 	var/jitter = upright && level >= CLASH_COWER_JITTER ? (clash_cower_w > 0 ? -CLASH_COWER_JITTER_PIXELS : CLASH_COWER_JITTER_PIXELS) : 0
 	recalculate_move_delay = TRUE
 	if(level >= CLASH_SUPPRESSED_STATUS && stat != DEAD)
 		clash_status_add(src, /datum/clash_status/suppressed)
 	else
 		clash_status_remove(src, /datum/clash_status/suppressed)
-	if(squash != clash_cower_squash)
-		var/matrix/hunch = matrix()
-		hunch.Scale(1, 1 - squash)
-		hunch.Translate(0, -world.icon_size / 2 * squash)
-		update_base_transform(hunch, CLASH_COWER_STEP)
-		clash_cower_squash = squash
 	if(jitter != clash_cower_w)
 		animate(src, pixel_w = jitter - clash_cower_w, time = CLASH_COWER_STEP, flags = ANIMATION_PARALLEL|ANIMATION_RELATIVE)
 		clash_cower_w = jitter
-	if(level <= 0 && !squash && !jitter)
+	if(level <= 0 && !jitter)
 		clash_cowering = FALSE
 		return
 	addtimer(CALLBACK(src, PROC_REF(clash_cower_tick)), CLASH_COWER_STEP)
@@ -280,8 +270,6 @@
 #undef CLASH_SUPPRESSION_SLOW
 #undef CLASH_SPOTTER_THRESHOLD
 #undef CLASH_SPOTTER_TIME
-#undef CLASH_COWER_SQUASH
-#undef CLASH_COWER_SQUASH_STEP
 #undef CLASH_SUPPRESSED_STATUS
 #undef CLASH_COWER_JITTER
 #undef CLASH_COWER_JITTER_PIXELS

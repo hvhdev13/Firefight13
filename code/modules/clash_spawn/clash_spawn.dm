@@ -213,3 +213,18 @@ SUBSYSTEM_DEF(clash_spawn)
 		return
 	fighter.assigned_squad.remove_marine_from_squad(fighter)
 	target.put_marine_in_squad(fighter)
+
+/datum/job/announce_entry_message(mob/living/carbon/human/new_human, datum/money_account/account, whitelist_status)
+	set waitfor = FALSE
+	if(!clash_uses_kits())
+		return ..()
+	sleep(1 SECONDS)
+	if(!new_human?.loc || !new_human.client)
+		return
+	var/role_name = clash_role_name(title)
+	to_chat_spaced(new_human, html = boxed_message("\
+		[SPAN_ROLE_BODY("|______________________|")] \n\
+		[SPAN_ROLE_HEADER("You are \a [lowertext(role_name)]")] \n\
+		[SPAN_ROLE_BODY("You are the [role_name]!")] \n\
+		[SPAN_ROLE_BODY("|______________________|")] \
+	"))
