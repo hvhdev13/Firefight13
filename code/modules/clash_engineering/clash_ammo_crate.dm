@@ -199,7 +199,12 @@ GLOBAL_LIST_EMPTY(clash_engineer_crates)
 	var/obj/item/ammo_magazine/loaded = gun.current_mag
 	if(istype(loaded, /obj/item/ammo_magazine/internal))
 		var/obj/item/ammo_magazine/handful/shells = new
-		shells.generate_handful(loaded.default_ammo, loaded.caliber, 5, gun.type)
+		var/datum/ammo/bullet = GLOB.ammo_list[loaded.default_ammo]
+		var/count = 5
+		while(count > 1 && !icon_exists(shells.icon, "[bullet.handful_state]_[count]"))
+			count--
+		shells.generate_handful(loaded.default_ammo, loaded.caliber, count, gun.type)
+		shells.max_rounds = count
 		return shells
 	var/mag_type = loaded ? loaded.type : initial(gun.current_mag)
 	if(!ispath(mag_type, /obj/item/ammo_magazine) || GLOB.faction_clash_restricted_items[mag_type])

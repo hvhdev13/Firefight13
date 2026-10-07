@@ -152,7 +152,7 @@ GLOBAL_DATUM_INIT(clash_progression_admin, /datum/clash_progression_admin, new)
 			var/lock
 			if(spawned.choices[slot] != option.id)
 				var/datum/clash_kit_option/replacement = spawned.get_option(slot)
-				var/slot_gun = clash_is_sidearm_attachment_slot(slot) ? clash_effective_sidearm(spawned, job) : gun_type
+				var/slot_gun = clash_is_attachment_slot(slot) ? clash_kit_slot_gun(spawned, job, slot) : gun_type
 				lock = "[clash_option_lock_text(ckey, option.id, job, slot_gun) || "Does not fit the gun"], spawns with [replacement ? replacement.name : "nothing"]"
 			picks += list(list("slot" = GLOB.clash_kit_slots[slot]["name"], "name" = option.name, "lock" = lock))
 		kit_rows += list(list("name" = kit.name, "active" = index == active, "picks" = picks, "extras" = length(kit.extras)))

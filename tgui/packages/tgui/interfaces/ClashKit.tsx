@@ -47,6 +47,7 @@ interface IssueItem {
   type?: string;
   icon: string;
   icon_state: string;
+  fixed?: BooleanLike;
 }
 
 interface PackItem {
@@ -81,9 +82,29 @@ interface Extra {
   status: 'ok' | 'room' | 'points' | 'gone' | 'locked' | 'pending';
 }
 
+interface LeftBehind {
+  index: number;
+  type: string;
+  name: string;
+  icon: string;
+  icon_state: string;
+  from: string | null;
+  fits: string[];
+}
+
+interface FailedMove {
+  index: number;
+  name: string;
+  icon: string;
+  icon_state: string;
+  from: string | null;
+  to: string;
+}
+
 type PackDrag = { fits: string[] } & (
   | { extra: number }
   | { type: string; from: string }
+  | { removed: number }
 );
 
 interface ShopItem {
@@ -137,6 +158,7 @@ interface KitProgress {
   shop_locks: Record<string, string>;
   gun?: GunProgress;
   sidearm_gun?: GunProgress;
+  back_gun?: GunProgress;
 }
 
 interface StaticData {
@@ -156,9 +178,17 @@ interface Data extends StaticData {
   issue: Record<string, IssueItem>;
   fits: string[];
   blocked_slots: Record<string, string>;
+  option_problems: Record<string, string>;
+  problems: Record<string, string>;
+  notes: Record<string, string>;
+  primary_shells: string[] | null;
+  back_shells: string[] | null;
+  primary_shell: string;
+  back_gun_slot: BooleanLike;
   doll: string | null;
   gun: string | null;
   sidearm: string | null;
+  back_gun: string | null;
   doll_pending: BooleanLike;
   deploy_state: 'lobby' | 'dead' | null;
   respawn_in: number;
@@ -170,7 +200,8 @@ interface Data extends StaticData {
   hint: string | null;
   pack: PackContainer[];
   extras: Extra[];
-  removed: { type: string; name: string }[];
+  removed: LeftBehind[];
+  failed_moves: FailedMove[];
   shop: ShopSection[];
   budget: [number, number];
   spent: { points: number; snowflake: number };
@@ -258,34 +289,75 @@ const GunPanel = (props: { readonly gun: GunProgress }) => {
   );
 };
 
+const WEAPON_TAB_LABELS: Record<WeaponView, string> = {
+  primary: 'Primary',
+  sidearm: 'Sidearm',
+  back: 'Scabbard',
+};
+
 const AttachmentGroup = (props: {
-  readonly name?: string;
-  readonly sidearm: boolean;
+  readonly view: WeaponView;
+  readonly scabbard: boolean;
+  readonly setView: (view: WeaponView) => void;
   readonly tiles: ReactNode[];
 }) => {
-  const { name, sidearm, tiles } = props;
+  const { view, scabbard, setView, tiles } = props;
+  const views: WeaponView[] = scabbard
+    ? ['primary', 'sidearm', 'back']
+    : ['primary', 'sidearm'];
   return (
     <Box>
-      <Box className="ClashKit__attachHeader">
-        {name ?? 'Attachments'}
-        {!name && (
-          <Box as="span" className="ClashKit__attachHint">
-            {sidearm ? 'pick a sidearm first' : 'pick a primary first'}
+      <Box className="ClashKit__attachHeader ClashKit__weaponTabs">
+        {views.map((id) => (
+          <Box
+            key={id}
+            as="span"
+            className={classes([
+              'ClashKit__weaponTab',
+              id === view && 'ClashKit__weaponTab--selected',
+            ])}
+            onClick={() => setView(id)}
+          >
+            {WEAPON_TAB_LABELS[id]}
           </Box>
-        )}
+        ))}
       </Box>
+
       <Box className="ClashKit__attachRow">{tiles}</Box>
+    </Box>
+  );
+};
+
+const ShellPicker = (props: { readonly shells?: string[] | null }) => {
+  const { act, data } = useBackend<Data>();
+  const { shells } = props;
+  if (!shells?.length) return null;
+  return (
+    <Box>
+      <Box className="ClashKit__attachHeader">Shells</Box>
+      <Box className="ClashKit__shellRow">
+        {shells.map((shell) => (
+          <Button
+            key={shell}
+            selected={shell === data.primary_shell}
+            onClick={() => act('gun_fill', { shell })}
+          >
+            {shell}
+          </Button>
+        ))}
+      </Box>
     </Box>
   );
 };
 
 const WeaponPreview = (props: {
   readonly image: string | null;
-  readonly sidearm: boolean;
+  readonly scale: number;
+  readonly empty: string;
   readonly pending: boolean;
   readonly progress?: GunProgress;
 }) => {
-  const { image, sidearm, pending, progress } = props;
+  const { image, scale, empty, pending, progress } = props;
   return (
     <>
       <Box
@@ -300,13 +372,11 @@ const WeaponPreview = (props: {
             src={`data:image/png;base64,${image}`}
             fitWidth={392}
             fitHeight={100}
-            maxScale={sidearm ? SIDEARM_SCALE : PRIMARY_SCALE}
+            maxScale={scale}
             whole
           />
         ) : (
-          <Box className="ClashKit__gunEmpty">
-            {sidearm ? 'No sidearm' : 'No primary'}
-          </Box>
+          <Box className="ClashKit__gunEmpty">{empty}</Box>
         )}
       </Box>
       {progress && <GunPanel gun={progress} />}
@@ -503,6 +573,13 @@ const ContentsHint = (props: { readonly contents?: string[] }) => {
   );
 };
 
+const ProblemMark = (props: { readonly text?: string }) =>
+  props.text ? (
+    <Tooltip content={props.text}>
+      <Icon name="circle-exclamation" className="ClashKit__problemMark" />
+    </Tooltip>
+  ) : null;
+
 const ItemIcon = (props: { readonly icon: string; readonly state: string }) => (
   <Box className="ClashKit__optionIcon">
     <DmIcon
@@ -541,6 +618,7 @@ const PackRow = (props: {
   readonly drag: PackDrag;
   readonly setDrag: (drag: PackDrag | null) => void;
   readonly removeTip: string;
+  readonly removeIcon?: string;
   readonly onRemove: () => void;
 }) => {
   const {
@@ -552,6 +630,7 @@ const PackRow = (props: {
     drag,
     setDrag,
     removeTip,
+    removeIcon = 'xmark',
     onRemove,
   } = props;
   return (
@@ -583,7 +662,7 @@ const PackRow = (props: {
         </Stack.Item>
         <Stack.Item>
           <Button
-            icon="xmark"
+            icon={removeIcon}
             color="transparent"
             tooltip={removeTip}
             onClick={onRemove}
@@ -594,21 +673,83 @@ const PackRow = (props: {
   );
 };
 
+const ProblemRow = (props: {
+  readonly icon: string | null;
+  readonly iconState: string | null;
+  readonly name: string;
+  readonly reason: string;
+  readonly removeTip: string;
+  readonly onRemove: () => void;
+}) => {
+  const { icon, iconState, name, reason, removeTip, onRemove } = props;
+  return (
+    <Box className="ClashKit__packItem ClashKit__packProblem">
+      <Stack align="center">
+        <Stack.Item>
+          {icon && iconState !== null ? (
+            <ItemIcon icon={icon} state={iconState} />
+          ) : (
+            <Box className="ClashKit__optionIcon" />
+          )}
+        </Stack.Item>
+        <Stack.Item grow>
+          {name}
+          <Box className="ClashKit__packProblemReason">
+            <Icon name="triangle-exclamation" /> {reason}
+          </Box>
+        </Stack.Item>
+        <Stack.Item>
+          <Button
+            icon="xmark"
+            color="transparent"
+            tooltip={removeTip}
+            onClick={onRemove}
+          />
+        </Stack.Item>
+      </Stack>
+    </Box>
+  );
+};
+
+const ExtraProblems = (props: { readonly problems: Extra[] }) => {
+  const { act } = useBackend<Data>();
+  return (
+    <>
+      {props.problems.map((extra) => (
+        <ProblemRow
+          key={`extra${extra.index}`}
+          icon={extra.icon}
+          iconState={extra.icon_state}
+          name={extra.name}
+          reason={EXTRA_PROBLEMS[extra.status]}
+          removeTip="Take it off the list"
+          onRemove={() => act('unbuy', { index: extra.index })}
+        />
+      ))}
+    </>
+  );
+};
+
+const problemLabel = (count: number) =>
+  `${count} ${count === 1 ? 'problem' : 'problems'}`;
+
 const UnassignedBox = (props: {
   readonly items: PackItem[];
+  readonly problems: Extra[];
   readonly drag: PackDrag | null;
   readonly setDrag: (drag: PackDrag | null) => void;
 }) => {
   const { act } = useBackend<Data>();
-  const { items, drag, setDrag } = props;
+  const { items, problems, drag, setDrag } = props;
   const [over, setOver] = useState(false);
   const accepts = !!drag && 'extra' in drag;
-  if (!items.length && !accepts) return null;
+  if (!items.length && !problems.length && !accepts) return null;
   return (
     <div
       className={classes([
         'ClashKit__packHolder',
         'ClashKit__packHolder--unassigned',
+        !!problems.length && 'ClashKit__packHolder--warn',
         accepts && 'ClashKit__packHolder--target',
         over && 'ClashKit__packHolder--drop',
       ])}
@@ -620,11 +761,17 @@ const UnassignedBox = (props: {
     >
       <Box className="ClashKit__packHead">
         <Box as="span">Unassigned</Box>
+        {!!problems.length && (
+          <Box as="span" className="ClashKit__packHeadWarn">
+            {problemLabel(problems.length)}
+          </Box>
+        )}
       </Box>
       <Box className="ClashKit__packNote">
         Drag bought gear onto a container. Anything left here is packed wherever
         it fits.
       </Box>
+      <ExtraProblems problems={problems} />
       {items.map((item) => (
         <PackRow
           key={item.extra_index}
@@ -645,19 +792,25 @@ const UnassignedBox = (props: {
 
 const PackHolder = (props: {
   readonly holder: PackContainer;
+  readonly problems: Extra[];
+  readonly failedMoves: FailedMove[];
+  readonly gearProblem?: string;
   readonly drag: PackDrag | null;
   readonly setDrag: (drag: PackDrag | null) => void;
 }) => {
   const { act } = useBackend<Data>();
-  const { holder, drag, setDrag } = props;
+  const { holder, problems, failedMoves, gearProblem, drag, setDrag } = props;
   const [over, setOver] = useState(false);
   const shown = holder.items.filter((item) => !item.unassigned);
   const accepts = !!drag && drag.fits.includes(holder.slot);
   const source = !!drag && 'from' in drag && drag.from === holder.slot;
+  const problemCount =
+    problems.length + failedMoves.length + (gearProblem ? 1 : 0);
   return (
     <div
       className={classes([
         'ClashKit__packHolder',
+        !!problemCount && 'ClashKit__packHolder--warn',
         drag &&
           !source &&
           (accepts
@@ -669,6 +822,8 @@ const PackHolder = (props: {
         if (!drag) return;
         if ('extra' in drag) {
           act('assign_extra', { index: drag.extra, to: holder.slot });
+        } else if ('removed' in drag) {
+          act('restore_item', { index: drag.removed, to: holder.slot });
         } else {
           act('move_item', {
             type: drag.type,
@@ -680,6 +835,11 @@ const PackHolder = (props: {
     >
       <Box className="ClashKit__packHead">
         <Box as="span">{holder.name}</Box>
+        {!!problemCount && (
+          <Box as="span" className="ClashKit__packHeadWarn">
+            {problemLabel(problemCount)}
+          </Box>
+        )}
         {!!holder.shells && (
           <Dropdown
             width="110px"
@@ -695,6 +855,23 @@ const PackHolder = (props: {
           {holder.capacity}
         </Box>
       </Box>
+      {gearProblem && (
+        <Box className="ClashKit__packNote ClashKit__packProblemReason">
+          <Icon name="circle-exclamation" /> {gearProblem}
+        </Box>
+      )}
+      <ExtraProblems problems={problems} />
+      {failedMoves.map((move) => (
+        <ProblemRow
+          key={`move${move.index}`}
+          icon={move.icon}
+          iconState={move.icon_state}
+          name={move.name}
+          reason={`No room here any more, stays in ${move.from ?? 'its old spot'}`}
+          removeTip="Forget this move"
+          onRemove={() => act('cancel_move', { index: move.index })}
+        />
+      ))}
       {shown.length ? (
         shown.map((item, itemIndex) => (
           <PackRow
@@ -718,6 +895,7 @@ const PackHolder = (props: {
             onRemove={() =>
               act('drop_item', {
                 type: item.type,
+                from: holder.slot,
                 extra: item.extra ? 1 : 0,
                 extra_index: item.extra_index,
               })
@@ -731,11 +909,75 @@ const PackHolder = (props: {
   );
 };
 
+const LeftBehindBox = (props: {
+  readonly items: LeftBehind[];
+  readonly drag: PackDrag | null;
+  readonly setDrag: (drag: PackDrag | null) => void;
+}) => {
+  const { act } = useBackend<Data>();
+  const { items, drag, setDrag } = props;
+  const [over, setOver] = useState(false);
+  const accepts = !!drag && 'from' in drag;
+  if (!items.length && !accepts) return null;
+  return (
+    <div
+      className={classes([
+        'ClashKit__packHolder',
+        'ClashKit__packHolder--unassigned',
+        accepts && 'ClashKit__packHolder--target',
+        over && 'ClashKit__packHolder--drop',
+      ])}
+      {...dropProps(accepts, over, setOver, () => {
+        if (drag && 'from' in drag) {
+          act('drop_item', { type: drag.type, from: drag.from, extra: 0 });
+        }
+      })}
+    >
+      <Box className="ClashKit__packHead">Left behind</Box>
+      <Box className="ClashKit__packNote">
+        Drag an item onto a container to pack it there.
+      </Box>
+      {items.map((item) => (
+        <PackRow
+          key={item.index}
+          icon={item.icon}
+          iconState={item.icon_state}
+          name={item.name}
+          drag={{ removed: item.index, fits: item.fits }}
+          setDrag={setDrag}
+          removeIcon="rotate-left"
+          removeTip="Pack it again where it came from"
+          onRemove={() => act('restore_item', { index: item.index })}
+        />
+      ))}
+    </div>
+  );
+};
+
+const PACK_KIT_SLOTS: Record<string, string> = {
+  back: 'back',
+  belt: 'belt',
+  l_store: 'pouch_l',
+  r_store: 'pouch_r',
+  webbing: 'webbing',
+};
+
 const PackView = () => {
-  const { act, data } = useBackend<Data>();
-  const { pack, extras, removed, doll_pending } = data;
+  const { data } = useBackend<Data>();
+  const { pack, extras, removed, failed_moves, doll_pending } = data;
   const [drag, setDrag] = useState<PackDrag | null>(null);
+  useEffect(() => {
+    document
+      .querySelector('.ClashKit__packProblem')
+      ?.scrollIntoView({ block: 'center' });
+  }, []);
+  const slots = pack.map((holder) => holder.slot);
   const problems = extras.filter((extra) => EXTRA_PROBLEMS[extra.status]);
+  const problemsIn = (slot: string | null) =>
+    problems.filter(
+      (extra) =>
+        (extra.slot && slots.includes(extra.slot) ? extra.slot : null) === slot,
+    );
   return (
     <>
       {!!doll_pending && (
@@ -743,30 +985,11 @@ const PackView = () => {
           <Icon name="circle-notch" spin /> Repacking...
         </Box>
       )}
-      {problems.map((extra) => (
-        <Box key={extra.index} className="ClashKit__option ClashKit__packWarn">
-          <Stack align="center">
-            <Stack.Item grow>
-              <Box className="ClashKit__optionName">{extra.name}</Box>
-              <Box className="ClashKit__optionBlurb">
-                {EXTRA_PROBLEMS[extra.status]}
-              </Box>
-            </Stack.Item>
-            <Stack.Item>
-              <Button
-                icon="xmark"
-                color="transparent"
-                tooltip="Take it off the list"
-                onClick={() => act('unbuy', { index: extra.index })}
-              />
-            </Stack.Item>
-          </Stack>
-        </Box>
-      ))}
       <UnassignedBox
         items={pack.flatMap((holder) =>
           holder.items.filter((item) => item.unassigned),
         )}
+        problems={problemsIn(null)}
         drag={drag}
         setDrag={setDrag}
       />
@@ -779,6 +1002,9 @@ const PackView = () => {
         <PackHolder
           key={holder.slot}
           holder={holder}
+          problems={problemsIn(holder.slot)}
+          failedMoves={failed_moves.filter((move) => move.to === holder.slot)}
+          gearProblem={data.problems?.[PACK_KIT_SLOTS[holder.slot]]}
           drag={drag}
           setDrag={setDrag}
         />
@@ -788,26 +1014,7 @@ const PackView = () => {
           This kit has nothing to pack into.
         </Box>
       )}
-      {!!removed.length && (
-        <Box className="ClashKit__packHolder">
-          <Box className="ClashKit__packHead">Left behind</Box>
-          {removed.map((item, index) => (
-            <Box key={index} className="ClashKit__packItem">
-              <Stack align="center">
-                <Stack.Item grow>{item.name}</Stack.Item>
-                <Stack.Item>
-                  <Button
-                    icon="rotate-left"
-                    color="transparent"
-                    tooltip="Pack it again"
-                    onClick={() => act('restore_item', { type: item.type })}
-                  />
-                </Stack.Item>
-              </Stack>
-            </Box>
-          ))}
-        </Box>
-      )}
+      <LeftBehindBox items={removed} drag={drag} setDrag={setDrag} />
     </>
   );
 };
@@ -823,8 +1030,12 @@ const ShopView = () => {
   const [search, setSearch] = useState('');
   const left = pointsLeft(data);
   const owned: Record<string, number> = {};
+  const problemOf: Record<string, string> = {};
   for (const extra of extras) {
     owned[extra.id] = (owned[extra.id] ?? 0) + 1;
+    if (EXTRA_PROBLEMS[extra.status]) {
+      problemOf[extra.id] = EXTRA_PROBLEMS[extra.status];
+    }
   }
   const query = search.trim().toLowerCase();
   const sections = shop
@@ -878,8 +1089,15 @@ const ShopView = () => {
             const short = left[item.pool] < item.cost;
             const lock = progress?.shop_locks[item.id];
             const count = owned[item.id] ?? 0;
+            const problem = problemOf[item.id];
             return (
-              <Box key={item.id} className="ClashKit__packItem">
+              <Box
+                key={item.id}
+                className={classes([
+                  'ClashKit__packItem',
+                  problem && 'ClashKit__packProblem',
+                ])}
+              >
                 <Stack align="center">
                   <Stack.Item>
                     <ItemIcon icon={item.icon} state={item.icon_state} />
@@ -895,6 +1113,11 @@ const ShopView = () => {
                     {count > 0 && (
                       <Box as="span" className="ClashKit__packBought">
                         ×{count}
+                      </Box>
+                    )}
+                    {problem && (
+                      <Box className="ClashKit__packProblemReason">
+                        <Icon name="triangle-exclamation" /> {problem}
                       </Box>
                     )}
                   </Stack.Item>
@@ -929,6 +1152,24 @@ const ShopView = () => {
   );
 };
 
+const packProblemCount = (data: Data) =>
+  data.extras.filter((extra) => EXTRA_PROBLEMS[extra.status]).length +
+  data.failed_moves.length +
+  Object.values(PACK_KIT_SLOTS).filter((slot) => data.problems?.[slot]).length;
+
+const KitProblems = () => {
+  const { data } = useBackend<Data>();
+  const count = Object.keys(data.problems ?? {}).length;
+  if (!count) return null;
+  return (
+    <Box className="ClashKit__kitProblems">
+      <Icon name="circle-exclamation" className="ClashKit__problemMark" />{' '}
+      {count} {count === 1 ? 'problem' : 'problems'} with this kit. Hover the
+      red marks to see what is wrong.
+    </Box>
+  );
+};
+
 const LEFT_SLOTS = ['helmet', 'eyes', 'mask', 'armor', 'back'];
 const RIGHT_SLOTS = ['primary', 'sidearm', 'grenade', 'belt'];
 const POUCH_SLOTS = ['pouch_l', 'webbing', 'pouch_r'];
@@ -939,27 +1180,158 @@ const SIDE_ATTACHMENT_SLOTS = [
   'side_under',
   'side_stock',
 ];
+const BACK_ATTACHMENT_SLOTS = [
+  'back_rail',
+  'back_muzzle',
+  'back_under',
+  'back_stock',
+];
 const PRIMARY_SCALE = 5;
 const SIDEARM_SCALE = 8;
 
-type WeaponView = 'primary' | 'sidearm';
+type WeaponView = 'primary' | 'sidearm' | 'back';
+
+const WEAPON_VIEWS: Record<
+  WeaponView,
+  { slot: string; slots: string[]; scale: number; empty: string }
+> = {
+  primary: {
+    slot: 'primary',
+    slots: ATTACHMENT_SLOTS,
+    scale: PRIMARY_SCALE,
+    empty: 'No primary',
+  },
+  sidearm: {
+    slot: 'sidearm',
+    slots: SIDE_ATTACHMENT_SLOTS,
+    scale: SIDEARM_SCALE,
+    empty: 'No sidearm',
+  },
+  back: {
+    slot: 'back_gun',
+    slots: BACK_ATTACHMENT_SLOTS,
+    scale: PRIMARY_SCALE,
+    empty: 'No shotgun in the scabbard',
+  },
+};
+
+const weaponViewData = (view: WeaponView, data: Data) =>
+  ({
+    primary: {
+      image: data.gun,
+      progress: data.progress?.gun,
+      shells: data.primary_shells,
+    },
+    sidearm: {
+      image: data.sidearm,
+      progress: data.progress?.sidearm_gun,
+      shells: null,
+    },
+    back: {
+      image: data.back_gun,
+      progress: data.progress?.back_gun,
+      shells: data.back_shells,
+    },
+  })[view];
+
+const NOTHING = 'nothing';
+const NOTHING_BLURBS: Record<string, string> = {
+  armor: 'Spawn without armor. Your primary goes on your back or in your hands',
+  primary: 'Spawn without a primary weapon or its ammo',
+  sidearm: 'Spawn without a sidearm or its ammo',
+  back: 'Spawn without it. What it holds stays behind',
+  belt: 'Spawn without it. What it holds stays behind',
+  pouch_l: 'Spawn without it. What it holds stays behind',
+  pouch_r: 'Spawn without it. What it holds stays behind',
+  webbing: 'Spawn without it. What it holds stays behind',
+  sentry: 'Spawn without a sentry',
+};
 
 const issueForSlot = (
   id: string,
   choices: Record<string, string>,
   issue: Record<string, IssueItem>,
+  evenIfNothing = false,
 ) => {
+  if (!evenIfNothing && choices[id] === NOTHING) return undefined;
   if (ATTACHMENT_SLOTS.includes(id) && choices.primary) return undefined;
   if (SIDE_ATTACHMENT_SLOTS.includes(id) && choices.sidearm) return undefined;
   return issue?.[id];
 };
 
-const weaponViewFor = (id: string): WeaponView | null => {
+const weaponViewFor = (id: string, scabbard?: boolean): WeaponView | null => {
+  if (id === 'back' && scabbard) return 'back';
   if (id === 'sidearm' || SIDE_ATTACHMENT_SLOTS.includes(id)) return 'sidearm';
+  if (id === 'back_gun' || BACK_ATTACHMENT_SLOTS.includes(id)) return 'back';
   if (id === 'primary' || ATTACHMENT_SLOTS.includes(id)) return 'primary';
   return null;
 };
 const PERK_SLOTS = ['class_perk', 'general_perk'];
+
+const ScabbardOptions = () => {
+  const { act, data } = useBackend<Data>();
+  if (!data.back_gun_slot) return null;
+  const locks = data.progress?.locks ?? {};
+  const ranks = data.progress?.ranks ?? {};
+  const options = [...(data.menus[data.faction]?.back_gun ?? [])].sort(
+    (a, b) => (ranks[a.id] ?? 0) - (ranks[b.id] ?? 0),
+  );
+  return (
+    <>
+      <Box className="ClashKit__optionsGroup">In the scabbard</Box>
+      <OptionRow
+        label="No shotgun"
+        blurb="The scabbard stays empty"
+        picked={!data.choices.back_gun}
+        onClick={() => act('clear', { slot: 'back_gun' })}
+      />
+      {options.map((option) => (
+        <OptionRow
+          key={option.id}
+          option={option}
+          lock={locks[option.id]}
+          picked={data.choices.back_gun === option.id}
+          disabled={!!locks[option.id]}
+          onClick={() => act('pick', { slot: 'back_gun', id: option.id })}
+        />
+      ))}
+    </>
+  );
+};
+
+const pickedFor = (data: Data, id: string) => {
+  const picked = findOption(data.menus, data.faction, id, data.choices[id]);
+  return id === 'back' && picked && data.back_gun_slot && data.choices.back_gun
+    ? { ...picked, icon_state: `${picked.icon_state}_full` }
+    : picked;
+};
+
+const optionMarks = (
+  data: Data,
+  slot: string,
+  id: string,
+  isIssue: boolean,
+) => {
+  const chosen = data.choices[slot];
+  const picked = chosen === id || (isIssue && !chosen);
+  return picked
+    ? { problem: data.problems?.[slot] }
+    : { note: data.option_problems?.[id] };
+};
+
+const weaponNames = (
+  data: Data,
+  issueFor: (id: string) => IssueItem | undefined,
+): Record<WeaponView, string | undefined> => {
+  const nameOf = (slot: string) =>
+    findOption(data.menus, data.faction, slot, data.choices[slot])?.name ??
+    issueFor(slot)?.name;
+  return {
+    primary: nameOf('primary'),
+    sidearm: nameOf('sidearm'),
+    back: nameOf('back_gun'),
+  };
+};
 
 const clock = (seconds: number) =>
   `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
@@ -984,7 +1356,10 @@ const SlotTile = (props: {
   readonly dense?: boolean;
   readonly lock?: string;
   readonly blocked?: string;
+  readonly problem?: string;
+  readonly note?: string;
   readonly fresh?: boolean;
+  readonly nothing?: boolean;
   readonly onClick: () => void;
 }) => {
   const {
@@ -997,12 +1372,15 @@ const SlotTile = (props: {
     dense,
     lock,
     blocked,
+    problem,
+    note,
     fresh,
+    nothing,
     onClick,
   } = props;
   const shown = picked ?? issued;
   const perk = PERK_SLOTS.includes(slot.id);
-  const tooltip = blocked
+  const label = blocked
     ? `${blocked}.`
     : lock
       ? `${picked?.name}: locked, ${lock}. ${perk ? 'You spawn without it.' : 'The starting item is used at spawn.'}`
@@ -1013,6 +1391,21 @@ const SlotTile = (props: {
         : issued
           ? issued.name
           : `${slot.name}: nothing`;
+  const tooltip = (
+    <>
+      <Box>{label}</Box>
+      {problem && (
+        <Box className="ClashKit__tipProblem">
+          <Icon name="circle-exclamation" /> {problem}
+        </Box>
+      )}
+      {note && (
+        <Box className="ClashKit__tipNote">
+          <Icon name="circle-info" /> {note}
+        </Box>
+      )}
+    </>
+  );
   return (
     <Tooltip content={tooltip}>
       <Box
@@ -1022,7 +1415,7 @@ const SlotTile = (props: {
           selected && 'ClashKit__slot--selected',
           (dimmed || lock) && !blocked && 'ClashKit__slot--dimmed',
           blocked && 'ClashKit__slot--blocked',
-          picked && 'ClashKit__slot--set',
+          (picked || nothing) && 'ClashKit__slot--set',
         ])}
         onClick={onClick}
       >
@@ -1047,8 +1440,17 @@ const SlotTile = (props: {
         )}
         <Box className="ClashKit__slotLabel">{slot.name}</Box>
         {blocked && <Icon className="ClashKit__slotBlocked" name="xmark" />}
+        {problem && !blocked && (
+          <Icon
+            name="circle-exclamation"
+            className="ClashKit__problemMark ClashKit__slotProblem"
+          />
+        )}
+        {note && !problem && (
+          <Icon name="circle-info" className="ClashKit__slotNote" />
+        )}
         {fresh && <Box className="ClashKit__slotNew">new</Box>}
-        {picked && <Box className="ClashKit__slotDot" />}
+        {(picked || nothing) && <Box className="ClashKit__slotDot" />}
       </Box>
     </Tooltip>
   );
@@ -1079,6 +1481,8 @@ const OptionRow = (props: {
   readonly picked: boolean;
   readonly disabled?: boolean;
   readonly lock?: string;
+  readonly problem?: string;
+  readonly note?: string;
   readonly fresh?: boolean;
   readonly onClick: () => void;
 }) => {
@@ -1090,6 +1494,8 @@ const OptionRow = (props: {
     picked,
     disabled,
     lock,
+    problem,
+    note,
     fresh,
     onClick,
   } = props;
@@ -1136,6 +1542,12 @@ const OptionRow = (props: {
               <Icon name="lock" /> {lock}
             </Box>
           )}
+          {problem && (
+            <Box className="ClashKit__packProblemReason">
+              <Icon name="circle-exclamation" /> {problem}
+            </Box>
+          )}
+          {note && <Box className="ClashKit__optionNote">({note})</Box>}
           {option && <StatChips stats={option.stats} />}
         </Stack.Item>
         <Stack.Item className="ClashKit__optionCheck">
@@ -1149,6 +1561,48 @@ const OptionRow = (props: {
         </Stack.Item>
       </Stack>
     </Box>
+  );
+};
+
+const DefaultRow = (props: {
+  readonly slotId: string;
+  readonly issued?: IssueItem;
+  readonly attachment: boolean;
+  readonly picked: boolean;
+}) => {
+  const { act } = useBackend<Data>();
+  const { slotId, issued, attachment, picked } = props;
+  const emptyBlurb = PERK_SLOTS.includes(slotId)
+    ? 'Spawn without a perk'
+    : attachment
+      ? 'Leave this slot empty'
+      : 'Nothing in this slot';
+  return (
+    <OptionRow
+      issued={issued}
+      label={issued ? issued.name : 'Nothing'}
+      blurb={issued ? (issued.desc ?? '') : emptyBlurb}
+      picked={picked}
+      onClick={() => act('clear', { slot: slotId })}
+    />
+  );
+};
+
+const NothingRow = (props: {
+  readonly slotId: string;
+  readonly issued?: IssueItem;
+  readonly picked: boolean;
+}) => {
+  const { act } = useBackend<Data>();
+  const { slotId, issued, picked } = props;
+  if (!issued || issued.fixed || PERK_SLOTS.includes(slotId)) return null;
+  return (
+    <OptionRow
+      label="Nothing"
+      blurb={NOTHING_BLURBS[slotId] ?? 'Spawn without it'}
+      picked={picked}
+      onClick={() => act('nothing', { slot: slotId })}
+    />
   );
 };
 
@@ -1184,9 +1638,7 @@ export const ClashKit = () => {
   const [weaponView, setWeaponView] = useState<WeaponView>('primary');
   const [tab, setTab] = useState<Tab>('gear');
   const left = pointsLeft(data);
-  const packProblems = data.extras.filter(
-    (extra) => EXTRA_PROBLEMS[extra.status],
-  ).length;
+  const packProblems = packProblemCount(data);
   const { shop } = data;
   const [waitLeft, setWaitLeft] = useState(respawn_in);
   useEffect(() => {
@@ -1204,16 +1656,19 @@ export const ClashKit = () => {
     setRenaming(false);
   }, [kit_index, job]);
 
+  useEffect(() => {
+    act('refresh');
+  }, []);
   const slotById = Object.fromEntries(slots.map((slot) => [slot.id, slot]));
+  const issueFor = (id: string) => issueForSlot(id, choices, issue);
   const kit = kits[kit_index - 1];
-  const primary = findOption(menus, faction, 'primary', choices.primary);
-  const gunName = primary?.name ?? issue?.primary?.name;
-  const sidearm = findOption(menus, faction, 'sidearm', choices.sidearm);
-  const sidearmName = sidearm?.name ?? issue?.sidearm?.name;
-  const slotGunName = (id: string) =>
-    SIDE_ATTACHMENT_SLOTS.includes(id) ? sidearmName : gunName;
-  const showSidearm = weaponView === 'sidearm';
-  const viewName = showSidearm ? sidearmName : gunName;
+  const gunNames = weaponNames(data, issueFor);
+  const slotGunName = (id: string) => gunNames[weaponViewFor(id) ?? 'primary'];
+  const view: WeaponView =
+    weaponView === 'back' && !data.back_gun_slot ? 'primary' : weaponView;
+  const viewInfo = WEAPON_VIEWS[view];
+  const viewData = weaponViewData(view, data);
+  const viewName = gunNames[view];
   const current = slotById[selectedSlot];
   const ranks = progress?.ranks ?? {};
   const slotOptions = (id: string) =>
@@ -1236,8 +1691,7 @@ export const ClashKit = () => {
         fits.includes(option.id),
     )
     .sort((a, b) => (ranks[a.id] ?? 0) - (ranks[b.id] ?? 0));
-  const issueFor = (id: string) => issueForSlot(id, choices, issue);
-  const issued = issueFor(selectedSlot);
+  const issued = issueForSlot(selectedSlot, choices, issue, true);
   const issuedOption = issued?.type
     ? options
         .filter(
@@ -1285,7 +1739,7 @@ export const ClashKit = () => {
     <SlotTile
       key={id}
       slot={slotById[id]}
-      picked={findOption(menus, faction, id, choices[id])}
+      picked={pickedFor(data, id)}
       issued={issueFor(id)}
       selected={selectedSlot === id}
       small={small}
@@ -1293,20 +1747,25 @@ export const ClashKit = () => {
       dense={dense}
       lock={choices[id] ? locks[choices[id]] : undefined}
       blocked={blocked_slots[id]}
+      problem={data.problems?.[id]}
+      note={data.notes?.[id]}
+      nothing={choices[id] === NOTHING}
       fresh={
         selectedSlot !== id &&
         slotOptions(id).some((option) => fresh.includes(option.id))
       }
       onClick={() => {
         setSelectedSlot(id);
-        setWeaponView((view) => weaponViewFor(id) ?? view);
+        setWeaponView(
+          (view) => weaponViewFor(id, !!data.back_gun_slot) ?? view,
+        );
         setTab('gear');
       }}
     />
   );
 
   return (
-    <Window width={1080} height={800} theme={isUpp ? 'crtred' : 'crtblue'}>
+    <Window width={1080} height={900} theme={isUpp ? 'crtred' : 'crtblue'}>
       <Window.Content
         className={classes(['ClashKit', isUpp && 'ClashKit--upp'])}
       >
@@ -1395,6 +1854,7 @@ export const ClashKit = () => {
                       <Icon name="pen" className="ClashKit__kitNamePen" />
                     </Box>
                   )}
+                  <KitProblems />
                   <Box className="ClashKit__dollSub">
                     Your {jobName} class
                     {kits.length > 1 && (
@@ -1464,12 +1924,12 @@ export const ClashKit = () => {
 
                 <Box className="ClashKit__attachBar">
                   <AttachmentGroup
-                    name={viewName}
-                    sidearm={showSidearm}
-                    tiles={(showSidearm
-                      ? SIDE_ATTACHMENT_SLOTS
-                      : ATTACHMENT_SLOTS
-                    ).map((id) => tile(id, true, !viewName))}
+                    view={view}
+                    scabbard={!!data.back_gun_slot}
+                    setView={setWeaponView}
+                    tiles={viewInfo.slots.map((id) =>
+                      tile(id, true, !viewName),
+                    )}
                   />
                   <Box>
                     <Box className="ClashKit__attachHeader">Perks</Box>
@@ -1480,11 +1940,13 @@ export const ClashKit = () => {
                   </Box>
                 </Box>
                 <WeaponPreview
-                  image={showSidearm ? data.sidearm : data.gun}
-                  sidearm={showSidearm}
+                  image={viewData.image}
+                  scale={viewInfo.scale}
+                  empty={viewInfo.empty}
                   pending={!!doll_pending}
-                  progress={showSidearm ? progress?.sidearm_gun : progress?.gun}
+                  progress={viewData.progress}
                 />
+                <ShellPicker shells={viewData.shells} />
               </Stack.Item>
 
               <Stack.Item grow className="ClashKit__optionsPanel">
@@ -1538,21 +2000,17 @@ export const ClashKit = () => {
                   className="ClashKit__optionsList"
                   style={{ display: tab === 'gear' ? undefined : 'none' }}
                 >
+                  <NothingRow
+                    slotId={selectedSlot}
+                    issued={issued}
+                    picked={choices[selectedSlot] === NOTHING}
+                  />
                   {!issuedOption && (
-                    <OptionRow
+                    <DefaultRow
+                      slotId={selectedSlot}
                       issued={issued}
-                      label={issued ? issued.name : 'Nothing'}
-                      blurb={
-                        issued
-                          ? (issued.desc ?? '')
-                          : PERK_SLOTS.includes(selectedSlot)
-                            ? 'Spawn without a perk'
-                            : current?.attachment
-                              ? 'Leave this slot empty'
-                              : 'Nothing in this slot'
-                      }
+                      attachment={!!current?.attachment}
                       picked={!choices[selectedSlot]}
-                      onClick={() => act('clear', { slot: selectedSlot })}
                     />
                   )}
                   {options.map((option) => {
@@ -1566,6 +2024,7 @@ export const ClashKit = () => {
                         key={option.id}
                         option={option}
                         lock={lock}
+                        {...optionMarks(data, selectedSlot, option.id, isIssue)}
                         fresh={
                           fresh.includes(option.id) ||
                           newHere.includes(option.id)
@@ -1583,6 +2042,7 @@ export const ClashKit = () => {
                       />
                     );
                   })}
+                  {selectedSlot === 'back' && <ScabbardOptions />}
                 </Box>
               </Stack.Item>
             </Stack>

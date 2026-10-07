@@ -286,3 +286,4 @@
 	else
 		hud_used.tethered_icon.name = ""
 		hud_used.tethered_icon.icon_state = "status_0"
+	clash_status_hud_tick(src)

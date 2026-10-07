@@ -1,8 +1,8 @@
 #define SCORE_CANVAS_WIDTH 224
-#define SCORE_PANEL_WIDTH 184
+#define SCORE_PANEL_WIDTH 200
 #define SCORE_PANEL_HEIGHT 26
-#define SCORE_PANEL_LEFT 21
-#define SCORE_SIDE_WIDTH 60
+#define SCORE_PANEL_LEFT 12
+#define SCORE_SIDE_WIDTH 68
 #define SCORE_FILL_STEPS 24
 
 GLOBAL_LIST_EMPTY(clash_score_panel_icons)
@@ -72,7 +72,7 @@ GLOBAL_LIST_EMPTY(clash_score_panel_icons)
 	var/left = SCORE_PANEL_LEFT
 	var/right_start = SCORE_PANEL_LEFT + SCORE_PANEL_WIDTH - SCORE_SIDE_WIDTH
 	var/text_width = SCORE_SIDE_WIDTH - 10
-	var/big = "font-family: \"VCR OSD Mono\"; font-size: 14px; -dm-text-outline: 1px black; vertical-align: middle; color: #ffffff"
+	var/big = "font-family: \"VCR OSD Mono\"; font-size: [max(uscm, upp) >= 1000 ? 11 : 14]px; -dm-text-outline: 1px black; vertical-align: middle; color: #ffffff"
 	var/small = "font-family: \"Small Fonts\"; font-size: 6px; -dm-text-outline: 1px black; vertical-align: bottom"
 	var/list/texts = list()
 	texts += clash_score_text("<span style='[small]; color: #e8ecef; text-align: left'>USCM</span>", left + 5, 13, text_width, 10)
@@ -156,8 +156,8 @@ GLOBAL_LIST_EMPTY(clash_score_panel_icons)
 
 /proc/clash_place_killfeed_line(atom/movable/screen/faction_killfeed/line, index, below_objectives)
 	line.screen_loc = "CENTER-3,TOP-2:20"
-	line.maptext_width = 400
-	line.maptext_x = SCORE_PANEL_LEFT + SCORE_PANEL_WIDTH - line.maptext_width
+	line.maptext_width = 640
+	line.maptext_x = SCORE_PANEL_LEFT + SCORE_PANEL_WIDTH / 2 - line.maptext_width / 2
 	line.maptext_y = -6 - index * 12 - (below_objectives ? 24 : 0)
 
 #undef SCORE_CANVAS_WIDTH
