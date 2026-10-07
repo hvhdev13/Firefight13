@@ -104,6 +104,8 @@ What players see on a timed move:
 - Walls inside a zone count: once destroyed, standing there captures.
 - Kutjevo maps: `/area/clash_arena/tdm_kutjevo/battlefield` replaces the Kutjevo exterior areas
   (no ceiling, same as the other maps' battlefields).
+- Indoors: paint roofed tiles with the `indoors` subtype of their area, `battlefield/indoors` or
+  `zone_N/indoors`. It has a metal ceiling, so rain stops there. A zone takes in its `indoors` tiles too.
 
 ## TDM bot rally
 

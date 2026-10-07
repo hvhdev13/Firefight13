@@ -6,6 +6,7 @@ GLOBAL_DATUM(clash_zone_tile_icon, /icon)
 #define CLASH_ZONE_MAX_RADIUS 7
 
 /area/clash_arena/var/clash_zone = FALSE
+/area/clash_arena/var/clash_indoors = FALSE
 
 /obj/effect/landmark/clash_objective
 	name = "Clash objective"
@@ -177,9 +178,13 @@ GLOBAL_DATUM(clash_zone_tile_icon, /icon)
 	. = list()
 	var/area/clash_arena/zone_area = get_area(center)
 	if(istype(zone_area) && zone_area.clash_zone)
-		for(var/turf/spot in zone_area)
-			if(spot.z == center.z)
-				. += spot
+		var/zone_type = zone_area.clash_indoors ? zone_area.parent_type : zone_area.type
+		for(var/area/clash_arena/part in GLOB.all_areas)
+			if(!istype(part, zone_type))
+				continue
+			for(var/turf/spot in part)
+				if(spot.z == center.z)
+					. += spot
 		return
 	for(var/turf/spot as anything in RANGE_TURFS(radius, center))
 		if(sqrt((spot.x - center.x) ** 2 + (spot.y - center.y) ** 2) <= radius + 0.3)

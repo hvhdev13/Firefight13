@@ -46,5 +46,5 @@ SUBSYSTEM_DEF(clash_hit_flinch)
 	var/strength = clamp(1 + damage_result / 12, 1, 3)
 	if(bullet.def_zone in list("head", "eyes", "mouth"))
 		strength += 1
-	animate(source, pixel_w = push_x * strength, pixel_z = push_y * strength, time = 1, easing = CUBIC_EASING|EASE_OUT, flags = ANIMATION_PARALLEL)
-	animate(pixel_w = 0, pixel_z = 0, time = 2, easing = CUBIC_EASING|EASE_IN)
+	animate(source, pixel_w = push_x * strength, pixel_z = push_y * strength, time = 1, easing = CUBIC_EASING|EASE_OUT, flags = ANIMATION_PARALLEL|ANIMATION_RELATIVE)
+	animate(pixel_w = -push_x * strength, pixel_z = -push_y * strength, time = 2, easing = CUBIC_EASING|EASE_IN, flags = ANIMATION_RELATIVE)

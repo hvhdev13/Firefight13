@@ -36,7 +36,6 @@ GLOBAL_LIST_INIT(clash_faction_ladders, list(
 		list(8, /obj/item/clothing/accessory/storage/webbing),
 		list(9, /obj/item/clothing/head/helmet/marine/desert),
 		list(10, /obj/item/clothing/accessory/storage/black_vest, "webbing_vest"),
-		list(11, /obj/item/weapon/gun/rifle/lmg),
 		list(12, /obj/item/clothing/head/helmet/marine/urban),
 		list(13, /obj/item/weapon/gun/revolver/m44),
 		list(13, /obj/item/storage/belt/gun/m44),
@@ -63,7 +62,6 @@ GLOBAL_LIST_INIT(clash_faction_ladders, list(
 		list(8, /obj/item/clothing/accessory/storage/webbing),
 		list(9, /obj/item/clothing/mask/rebreather/scarf/tacticalmask/black),
 		list(10, /obj/item/clothing/accessory/storage/black_vest, "webbing_vest"),
-		list(11, /obj/item/weapon/gun/pkp),
 		list(12, /obj/item/clothing/mask/rebreather/scarf/tacticalmask/tan),
 		list(13, /obj/item/weapon/gun/revolver/upp),
 		list(13, /obj/item/storage/belt/gun/type47),
@@ -92,14 +90,30 @@ GLOBAL_LIST_INIT(clash_role_levels, list(
 	JOB_UPP_LEADER = 11,
 ))
 
+GLOBAL_LIST_INIT(clash_class_weapons, list(
+	CLASH_CLASS_HEAVY = list(
+		list(8, /obj/item/weapon/gun/smartgun),
+		list(8, /obj/item/weapon/gun/minigun/upp),
+	),
+))
+
+GLOBAL_LIST_INIT(clash_class_only_primaries, list(CLASH_CLASS_HEAVY))
+
+GLOBAL_LIST_INIT(clash_role_names, list(
+	JOB_SQUAD_SMARTGUN = "Machine Gunner",
+	JOB_UPP = "Rifleman",
+	JOB_UPP_MEDIC = "Hospital Corpsman",
+	JOB_UPP_ENGI = "Combat Technician",
+	JOB_UPP_SPECIALIST = "Machine Gunner",
+	JOB_UPP_LEADER = "Squad Leader",
+))
+
 GLOBAL_LIST_INIT(clash_arena_roles, list(
 	JOB_SQUAD_MARINE,
 	JOB_SQUAD_MEDIC,
 	JOB_SQUAD_ENGI,
 	JOB_SQUAD_SMARTGUN,
-	JOB_SQUAD_TEAM_LEADER,
 	JOB_SQUAD_LEADER,
-	JOB_SQUAD_SPECIALIST,
 	JOB_UPP,
 	JOB_UPP_MEDIC,
 	JOB_UPP_ENGI,
@@ -233,6 +247,9 @@ GLOBAL_LIST_EMPTY(clash_option_gates)
 				var/list/carrier_step = steps[step]
 				for(var/index in 2 to length(carrier_step))
 					gates[clash_gate_key(faction, carrier_step[index])] = list("kind" = CLASH_GATE_CARRIER, "family" = family, "step" = step, "xp" = carrier_step[1])
+		for(var/class in GLOB.clash_class_weapons)
+			for(var/list/rung as anything in GLOB.clash_class_weapons[class])
+				gates[clash_gate_key(faction, rung[2])] = list("kind" = CLASH_GATE_CLASS_LEVEL, "class" = class, "level" = rung[1])
 		for(var/list/rung as anything in GLOB.clash_faction_ladders[faction])
 			var/key = clash_gate_key(faction, rung[2])
 			if(length(rung) > 2)
@@ -273,6 +290,9 @@ GLOBAL_LIST_EMPTY(clash_option_gates)
 		if(clash_item_option(faction, item_type))
 			return item_type
 	return null
+
+/proc/clash_role_name(title)
+	return GLOB.clash_role_names[title] || title
 
 /proc/clash_insignia_name(faction, level)
 	var/list/names = GLOB.clash_insignia_names[faction]

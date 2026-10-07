@@ -373,21 +373,23 @@ GLOBAL_LIST_INIT(clash_radar_tones, list(
 		if(medic_sense && ally.health < ally.maxHealth / 2)
 			kind = "hurt"
 		paint(contact, dx, dy, kind, from, arc, sweep_angle)
-	if(clash_has_perk(viewer, /datum/clash_perk/keen_ears))
-		for(var/mob/living/carbon/human/enemy as anything in GLOB.alive_human_list)
-			if(world.time > enemy.clash_loud_until || enemy.faction == viewer.faction || enemy.z != viewer.z)
-				continue
-			var/dx = enemy.x - viewer.x
-			var/dy = enemy.y - viewer.y
-			var/distance = sqrt(dx * dx + dy * dy)
-			if(distance > RADAR_KEEN_EARS_RANGE)
-				continue
-			if(distance > RADAR_RANGE)
-				dx *= RADAR_RANGE / distance
-				dy *= RADAR_RANGE / distance
-			var/contact = "enemy[REF(enemy)]"
-			seen[contact] = TRUE
-			paint(contact, dx, dy, "enemy", from, arc, sweep_angle)
+	var/keen_ears = clash_has_perk(viewer, /datum/clash_perk/keen_ears)
+	for(var/mob/living/carbon/human/enemy as anything in GLOB.alive_human_list)
+		if(enemy.faction == viewer.faction || enemy.z != viewer.z)
+			continue
+		if((!keen_ears || world.time > enemy.clash_loud_until) && (enemy.clash_spotted_faction != viewer.faction || world.time > enemy.clash_spotted_until))
+			continue
+		var/dx = enemy.x - viewer.x
+		var/dy = enemy.y - viewer.y
+		var/distance = sqrt(dx * dx + dy * dy)
+		if(distance > RADAR_KEEN_EARS_RANGE)
+			continue
+		if(distance > RADAR_RANGE)
+			dx *= RADAR_RANGE / distance
+			dy *= RADAR_RANGE / distance
+		var/contact = "enemy[REF(enemy)]"
+		seen[contact] = TRUE
+		paint(contact, dx, dy, "enemy", from, arc, sweep_angle)
 	if(clash_fast_medicine() && clash_is_medic(viewer))
 		var/triage = clash_has_perk(viewer, /datum/clash_perk/triage)
 		for(var/mob/living/carbon/human/body in GLOB.dead_mob_list)

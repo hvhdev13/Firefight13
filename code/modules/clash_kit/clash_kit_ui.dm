@@ -124,6 +124,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 		"menus" = menus,
 		"roles" = list(list("faction" = FACTION_MARINE, "name" = "USCM", "jobs" = roles[FACTION_MARINE]), list("faction" = FACTION_UPP, "name" = "UPP", "jobs" = roles[FACTION_UPP])),
 		"kit_count" = CLASH_KIT_COUNT,
+		"role_names" = GLOB.clash_role_names,
 	)
 
 /datum/clash_kit_screen/ui_data(mob/user)
@@ -168,7 +169,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 	var/hint
 	if(fighter)
 		if(fighter.job != job)
-			hint = "Editing [job]. You are playing [fighter.job]."
+			hint = "Editing [clash_role_name(job)]. You are playing [clash_role_name(fighter.job)]."
 		else
 			hint = "Changes go on at your next spawn."
 	else if(deploy_state)
@@ -182,6 +183,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 		"issue" = clash_sentry_issue(clash_filter_issue(issue, ckey, job) || list(), job),
 		"sentry_slot" = clash_job_is_engineer(job),
 		"job_class" = GLOB.clash_job_classes[job],
+		"class_primaries" = (GLOB.clash_job_classes[job] in GLOB.clash_class_only_primaries),
 		"fits" = fits,
 		"doll" = render?["doll"],
 		"gun" = render?["gun"],

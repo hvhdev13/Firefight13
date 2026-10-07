@@ -143,6 +143,10 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 		return null
 	if(option.only_class && option.only_class != GLOB.clash_job_classes[job])
 		return "Only for [GLOB.clash_class_names[option.only_class]]s"
+	if(option.slot == KIT_SLOT_ARMOR && ispath(primary_type, /obj/item/weapon/gun/smartgun))
+		return "The M56A2 only fires with the M56 harness"
+	if(option.slot == KIT_SLOT_PRIMARY && option.only_class != GLOB.clash_job_classes[job] && (GLOB.clash_job_classes[job] in GLOB.clash_class_only_primaries))
+		return "Machine Gunners carry a machine gun"
 	var/datum/clash_perk/perk = GLOB.clash_perks[option.item_type]
 	if(perk)
 		return perk.lock_text(ckey, job)
@@ -182,6 +186,9 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 			if(progress.faction_level(faction) < gate["level"])
 				return "Unlocks at [clash_side_name(faction)] level [gate["level"]]"
 			return clash_gear_lock_text(progress, GLOB.clash_job_classes[job], gate["gear"])
+		if(CLASH_GATE_CLASS_LEVEL)
+			if(progress.class_level(gate["class"]) < gate["level"])
+				return "Unlocks at [GLOB.clash_class_names[gate["class"]]] level [gate["level"]]"
 		if(CLASH_GATE_CARRIER)
 			if(progress.carrier_step(gate["family"]) >= gate["step"] || (gate["level"] && progress.faction_level(faction) >= gate["level"]))
 				return null
@@ -280,6 +287,8 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 		var/id = kit.choices[slot]
 		if(clash_option_lock_text(ckey, id, job))
 			id = starting[slot] ? clash_kit_option_id(faction, slot, starting[slot]) : null
+			if(id && clash_option_lock_text(ckey, id, job))
+				id = null
 		if(id)
 			filtered.choices[slot] = id
 	var/gun_type = clash_effective_primary(filtered, job)

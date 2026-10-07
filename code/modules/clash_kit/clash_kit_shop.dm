@@ -63,15 +63,15 @@ GLOBAL_LIST_INIT(clash_role_shop_ammo, list(
 	var/list/sections = list()
 	var/list/by_id = list()
 	var/list/ammo_items = list()
+	var/list/role_ammo = GLOB.clash_role_shop_ammo[job]
 	for(var/slot in list(KIT_SLOT_PRIMARY, KIT_SLOT_SIDEARM))
 		for(var/datum/clash_kit_option/option as anything in GLOB.clash_kit_menu[clash_kit_faction_for_job(job)]?[slot])
 			var/obj/item/ammo_type = option.ammo_type
-			if(!ammo_type || by_id["[ammo_type]"])
+			if(!ammo_type || by_id["[ammo_type]"] || role_ammo?[ammo_type] || (option.only_class && option.only_class != GLOB.clash_job_classes[job]))
 				continue
 			var/list/item = list("id" = "[ammo_type]", "name" = capitalize(strip_improper(initial(ammo_type.name))), "cost" = CLASH_SHOP_AMMO_COST, "pool" = CLASH_SHOP_POINTS, "icon" = "[initial(ammo_type.icon)]", "icon_state" = initial(ammo_type.icon_state))
 			ammo_items += list(item)
 			by_id["[ammo_type]"] = item
-	var/list/role_ammo = GLOB.clash_role_shop_ammo[job]
 	for(var/obj/item/ammo_type as anything in role_ammo)
 		var/list/item = list("id" = "[ammo_type]", "name" = capitalize(strip_improper(initial(ammo_type.name))), "cost" = role_ammo[ammo_type], "pool" = CLASH_SHOP_POINTS, "icon" = "[initial(ammo_type.icon)]", "icon_state" = initial(ammo_type.icon_state))
 		ammo_items += list(item)
