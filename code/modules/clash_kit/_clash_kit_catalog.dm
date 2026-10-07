@@ -341,10 +341,18 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 		return null
 	return back_gun.item_type
 
+/obj/item/storage/large_holster/m37/clash
+	bypass_w_limit = list(
+		/obj/item/weapon/gun/shotgun/pump,
+		/obj/item/weapon/gun/shotgun/combat,
+		/obj/item/weapon/gun/shotgun/double/mou53,
+	)
+
 /obj/item/storage/large_holster/m37/clash_upp
 	name = "\improper Type 23 shotgun scabbard"
 	desc = "A large leather holster fitted for the Type 23 shotgun. It has harnesses that allow it to be secured to the back for easy storage."
 	can_hold = list(/obj/item/weapon/gun/shotgun/type23)
+	bypass_w_limit = list(/obj/item/weapon/gun/shotgun/type23)
 
 /proc/build_clash_kit_catalog()
 	if(length(GLOB.clash_kit_options))
@@ -480,7 +488,7 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 	add_clash_kit_option(faction, KIT_SLOT_MASK, "Heat absorbent coif", /obj/item/clothing/mask/rebreather/scarf, "Scarf and rebreather")
 	add_clash_kit_option(faction, KIT_SLOT_BACK, "Backpack", /obj/item/storage/backpack/marine, "Most room")
 	add_clash_kit_option(faction, KIT_SLOT_BACK, "Satchel", /obj/item/storage/backpack/marine/satchel, "Less room, open it without taking it off")
-	add_clash_kit_option(faction, KIT_SLOT_BACK, "Shotgun scabbard", /obj/item/storage/large_holster/m37, "Carries a shotgun on the back")
+	add_clash_kit_option(faction, KIT_SLOT_BACK, "Shotgun scabbard", /obj/item/storage/large_holster/m37/clash, "Carries a shotgun on the back")
 	add_clash_kit_option(faction, KIT_SLOT_BELT, "M276 ammo load rig", /obj/item/storage/belt/marine, "Rifle magazines")
 	add_clash_kit_option(faction, KIT_SLOT_BELT, "M276 M4A3 holster rig", /obj/item/storage/belt/gun/m4a3, "Holsters the M4A3 or 88 Mod 4 with spare magazines")
 	add_clash_kit_option(faction, KIT_SLOT_BELT, "M276 M44 holster rig", /obj/item/storage/belt/gun/m44, "Holsters the revolver with speedloaders")

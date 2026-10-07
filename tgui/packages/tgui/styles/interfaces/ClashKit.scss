@@ -294,17 +294,6 @@ $note: #7c858e;
     }
   }
 
-  &__slotBadge {
-    position: absolute;
-    right: 3px;
-    bottom: 14px;
-    padding: 1px;
-    border-radius: 3px;
-    background: rgba(0, 0, 0, 0.6);
-    box-shadow: 0 0 0 1px var(--kit-accent);
-    pointer-events: none;
-  }
-
   &__optionsGroup {
     margin: 12px 0 6px;
     padding: 0 8px 4px;

@@ -1268,11 +1268,6 @@ const weaponViewFor = (id: string, scabbard?: boolean): WeaponView | null => {
 };
 const PERK_SLOTS = ['class_perk', 'general_perk'];
 
-const scabbardGun = (data: Data) =>
-  data.back_gun_slot
-    ? findOption(data.menus, data.faction, 'back_gun', data.choices.back_gun)
-    : undefined;
-
 const ScabbardOptions = () => {
   const { act, data } = useBackend<Data>();
   if (!data.back_gun_slot) return null;
@@ -1302,6 +1297,13 @@ const ScabbardOptions = () => {
       ))}
     </>
   );
+};
+
+const pickedFor = (data: Data, id: string) => {
+  const picked = findOption(data.menus, data.faction, id, data.choices[id]);
+  return id === 'back' && picked && data.back_gun_slot && data.choices.back_gun
+    ? { ...picked, icon_state: `${picked.icon_state}_full` }
+    : picked;
 };
 
 const optionMarks = (
@@ -1356,13 +1358,11 @@ const SlotTile = (props: {
   readonly blocked?: string;
   readonly problem?: string;
   readonly note?: string;
-  readonly badge?: Option;
   readonly fresh?: boolean;
   readonly nothing?: boolean;
   readonly onClick: () => void;
 }) => {
   const {
-    badge,
     slot,
     picked,
     issued,
@@ -1437,16 +1437,6 @@ const SlotTile = (props: {
           </Box>
         ) : (
           !slot.image && <Icon className="ClashKit__slotEmpty" name="plus" />
-        )}
-        {badge && (
-          <Box className="ClashKit__slotBadge">
-            <IconSprite
-              icon={badge.icon}
-              state={badge.icon_state}
-              fitWidth={40}
-              fitHeight={14}
-            />
-          </Box>
         )}
         <Box className="ClashKit__slotLabel">{slot.name}</Box>
         {blocked && <Icon className="ClashKit__slotBlocked" name="xmark" />}
@@ -1749,7 +1739,7 @@ export const ClashKit = () => {
     <SlotTile
       key={id}
       slot={slotById[id]}
-      picked={findOption(menus, faction, id, choices[id])}
+      picked={pickedFor(data, id)}
       issued={issueFor(id)}
       selected={selectedSlot === id}
       small={small}
@@ -1759,7 +1749,6 @@ export const ClashKit = () => {
       blocked={blocked_slots[id]}
       problem={data.problems?.[id]}
       note={data.notes?.[id]}
-      badge={id === 'back' ? scabbardGun(data) : undefined}
       nothing={choices[id] === NOTHING}
       fresh={
         selectedSlot !== id &&
@@ -1776,7 +1765,7 @@ export const ClashKit = () => {
   );
 
   return (
-    <Window width={1080} height={800} theme={isUpp ? 'crtred' : 'crtblue'}>
+    <Window width={1080} height={900} theme={isUpp ? 'crtred' : 'crtblue'}>
       <Window.Content
         className={classes(['ClashKit', isUpp && 'ClashKit--upp'])}
       >

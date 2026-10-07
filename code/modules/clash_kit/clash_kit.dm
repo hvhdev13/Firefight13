@@ -186,6 +186,8 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 			kit.name = stored["name"] == "Standard issue" ? "Default" : stored["name"]
 			for(var/slot in stored["choices"])
 				var/id = replacetext(replacetext(stored["choices"][slot], "/obj/item/storage/pouch/firstaid/ert", "/obj/item/storage/pouch/firstaid/clash"), "/obj/item/storage/pouch/bayonet/upp", "/obj/item/storage/pouch/bayonet")
+				if(findtext(id, "/obj/item/storage/large_holster/m37") == length(id) - length("/obj/item/storage/large_holster/m37") + 1)
+					id += "/clash"
 				if(id == CLASH_KIT_NOTHING && (slot in GLOB.clash_kit_slots))
 					kit.choices[slot] = id
 					continue
@@ -654,7 +656,7 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 	var/obj/item/storage/large_holster/scabbard = wearer.back
 	if(back_gun?.faction != faction || !istype(scabbard) || !clash_job_carries_back_gun(job))
 		return
-	var/obj/item/weapon/gun/gun = new back_gun.item_type(wearer)
+	var/obj/item/weapon/gun/gun = new back_gun.item_type()
 	clash_kit_fit_sidearm_attachments(wearer, gun, kit, ckey, job, FALSE, GLOB.clash_kit_back_attachment_slots)
 	if(!scabbard.can_be_inserted(gun, wearer, TRUE) || !scabbard.handle_item_insertion(gun, TRUE, wearer))
 		qdel(gun)
