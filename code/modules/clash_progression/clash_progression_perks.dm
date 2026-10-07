@@ -185,13 +185,6 @@
 	level = 10
 	icon_type = /obj/item/ammo_magazine/rifle
 
-/datum/clash_perk/heavy_fire
-	name = "Heavy Fire"
-	desc = "Your near misses suppress 27 (from 18)"
-	class = CLASH_CLASS_HEAVY
-	level = 2
-	icon_type = /obj/item/ammo_magazine/rifle/lmg
-
 /datum/clash_perk/spotter
 	name = "Spotter"
 	desc = "Enemies you suppress past half show as red dots on your team's radar within 14 tiles for 3 seconds"
@@ -224,7 +217,7 @@
 	name = "Quick Brace"
 	desc = "Your bipod deploys on the ground in 1 second (from 1.5)"
 	class = CLASH_CLASS_HEAVY
-	level = 14
+	level = 2
 	icon_type = /obj/item/attachable/bipod/m41ae2
 
 /datum/clash_perk/flak

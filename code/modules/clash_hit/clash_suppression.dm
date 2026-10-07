@@ -15,7 +15,6 @@
 #define CLASH_SUPPRESSION_SHAKE 0.1
 #define CLASH_SUPPRESSION_SHAKE_HEAVY 0.15
 #define CLASH_LOUD_TIME (3 SECONDS)
-#define CLASH_SUPPRESSION_HEAVY_MISS 27
 #define CLASH_SUPPRESSION_WIDE_RADIUS 2.5
 #define CLASH_SUPPRESSION_BRACED 0.5
 #define CLASH_SUPPRESSION_SLOW 0.25
@@ -181,7 +180,6 @@
 		return
 	var/reach = length + CLASH_SUPPRESSION_OVERSHOOT
 	var/radius = clash_has_perk(shooter, /datum/clash_perk/wide_fire) ? CLASH_SUPPRESSION_WIDE_RADIUS : CLASH_SUPPRESSION_MISS_RADIUS
-	var/amount = clash_has_perk(shooter, /datum/clash_perk/heavy_fire) ? CLASH_SUPPRESSION_HEAVY_MISS : CLASH_SUPPRESSION_NEAR_MISS
 	for(var/mob/living/carbon/human/target as anything in GLOB.alive_human_list)
 		if(target.z != start.z || target.faction == shooter.faction)
 			continue
@@ -191,7 +189,7 @@
 		if(along < 1 || along > reach)
 			continue
 		if(abs(offset_x * line_y - offset_y * line_x) / length <= radius)
-			if(clash_suppress(target, amount, shooter))
+			if(clash_suppress(target, CLASH_SUPPRESSION_NEAR_MISS, shooter))
 				target.clash_near_miss_cue()
 
 /datum/element/clash_suppression
@@ -265,7 +263,6 @@
 #undef CLASH_SUPPRESSION_SHAKE
 #undef CLASH_SUPPRESSION_SHAKE_HEAVY
 #undef CLASH_LOUD_TIME
-#undef CLASH_SUPPRESSION_HEAVY_MISS
 #undef CLASH_SUPPRESSION_WIDE_RADIUS
 #undef CLASH_SUPPRESSION_BRACED
 #undef CLASH_SUPPRESSION_SLOW
