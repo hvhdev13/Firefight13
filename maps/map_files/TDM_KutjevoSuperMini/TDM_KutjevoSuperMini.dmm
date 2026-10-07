@@ -306,18 +306,6 @@
 	},
 /turf/open/floor/plating/plating_catwalk/prison,
 /area/clash_arena/tdm_kutjevo/upp_base)
-"abW" = (
-/obj/structure/machinery/door/airlock/multi_tile/upp/generic_solid/autoname{
-	no_panel = 1;
-	unacidable = 1;
-	masterkey_resist = 1;
-	not_weldable = 1
-	},
-/obj/structure/blocker/clash_gate/upp{
-	dir = 4
-	},
-/turf/open/floor/strata/floor2,
-/area/clash_arena/tdm_kutjevo/upp_base)
 "abX" = (
 /obj/effect/landmark/start/marine/smartgunner/bravo,
 /obj/effect/landmark/late_join/bravo,
@@ -1124,7 +1112,7 @@
 /obj/structure/blocker/clash_gate/upp{
 	dir = 4
 	},
-/turf/open/floor/corsat/red/west,
+/turf/open/floor/kutjevo/colors/red/tile,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "aii" = (
 /obj/structure/machinery/light,
@@ -1625,12 +1613,6 @@
 /obj/structure/fence/slim/upp,
 /turf/open/floor/kutjevo/colors/orange,
 /area/kutjevo/exterior/Northwest_Colony)
-"aqs" = (
-/obj/structure/blocker/clash_gate/upp{
-	dir = 4
-	},
-/turf/open/floor/strata/floor2,
-/area/clash_arena/tdm_kutjevo/upp_base)
 "aqv" = (
 /obj/structure/sign/flag/upp,
 /turf/closed/wall/upp_ship/reinforced/outer,
@@ -2602,12 +2584,6 @@
 /obj/structure/platform/metal/kutjevo_smooth,
 /turf/open/floor/plating/kutjevo,
 /area/kutjevo/interior/power)
-"aEE" = (
-/obj/structure/blocker/clash_gate/upp{
-	dir = 4
-	},
-/turf/open/floor/corsat/red/east,
-/area/clash_arena/tdm_kutjevo/upp_base)
 "aFd" = (
 /obj/effect/landmark/clash_objective/domination_zone/c,
 /turf/open/floor/kutjevo/multi_tiles,
@@ -2782,18 +2758,6 @@
 	},
 /turf/open/floor/kutjevo/multi_tiles/east,
 /area/kutjevo/interior/power)
-"bEn" = (
-/obj/structure/machinery/door/airlock/multi_tile/upp/generic_solid/autoname{
-	no_panel = 1;
-	unacidable = 1;
-	masterkey_resist = 1;
-	not_weldable = 1
-	},
-/obj/structure/blocker/clash_gate/upp{
-	dir = 4
-	},
-/turf/open/floor/almayer/cargo_arrow,
-/area/clash_arena/tdm_kutjevo/upp_base)
 "bEp" = (
 /turf/closed/wall/kutjevo/rock,
 /area/kutjevo/exterior/scrubland)
@@ -3016,7 +2980,7 @@
 /obj/structure/blocker/clash_gate/upp{
 	dir = 4
 	},
-/turf/open/floor/almayer/cargo_arrow,
+/turf/open/floor/kutjevo/colors/red/tile,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "eBI" = (
 /turf/open/floor/kutjevo/colors/orange,
@@ -14655,7 +14619,7 @@ ctw
 ctw
 alW
 ctw
-bEn
+aie
 lRy
 aja
 lRy
@@ -14867,7 +14831,7 @@ alV
 alV
 ayi
 gcl
-aqs
+eAL
 gcl
 gcl
 gcl
@@ -15533,7 +15497,7 @@ axK
 axK
 alc
 gcl
-abW
+aie
 gcl
 gcl
 gcl
@@ -15543,7 +15507,7 @@ gcl
 gcl
 gcl
 gcl
-bEn
+aie
 lRy
 aja
 lRy
@@ -15755,7 +15719,7 @@ vEW
 vEW
 vEW
 aaG
-aEE
+eAL
 gYL
 aDD
 gYL

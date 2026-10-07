@@ -85,6 +85,7 @@ GLOBAL_DATUM(clash_zone_tile_icon, /icon)
 /datum/clash_zone
 	var/label
 	var/turf/center
+	var/turf/hold
 	var/radius
 	var/owner
 	var/capturing
@@ -102,8 +103,11 @@ GLOBAL_DATUM(clash_zone_tile_icon, /icon)
 	src.center = center
 	src.radius = radius
 	src.preview = preview
+	var/list/open = list()
 	for(var/turf/spot as anything in get_clash_zone_turfs(center, radius))
 		covered[spot] = TRUE
+		if(clash_turf_passable(spot))
+			open += spot
 		var/obj/effect/clash_zone_tile/tile = new(spot)
 		tiles += tile
 		if(preview)
@@ -111,15 +115,17 @@ GLOBAL_DATUM(clash_zone_tile_icon, /icon)
 			animate(alpha = 255, time = 5)
 	refresh_tiles()
 	marker = new(center)
+	hold = clash_turf_passable(center) ? center : (get_clash_nearest_turf(open, center.x, center.y) || center)
 	if(!preview)
-		GLOB.clash_objective_turfs += center
+		GLOB.clash_objective_turfs += hold
 
 /datum/clash_zone/Destroy(force)
 	if(!preview)
-		GLOB.clash_objective_turfs -= center
+		GLOB.clash_objective_turfs -= hold
 	QDEL_LIST(tiles)
 	QDEL_NULL(marker)
 	center = null
+	hold = null
 	covered = null
 	return ..()
 
@@ -138,7 +144,7 @@ GLOBAL_DATUM(clash_zone_tile_icon, /icon)
 /datum/clash_zone/proc/get_occupant_mobs()
 	. = list()
 	for(var/mob/living/carbon/human/fighter as anything in GLOB.alive_human_list)
-		if(!fighter.client || fighter.statistic_exempt || fighter.stat != CONSCIOUS || !covered[get_turf(fighter)])
+		if(!fighter.client || fighter.statistic_exempt || fighter.stat != CONSCIOUS || fighter.health < fighter.health_threshold_crit || !covered[get_turf(fighter)])
 			continue
 		if(fighter.faction in list(FACTION_MARINE, FACTION_UPP))
 			. += fighter
@@ -194,7 +200,7 @@ GLOBAL_DATUM(clash_zone_tile_icon, /icon)
 	return "[floor(seconds / 60)]:[seconds % 60 < 10 ? "0" : ""][seconds % 60]"
 
 /proc/clash_turf_passable(turf/spot)
-	if(!spot || spot.density)
+	if(!spot || spot.density || istype(spot, /turf/open/space))
 		return FALSE
 	for(var/obj/thing in spot)
 		if(thing.density && thing.anchored && !istype(thing, /obj/structure/machinery/door))
@@ -248,6 +254,38 @@ GLOBAL_DATUM(clash_zone_tile_icon, /icon)
 			steps[next] = taken + 1
 			queue += next
 
+/proc/get_clash_middle_turf(x, y, z)
+	return get_clash_open_turf_near(x, y, z) || get_clash_base_path_middle(z)
+
+/proc/get_clash_base_path_middle(z)
+	var/list/came_from = list()
+	var/list/queue = list()
+	for(var/area/clash_arena/base in GLOB.all_areas)
+		if(base.clash_faction != FACTION_MARINE)
+			continue
+		for(var/turf/spot in base)
+			if(spot.z == z && clash_turf_passable(spot))
+				came_from[spot] = spot
+				queue += spot
+	var/index = 1
+	while(index <= length(queue))
+		var/turf/current = queue[index]
+		index++
+		var/area/clash_arena/here = get_area(current)
+		if(istype(here) && here.clash_faction == FACTION_UPP)
+			var/list/path = list(current)
+			while(came_from[current] != current)
+				current = came_from[current]
+				path += current
+			return path[ceil(length(path) / 2)]
+		for(var/direction in GLOB.cardinals)
+			var/turf/next = get_step(current, direction)
+			if(!next || came_from[next] || !clash_turf_passable(next))
+				continue
+			came_from[next] = current
+			queue += next
+	return null
+
 /proc/get_clash_nearest_turf(list/candidates, x, y)
 	var/best_distance
 	for(var/turf/spot as anything in candidates)
@@ -288,6 +326,11 @@ GLOBAL_DATUM(clash_zone_tile_icon, /icon)
 		return "is inside a base"
 	return null
 
+/proc/clash_zone_marker_problem(turf/spot)
+	if(clash_in_base(spot))
+		return "is inside a base"
+	return null
+
 /proc/clash_marker_spot(obj/effect/landmark/clash_objective/mark, default_radius)
 	return list(mark.label, get_turf(mark), clamp(round(mark.radius || default_radius), 1, CLASH_ZONE_MAX_RADIUS))
 
@@ -315,7 +358,7 @@ GLOBAL_DATUM(clash_zone_tile_icon, /icon)
 	else
 		log_debug("HVH: no base areas found, objectives placed from the map centre")
 
-	var/turf/middle = get_clash_open_turf_near(mid_x, mid_y, z)
+	var/turf/middle = get_clash_middle_turf(mid_x, mid_y, z)
 	if(!middle)
 		log_debug("HVH: no open ground near the map centre for objectives")
 		return
@@ -323,9 +366,9 @@ GLOBAL_DATUM(clash_zone_tile_icon, /icon)
 		. += list(list("Hill", middle, radius))
 		return
 	var/list/reachable = get_clash_reachable_turfs(middle)
-	. += list(list("A", get_clash_nearest_turf(reachable, mid_x + flank_x, mid_y + flank_y) || middle, radius))
+	. += list(list("A", get_clash_nearest_turf(reachable, middle.x + flank_x, middle.y + flank_y) || middle, radius))
 	. += list(list("B", middle, radius))
-	. += list(list("C", get_clash_nearest_turf(reachable, mid_x - flank_x, mid_y - flank_y) || middle, radius))
+	. += list(list("C", get_clash_nearest_turf(reachable, middle.x - flank_x, middle.y - flank_y) || middle, radius))
 
 #undef CLASH_ZONE_SEARCH_STEPS
 #undef CLASH_ZONE_MAX_RADIUS

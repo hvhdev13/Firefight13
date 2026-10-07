@@ -166,7 +166,7 @@
 	if(!uscm || !upp)
 		log_debug("HVH: no base areas found, cannot place flag stands")
 		return
-	var/turf/middle = get_clash_open_turf_near((uscm[1] + upp[1]) / 2, (uscm[2] + upp[2]) / 2, z)
+	var/turf/middle = get_clash_middle_turf((uscm[1] + upp[1]) / 2, (uscm[2] + upp[2]) / 2, z)
 	if(!middle)
 		return
 	var/list/reachable = get_clash_reachable_turfs(middle, 200)

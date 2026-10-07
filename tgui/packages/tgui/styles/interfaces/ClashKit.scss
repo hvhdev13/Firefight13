@@ -317,6 +317,26 @@ $panel: rgba(0, 0, 0, 0.3);
     &--dimmed {
       opacity: 0.35;
     }
+
+    &--blocked {
+      border-color: rgba(220, 60, 60, 0.6);
+
+      .ClashKit__slotIcon,
+      .ClashKit__slotArt {
+        opacity: 0.25;
+      }
+    }
+  }
+
+  &__slotBlocked {
+    position: absolute;
+    left: 50%;
+    top: 44%;
+    transform: translate(-50%, -50%);
+    font-size: 2.2em;
+    color: #e04848;
+    text-shadow: 0 0 3px #000;
+    pointer-events: none;
   }
 
   &__slotArt {

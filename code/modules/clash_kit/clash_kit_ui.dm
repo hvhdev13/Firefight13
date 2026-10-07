@@ -185,6 +185,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 		"job_class" = GLOB.clash_job_classes[job],
 		"class_primaries" = (GLOB.clash_job_classes[job] in GLOB.clash_class_only_primaries),
 		"fits" = fits,
+		"blocked_slots" = clash_kit_blocked_slots(gun_type),
 		"doll" = render?["doll"],
 		"gun" = render?["gun"],
 		"sidearm" = render?["sidearm"],

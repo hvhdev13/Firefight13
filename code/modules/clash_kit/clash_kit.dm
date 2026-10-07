@@ -271,7 +271,16 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 		if(istype(pouch) && !length(pouch.contents))
 			clash_kit_top_up(pouch, ammo_type, wearer)
 
+/proc/clash_kit_blocked_slots(primary_type)
+	. = list()
+	if(ispath(primary_type, /obj/item/weapon/gun/smartgun))
+		.[KIT_SLOT_BACK] = "You cannot use a backpack with the M56 harness"
+
 /proc/clash_kit_smartgun_rig(mob/living/carbon/human/wearer, datum/clash_kit/kit)
+	var/obj/item/pack = wearer.back
+	if(pack && !(pack.flags_item & SMARTGUNNER_BACKPACK_OVERRIDE))
+		wearer.temp_drop_inv_item(pack, TRUE)
+		qdel(pack)
 	clash_kit_replace_worn(wearer, WEAR_JACKET, /obj/item/clothing/suit/storage/marine/smartgunner)
 	if(!kit.get_option(KIT_SLOT_BELT))
 		clash_kit_replace_worn(wearer, WEAR_WAIST, /obj/item/storage/belt/gun/smartgunner)
@@ -635,7 +644,7 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 	clash_swap_issued_flare_pouches(wearer)
 	for(var/slot in GLOB.clash_kit_worn_slots)
 		var/datum/clash_kit_option/option = kit.get_option(slot)
-		if(!option || option.faction != faction || (slot == KIT_SLOT_ARMOR && ispath(primary?.item_type, /obj/item/weapon/gun/smartgun)))
+		if(!option || option.faction != faction || ((slot == KIT_SLOT_ARMOR || slot == KIT_SLOT_BACK) && ispath(primary?.item_type, /obj/item/weapon/gun/smartgun)))
 			continue
 		var/wear_slot = GLOB.clash_kit_slots[slot]["wear"]
 		var/obj/item/worn = wearer.get_item_by_slot(wear_slot)

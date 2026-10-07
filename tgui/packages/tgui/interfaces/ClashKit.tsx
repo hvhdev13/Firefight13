@@ -155,6 +155,7 @@ interface Data extends StaticData {
   choices: Record<string, string>;
   issue: Record<string, IssueItem>;
   fits: string[];
+  blocked_slots: Record<string, string>;
   doll: string | null;
   gun: string | null;
   sidearm: string | null;
@@ -982,6 +983,7 @@ const SlotTile = (props: {
   readonly small?: boolean;
   readonly dense?: boolean;
   readonly lock?: string;
+  readonly blocked?: string;
   readonly fresh?: boolean;
   readonly onClick: () => void;
 }) => {
@@ -994,20 +996,23 @@ const SlotTile = (props: {
     small,
     dense,
     lock,
+    blocked,
     fresh,
     onClick,
   } = props;
   const shown = picked ?? issued;
   const perk = PERK_SLOTS.includes(slot.id);
-  const tooltip = lock
-    ? `${picked?.name}: locked, ${lock}. ${perk ? 'You spawn without it.' : 'The starting item is used at spawn.'}`
-    : picked
-      ? perk
-        ? `${picked.name}: ${picked.blurb}`
-        : picked.name
-      : issued
-        ? issued.name
-        : `${slot.name}: nothing`;
+  const tooltip = blocked
+    ? `${blocked}.`
+    : lock
+      ? `${picked?.name}: locked, ${lock}. ${perk ? 'You spawn without it.' : 'The starting item is used at spawn.'}`
+      : picked
+        ? perk
+          ? `${picked.name}: ${picked.blurb}`
+          : picked.name
+        : issued
+          ? issued.name
+          : `${slot.name}: nothing`;
   return (
     <Tooltip content={tooltip}>
       <Box
@@ -1015,7 +1020,8 @@ const SlotTile = (props: {
           'ClashKit__slot',
           small && 'ClashKit__slot--small',
           selected && 'ClashKit__slot--selected',
-          (dimmed || lock) && 'ClashKit__slot--dimmed',
+          (dimmed || lock) && !blocked && 'ClashKit__slot--dimmed',
+          blocked && 'ClashKit__slot--blocked',
           picked && 'ClashKit__slot--set',
         ])}
         onClick={onClick}
@@ -1040,6 +1046,7 @@ const SlotTile = (props: {
           !slot.image && <Icon className="ClashKit__slotEmpty" name="plus" />
         )}
         <Box className="ClashKit__slotLabel">{slot.name}</Box>
+        {blocked && <Icon className="ClashKit__slotBlocked" name="xmark" />}
         {fresh && <Box className="ClashKit__slotNew">new</Box>}
         {picked && <Box className="ClashKit__slotDot" />}
       </Box>
@@ -1159,6 +1166,7 @@ export const ClashKit = () => {
     choices,
     issue,
     fits,
+    blocked_slots,
     doll,
     doll_pending,
     deploy_state,
@@ -1284,6 +1292,7 @@ export const ClashKit = () => {
       dimmed={dimmed}
       dense={dense}
       lock={choices[id] ? locks[choices[id]] : undefined}
+      blocked={blocked_slots[id]}
       fresh={
         selectedSlot !== id &&
         slotOptions(id).some((option) => fresh.includes(option.id))

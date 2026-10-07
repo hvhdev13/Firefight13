@@ -242,13 +242,13 @@
 	if(!main)
 		zone_notes += length(alternates) ? "Secondary and tertiary hill markers need a KOTH primary hill marker, so the hill was placed automatically." : "No KOTH hill markers on this map, the hill was placed automatically."
 		return get_clash_auto_objective_spots(zone_count, zone_radius)
-	var/problem = clash_marker_problem(get_turf(main))
+	var/problem = clash_zone_marker_problem(get_turf(main))
 	if(problem)
 		zone_notes += "The KOTH primary hill marker [problem], so the hill was placed automatically."
 		return get_clash_auto_objective_spots(zone_count, zone_radius)
 	hill_spots += list(clash_marker_spot(main, zone_radius))
 	for(var/obj/effect/landmark/clash_objective/alternate as anything in alternates)
-		problem = clash_marker_problem(get_turf(alternate))
+		problem = clash_zone_marker_problem(get_turf(alternate))
 		if(problem)
 			zone_notes += "[alternate.name] [problem], skipped."
 			continue
@@ -402,7 +402,7 @@
 			problems += "[initial(marker_type.label)] is missing"
 			continue
 		found = TRUE
-		var/problem = clash_marker_problem(get_turf(mark))
+		var/problem = clash_zone_marker_problem(get_turf(mark))
 		if(problem)
 			problems += "[mark.label] [problem]"
 			continue

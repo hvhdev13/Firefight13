@@ -145,6 +145,9 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 		return "Only for [GLOB.clash_class_names[option.only_class]]s"
 	if(option.slot == KIT_SLOT_ARMOR && ispath(primary_type, /obj/item/weapon/gun/smartgun))
 		return "The M56A2 only fires with the M56 harness"
+	var/list/blocked = clash_kit_blocked_slots(primary_type)
+	if(blocked[option.slot])
+		return blocked[option.slot]
 	if(option.slot == KIT_SLOT_PRIMARY && option.only_class != GLOB.clash_job_classes[job] && (GLOB.clash_job_classes[job] in GLOB.clash_class_only_primaries))
 		return "Machine Gunners carry a machine gun"
 	var/datum/clash_perk/perk = GLOB.clash_perks[option.item_type]
