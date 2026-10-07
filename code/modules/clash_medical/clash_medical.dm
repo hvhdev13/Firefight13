@@ -548,15 +548,6 @@ GLOBAL_LIST_INIT(clash_medic_stripped_items, list(
 	. = ..()
 	clash_injector_overlay(src, "emptyskill", "autoinjector_2", "#d87f2b")
 
-/atom/movable/screen/alert/clash_internal
-	name = "Internal injuries"
-	desc = "A medic's Fix-all injector can fix this."
-	icon_state = "template"
-
-/atom/movable/screen/alert/clash_internal/Initialize(mapload, ...)
-	. = ..()
-	clash_injector_overlay(src, "empty_research_oneuse", "autoinjector_oneuse_1", "#f2c230")
-
 /proc/clash_injector_overlay(atom/movable/screen/alert/alert, body_state, fill_state, fill_color)
 	var/image/filling = image('icons/obj/items/syringe.dmi', fill_state)
 	filling.color = fill_color
@@ -579,19 +570,109 @@ GLOBAL_LIST_INIT(clash_medic_stripped_items, list(
 	return FALSE
 
 /proc/clash_update_internal_injuries(mob/living/carbon/human/patient)
-	if(!clash_is_bot(patient) && clash_has_internal_injuries(patient))
+	var/injured = !clash_is_bot(patient) && clash_has_internal_injuries(patient)
+	if(injured)
 		clash_status_add(patient, /datum/clash_status/internal_injuries)
-		patient.throw_alert("clash_internal", /atom/movable/screen/alert/clash_internal)
-		return
-	clash_status_remove(patient, /datum/clash_status/internal_injuries)
-	patient.clear_alert("clash_internal")
+	else
+		clash_status_remove(patient, /datum/clash_status/internal_injuries)
+	clash_update_hud_statuses(patient, injured)
 
 /proc/clash_check_internal_injuries()
 	for(var/mob/living/carbon/human/fighter as anything in GLOB.alive_human_list)
 		clash_update_internal_injuries(fighter)
-	for(var/mob/living/carbon/human/fighter as anything in GLOB.clash_status_holders)
-		if(fighter.stat == DEAD)
+	for(var/mob/living/carbon/human/fighter as anything in GLOB.clash_status_holders | GLOB.clash_hud_status_mobs)
+		if(QDELETED(fighter))
+			GLOB.clash_hud_status_mobs -= fighter
+		else if(fighter.stat == DEAD)
 			clash_update_internal_injuries(fighter)
+
+GLOBAL_LIST_EMPTY(clash_hud_status_mobs)
+
+/mob/living/carbon/human/var/list/clash_hud_statuses
+
+/atom/movable/screen/clash_hud_status
+	icon = 'icons/mob/hud/clash_status.dmi'
+	var/client/shown_to
+
+/atom/movable/screen/clash_hud_status/Destroy()
+	shown_to?.screen -= src
+	shown_to = null
+	return ..()
+
+/atom/movable/screen/clash_hud_status/MouseEntered(location, control, params)
+	openToolTip(usr, src, params, title = name, content = desc)
+
+/atom/movable/screen/clash_hud_status/MouseExited(location, control, params)
+	closeToolTip(usr)
+
+/proc/clash_status_hud_tick(mob/living/carbon/human/patient)
+	if(clash_fast_medicine())
+		clash_update_hud_statuses(patient, !clash_is_bot(patient) && clash_has_internal_injuries(patient))
+
+/proc/clash_fracture_text(mob/living/carbon/human/patient)
+	var/list/broken = list()
+	for(var/obj/limb/limb as anything in patient.limbs)
+		if(limb.status & LIMB_BROKEN)
+			broken += "[limb.display_name][limb.status & LIMB_SPLINTED ? " (splinted)" : ""]"
+	return length(broken) ? "Fractured: [broken.Join(", ")]." : null
+
+/proc/clash_update_hud_statuses(mob/living/carbon/human/patient, injured)
+	var/list/wanted = list()
+	if(!clash_is_bot(patient) && patient.stat != DEAD)
+		var/fractures = clash_fracture_text(patient)
+		if(fractures)
+			wanted["break"] = list("Fracture", fractures)
+		if(injured)
+			wanted["organ"] = list("Organ damage", "A medic's Fix-all injector heals it.")
+	var/list/shown = patient.clash_hud_statuses
+	if(!length(wanted) && !length(shown))
+		return
+	var/client/viewer = patient.client
+	for(var/kind in shown?.Copy())
+		if(wanted[kind])
+			continue
+		qdel(shown[kind])
+		shown -= kind
+	if(!length(wanted))
+		patient.clash_hud_statuses = null
+		GLOB.clash_hud_status_mobs -= patient
+		return
+	if(!shown)
+		shown = list()
+		patient.clash_hud_statuses = shown
+		GLOB.clash_hud_status_mobs |= patient
+	var/datum/custom_hud/ui_datum
+	if(patient.faction == FACTION_UPP)
+		ui_datum = GLOB.custom_huds_list[HUD_RED]
+	else if(viewer)
+		ui_datum = GLOB.custom_huds_list[viewer.prefs.UI_style]
+	else
+		ui_datum = GLOB.custom_huds_list[HUD_MIDNIGHT]
+	var/style = "[ui_datum.ui_style_icon]"
+	style = copytext(style, findlasttext(style, "/") + 1, findlasttext(style, "."))
+	var/placement = 1
+	var/datum/hud/hud = patient.hud_used
+	for(var/atom/movable/screen/upstream as anything in list(hud?.bleeding_icon, hud?.slowed_icon, hud?.shrapnel_icon, hud?.tethering_icon, hud?.tethered_icon))
+		if(upstream && upstream.icon_state != "status_0")
+			placement++
+	for(var/kind in list("break", "organ"))
+		var/list/info = wanted[kind]
+		if(!info)
+			continue
+		var/atom/movable/screen/clash_hud_status/icon = shown[kind]
+		if(!icon)
+			icon = new
+			shown[kind] = icon
+		icon.icon_state = "[style]_[kind]"
+		icon.name = info[1]
+		icon.desc = info[2]
+		icon.screen_loc = ui_datum.get_status_loc(placement)
+		placement++
+		if(icon.shown_to != viewer)
+			icon.shown_to?.screen -= icon
+			icon.shown_to = viewer
+		if(viewer && !(icon in viewer.screen))
+			viewer.screen += icon
 
 /obj/limb/chest/remove_wound_bleeding()
 	if(!clash_fast_medicine())

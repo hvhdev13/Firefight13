@@ -64,7 +64,7 @@
 	var/next_xp = clash_level_xp_for(level + 1, base)
 	return list("to_next" = max(0, next_xp - xp), "fill" = clamp((xp - floor_xp) / (next_xp - floor_xp), 0, 1))
 
-/proc/clash_progress_ui_data(ckey, job, primary_type, gun_type, sidearm_type)
+/proc/clash_progress_ui_data(ckey, job, primary_type, gun_type, sidearm_type, back_type)
 	if(!clash_progression_gating())
 		return null
 	build_clash_option_gates()
@@ -80,7 +80,7 @@
 	var/list/ranks = list()
 	for(var/slot in GLOB.clash_kit_menu[faction])
 		var/attachment = clash_is_attachment_slot(slot)
-		var/slot_gun = clash_is_sidearm_attachment_slot(slot) ? sidearm_type : primary_type
+		var/slot_gun = clash_is_sidearm_attachment_slot(slot) ? sidearm_type : (clash_is_back_attachment_slot(slot) ? back_type : primary_type)
 		for(var/datum/clash_kit_option/option as anything in GLOB.clash_kit_menu[faction][slot])
 			ranks[option.id] = clash_option_rank(progress, option, class, slot_gun)
 			var/lock_text = clash_option_lock_text(ckey, option.id, job, slot_gun)
@@ -119,6 +119,7 @@
 		"shop_locks" = shop_locks,
 		"gun" = clash_gun_progress(progress, clash_track_type(gun_type)),
 		"sidearm_gun" = clash_gun_progress(progress, clash_track_type(sidearm_type)),
+		"back_gun" = clash_gun_progress(progress, clash_track_type(back_type)),
 	)
 
 /proc/clash_option_rank(datum/clash_progress/progress, datum/clash_kit_option/option, class, primary_type)

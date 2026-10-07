@@ -175,7 +175,7 @@ GLOBAL_LIST_INIT(clash_gear_names, list(
 	"general_pouch" = "medium general pouch",
 	"flare_pouch" = "flare pouch",
 	"pistol_pouch" = "pistol pouch",
-	"bayonet_sheath" = "bayonet sheath",
+	"bayonet_sheath" = "throwing knives",
 	"extra_helmet" = "extra helmet",
 ))
 

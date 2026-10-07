@@ -77,7 +77,9 @@ GLOBAL_LIST_INIT(clash_arena_eng_removed, list(
 	for(var/obj/item/clash_ammo_crate/old_crate as anything in crates?.Copy())
 		if(old_crate.deployed?.faction != engineer.faction)
 			qdel(old_crate)
-	clash_give_engineer_item(engineer, clash_new_sentry(engineer, clash_engineer_sentry_choice(engineer)))
+	var/sentry_tier = clash_engineer_sentry_choice(engineer)
+	if(sentry_tier)
+		clash_give_engineer_item(engineer, clash_new_sentry(engineer, sentry_tier))
 	clash_give_engineer_item(engineer, clash_new_crate(engineer))
 
 /proc/clash_goggles_up(obj/item/clothing/glasses/welding/goggles, mob/living/carbon/human/wearer)
@@ -168,6 +170,8 @@ GLOBAL_LIST_INIT(clash_arena_eng_removed, list(
 
 /proc/clash_engineer_sentry_choice(mob/living/carbon/human/engineer)
 	var/datum/clash_kit/kit = get_clash_active_kit(engineer.ckey, engineer.job)
+	if(kit?.wants_nothing(KIT_SLOT_SENTRY))
+		return null
 	var/datum/clash_kit_option/option = kit?.get_option(KIT_SLOT_SENTRY)
 	var/tier = option ? clash_sentry_tier_of(option.item_type) : null
 	if(!tier || clash_engineer_level(engineer.ckey) < GLOB.clash_sentry_tiers[tier]["level"])

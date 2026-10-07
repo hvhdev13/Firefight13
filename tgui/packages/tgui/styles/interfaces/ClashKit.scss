@@ -5,12 +5,19 @@ $accent-upp: #ff5a4d;
 $line: rgba(255, 255, 255, 0.12);
 $line-strong: rgba(255, 255, 255, 0.45);
 $panel: rgba(0, 0, 0, 0.3);
+$problem: #e04848;
+$problem-upp: #ffb02e;
+$note: #7c858e;
 
 .ClashKit {
   --kit-accent: #{$accent};
+  --kit-problem: #{$problem};
+  --kit-problem-fill: rgba(224, 72, 72, 0.12);
 
   &--upp {
     --kit-accent: #{$accent-upp};
+    --kit-problem: #{$problem-upp};
+    --kit-problem-fill: rgba(255, 176, 46, 0.12);
   }
 
   &__header {
@@ -265,6 +272,49 @@ $panel: rgba(0, 0, 0, 0.3);
     gap: 14px;
   }
 
+  &__weaponTabs {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    opacity: 1;
+  }
+
+  &__weaponTab {
+    opacity: 0.45;
+    cursor: pointer;
+
+    &:hover {
+      opacity: 0.8;
+    }
+
+    &--selected {
+      opacity: 1;
+      color: var(--kit-accent);
+      box-shadow: 0 1px 0 var(--kit-accent);
+    }
+  }
+
+  &__slotBadge {
+    position: absolute;
+    right: 3px;
+    bottom: 14px;
+    padding: 1px;
+    border-radius: 3px;
+    background: rgba(0, 0, 0, 0.6);
+    box-shadow: 0 0 0 1px var(--kit-accent);
+    pointer-events: none;
+  }
+
+  &__optionsGroup {
+    margin: 12px 0 6px;
+    padding: 0 8px 4px;
+    border-bottom: 1px solid $line;
+    font-size: 0.8em;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    opacity: 0.75;
+  }
+
   &__attachHeader {
     margin: 10px 0 4px;
     text-align: center;
@@ -272,6 +322,12 @@ $panel: rgba(0, 0, 0, 0.3);
     letter-spacing: 0.1em;
     text-transform: uppercase;
     opacity: 0.75;
+  }
+
+  &__shellRow {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
   }
 
   &__attachHint {
@@ -447,7 +503,7 @@ $panel: rgba(0, 0, 0, 0.3);
     }
 
     &--warn {
-      color: #e8b931;
+      color: var(--kit-problem);
       opacity: 1;
     }
   }
@@ -522,9 +578,70 @@ $panel: rgba(0, 0, 0, 0.3);
     opacity: 0.7;
   }
 
-  &__packWarn {
-    border-left-color: #e6a23c;
-    cursor: default;
+  &__packHolder--warn {
+    border-color: var(--kit-problem);
+  }
+
+  & &__packHeadWarn {
+    color: var(--kit-problem);
+    font-weight: normal;
+  }
+
+  &__packProblem {
+    background: var(--kit-problem-fill);
+    box-shadow: 3px 0 0 var(--kit-problem) inset;
+  }
+
+  & &__packProblemReason {
+    color: var(--kit-problem);
+    font-size: 0.85em;
+  }
+
+  & &__problemMark {
+    border-radius: 50%;
+    background: #000;
+    color: var(--kit-problem);
+    cursor: help;
+  }
+
+  &__slotProblem {
+    position: absolute;
+    top: 3px;
+    left: 4px;
+    font-size: 1.15em;
+  }
+
+  & &__slotNote {
+    position: absolute;
+    top: 3px;
+    left: 4px;
+    color: var(--kit-accent);
+  }
+
+  &__slotProblem ~ &__slotNew {
+    left: 22px;
+  }
+
+  & &__tipProblem {
+    margin-top: 4px;
+    color: var(--kit-problem);
+  }
+
+  & &__tipNote {
+    margin-top: 4px;
+    color: var(--kit-accent);
+  }
+
+  & &__optionNote {
+    color: $note;
+    font-size: 0.85em;
+    font-style: italic;
+  }
+
+  & &__kitProblems {
+    margin: 2px 0 4px;
+    color: var(--kit-problem);
+    font-size: 0.85em;
   }
 
   &__shopPoints {

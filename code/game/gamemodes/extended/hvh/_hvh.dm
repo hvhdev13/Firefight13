@@ -443,7 +443,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	var/weapon = entry["cause"] ? " <span style='color: #9aa3ab'>\[[html_encode(entry["cause"])]\]</span> " : " <span style='color: #9aa3ab'>&gt;</span> "
 	if(entry["revive"])
 		weapon = " <span style='color: #7fd67f'>revived</span> "
-	return "<span class='maptext' style='text-align: right; font-size: 6px; [outline]'><span style='color: [entry["killer_color"]]'>[clash_feed_name(entry["killer"])][entry["assister"] ? " <span style='color: #9aa3ab'>+</span> [clash_feed_name(entry["assister"])]" : ""]</span>[weapon]<span style='color: [entry["victim_color"]]'>[clash_feed_name(entry["victim"])]</span></span>"
+	return "<span class='maptext' style='text-align: center; font-size: 6px; [outline]'><span style='color: [entry["killer_color"]]'>[clash_feed_name(entry["killer"])][entry["assister"] ? " <span style='color: #9aa3ab'>+</span> [clash_feed_name(entry["assister"])]" : ""]</span>[weapon]<span style='color: [entry["victim_color"]]'>[clash_feed_name(entry["victim"])]</span></span>"
 
 /proc/clash_feed_name(name)
 	var/tag_start = findtext(name, " \[BOT\]")
@@ -928,6 +928,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 
 /datum/game_mode/extended/faction_clash/hvh/proc/begin_intermission()
 	intermission_end_time = world.time + CLASH_INTERMISSION
+	intermission_timer_id = addtimer(CALLBACK(src, PROC_REF(end_intermission)), CLASH_INTERMISSION, TIMER_STOPPABLE)
 	var/list/result = match_results[length(match_results)]
 	var/line = get_match_result_line(result)
 	for(var/faction in list(FACTION_MARINE, FACTION_UPP))
@@ -936,7 +937,6 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		if(!get_open_clash_kit_screen(player))
 			GLOB.clash_scoreboard.tgui_interact(player)
 	update_score_huds()
-	intermission_timer_id = addtimer(CALLBACK(src, PROC_REF(end_intermission)), CLASH_INTERMISSION, TIMER_STOPPABLE)
 
 /datum/game_mode/extended/faction_clash/hvh/proc/end_intermission()
 	if(round_finished || !intermission_end_time)

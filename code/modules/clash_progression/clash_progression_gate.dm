@@ -36,6 +36,8 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 	return gun_type
 
 /proc/clash_effective_primary(datum/clash_kit/kit, job)
+	if(kit?.wants_nothing(KIT_SLOT_PRIMARY))
+		return null
 	var/datum/clash_kit_option/primary = kit?.get_option(KIT_SLOT_PRIMARY)
 	if(primary)
 		return primary.item_type
@@ -44,6 +46,8 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 	return issued_gun ? text2path(issued_gun["type"]) : null
 
 /proc/clash_effective_sidearm(datum/clash_kit/kit, job)
+	if(kit?.wants_nothing(KIT_SLOT_SIDEARM))
+		return null
 	var/datum/clash_kit_option/sidearm = kit?.get_option(KIT_SLOT_SIDEARM)
 	if(sidearm)
 		return sidearm.item_type
@@ -149,6 +153,8 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 	if(blocked[option.slot])
 		return blocked[option.slot]
 	if(option.slot == KIT_SLOT_PRIMARY && option.only_class != GLOB.clash_job_classes[job] && (GLOB.clash_job_classes[job] in GLOB.clash_class_only_primaries))
+		return "Machine Gunners carry a machine gun"
+	if(option.slot == KIT_SLOT_BACK_GUN && !clash_job_carries_back_gun(job))
 		return "Machine Gunners carry a machine gun"
 	var/datum/clash_perk/perk = GLOB.clash_perks[option.item_type]
 	if(perk)
@@ -283,6 +289,7 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 	filtered.extra_slots = kit.extra_slots
 	filtered.moves = kit.moves
 	filtered.removed = kit.removed
+	filtered.removed_slots = kit.removed_slots
 	filtered.fills = kit.fills
 	for(var/slot in kit.choices)
 		if(clash_is_attachment_slot(slot))
@@ -306,6 +313,13 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 			var/slot = GLOB.clash_kit_sidearm_attachment_slots[gun_slot]
 			var/id = kit.choices[slot]
 			if(id && !clash_option_lock_text(ckey, id, job, sidearm_type))
+				filtered.choices[slot] = id
+	var/back_type = clash_effective_back_gun(filtered, job)
+	if(back_type)
+		for(var/gun_slot in GLOB.clash_kit_back_attachment_slots)
+			var/slot = GLOB.clash_kit_back_attachment_slots[gun_slot]
+			var/id = kit.choices[slot]
+			if(id && !clash_option_lock_text(ckey, id, job, back_type))
 				filtered.choices[slot] = id
 	return filtered
 

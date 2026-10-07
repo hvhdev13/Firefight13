@@ -91,6 +91,8 @@ SUBSYSTEM_DEF(clash_spawn)
 		if(kit)
 			apply_clash_kit(spawned, kit)
 			to_chat(spawned, SPAN_NOTICE("Kitted out as [kit.name]. [clash_perk_spawn_text(spawned)]Use the Loadout verb to change it for your next spawn."))
+			for(var/slot in spawned.clash_kit_notes)
+				to_chat(spawned, SPAN_NOTICE(spawned.clash_kit_notes[slot]))
 		clash_issue_medic_gear(spawned)
 		clash_issue_engineer_gear(spawned)
 	else

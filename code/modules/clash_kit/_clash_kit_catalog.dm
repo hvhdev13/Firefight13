@@ -20,14 +20,22 @@
 #define KIT_SLOT_WEBBING "webbing"
 #define KIT_SLOT_CLASS_PERK "class_perk"
 #define KIT_SLOT_GENERAL_PERK "general_perk"
+#define KIT_SLOT_BACK_GUN "back_gun"
+#define KIT_SLOT_BACK_RAIL "back_rail"
+#define KIT_SLOT_BACK_MUZZLE "back_muzzle"
+#define KIT_SLOT_BACK_UNDER "back_under"
+#define KIT_SLOT_BACK_STOCK "back_stock"
 GLOBAL_LIST_INIT(clash_kit_worn_slots, list(KIT_SLOT_HELMET, KIT_SLOT_EYES, KIT_SLOT_ARMOR, KIT_SLOT_MASK, KIT_SLOT_BACK, KIT_SLOT_BELT, KIT_SLOT_POUCH_L, KIT_SLOT_POUCH_R))
 GLOBAL_LIST_INIT(clash_kit_attachment_slots, list(KIT_SLOT_RAIL, KIT_SLOT_MUZZLE, KIT_SLOT_UNDER, KIT_SLOT_STOCK))
 GLOBAL_LIST_INIT(clash_kit_sidearm_attachment_slots, list(KIT_SLOT_RAIL = KIT_SLOT_SIDE_RAIL, KIT_SLOT_MUZZLE = KIT_SLOT_SIDE_MUZZLE, KIT_SLOT_UNDER = KIT_SLOT_SIDE_UNDER, KIT_SLOT_STOCK = KIT_SLOT_SIDE_STOCK))
+GLOBAL_LIST_INIT(clash_kit_back_attachment_slots, list(KIT_SLOT_RAIL = KIT_SLOT_BACK_RAIL, KIT_SLOT_MUZZLE = KIT_SLOT_BACK_MUZZLE, KIT_SLOT_UNDER = KIT_SLOT_BACK_UNDER, KIT_SLOT_STOCK = KIT_SLOT_BACK_STOCK))
 #define CLASH_KIT_COUNT 7
+#define CLASH_KIT_NOTHING "nothing"
 #define CLASH_KIT_SPAWN "spawn"
 #define CLASH_KIT_RESET "reset"
 #define CLASH_KIT_PREVIEW "preview"
 #define CLASH_KIT_FILL_LIMIT 30
+#define CLASH_KIT_GUN_FILL "gun"
 #define CLASH_KIT_MOVE_LIMIT 40
 #define CLASH_ATTACHMENT_EFFECTS_SHOWN 5
 #define CLASH_KIT_SPARE_PRIMARY 4
@@ -47,6 +55,7 @@ GLOBAL_LIST_INIT(clash_kit_slots, list(
 	KIT_SLOT_POUCH_R = list("name" = "Right pouch", "image" = "inventory-pocket.png", "wear" = WEAR_R_STORE),
 	KIT_SLOT_PRIMARY = list("name" = "Primary", "image" = "inventory-suit_storage.png", "wear" = WEAR_J_STORE),
 	KIT_SLOT_SIDEARM = list("name" = "Sidearm", "image" = "inventory-hand_r.png", "wear" = null),
+	KIT_SLOT_BACK_GUN = list("name" = "Scabbard", "image" = "inventory-back.png", "wear" = null),
 	KIT_SLOT_GRENADE = list("name" = "Grenades", "image" = "inventory-pocket.png", "wear" = null),
 	KIT_SLOT_RAIL = list("name" = "Rail", "image" = null, "wear" = null),
 	KIT_SLOT_MUZZLE = list("name" = "Muzzle", "image" = null, "wear" = null),
@@ -56,6 +65,10 @@ GLOBAL_LIST_INIT(clash_kit_slots, list(
 	KIT_SLOT_SIDE_MUZZLE = list("name" = "Muzzle", "image" = null, "wear" = null),
 	KIT_SLOT_SIDE_UNDER = list("name" = "Underbarrel", "image" = null, "wear" = null),
 	KIT_SLOT_SIDE_STOCK = list("name" = "Stock", "image" = null, "wear" = null),
+	KIT_SLOT_BACK_RAIL = list("name" = "Rail", "image" = null, "wear" = null),
+	KIT_SLOT_BACK_MUZZLE = list("name" = "Muzzle", "image" = null, "wear" = null),
+	KIT_SLOT_BACK_UNDER = list("name" = "Underbarrel", "image" = null, "wear" = null),
+	KIT_SLOT_BACK_STOCK = list("name" = "Stock", "image" = null, "wear" = null),
 	KIT_SLOT_WEBBING = list("name" = "Accessory", "image" = "inventory-uniform.png", "wear" = null),
 	KIT_SLOT_SENTRY = list("name" = "Sentry", "image" = null, "wear" = null),
 	KIT_SLOT_CLASS_PERK = list("name" = "Class perk", "image" = null, "wear" = null),
@@ -297,7 +310,7 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 	return attachment_type in get_clash_gun_attachables(gun_type)
 
 /proc/clash_is_attachment_slot(slot)
-	return (slot in GLOB.clash_kit_attachment_slots) || clash_is_sidearm_attachment_slot(slot)
+	return (slot in GLOB.clash_kit_attachment_slots) || clash_is_sidearm_attachment_slot(slot) || clash_is_back_attachment_slot(slot)
 
 /proc/clash_is_sidearm_attachment_slot(slot)
 	for(var/gun_slot in GLOB.clash_kit_sidearm_attachment_slots)
@@ -305,8 +318,33 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 			return TRUE
 	return FALSE
 
+/proc/clash_is_back_attachment_slot(slot)
+	for(var/gun_slot in GLOB.clash_kit_back_attachment_slots)
+		if(GLOB.clash_kit_back_attachment_slots[gun_slot] == slot)
+			return TRUE
+	return FALSE
+
 /proc/clash_kit_slot_gun(datum/clash_kit/kit, job, slot)
-	return clash_is_sidearm_attachment_slot(slot) ? clash_effective_sidearm(kit, job) : clash_effective_primary(kit, job)
+	if(clash_is_sidearm_attachment_slot(slot))
+		return clash_effective_sidearm(kit, job)
+	if(clash_is_back_attachment_slot(slot))
+		return clash_effective_back_gun(kit, job)
+	return clash_effective_primary(kit, job)
+
+/proc/clash_job_carries_back_gun(job)
+	return !(GLOB.clash_job_classes[job] in GLOB.clash_class_only_primaries)
+
+/proc/clash_effective_back_gun(datum/clash_kit/kit, job)
+	var/datum/clash_kit_option/scabbard = kit?.get_option(KIT_SLOT_BACK)
+	var/datum/clash_kit_option/back_gun = kit?.get_option(KIT_SLOT_BACK_GUN)
+	if(!back_gun || !ispath(scabbard?.item_type, /obj/item/storage/large_holster) || !clash_job_carries_back_gun(job))
+		return null
+	return back_gun.item_type
+
+/obj/item/storage/large_holster/m37/clash_upp
+	name = "\improper Type 23 shotgun scabbard"
+	desc = "A large leather holster fitted for the Type 23 shotgun. It has harnesses that allow it to be secured to the back for easy storage."
+	can_hold = list(/obj/item/weapon/gun/shotgun/type23)
 
 /proc/build_clash_kit_catalog()
 	if(length(GLOB.clash_kit_options))
@@ -319,6 +357,8 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 	add_clash_sentry_options(FACTION_UPP)
 	add_clash_perk_options(FACTION_MARINE)
 	add_clash_perk_options(FACTION_UPP)
+	add_clash_kit_back_guns(FACTION_MARINE)
+	add_clash_kit_back_guns(FACTION_UPP)
 	add_clash_kit_gun_attachments(FACTION_MARINE)
 	add_clash_kit_gun_attachments(FACTION_UPP)
 	describe_clash_attachment_options()
@@ -350,6 +390,31 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 		var/obj/item/attachable/attachment = attachment_type
 		var/datum/clash_kit_option/primary_option = GLOB.clash_kit_options[clash_kit_option_id(faction, initial(attachment.slot), attachment_type)]
 		add_clash_kit_option(faction, GLOB.clash_kit_sidearm_attachment_slots[initial(attachment.slot)], primary_option?.name || capitalize(strip_improper(initial(attachment.name))), attachment_type)
+	var/list/back_fits = list()
+	for(var/datum/clash_kit_option/gun as anything in GLOB.clash_kit_menu[faction][KIT_SLOT_BACK_GUN])
+		for(var/attachment_type in get_clash_gun_attachables(gun.item_type))
+			var/obj/item/attachable/attachment = attachment_type
+			if(ispath(attachment_type, /obj/item/attachable/bayonet) || !GLOB.clash_kit_back_attachment_slots[initial(attachment.slot)])
+				continue
+			back_fits |= attachment_type
+	for(var/attachment_type in back_fits)
+		var/obj/item/attachable/attachment = attachment_type
+		var/datum/clash_kit_option/primary_option = GLOB.clash_kit_options[clash_kit_option_id(faction, initial(attachment.slot), attachment_type)]
+		add_clash_kit_option(faction, GLOB.clash_kit_back_attachment_slots[initial(attachment.slot)], primary_option?.name || capitalize(strip_improper(initial(attachment.name))), attachment_type)
+
+/proc/add_clash_kit_back_guns(faction)
+	var/datum/clash_kit_option/scabbard_option
+	for(var/datum/clash_kit_option/back as anything in GLOB.clash_kit_menu[faction][KIT_SLOT_BACK])
+		if(ispath(back.item_type, /obj/item/storage/large_holster))
+			scabbard_option = back
+	if(!scabbard_option)
+		return
+	var/obj/item/storage/large_holster/scabbard = new scabbard_option.item_type
+	for(var/datum/clash_kit_option/gun as anything in GLOB.clash_kit_menu[faction][KIT_SLOT_PRIMARY].Copy())
+		if(gun.only_class || !is_path_in_list(gun.item_type, scabbard.can_hold))
+			continue
+		add_clash_kit_option(faction, KIT_SLOT_BACK_GUN, gun.name, gun.item_type, gun.blurb, gun.ammo_type, gun.ammo_count)
+	qdel(scabbard)
 
 /proc/build_clash_kit_shared(faction)
 	for(var/slot in list(KIT_SLOT_POUCH_L, KIT_SLOT_POUCH_R))
@@ -369,7 +434,7 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 		add_clash_kit_option(faction, slot, "Flare pouch", /obj/item/storage/pouch/flare/full, "Light up a lane")
 		add_clash_kit_option(faction, slot, "Explosive pouch", /obj/item/storage/pouch/explosive, "Carries your grenades")
 		add_clash_kit_option(faction, slot, "Medium general pouch", /obj/item/storage/pouch/general/medium, "Tools, flares, whatever fits")
-		add_clash_kit_option(faction, slot, "Bayonet sheath", faction == FACTION_UPP ? /obj/item/storage/pouch/bayonet/upp : /obj/item/storage/pouch/bayonet, "Spare blade on the hip")
+		add_clash_kit_option(faction, slot, "Throwing knives", /obj/item/storage/pouch/bayonet, "Five throwing knives")
 	var/datum/clash_kit_option/goggles = add_clash_kit_option(faction, KIT_SLOT_EYES, "Welding goggles", /obj/item/clothing/glasses/welding, "Flip them down to weld without hurting your eyes")
 	goggles.only_class = GLOB.clash_job_classes[JOB_SQUAD_ENGI]
 	add_clash_kit_option(faction, KIT_SLOT_WEBBING, "Black webbing", /obj/item/clothing/accessory/storage/webbing/black, "3-slot chest rig for small gear. Fits magazines.")
@@ -463,7 +528,7 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 	add_clash_kit_option(faction, KIT_SLOT_MASK, "Rebreather", /obj/item/clothing/mask/rebreather, "Low profile")
 	add_clash_kit_option(faction, KIT_SLOT_BACK, "Combat pack", /obj/item/storage/backpack/lightpack/upp, "Standard issue")
 	add_clash_kit_option(faction, KIT_SLOT_BACK, "Satchel", /obj/item/storage/backpack/marine/satchel, "Less room, open it without taking it off")
-	add_clash_kit_option(faction, KIT_SLOT_BACK, "Shotgun scabbard", /obj/item/storage/large_holster/m37, "Carries a shotgun on the back")
+	add_clash_kit_option(faction, KIT_SLOT_BACK, "Shotgun scabbard", /obj/item/storage/large_holster/m37/clash_upp, "Carries a shotgun on the back")
 	add_clash_kit_option(faction, KIT_SLOT_BELT, "Type 41 ammo load rig", /obj/item/storage/belt/marine/upp, "Rifle magazines")
 	add_clash_kit_option(faction, KIT_SLOT_BELT, "NPZ92 holster rig", /obj/item/storage/belt/gun/type47, "Holsters a pistol with spare magazines")
 	add_clash_kit_option(faction, KIT_SLOT_BELT, "Type 42 shotgun shell rig", /obj/item/storage/belt/shotgun/upp, "Shells and slugs")
