@@ -77,6 +77,7 @@
 				langchat_listeners += observer
 		var/follow = listener.stat == DEAD ? " (<a href='byond://?src=\ref[listener];track=\ref[src]'>F</a>)" : ""
 		to_chat(listener, "<span class='game deadsay'><span class='prefix'>DEAD:</span> <span class='name'>[real_name][follow]</span> says, <span class='message'>\"[message]\"</span></span>")
+		clash_chat_dead(listener.client, src, message)
 	if(length(langchat_listeners))
 		langchat_speech(message, langchat_listeners, GLOB.all_languages, skip_language_check = TRUE)
 
@@ -95,37 +96,6 @@
 
 /obj/structure/barricade/update_health(damage, nomessage)
 	return ..(damage, nomessage || istype(SSticker.mode, /datum/game_mode/extended/faction_clash/hvh))
-
-/mob/living/say_verb(message as text)
-	if(!clash_wants_all_chat(message))
-		return ..()
-	clash_all_chat(copytext(message, 2))
-
-/mob/dead/say_verb(message as text)
-	if(!clash_wants_all_chat(message))
-		return ..()
-	clash_all_chat(copytext(message, 2))
-
-/proc/clash_wants_all_chat(message)
-	return copytext(message, 1, 2) == ";" && istype(SSticker.mode, /datum/game_mode/extended/faction_clash/hvh)
-
-/mob/proc/clash_all_chat(message)
-	message = trim(strip_html(message, MAX_MESSAGE_LEN))
-	if(!length(message) || !client)
-		return
-	if(client.prefs.muted & MUTE_IC)
-		to_chat(src, SPAN_DANGER("You cannot speak in IC (Muted)."))
-		return
-	if(isliving(src) && stat == UNCONSCIOUS)
-		to_chat(src, SPAN_WARNING("You can't talk while unconscious."))
-		return
-	if(!client.attempt_talking(message) || !filter_message(client, message))
-		return
-	log_say("ALL/[key_name(src)] : [message]")
-	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
-	var/line = "<span class='game say'><b>\[ALL\]</b> <span style='color: [clash_mode.faction_color(faction)]'><b>[html_encode(real_name)]</b></span>: [message]</span>"
-	for(var/client/listener as anything in GLOB.clients)
-		to_chat(listener, line)
 
 /obj/item/weapon/twohanded/offhand/unwield(mob/user)
 	if(QDELETED(src))

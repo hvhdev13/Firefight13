@@ -10,6 +10,8 @@ $scrollbar-color-multiplier: 1 !default;
 ////////////////////////////////////////////////
 // Normal chat colors
 $say: hsl(214, 38%, 74%);
+$team: hsl(140, 45%, 55%);
+$all: hsl(0, 0%, 95%);
 $comms: hsl(0, 0%, 71%);
 $me: hsl(227, 64%, 60%);
 $ooc: hsl(225, 92%, 54%);
@@ -50,6 +52,8 @@ $army: hsl(170, 47%, 36%);
 
 $_channel_map: (
   'say': $say,
+  'team': $team,
+  'all': $all,
   'comms': $comms,
   'me': $me,
   'ooc': $ooc,

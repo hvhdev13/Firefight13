@@ -71,6 +71,7 @@ CLIENT_VERB(ooc, msg as text)
 	for(var/client/C in GLOB.clients)
 		if(C.prefs.toggles_chat & CHAT_OOC)
 			to_chat(C, "<font color='[display_colour]'><span class='ooc linkify'>[ooc_prefix]<span class='prefix'>OOC: [username()]</span>: <span class='message'>[msg]</span></span></font>")
+			clash_chat_ooc(C, src, display_colour, username(), msg)
 
 /client/proc/set_ooc_color_global(newColor as color)
 	set name = "OOC Text Color - Global"
@@ -175,6 +176,7 @@ CLIENT_VERB(looc, msg as text)
 
 		if(C.prefs.toggles_chat & CHAT_LOOC)
 			to_chat(C, "<font color='#f557b8'><span class='ooc linkify'><span class='prefix'>LOOC:</span> <EM>[display_name]:</EM> <span class='message'>[msg]</span></span></font>")
+			clash_chat_looc(C, src, display_name, msg)
 
 	if(mob.looc_overhead || GLOB.ooc_allowed)
 		var/transmit_language = isxeno(mob) ? LANGUAGE_XENOMORPH : LANGUAGE_ENGLISH
@@ -194,6 +196,7 @@ CLIENT_VERB(looc, msg as text)
 			var/prefix = "(R)LOOC"
 			if (C.mob in heard)
 				prefix = "LOOC"
+				clash_chat_looc(C, src, display_name, msg)
 			to_chat(C, "<font color='#f557b8'><span class='ooc linkify'><span class='prefix'>[prefix]:</span> <EM>[display_name]:</EM> <span class='message'>[msg]</span></span></font>")
 
 CLIENT_VERB(round_info)

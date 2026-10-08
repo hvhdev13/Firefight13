@@ -1,5 +1,7 @@
 export type Channel =
   | 'Say'
+  | 'Team'
+  | 'All'
   | 'Comms'
   | 'Me'
   | 'OOC'
@@ -17,6 +19,8 @@ export class ChannelIterator {
   private index: number = 0;
   private readonly channels: Channel[] = [
     'Say',
+    'Team',
+    'All',
     'Comms',
     'Me',
     'OOC',
@@ -24,8 +28,15 @@ export class ChannelIterator {
     'Mentor',
     'ASAY',
   ];
-  private readonly blacklist: Channel[] = ['Mentor', 'ASAY']; // These currently must match the ADMIN_CHANNEL and MENTOR_CHANNEL define in speech_channels.dm
-  private readonly quiet: Channel[] = ['OOC', 'LOOC', 'Mentor', 'ASAY'];
+  private readonly blacklist: Channel[] = ['Team', 'All', 'Mentor', 'ASAY']; // These currently must match the ADMIN_CHANNEL and MENTOR_CHANNEL define in speech_channels.dm
+  private readonly quiet: Channel[] = [
+    'Team',
+    'All',
+    'OOC',
+    'LOOC',
+    'Mentor',
+    'ASAY',
+  ];
 
   public next(whitelist?: Channel[]): Channel {
     if (
@@ -37,6 +48,9 @@ export class ChannelIterator {
 
     for (let index = 1; index <= this.channels.length; index++) {
       let nextIndex = (this.index + index) % this.channels.length;
+      if (this.channels[nextIndex] === 'Comms' && whitelist?.includes('All')) {
+        continue;
+      }
       if (
         !this.blacklist.includes(this.channels[nextIndex]) ||
         whitelist?.includes(this.channels[nextIndex])
