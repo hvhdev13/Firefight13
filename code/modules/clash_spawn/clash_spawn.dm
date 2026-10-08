@@ -200,6 +200,12 @@ SUBSYSTEM_DEF(clash_spawn)
 	page += "<button onclick=\"location.href='byond://?src=[REF(src)];clash_welcome=1;hide=' + (document.getElementById('hide').checked ? 1 : 0)\">GOT IT</button></div>"
 	show_browser(viewer, page.Join(), "Welcome to Firefight13", "clash_welcome", width = 500, height = 560)
 
+/datum/controller/subsystem/statpanels/set_status_tab(client/target)
+	var/discord = "Discord: [GLOB.clash_discord_link]"
+	if(global_data && !(discord in global_data))
+		global_data.Insert(1, discord)
+	return ..()
+
 /datum/controller/subsystem/clash_spawn/Topic(href, list/href_list)
 	if(href_list["clash_discord"] && usr?.client)
 		usr << link(GLOB.clash_discord_link)
