@@ -2,6 +2,7 @@
 #define CLASH_HILL_MATCH "match"
 #define CLASH_HILL_TIMED "timed"
 #define CLASH_HILL_WARNING (30 SECONDS)
+#define CLASH_HILL_BOTS_MOVE (10 SECONDS)
 
 /datum/game_mode/extended/faction_clash/hvh/tdm/objective
 	name = "Objective"
@@ -46,17 +47,24 @@
 	log_debug("HVH: objective [zone.label] at [zone.center.x],[zone.center.y] radius [zone.radius]")
 	return zone
 
-/datum/game_mode/extended/faction_clash/hvh/tdm/objective/proc/reanchor_bots()
-	for(var/datum/clash_bot/bot as anything in GLOB.clash_bots)
-		if(bot.post && !bot.post.rally_id)
-			bot.anchor = bot.post.get_hold_turf()
+/datum/game_mode/extended/faction_clash/hvh/tdm/objective/plan_bots(datum/clash_bot_director/director)
+	var/list/spots = list()
+	for(var/datum/clash_zone/zone as anything in zones)
+		spots += zone.hold
+	director.plan_objectives(spots)
+
+/datum/game_mode/extended/faction_clash/hvh/tdm/objective/is_objective_turf(turf/spot)
+	for(var/datum/clash_zone/zone as anything in zones)
+		if(zone.covered[spot])
+			return TRUE
+	return FALSE
 
 /datum/game_mode/extended/faction_clash/hvh/tdm/objective/can_rebuild_objectives()
 	return TRUE
 
 /datum/game_mode/extended/faction_clash/hvh/tdm/objective/rebuild_objectives()
 	build_zones()
-	reanchor_bots()
+	clash_bot_replan()
 
 /datum/game_mode/extended/faction_clash/hvh/tdm/objective/get_objective_turfs()
 	. = list()
@@ -117,7 +125,7 @@
 	for(var/datum/clash_zone/zone as anything in zones)
 		zone.reset()
 		zone.update_visuals(null, capture_time)
-	reanchor_bots()
+	clash_bot_replan()
 	if(!objective_timer_id)
 		objective_timer_id = addtimer(CALLBACK(src, PROC_REF(tick_objectives)), 1 SECONDS, TIMER_LOOP|TIMER_STOPPABLE)
 
@@ -140,10 +148,14 @@
 		settle_zone(zone)
 		zone.update_visuals(zone.owner ? faction_color(zone.owner) : null, capture_time)
 		zone.refresh_tiles()
+	var/scored = FALSE
 	for(var/datum/clash_zone/zone as anything in zones)
 		if(zone.owner && (persistent || !zone.contested))
 			objective_points[zone.owner] = (objective_points[zone.owner] || 0) + 1
+			scored = TRUE
 			clash_progress_zone(zone)
+	if(scored)
+		update_score_huds()
 	for(var/faction in list(FACTION_MARINE, FACTION_UPP))
 		var/points = objective_points[faction] || 0
 		if(points >= point_limit)
@@ -196,7 +208,7 @@
 /datum/game_mode/extended/faction_clash/hvh/tdm/objective/koth
 	name = GAMEMODE_KOTH
 	config_tag = GAMEMODE_KOTH
-	point_limit = 200
+	point_limit = 250
 	zone_count = 1
 	zone_radius = 3
 	var/list/hill_spots = list()
@@ -222,7 +234,6 @@
 		if(CLASH_HILL_MATCH)
 			. += "The hill moves after every match."
 	. += "First team to [point_limit] points wins, otherwise the most points when time runs out."
-	. += "Bots fight over the hill but cannot hold or contest it."
 
 /datum/game_mode/extended/faction_clash/hvh/tdm/objective/koth/get_zone_spots()
 	hill_spots = list()
@@ -284,7 +295,7 @@
 	QDEL_NULL(next_hill)
 	QDEL_LIST(zones)
 	add_zone(hill_spots[index])
-	reanchor_bots()
+	clash_bot_replan()
 
 /datum/game_mode/extended/faction_clash/hvh/tdm/objective/koth/proc/get_next_hill_index()
 	return hill_index % length(hill_spots) + 1
@@ -336,6 +347,12 @@
 	. = ..()
 	if(next_hill)
 		. += list(list("key" = REF(next_hill), "turf" = next_hill.center, "letter" = "H", "tone" = "open", "hollow" = TRUE))
+
+/datum/game_mode/extended/faction_clash/hvh/tdm/objective/koth/plan_bots(datum/clash_bot_director/director)
+	if(!length(zones))
+		director.plan_skirmish()
+		return
+	director.plan_koth(zones[1], next_hill, next_move_at && next_move_at - world.time < CLASH_HILL_BOTS_MOVE)
 
 /datum/game_mode/extended/faction_clash/hvh/tdm/objective/koth/get_admin_objective_actions()
 	if(length(hill_spots) < 2)
@@ -420,10 +437,15 @@
 	zone_notes += found ? "Zones were placed automatically because domination marker [english_list(problems)]." : "No domination markers on this map, the zones were placed automatically."
 	return get_clash_auto_objective_spots(zone_count, zone_radius)
 
+/datum/game_mode/extended/faction_clash/hvh/tdm/objective/domination/plan_bots(datum/clash_bot_director/director)
+	if(!length(zones))
+		director.plan_skirmish()
+		return
+	director.plan_domination(zones)
+
 /datum/game_mode/extended/faction_clash/hvh/tdm/objective/domination/get_objective_rules()
 	return list(
 		"Take a zone by standing on it with no enemies for [capture_time / 10] seconds.",
 		"Every zone your team holds scores points even after you leave them.",
 		"First team to [point_limit] points wins, otherwise the most points when time runs out.",
-		"Bots fight over the zones but cannot take or contest them.",
 	)

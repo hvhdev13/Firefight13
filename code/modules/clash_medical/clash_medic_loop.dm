@@ -16,7 +16,7 @@ GLOBAL_LIST_EMPTY(clash_call_medic_icons)
 /proc/clash_medics_near(mob/living/carbon/human/body)
 	. = list()
 	for(var/mob/living/carbon/human/medic as anything in GLOB.alive_human_list)
-		if(medic.client && medic.stat == CONSCIOUS && medic.faction == body.faction && medic.z == body.z && clash_is_medic(medic) && get_dist(medic, body) <= CLASH_MEDIC_RANGE)
+		if((medic.client || clash_is_bot(medic)) && medic.stat == CONSCIOUS && medic.faction == body.faction && medic.z == body.z && clash_is_medic(medic) && get_dist(medic, body) <= CLASH_MEDIC_RANGE)
 			. += medic
 
 /proc/clash_revive_status(mob/viewer)

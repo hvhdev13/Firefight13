@@ -49,6 +49,7 @@ GLOBAL_LIST_INIT(clash_bot_side_spawners, list(
 		var/obj/effect/landmark/clash_npc/spawner = new spawner_type(spot)
 		spawner.temporary = TRUE
 		spawner.respawn_delay = 0
+		spawner.spawn_in_base = FALSE
 		INVOKE_ASYNC(spawner, TYPE_PROC_REF(/obj/effect/landmark/clash_npc, spawn_npc))
 		.++
 
@@ -108,7 +109,7 @@ GLOBAL_LIST_INIT(clash_bot_side_spawners, list(
 		var/area/place = get_area(body)
 		bots += list(list(
 			"ref" = REF(bot),
-			"name" = body.real_name,
+			"name" = "[body.real_name] ([clash_role_name(body.job)])",
 			"faction" = body.faction,
 			"health" = round(clamp(body.health / body.maxHealth, 0, 1) * 100),
 			"state" = bot.get_state(),

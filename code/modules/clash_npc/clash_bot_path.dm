@@ -40,7 +40,9 @@
 
 /datum/clash_bot/proc/can_enter(turf/spot)
 	var/area/clash_arena/zone = get_area(spot)
-	return !(istype(zone) && zone.clash_faction && zone.clash_faction != body.faction)
+	if(!istype(zone) || !zone.clash_faction)
+		return TRUE
+	return zone.clash_faction == body.faction && !carrying()
 
 /datum/clash_bot/proc/border_blocked(turf/from, turf/into, direction)
 	for(var/obj/structure/thing in from)
@@ -51,11 +53,20 @@
 			return TRUE
 	return FALSE
 
+/datum/clash_bot/var/obj/item/card/id/path_card
+
+/datum/clash_bot/proc/step_open(turf/from, turf/into, direction)
+	if(!into || into.density || !can_enter(into))
+		return FALSE
+	if(LinkBlockedWithAccess(from, into, path_card) || border_blocked(from, into, direction))
+		return FALSE
+	return !(locate(/obj/flamer_fire) in into)
+
 /datum/clash_bot/proc/find_path(turf/goal)
 	var/turf/start = get_turf(body)
 	if(!start || !goal || start == goal)
 		return list()
-	var/obj/item/card/id/id_card = body.get_idcard()
+	path_card = body.get_idcard()
 	var/list/heap = list()
 	var/list/cost = list()
 	var/list/came_from = list()
@@ -78,15 +89,23 @@
 		if(remaining < closest_distance)
 			closest = current
 			closest_distance = remaining
-		for(var/direction in GLOB.cardinals)
+		for(var/direction in GLOB.alldirs)
 			var/turf/next = get_step(current, direction)
-			if(!next || next.density || closed[next] || !can_enter(next))
+			if(!next || closed[next])
 				continue
-			if(LinkBlockedWithAccess(current, next, id_card) || border_blocked(current, next, direction))
-				continue
-			if(locate(/obj/flamer_fire) in next)
-				continue
-			var/next_cost = cost[current] + 1
+			var/step_cost = 1
+			if(direction in GLOB.cardinals)
+				if(!step_open(current, next, direction))
+					continue
+			else
+				var/vertical = direction & (NORTH|SOUTH)
+				var/horizontal = direction & (EAST|WEST)
+				var/turf/side_one = get_step(current, vertical)
+				var/turf/side_two = get_step(current, horizontal)
+				if(!step_open(current, side_one, vertical) || !step_open(side_one, next, horizontal) || !step_open(current, side_two, horizontal) || !step_open(side_two, next, vertical))
+					continue
+				step_cost = 1.4
+			var/next_cost = cost[current] + step_cost + danger_cost(next)
 			if(!isnull(cost[next]) && next_cost >= cost[next])
 				continue
 			cost[next] = next_cost

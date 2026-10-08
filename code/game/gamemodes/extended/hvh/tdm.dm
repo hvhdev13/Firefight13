@@ -36,7 +36,7 @@
 		"[matches_per_round] match\s per round.",
 		"First team to [kill_limit] kills wins, otherwise the team with the most kills when time runs out wins.",
 		"Respawn enabled.",
-		"Bots fill lowpop and have a grey \[BOT\] tag. A bot killing a player scores 1 for the bot's team. Kills on bots do not count toward the score but provide 25% of regular XP.",
+		"Bots fill lowpop and have a grey \[BOT\] tag and a diamond marker. A kill on a player scores 1, a kill on a bot scores 0.5, whoever makes it. Kills on bots give 25% of regular XP.",
 	)
 
 /datum/game_mode/extended/faction_clash/hvh/tdm/get_welcome_tagline()

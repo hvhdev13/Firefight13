@@ -61,9 +61,10 @@
 		GLOB.clash_objective_turfs -= stands[faction]
 	QDEL_LIST(stand_tiles)
 	build_stands()
-	for(var/datum/clash_bot/bot as anything in GLOB.clash_bots)
-		if(bot.post && !bot.post.rally_id)
-			bot.anchor = bot.post.get_hold_turf()
+	clash_bot_replan()
+
+/datum/game_mode/extended/faction_clash/hvh/tdm/ctf/plan_bots(datum/clash_bot_director/director)
+	director.plan_ctf(stands, flags)
 
 /datum/game_mode/extended/faction_clash/hvh/tdm/ctf/get_radar_pins(mob/viewer)
 	. = list()
@@ -150,9 +151,7 @@
 			spawn_flag(faction)
 		else
 			return_flag(flag, null, TRUE)
-	for(var/datum/clash_bot/bot as anything in GLOB.clash_bots)
-		if(bot.post && !bot.post.rally_id)
-			bot.anchor = bot.post.get_hold_turf()
+	clash_bot_replan()
 	if(!flag_timer_id)
 		flag_timer_id = addtimer(CALLBACK(src, PROC_REF(tick_flags)), 1 SECONDS, TIMER_LOOP|TIMER_STOPPABLE)
 
@@ -294,6 +293,7 @@
 	entry["captures"] = (entry["captures"] || 0) + 1
 	clash_progress_capture(runner)
 	announce_flag(flag, "captured", runner)
+	update_score_huds()
 	return_flag(flag, null, TRUE)
 	log_debug("HVH: [runner.real_name] captured the [flag.faction] flag, [runner.faction] at [captures[runner.faction]]")
 	if(captures[runner.faction] >= capture_limit)

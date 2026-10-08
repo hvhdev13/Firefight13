@@ -64,7 +64,7 @@ GLOBAL_DATUM_INIT(clash_career, /datum/clash_career, new)
 		if(!total)
 			total = list("name" = name, "faction" = round_entry["faction"], "mvps" = 0, "best_streak" = 0)
 			by_ckey[ckey] = total
-		for(var/stat in list("kills", "assists", "deaths", "captures", "shots", "hits"))
+		for(var/stat in list("kills", "bot_kills", "assists", "deaths", "captures", "shots", "hits"))
 			total[stat] = (total[stat] || 0) + (round_entry[stat] || 0)
 		total["best_streak"] = max(total["best_streak"], round_entry["best_streak"] || 0)
 		for(var/mvp in mvp_names)
@@ -81,7 +81,7 @@ GLOBAL_DATUM_INIT(clash_career, /datum/clash_career, new)
 		if(!islist(career))
 			career = list()
 			players[ckey] = career
-		for(var/stat in list("kills", "assists", "deaths", "captures", "shots", "hits", "mvps"))
+		for(var/stat in list("kills", "bot_kills", "assists", "deaths", "captures", "shots", "hits", "mvps"))
 			career[stat] = (career[stat] || 0) + (total[stat] || 0)
 		career["rounds"] = (career["rounds"] || 0) + 1
 		if(winner && total["faction"] == winner)
