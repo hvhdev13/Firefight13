@@ -160,6 +160,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	unlock_upp_job_slots()
 	if(arena_rules)
 		unlock_uscm_arena_slots()
+		start_clash_chat()
 
 /datum/game_mode/extended/faction_clash/hvh/proc/restrict_uscm_squads()
 	for(var/datum/squad/squad as anything in GLOB.RoleAuthority.squads)

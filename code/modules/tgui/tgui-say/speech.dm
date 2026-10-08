@@ -35,6 +35,12 @@
 		if(SAY_CHANNEL)
 			client.mob.say_verb(entry)
 			return TRUE
+		if(TEAM_CHANNEL)
+			client.mob.clash_team_chat(entry)
+			return TRUE
+		if(ALL_CHANNEL)
+			client.mob.clash_all_chat(entry)
+			return TRUE
 		if(COMMS_CHANNEL)
 			client.mob.say_verb(";" + entry)
 			return TRUE
