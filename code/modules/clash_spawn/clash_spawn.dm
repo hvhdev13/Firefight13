@@ -1,5 +1,6 @@
 GLOBAL_LIST_EMPTY(clash_welcomed)
 GLOBAL_VAR_INIT(clash_feedback_contact, "")
+GLOBAL_VAR_INIT(clash_discord_link, "https://discord.gg/XyTBFQRKRk")
 
 GLOBAL_LIST_INIT(clash_arena_removed_items, list(/obj/item/storage/box/mre, /obj/item/ammo_box/magazine/misc/mre, /obj/item/storage/box/attachments))
 
@@ -141,8 +142,10 @@ SUBSYSTEM_DEF(clash_spawn)
 	page += "button{background:#2d5a9e;color:#fff;border:0;padding:6px 18px;font-weight:bold;letter-spacing:1px;cursor:pointer}"
 	page += "button:hover{background:#3a6fc0}input.contact{width:100%;background:#1a1f25;color:#fff;border:1px solid #4a525c;padding:3px}"
 	page += ".tagline{margin:0 0 6px;color:#fff;font-weight:bold;letter-spacing:1px}"
+	page += ".discord{margin-top:6px;color:#d6dbe0}.discord a{color:#7f9cf5;font-weight:bold}"
 	page += "</style>"
-	page += "<div class='head'><h1>Welcome to Firefight13.</h1><div class='sub'>\[The server is actively being playtested and updated. Everything is subject to change without notice.\]</div></div>"
+	page += "<div class='head'><h1>Welcome to Firefight13.</h1><div class='sub'>\[The server is actively being playtested and updated. Everything is subject to change without notice.\]</div>"
+	page += "<div class='discord'>Join us on Discord: <a href='byond://?src=[REF(src)];clash_discord=1'>[GLOB.clash_discord_link]</a></div></div>"
 	page += "<div class='body'>"
 	if(istype(clash_mode))
 		page += "<h2>[clash_mode.name]</h2>"
@@ -198,6 +201,9 @@ SUBSYSTEM_DEF(clash_spawn)
 	show_browser(viewer, page.Join(), "Welcome to Firefight13", "clash_welcome", width = 500, height = 560)
 
 /datum/controller/subsystem/clash_spawn/Topic(href, list/href_list)
+	if(href_list["clash_discord"] && usr?.client)
+		usr << link(GLOB.clash_discord_link)
+		return
 	if(!href_list["clash_welcome"] || !usr?.client)
 		return
 	close_browser(usr, "clash_welcome")

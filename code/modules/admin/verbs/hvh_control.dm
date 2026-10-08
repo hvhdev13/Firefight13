@@ -12,11 +12,15 @@
 		var/list/outside = list("Progression Panel")
 		if(!SSticker.mode && (GLOB.master_mode in HVH_MODE_TAGS))
 			outside += "Change game mode"
+		if(check_rights(R_SERVER, FALSE))
+			outside += "Change ground map"
 		var/picked = tgui_input_list(usr, "This is not an HvH round. What should happen?", "HvH Control", outside)
 		if(picked == "Progression Panel")
 			clash_progression_panel()
 		else if(picked == "Change game mode")
 			hvh_change_mode()
+		else if(picked == "Change ground map")
+			admin_holder.change_ground_map()
 		return
 	var/list/actions = list("End match now", "Skip countdown or break", "Set a team's score", "Bot Control Panel", "Progression Panel")
 	if(clash_mode.can_rebuild_objectives())
@@ -24,9 +28,14 @@
 	var/list/objective_actions = clash_mode.get_admin_objective_actions()
 	actions += objective_actions
 	actions += "Change game mode"
+	if(check_rights(R_SERVER, FALSE))
+		actions += "Change ground map"
 	var/choice = tgui_input_list(usr, "What should happen?", "HvH Control", actions)
 	if(choice == "Change game mode")
 		hvh_change_mode()
+		return
+	if(choice == "Change ground map")
+		admin_holder.change_ground_map()
 		return
 	if(choice == "Bot Control Panel")
 		clash_bot_panel()
