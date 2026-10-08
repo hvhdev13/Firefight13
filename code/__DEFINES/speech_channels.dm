@@ -1,5 +1,7 @@
 // Used to direct channels to speak into.
 #define SAY_CHANNEL "Say"
+#define TEAM_CHANNEL "Team"
+#define ALL_CHANNEL "All"
 #define COMMS_CHANNEL "Comms"
 #define WHISPER_CHANNEL "Whisper"
 #define ME_CHANNEL "Me"

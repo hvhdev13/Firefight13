@@ -1724,6 +1724,7 @@
 #include "code\modules\clans\rank.dm"
 #include "code\modules\clans\ship.dm"
 #include "code\modules\clash_base_lock\clash_base_lock.dm"
+#include "code\modules\clash_chat\clash_chat.dm"
 #include "code\modules\clash_engineering\_clash_engineering_defines.dm"
 #include "code\modules\clash_engineering\clash_ammo_crate.dm"
 #include "code\modules\clash_engineering\clash_engineering.dm"

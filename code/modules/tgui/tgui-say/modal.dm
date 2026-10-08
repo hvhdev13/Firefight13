@@ -72,7 +72,7 @@
 		"lightMode" = client.prefs?.tgui_say_light_mode,
 		"scale" = client.prefs?.window_scale,
 		"maxLength" = max_length,
-		"extraChannels" = client.admin_holder?.get_tgui_say_extra_channels(),
+		"extraChannels" = (client.admin_holder?.get_tgui_say_extra_channels() || list()) + client.clash_say_channels(),
 		"languages" = languages
 	))
 
@@ -91,7 +91,8 @@
 	if(!payload?["channel"])
 		CRASH("No channel provided to an open TGUI-Say")
 	window_open = TRUE
-	if(payload["channel"] != OOC_CHANNEL && payload["channel"] != LOOC_CHANNEL && payload["channel"] != ADMIN_CHANNEL && payload["channel"] != MENTOR_CHANNEL)
+	client.clash_chat_set_typing(TRUE)
+	if(payload["channel"] != OOC_CHANNEL && payload["channel"] != LOOC_CHANNEL && payload["channel"] != ADMIN_CHANNEL && payload["channel"] != MENTOR_CHANNEL && payload["channel"] != TEAM_CHANNEL && payload["channel"] != ALL_CHANNEL)
 		start_thinking()
 	return TRUE
 
@@ -101,6 +102,7 @@
  */
 /datum/tgui_say/proc/close()
 	window_open = FALSE
+	client.clash_chat_set_typing(FALSE)
 	stop_thinking()
 
 /**

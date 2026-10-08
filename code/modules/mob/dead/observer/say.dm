@@ -60,6 +60,7 @@
 		message = "<b>[message]</b>"
 
 	to_chat(src, "<span class='game say'><span class='name'>[comm_paygrade][speaker_name]</span>[alt_name] [track][verb], <span class='message'><span class='[style]'>\"[message]\"</span></span></span>")
+	clash_chat_local(src, speaker, "[comm_paygrade][speaker_name]", message)
 	if(speech_sound && speaker.z == z && get_dist(speaker, src) <= GLOB.world_view_size)
 		var/turf/source = get_turf(speaker)
 		playsound_client(client, speech_sound, source, sound_vol)
