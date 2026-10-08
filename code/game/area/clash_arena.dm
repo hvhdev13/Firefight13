@@ -290,3 +290,43 @@
 /area/clash_arena/tdm_forest/battlefield/zone_6/indoors
 	ceiling = CEILING_METAL
 	clash_indoors = TRUE
+
+/turf/open/clash_void
+	name = "\proper space"
+	desc = "Nothing but stars below. There is no way across but the bridges."
+	icon = 'icons/turf/floors/space.dmi'
+	icon_state = "0"
+	can_bloody = FALSE
+	supports_surgery = FALSE
+	allow_construction = FALSE
+	is_weedable = NOT_WEEDABLE
+	minimap_color = MINIMAP_BLACK
+
+/turf/open/clash_void/Initialize(mapload, ...)
+	. = ..()
+	icon_state = "[((x + y) ^ ~(x * y) + z) % 25]"
+
+/turf/open/clash_void/Enter(atom/movable/mover, atom/old_loc)
+	if(isobserver(mover))
+		return ..()
+	return FALSE
+
+/turf/open/clash_void/ex_act(severity)
+	return
+
+/turf/open/clash_lattice
+	name = "lattice"
+	desc = "A support lattice over open space."
+	icon = 'icons/obj/structures/structures.dmi'
+	icon_state = "latticefull"
+	can_bloody = FALSE
+	allow_construction = FALSE
+	is_weedable = NOT_WEEDABLE
+	minimap_color = MINIMAP_BLACK
+
+/turf/open/clash_lattice/Initialize(mapload, ...)
+	. = ..()
+	underlays += image('icons/turf/floors/space.dmi', "[((x + y) ^ ~(x * y) + z) % 25]")
+
+/turf/open/clash_lattice/ex_act(severity)
+	return
