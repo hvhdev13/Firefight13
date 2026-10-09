@@ -1042,8 +1042,12 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 			return "UPP wins [upp] to [uscm]."
 	return "Draw at [uscm] each."
 
-/datum/game_mode/extended/faction_clash/hvh/proc/can_start_round_votes()
-	return round_vote_stage == CLASH_VOTES_NONE
+/datum/game_mode/extended/faction_clash/hvh/proc/restart_round_votes()
+	if(round_vote_stage == CLASH_VOTES_MODE || round_vote_stage == CLASH_VOTES_MAP)
+		return FALSE
+	round_vote_stage = CLASH_VOTES_NONE
+	start_round_votes()
+	return TRUE
 
 /datum/game_mode/extended/faction_clash/hvh/proc/start_round_votes()
 	if(round_vote_stage != CLASH_VOTES_NONE)

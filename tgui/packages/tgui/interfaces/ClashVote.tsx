@@ -41,6 +41,8 @@ const INNER = 12;
 const HEADER = 96;
 const FOOTER = 64;
 const TITLEBAR = 32;
+const CARD_TEXT = 68;
+const SLACK = 16;
 const MIN_WIDTH = 760;
 const MAX_ROWS = 3;
 const SCROLLBAR = 16;
@@ -90,6 +92,7 @@ const VoteCard = (props: {
       onMouseLeave={() => setHover(false)}
       style={{
         width: shape.width + 2 * INNER,
+        height: shape.height + 2 * INNER + CARD_TEXT,
         padding: INNER,
         boxSizing: 'border-box',
         background: PANEL,
@@ -272,7 +275,7 @@ export const ClashVote = (props) => {
   const shownRows = Math.min(rows, MAX_ROWS);
   const scrolling = rows > MAX_ROWS;
   const cardWidth = shape.width + 2 * INNER;
-  const cardHeight = shape.height + 2 * INNER + 64;
+  const cardHeight = shape.height + 2 * INNER + CARD_TEXT;
   const width = voting
     ? Math.max(
         MIN_WIDTH,
@@ -288,7 +291,8 @@ export const ClashVote = (props) => {
       PAD +
       shownRows * cardHeight +
       (shownRows - 1) * GAP +
-      FOOTER
+      FOOTER +
+      SLACK
     : TITLEBAR + HEADER + 200;
   const noun = stage === 'mode' ? 'mode' : 'map';
   const title =
@@ -329,7 +333,7 @@ export const ClashVote = (props) => {
                 padding: `${PAD}px ${PAD}px 0`,
                 alignContent: 'start',
                 minHeight: 0,
-                overflowY: scrolling ? 'auto' : 'hidden',
+                overflowY: scrolling ? 'auto' : 'visible',
               }}
             >
               {cards.map((card) => (

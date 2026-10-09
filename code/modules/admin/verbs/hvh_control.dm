@@ -30,14 +30,12 @@
 	actions += "Change game mode"
 	if(check_rights(R_SERVER, FALSE))
 		actions += "Change ground map"
-	if(clash_mode.can_start_round_votes())
-		actions += "Start next round votes"
+	actions += "Start next round votes"
 	var/choice = tgui_input_list(usr, "What should happen?", "HvH Control", actions)
 	if(choice == "Start next round votes")
-		if(SSticker.mode != clash_mode || !clash_mode.can_start_round_votes())
-			to_chat(usr, SPAN_WARNING("The votes for the next round already ran this round."))
+		if(SSticker.mode != clash_mode || !clash_mode.restart_round_votes())
+			to_chat(usr, SPAN_WARNING("The votes for the next round are already open."))
 			return
-		clash_mode.start_round_votes()
 		message_admins("[key_name_admin(usr)] started the votes for the next round.")
 		log_admin("[key_name(usr)] started the votes for the next round.")
 		return
