@@ -8,7 +8,6 @@
 #define CLASH_VOTE_RETRY (10 SECONDS)
 #define CLASH_REBOOT_AFTER_VOTES (30 SECONDS)
 #define CLASH_REBOOT_HOLD_LIMIT (5 MINUTES)
-#define CLASH_FC_MIN_PLAYERS 30
 #define CLASH_VOTES_NONE 0
 #define CLASH_VOTES_MODE 1
 #define CLASH_VOTES_MAP 2
@@ -1043,6 +1042,9 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 			return "UPP wins [upp] to [uscm]."
 	return "Draw at [uscm] each."
 
+/datum/game_mode/extended/faction_clash/hvh/proc/can_start_round_votes()
+	return round_vote_stage == CLASH_VOTES_NONE
+
 /datum/game_mode/extended/faction_clash/hvh/proc/start_round_votes()
 	if(round_vote_stage != CLASH_VOTES_NONE)
 		return
@@ -1082,6 +1084,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 			SSmapping.changemap(config.maplist[GROUND_MAP][picked], GROUND_MAP)
 			to_chat(world, SPAN_BOLDNOTICE("No map was chosen for [GLOB.master_mode], so the next map is [picked]."))
 	log_debug("HVH: next round votes done, [GLOB.master_mode] next")
+	GLOB.clash_vote_ui.finish()
 	if(reboot_held)
 		release_held_reboot()
 
@@ -1135,10 +1138,181 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		return null
 	. = list()
 	for(var/mode_tag in HVH_MODE_TAGS)
-		if(mode_tag == GAMEMODE_FACTION_CLASH_UPP_CM && length(GLOB.clients) < CLASH_FC_MIN_PLAYERS)
+		if(mode_tag == GAMEMODE_FACTION_CLASH_UPP_CM)
 			continue
 		if(length(get_clash_vote_maps(mode_tag)))
 			. += mode_tag
+
+GLOBAL_LIST_INIT(clash_vote_mode_icons, list(
+	GAMEMODE_TDM = "clash_mode_tdm.png",
+	GAMEMODE_KOTH = "clash_mode_koth.png",
+	GAMEMODE_DOMINATION = "clash_mode_domination.png",
+	GAMEMODE_CTF = "clash_mode_ctf.png",
+))
+
+GLOBAL_DATUM_INIT(clash_vote_ui, /datum/clash_vote_ui, new)
+
+/proc/clash_vote_running()
+	return clash_vote_context() && (SSvote.mode == "gamemode" || SSvote.mode == "groundmap")
+
+/proc/clash_map_preview_base(datum/map_config/ground)
+	var/map_file = islist(ground.map_file) ? ground.map_file[1] : ground.map_file
+	return splittext(map_file, ".")[1]
+
+/datum/controller/subsystem/vote/tgui_interact(mob/user, datum/tgui/ui)
+	if(clash_vote_running())
+		GLOB.clash_vote_ui.tgui_interact(user)
+		return
+	return ..()
+
+/datum/asset/simple/clash_vote
+	assets = list(
+		"clash_mode_tdm.png" = 'icons/images/ui_images/clash_modes/tdm.png',
+		"clash_mode_koth.png" = 'icons/images/ui_images/clash_modes/koth.png',
+		"clash_mode_domination.png" = 'icons/images/ui_images/clash_modes/domination.png',
+		"clash_mode_ctf.png" = 'icons/images/ui_images/clash_modes/ctf.png',
+	)
+
+/datum/asset/simple/clash_vote/register()
+	for(var/map_name in config.maplist[GROUND_MAP])
+		var/datum/map_config/ground = config.maplist[GROUND_MAP][map_name]
+		var/base = clash_map_preview_base(ground)
+		var/preview = "icons/images/ui_images/clash_maps/[base].png"
+		if(fexists(preview))
+			assets["clash_map_[base].png"] = fcopy_rsc(preview)
+	return ..()
+
+/datum/clash_vote_ui
+	var/vote_started
+	var/list/picks = list()
+	var/close_timer_id
+
+/datum/clash_vote_ui/tgui_interact(mob/user, datum/tgui/ui)
+	ui = SStgui.try_update_ui(user, src, ui)
+	if(!ui)
+		ui = new(user, src, "ClashVote", "Vote")
+		ui.open()
+
+/datum/clash_vote_ui/ui_state(mob/user)
+	return GLOB.always_state
+
+/datum/clash_vote_ui/ui_assets(mob/user)
+	return list(get_asset_datum(/datum/asset/simple/clash_vote))
+
+/datum/clash_vote_ui/proc/sync_vote()
+	if(vote_started == SSvote.started_time)
+		return
+	vote_started = SSvote.started_time
+	picks.Cut()
+	if(close_timer_id)
+		deltimer(close_timer_id)
+		close_timer_id = null
+
+/datum/clash_vote_ui/proc/stage()
+	if(SSvote.mode == "gamemode")
+		return "mode"
+	if(SSvote.mode == "groundmap")
+		return "map"
+	var/datum/game_mode/extended/faction_clash/hvh/hvh = SSticker.mode
+	if(istype(hvh) && hvh.round_vote_stage == CLASH_VOTES_MAP)
+		return "between"
+	return "done"
+
+/datum/clash_vote_ui/proc/players_text(datum/map_config/ground)
+	var/low = ground.config_min_users
+	var/high = ground.config_max_users
+	if(low && high)
+		return "[low] - [high]"
+	if(low)
+		return "[low]+"
+	if(high)
+		return "1 - [high]"
+
+/datum/clash_vote_ui/ui_data(mob/user)
+	sync_vote()
+	. = list()
+	var/stage = stage()
+	if(stage == "done")
+		schedule_close()
+	.["stage"] = stage
+	.["mode"] = GLOB.master_mode
+	.["time_left"] = max(SSvote.time_remaining, 0)
+	.["time_total"] = CONFIG_GET(number/vote_period) / 10
+	.["voters"] = length(SSvote.voted)
+	.["players"] = length(GLOB.clients)
+	.["is_admin"] = check_rights_for(user.client, R_ADMIN)
+	var/datum/map_config/next_ground = LAZYACCESS(SSmapping.next_map_configs, GROUND_MAP)
+	.["next_map"] = next_ground && clash_map_title(next_ground.map_name)
+	var/mine = picks[user.ckey]
+	var/datum/asset/simple/clash_vote/pack = get_asset_datum(/datum/asset/simple/clash_vote)
+	var/total = 0
+	for(var/key in SSvote.choices)
+		total += SSvote.choices[key]
+	var/list/cards = list()
+	for(var/key in SSvote.choices)
+		var/votes = SSvote.choices[key] + SSvote.carryover[key]
+		if(SSvote.vote_adjustment_callback)
+			votes += SSvote.vote_adjustment_callback.Invoke(votes, SSvote.carryover[key], total)
+		var/list/card = list("key" = key, "votes" = votes, "mine" = key == mine)
+		if(stage == "map")
+			var/datum/map_config/ground = config.maplist[GROUND_MAP][key]
+			card["title"] = clash_map_title(key)
+			card["players"] = ground && players_text(ground)
+			var/preview = ground && "clash_map_[clash_map_preview_base(ground)].png"
+			card["image"] = (preview in pack.assets) ? preview : null
+		else
+			card["title"] = key
+			card["maps"] = length(get_clash_vote_maps(key))
+			card["image"] = GLOB.clash_vote_mode_icons[key]
+		cards += list(card)
+	.["cards"] = cards
+
+/datum/clash_vote_ui/ui_act(action, list/params, datum/tgui/ui, datum/ui_state/state)
+	. = ..()
+	if(.)
+		return
+	switch(action)
+		if("vote")
+			return cast_vote(usr, params["key"])
+		if("cancel")
+			if(!clash_vote_running() || !check_rights(R_ADMIN))
+				return
+			SSvote.reset()
+			to_chat(world, "<b><font color='purple'>The vote has been cancelled.</font></b>")
+			return TRUE
+
+/datum/clash_vote_ui/proc/cast_vote(mob/voter, choice)
+	var/ckey = voter.ckey
+	if(!clash_vote_running() || !ckey || !(choice in SSvote.choices))
+		return
+	if(CONFIG_GET(flag/no_dead_vote) && voter.stat == DEAD && !check_rights_for(voter.client, R_ADMIN))
+		return
+	sync_vote()
+	if(!(ckey in SSvote.voted))
+		SSvote.voted += ckey
+	else if(picks[ckey] && picks[ckey] != choice)
+		SSvote.choices[picks[ckey]]--
+	else
+		return
+	SSvote.choices[choice]++
+	picks[ckey] = choice
+	SStgui.update_uis(src)
+	return TRUE
+
+/datum/clash_vote_ui/proc/finish()
+	schedule_close()
+	SStgui.update_uis(src)
+
+/datum/clash_vote_ui/proc/schedule_close()
+	if(!close_timer_id)
+		close_timer_id = addtimer(CALLBACK(src, PROC_REF(close_all)), 10 SECONDS, TIMER_STOPPABLE)
+
+/datum/clash_vote_ui/proc/close_all()
+	close_timer_id = null
+	SStgui.close_uis(src)
+
+/proc/clash_map_title(map_name)
+	return copytext(map_name, 1, 5) == "TDM " ? copytext(map_name, 5) : map_name
 
 GLOBAL_VAR(clash_start_mode)
 
