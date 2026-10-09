@@ -632,7 +632,7 @@ GLOBAL_LIST_EMPTY(clash_hud_status_mobs)
 		return
 	status.maptext = text
 	status.maptext_width = 26
-	status.maptext_y = -4
+	status.maptext_y = 8
 
 /proc/clash_failed_organs(mob/living/carbon/human/patient)
 	. = 0
