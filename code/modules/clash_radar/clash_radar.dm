@@ -84,7 +84,7 @@ GLOBAL_LIST_INIT(clash_radar_tones, list(
 			else if(abs(dx) < 0.5 || abs(dy) < 0.5)
 				pixel = rgb(31, 42, 50, 200)
 			else
-				pixel = y % 2 ? rgb(16, 22, 27, 165) : rgb(14, 19, 24, 165)
+				pixel = y % 2 ? rgb(16, 22, 27, 51) : rgb(14, 19, 24, 51)
 			backdrop.DrawBox(pixel, x, y)
 	var/middle = RADAR_SIZE / 2
 	backdrop.DrawBox(RADAR_COLOR_TICK, middle, RADAR_SIZE - 7, middle + 1, RADAR_SIZE - 5)
