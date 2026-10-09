@@ -77,7 +77,7 @@ GLOBAL_LIST_EMPTY(clash_score_panel_icons)
 	var/left = SCORE_PANEL_LEFT
 	var/right_start = SCORE_PANEL_LEFT + SCORE_PANEL_WIDTH - SCORE_SIDE_WIDTH
 	var/text_width = SCORE_SIDE_WIDTH - 10
-	var/big = "font-family: \"VCR OSD Mono\"; font-size: [max(uscm, upp) >= 1000 ? 11 : 14]px; -dm-text-outline: 1px black; vertical-align: middle; color: #ffffff"
+	var/big = "font-family: \"VCR OSD Mono\"; font-size: [max(length("[uscm]"), length("[upp]")) >= 4 ? 11 : 14]px; -dm-text-outline: 1px black; vertical-align: middle; color: #ffffff"
 	var/small = "font-family: \"Small Fonts\"; font-size: 6px; -dm-text-outline: 1px black; vertical-align: bottom"
 	var/list/texts = list()
 	texts += clash_score_text("<span style='[small]; color: #e8ecef; text-align: left'>USCM</span>", left + 5, 13, text_width, 10)
