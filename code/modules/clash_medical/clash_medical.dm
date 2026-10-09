@@ -291,6 +291,8 @@ GLOBAL_LIST_INIT(clash_medic_stripped_items, list(
 	if(!ishuman(user))
 		to_chat(user, SPAN_WARNING("You don't have the dexterity to do this!"))
 		return TRUE
+	if(user.action_busy)
+		return TRUE
 	var/obj/limb/affecting = clash_treat_target(patient, patient.get_limb(user.zone_selected))
 	if(!affecting)
 		to_chat(user, SPAN_WARNING("[patient] has no [parse_zone(user.zone_selected)]!"))
