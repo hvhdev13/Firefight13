@@ -798,6 +798,7 @@ GLOBAL_LIST_INIT_TYPED(huds, /datum/mob_hud, flatten_numeric_alist(alist(
 
 	hud_set_new_player()
 	F.modify_hud_holder(holder, src)
+	clash_hide_squad_icon(src)
 
 /mob/living/carbon/human/yautja/hud_set_squad()
 	set waitfor = FALSE

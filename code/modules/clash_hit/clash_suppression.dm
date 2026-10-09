@@ -245,6 +245,7 @@
 /proc/clash_mark_loud(mob/living/carbon/human/shooter)
 	if(ishuman(shooter))
 		shooter.clash_loud_until = world.time + CLASH_LOUD_TIME
+		clash_bots_hear(shooter)
 
 #undef CLASH_SUPPRESSION_MAX
 #undef CLASH_SUPPRESSION_NEAR_MISS

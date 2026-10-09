@@ -41,8 +41,13 @@
 /datum/clash_bot/proc/can_enter(turf/spot)
 	if(istype(spot, /turf/open/clash_void))
 		return FALSE
+	var/area/clash_arena/here = get_area(body)
+	if(istype(here) && clash_is_held(body, here.clash_faction, spot))
+		return FALSE
 	var/area/clash_arena/zone = get_area(spot)
-	return !(istype(zone) && zone.clash_faction && zone.clash_faction != body.faction)
+	if(!istype(zone) || !zone.clash_faction)
+		return TRUE
+	return zone.clash_faction == body.faction && !carrying()
 
 /datum/clash_bot/proc/border_blocked(turf/from, turf/into, direction)
 	for(var/obj/structure/thing in from)
@@ -53,11 +58,43 @@
 			return TRUE
 	return FALSE
 
+/datum/clash_bot/var/obj/item/card/id/path_card
+
+/datum/clash_bot/proc/link_blocked(turf/from, turf/into, direction)
+	if(DirBlockedWithAccess(from, direction, path_card) || DirBlockedWithAccess(into, REVERSE_DIR(direction), path_card))
+		return TRUE
+	for(var/obj/thing in into)
+		if(thing.density && !istype(thing, /obj/structure/machinery/door) && !(thing.flags_atom & ON_BORDER) && !fence_gate(thing))
+			return TRUE
+	return FALSE
+
+/datum/clash_bot/proc/fence_gate(obj/structure/fence/gate)
+	return istype(gate) && gate.door && !gate.cut && gate.density
+
+/datum/clash_bot/proc/door_shut(turf/spot)
+	for(var/obj/structure/machinery/door/door in spot)
+		if(!door.density)
+			continue
+		var/obj/structure/machinery/door/firedoor/shutter = door
+		if(istype(shutter) && (shutter.blocked || shutter.inoperable() || (shutter.lockdown && !shutter.allowed(body))))
+			return TRUE
+		var/obj/structure/machinery/door/airlock/airlock = door
+		if(istype(airlock) && (airlock.locked || airlock.welded))
+			return TRUE
+	return FALSE
+
+/datum/clash_bot/proc/step_open(turf/from, turf/into, direction)
+	if(!into || into.density || blocked_steps[into] > world.time || !can_enter(into))
+		return FALSE
+	if(link_blocked(from, into, direction) || border_blocked(from, into, direction) || door_shut(into))
+		return FALSE
+	return !(locate(/obj/flamer_fire) in into)
+
 /datum/clash_bot/proc/find_path(turf/goal)
 	var/turf/start = get_turf(body)
 	if(!start || !goal || start == goal)
 		return list()
-	var/obj/item/card/id/id_card = body.get_idcard()
+	path_card = body.get_idcard()
 	var/list/heap = list()
 	var/list/cost = list()
 	var/list/came_from = list()
@@ -82,13 +119,9 @@
 			closest_distance = remaining
 		for(var/direction in GLOB.cardinals)
 			var/turf/next = get_step(current, direction)
-			if(!next || next.density || closed[next] || !can_enter(next))
+			if(!next || closed[next] || !step_open(current, next, direction))
 				continue
-			if(LinkBlockedWithAccess(current, next, id_card) || border_blocked(current, next, direction))
-				continue
-			if(locate(/obj/flamer_fire) in next)
-				continue
-			var/next_cost = cost[current] + 1
+			var/next_cost = cost[current] + 1 + danger_cost(next)
 			if(!isnull(cost[next]) && next_cost >= cost[next])
 				continue
 			cost[next] = next_cost
@@ -100,5 +133,25 @@
 		path.Insert(1, backtrack)
 		backtrack = came_from[backtrack]
 	return path
+
+/datum/clash_bot/proc/walk_steps(max_steps, radius)
+	var/turf/start = get_turf(body)
+	path_card = body.get_idcard()
+	var/list/steps = list()
+	steps[start] = 0
+	var/list/queue = list(start)
+	var/index = 1
+	while(index <= length(queue))
+		var/turf/current = queue[index++]
+		var/next_steps = steps[current] + 1
+		if(next_steps > max_steps)
+			continue
+		for(var/direction in GLOB.cardinals)
+			var/turf/next = get_step(current, direction)
+			if(!next || !isnull(steps[next]) || get_dist(start, next) > radius || !step_open(current, next, direction))
+				continue
+			steps[next] = next_steps
+			queue += next
+	return steps
 
 #undef CLASH_BOT_PATH_BUDGET

@@ -5,9 +5,50 @@
 #define CLASH_STATUS_TOP_Y 8
 #define CLASH_STATUS_STEP 8
 #define CLASH_STATUS_FADE (2 DECISECONDS)
+#define CLASH_CLASS_MARK_Y 24
 
 GLOBAL_LIST_EMPTY(clash_status_holders)
 GLOBAL_LIST_INIT(clash_statuses, build_clash_statuses())
+GLOBAL_LIST_EMPTY(clash_class_marks)
+GLOBAL_LIST_EMPTY(clash_class_mark_icons)
+GLOBAL_LIST_INIT(clash_class_mark_patterns, list(
+	CLASH_CLASS_MEDIC = list(
+		"..ooo..",
+		"..oGo..",
+		"oooGooo",
+		"oGGGGGo",
+		"oooGooo",
+		"..oGo..",
+		"..ooo..",
+	),
+	CLASH_CLASS_ENGINEER = list(
+		"oo...oo",
+		"oGo.oGo",
+		"oGGoGGo",
+		".oGGGo.",
+		"..oGo..",
+		"..oGo..",
+		"..ooo..",
+	),
+	CLASH_CLASS_HEAVY = list(
+		"ooooooo",
+		"oGoGoGo",
+		"oGoGoGo",
+		"oGoGoGo",
+		"oGoGoGo",
+		"oGoGoGo",
+		"ooooooo",
+	),
+	CLASH_CLASS_LEADER = list(
+		"...o...",
+		"..oGo..",
+		"ooGGGoo",
+		"oGGGGGo",
+		".oGGGo.",
+		"oGGoGGo",
+		"oo...oo",
+	),
+))
 
 /datum/clash_status
 	var/name
@@ -170,6 +211,56 @@ GLOBAL_LIST_INIT(clash_statuses, build_clash_statuses())
 				badges += badge
 		holder.show_to(viewer, badges)
 
+/proc/get_clash_class_mark_icon(class)
+	if(!GLOB.clash_class_mark_icons[class])
+		GLOB.clash_class_mark_icons[class] = clash_pattern_icon(GLOB.clash_class_mark_patterns[class], list("o" = rgb(10, 12, 15, 230), "G" = rgb(240, 190, 60)))
+	return GLOB.clash_class_mark_icons[class]
+
+/proc/clash_class_mark_sees(client/viewer, mob/living/carbon/human/target)
+	return isobserver(viewer.mob) || viewer.mob.faction == target.faction
+
+/proc/clash_class_mark_add(mob/living/carbon/human/target)
+	clash_class_mark_remove(target)
+	var/class = GLOB.clash_job_classes[target.job]
+	if(!clash_fast_medicine() || !GLOB.clash_class_mark_patterns[class])
+		return
+	var/image/mark = image(get_clash_class_mark_icon(class), target, layer = ABOVE_FLY_LAYER)
+	mark.appearance_flags = RESET_COLOR|RESET_ALPHA|RESET_TRANSFORM|KEEP_APART
+	mark.mouse_opacity = MOUSE_OPACITY_TRANSPARENT
+	mark.pixel_x = CLASH_STATUS_X
+	mark.pixel_y = CLASH_CLASS_MARK_Y
+	GLOB.clash_class_marks[target] = mark
+	for(var/client/viewer as anything in GLOB.clients)
+		if(clash_class_mark_sees(viewer, target))
+			viewer.images += mark
+
+/proc/clash_class_mark_remove(mob/living/carbon/human/target)
+	var/image/mark = GLOB.clash_class_marks[target]
+	if(!mark)
+		return
+	GLOB.clash_class_marks -= target
+	for(var/client/viewer as anything in GLOB.clients)
+		viewer.images -= mark
+
+/proc/clash_class_mark_sync_viewer(client/viewer)
+	for(var/mob/living/carbon/human/target as anything in GLOB.clash_class_marks)
+		var/image/mark = GLOB.clash_class_marks[target]
+		if(QDELETED(target))
+			GLOB.clash_class_marks -= target
+			viewer.images -= mark
+		else if(clash_class_mark_sees(viewer, target))
+			viewer.images |= mark
+		else
+			viewer.images -= mark
+
+/proc/clash_hide_squad_icon(mob/living/carbon/human/target)
+	if(!clash_fast_medicine() || !(target.faction in list(FACTION_MARINE, FACTION_UPP)))
+		return
+	var/datum/faction/side = get_faction(target.faction)
+	var/image/holder = target.hud_list[side.hud_type]
+	holder.icon_state = "hudblank"
+	holder.overlays.Cut()
+
 SUBSYSTEM_DEF(clash_status)
 	name = "Clash Status"
 	flags = SS_NO_FIRE
@@ -182,6 +273,7 @@ SUBSYSTEM_DEF(clash_status)
 	SIGNAL_HANDLER
 	if(new_mob.client)
 		clash_status_sync_viewer(new_mob.client)
+		clash_class_mark_sync_viewer(new_mob.client)
 
 #undef CLASH_STATUS_EVERYONE
 #undef CLASH_STATUS_TEAM
@@ -190,3 +282,4 @@ SUBSYSTEM_DEF(clash_status)
 #undef CLASH_STATUS_TOP_Y
 #undef CLASH_STATUS_STEP
 #undef CLASH_STATUS_FADE
+#undef CLASH_CLASS_MARK_Y

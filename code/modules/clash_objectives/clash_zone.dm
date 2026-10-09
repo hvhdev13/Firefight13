@@ -144,7 +144,7 @@ GLOBAL_DATUM(clash_zone_tile_icon, /icon)
 /datum/clash_zone/proc/get_occupant_mobs()
 	. = list()
 	for(var/mob/living/carbon/human/fighter as anything in GLOB.alive_human_list)
-		if(!fighter.client || fighter.statistic_exempt || fighter.is_mob_incapacitated(TRUE) || HAS_TRAIT(fighter, TRAIT_FLOORED) || !covered[get_turf(fighter)])
+		if(!clash_counts_on_objectives(fighter) || fighter.is_mob_incapacitated(TRUE) || HAS_TRAIT(fighter, TRAIT_FLOORED) || !covered[get_turf(fighter)])
 			continue
 		if(fighter.faction in list(FACTION_MARINE, FACTION_UPP))
 			. += fighter

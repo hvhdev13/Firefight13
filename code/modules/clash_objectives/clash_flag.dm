@@ -74,7 +74,7 @@
 		else if(isturf(loc))
 			mode.return_flag(src, user)
 		return
-	if(!(user.faction in list(FACTION_MARINE, FACTION_UPP)) || user.statistic_exempt || !user.client)
+	if(!(user.faction in list(FACTION_MARINE, FACTION_UPP)) || !clash_counts_on_objectives(user))
 		return
 	if(!mode.match_live)
 		to_chat(user, SPAN_WARNING("The match is not on."))
@@ -120,6 +120,9 @@
 		var/obj/effect/clash_zone_tile/tile = new(spot)
 		tile.color = colour
 		. += tile
+
+/proc/clash_counts_on_objectives(mob/living/carbon/human/fighter)
+	return clash_is_bot(fighter) || (fighter.client && !fighter.statistic_exempt)
 
 /proc/clash_carries_enemy_flag(atom/movable/mover)
 	if(!ishuman(mover))

@@ -10,6 +10,7 @@ interface Row {
   role?: string;
   alive: BooleanLike;
   kills: number;
+  bot_kills: number;
   assists: number;
   deaths: number;
   captures: number;
@@ -32,6 +33,8 @@ interface Team {
   alive: number;
   own: BooleanLike;
   players: Row[];
+  bots: number;
+  bot_kills: number;
 }
 
 interface Objective {
@@ -259,8 +262,9 @@ const TeamTable = (props: {
   readonly team: Team;
   readonly showCaptures: boolean;
   readonly showRevives: boolean;
+  readonly showBotKills: boolean;
 }) => {
-  const { team, showCaptures, showRevives } = props;
+  const { team, showCaptures, showRevives, showBotKills } = props;
   const rows = [...team.players].sort(byScore);
   return (
     <div
@@ -276,6 +280,7 @@ const TeamTable = (props: {
             <th className="ClashScoreboard__rank">#</th>
             <th className="ClashScoreboard__nameCol">{team.name}</th>
             <th title="Kills">K</th>
+            {showBotKills && <th title="Bot kills">BK</th>}
             <th title="Assists">A</th>
             <th title="Deaths">D</th>
             {showCaptures && <th title="Flag captures">CAP</th>}
@@ -322,6 +327,7 @@ const TeamTable = (props: {
                 )}
               </td>
               <td className="ClashScoreboard__kills">{row.kills}</td>
+              {showBotKills && <td>{row.bot_kills}</td>}
               <td>{row.assists}</td>
               <td>{row.deaths}</td>
               {showCaptures && <td>{row.captures}</td>}
@@ -344,6 +350,11 @@ const TeamTable = (props: {
       </table>
       {!rows.length && (
         <div className="ClashScoreboard__empty">No players yet</div>
+      )}
+      {(team.bots > 0 || team.bot_kills > 0) && (
+        <div className="ClashScoreboard__bots">
+          Bots ({team.bots}): {team.bot_kills} kills
+        </div>
       )}
       <div className="ClashScoreboard__teamFoot">
         <span>
@@ -406,6 +417,9 @@ export const ClashScoreboard = () => {
   );
   const showRevives = teams.some((team) =>
     team.players.some((row) => row.revives > 0),
+  );
+  const showBotKills = teams.some((team) =>
+    team.players.some((row) => row.bot_kills > 0),
   );
 
   return (
@@ -510,11 +524,13 @@ export const ClashScoreboard = () => {
                 team={left}
                 showCaptures={showCaptures}
                 showRevives={showRevives}
+                showBotKills={showBotKills}
               />
               <TeamTable
                 team={right}
                 showCaptures={showCaptures}
                 showRevives={showRevives}
+                showBotKills={showBotKills}
               />
             </div>
             <div className="ClashScoreboard__footer">

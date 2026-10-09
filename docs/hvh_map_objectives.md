@@ -115,6 +115,16 @@ What players see on a timed move:
 - Only used in modes without objectives (TDM). In KOTH, Domination and CTF bots go to the objectives.
 - Without a rally for its side a bot holds around its own spawner.
 
+## Bot fill
+
+- `/obj/effect/landmark/clash_npc/uscm/fill` and `/upp/fill` are fill slots. Bots spawn in their side's base
+  and walk out, so where a fill marker sits only matters as its hold point.
+- `fill_limit` (var edit, number): the side's fill target. With several markers the highest value wins; unset
+  keeps the default of 5. Each side is filled up to the larger of this and the enemy's player count, minus its
+  own players, never past the side's bot cap (10).
+- More bots than markers is fine: extra slots are made at a marker as needed.
+- `spawn_in_base = 0` makes that marker spawn its bot where it stands instead.
+
 ## Fallback
 
 | Situation | Result |

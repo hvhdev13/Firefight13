@@ -16,7 +16,15 @@
 #define CLASH_FINAL_REBOOT_DELAY (15 SECONDS)
 #define CLASH_ASSIST_WINDOW (10 SECONDS)
 #define CLASH_SUPPRESSION_ASSIST_WINDOW (5 SECONDS)
+#define CLASH_BOT_KILL_SCORE 0.5
 #define CLASH_KILL_SOUND 'sound/weapons/gun_xm88_directhit_high.ogg'
+#define CLASH_BOT_TASK_DEFEND "defend"
+#define CLASH_BOT_TASK_PATROL "patrol"
+#define CLASH_BOT_TASK_ATTACK "attack"
+#define CLASH_BOT_TASK_RUN "run"
+#define CLASH_BOT_TASK_ESCORT "escort"
+#define CLASH_BOT_TASK_RECOVER "recover"
+#define CLASH_BOT_TASK_INTERCEPT "intercept"
 GLOBAL_LIST_INIT(clash_streak_steps, list(3, 5, 7, 10, 15, 20))
 GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 
@@ -64,6 +72,8 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	var/list/idle_warned = list()
 	var/idle_timer_id
 	var/list/faction_kills = list()
+	var/list/bot_side_kills = list()
+	var/list/round_bot_side_kills = list()
 	var/list/faction_deaths = list()
 	var/list/player_scores = list()
 	var/list/environment_kills = list()
@@ -257,6 +267,8 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	countdown_timer_id = null
 	match_number++
 	match_live = TRUE
+	if(match_number == 1)
+		INVOKE_ASYNC(GLOBAL_PROC, GLOBAL_PROC_REF(clash_note_map_gear), get_clash_ground_z())
 	countdown_end_time = null
 	intermission_end_time = null
 	bases_sealed = FALSE
@@ -296,6 +308,12 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 
 /datum/game_mode/extended/faction_clash/hvh/proc/get_radar_pins(mob/viewer)
 	return list()
+
+/datum/game_mode/extended/faction_clash/hvh/proc/is_objective_turf(turf/spot)
+	return FALSE
+
+/datum/game_mode/extended/faction_clash/hvh/proc/plan_bots(datum/clash_bot_director/director)
+	director.plan_skirmish()
 
 /datum/game_mode/extended/faction_clash/hvh/proc/get_admin_objective_actions()
 	return list()
@@ -339,7 +357,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 /datum/game_mode/extended/faction_clash/hvh/proc/get_score_entry(mob_name, faction, owner_ckey)
 	var/list/entry = player_scores[mob_name]
 	if(!entry)
-		entry = list("kills" = 0, "assists" = 0, "deaths" = 0, "shots" = 0, "hits" = 0, "best_streak" = 0, "faction" = faction, "ckey" = owner_ckey)
+		entry = list("kills" = 0, "bot_kills" = 0, "assists" = 0, "deaths" = 0, "shots" = 0, "hits" = 0, "best_streak" = 0, "faction" = faction, "ckey" = owner_ckey)
 		player_scores[mob_name] = entry
 	if(owner_ckey && !entry["ckey"])
 		entry["ckey"] = owner_ckey
@@ -382,6 +400,8 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 			"alive" = alive,
 			"own" = viewer.faction == faction,
 			"players" = players,
+			"bots" = clash_bot_count(faction),
+			"bot_kills" = bot_side_kills[faction] || 0,
 		))
 	var/list/results = list()
 	for(var/list/result as anything in match_results)
@@ -425,6 +445,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		"role" = fighter && clash_role_name(fighter.job),
 		"alive" = fighter && fighter.stat != DEAD,
 		"kills" = entry?["kills"] || 0,
+		"bot_kills" = entry?["bot_kills"] || 0,
 		"assists" = entry?["assists"] || 0,
 		"deaths" = entry?["deaths"] || 0,
 		"captures" = entry?["captures"] || 0,
@@ -439,7 +460,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 /datum/game_mode/extended/faction_clash/hvh/proc/get_killfeed_line(list/entry, mob/viewer)
 	var/involved = viewer && (entry["killer"] == viewer.real_name || entry["victim"] == viewer.real_name)
 	var/outline = involved ? "-dm-text-outline: 1px #7a5a00" : "-dm-text-outline: 1px black"
-	var/weapon = entry["cause"] ? " <span style='color: #9aa3ab'>\[[html_encode(entry["cause"])]\]</span> " : " <span style='color: #9aa3ab'>&gt;</span> "
+	var/weapon = entry["cause"] ? " <span style='color: #ffcf4d'>\[[html_encode(entry["cause"])]\]</span> " : " <span style='color: #9aa3ab'>&gt;</span> "
 	if(entry["revive"])
 		weapon = " <span style='color: #7fd67f'>revived</span> "
 	return "<span class='maptext' style='text-align: center; font-size: 6px; [outline]'><span style='color: [entry["killer_color"]]'>[clash_feed_name(entry["killer"])][entry["assister"] ? " <span style='color: #9aa3ab'>+</span> [clash_feed_name(entry["assister"])]" : ""]</span>[weapon]<span style='color: [entry["victim_color"]]'>[clash_feed_name(entry["victim"])]</span></span>"
@@ -592,8 +613,37 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	clash_progress_kill(victim, killer, cause, cause_object)
 	if(istype(cause_object, /obj/structure/machinery/defenses))
 		score_sentry_kill(killer)
-	if(type == /datum/game_mode/extended/faction_clash/hvh/tdm && killer.statistic_exempt && !victim.statistic_exempt && killer.faction != victim.faction && (killer.faction in list(FACTION_MARINE, FACTION_UPP)))
-		score_kill(killer.faction)
+	if(killer.statistic_exempt && !victim.statistic_exempt && killer.faction != victim.faction && (killer.faction in list(FACTION_MARINE, FACTION_UPP)))
+		note_bot_side_kill(killer.faction)
+		if(scores_bot_kills())
+			score_kill(killer.faction)
+
+/datum/game_mode/extended/faction_clash/hvh/proc/scores_bot_kills()
+	return type == /datum/game_mode/extended/faction_clash/hvh/tdm
+
+/datum/game_mode/extended/faction_clash/hvh/proc/note_bot_side_kill(faction)
+	if(match_live)
+		bot_side_kills[faction] = (bot_side_kills[faction] || 0) + 1
+
+/datum/game_mode/extended/faction_clash/hvh/proc/score_bot_death(mob/living/carbon/human/victim)
+	var/datum/cause_data/cause = victim.last_damage_data
+	var/mob/living/carbon/human/killer = cause?.resolve_mob()
+	suppressed_by -= victim.real_name
+	if(!match_live || round_finished || !ishuman(killer) || killer == victim || killer.faction == victim.faction || !(killer.faction in list(FACTION_MARINE, FACTION_UPP)))
+		recent_damage -= victim.real_name
+		return
+	add_killfeed(killer.real_name, killer.faction, victim.real_name, victim.faction, cause.cause_name)
+	if(killer.statistic_exempt)
+		note_bot_side_kill(killer.faction)
+	else
+		var/list/entry = get_score_entry(killer.real_name, killer.faction, killer.mind?.ckey || killer.ckey)
+		entry["bot_kills"] += 1
+	if(!scores_bot_kills())
+		update_score_huds()
+		return
+	faction_kills[killer.faction] = (faction_kills[killer.faction] || 0) + CLASH_BOT_KILL_SCORE
+	update_score_huds()
+	check_kill_limit(killer.faction)
 
 /datum/game_mode/extended/faction_clash/hvh/proc/record_damage(mob/living/victim, mob/attacker, weapon_type, damage = 0)
 	if(!match_live || round_finished || attacker.faction == victim.faction)
@@ -838,6 +888,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	archive_match()
 	player_scores = round_scores
 	faction_kills = round_faction_kills
+	bot_side_kills = round_bot_side_kills
 	faction_deaths = round_faction_deaths
 	environment_kills = round_environment_kills
 	round_finished = get_round_result()
@@ -883,11 +934,11 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	var/list/best_entry
 	for(var/name in scores)
 		var/list/entry = scores[name]
-		if(!entry["ckey"] || (!entry["kills"] && !entry["assists"] && !entry["captures"] && !entry["revives"]))
+		if(!entry["ckey"] || (!entry["kills"] && !entry["bot_kills"] && !entry["assists"] && !entry["captures"] && !entry["revives"]))
 			continue
 		if(best_entry)
-			var/score = entry["kills"] + entry["assists"] * 0.5 + (entry["captures"] || 0) * 3 + (entry["revives"] || 0) * 0.5
-			var/best_score = best_entry["kills"] + best_entry["assists"] * 0.5 + (best_entry["captures"] || 0) * 3 + (best_entry["revives"] || 0) * 0.5
+			var/score = entry["kills"] + (entry["bot_kills"] || 0) * 0.25 + entry["assists"] * 0.5 + (entry["captures"] || 0) * 3 + (entry["revives"] || 0) * 0.5
+			var/best_score = best_entry["kills"] + (best_entry["bot_kills"] || 0) * 0.25 + best_entry["assists"] * 0.5 + (best_entry["captures"] || 0) * 3 + (best_entry["revives"] || 0) * 0.5
 			if(score < best_score || (score == best_score && entry["deaths"] >= best_entry["deaths"]))
 				continue
 		best = name
@@ -901,7 +952,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		if(!total)
 			round_scores[name] = entry.Copy()
 			continue
-		for(var/stat in list("kills", "assists", "deaths", "shots", "hits", "captures", "revives", "sentry_kills"))
+		for(var/stat in list("kills", "bot_kills", "assists", "deaths", "shots", "hits", "captures", "revives", "sentry_kills"))
 			total[stat] = (total[stat] || 0) + (entry[stat] || 0)
 		total["best_streak"] = max(total["best_streak"], entry["best_streak"])
 		if(!total["ckey"])
@@ -910,10 +961,13 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		round_faction_kills[faction] = (round_faction_kills[faction] || 0) + faction_kills[faction]
 	for(var/faction in faction_deaths)
 		round_faction_deaths[faction] = (round_faction_deaths[faction] || 0) + faction_deaths[faction]
+	for(var/faction in bot_side_kills)
+		round_bot_side_kills[faction] = (round_bot_side_kills[faction] || 0) + bot_side_kills[faction]
 	for(var/cause in environment_kills)
 		round_environment_kills[cause] = (round_environment_kills[cause] || 0) + environment_kills[cause]
 	player_scores = list()
 	faction_kills = list()
+	bot_side_kills = list()
 	faction_deaths = list()
 	environment_kills = list()
 	kill_streaks = list()
@@ -979,6 +1033,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	clash_reset_trials()
 	for(var/datum/clash_bot/bot as anything in GLOB.clash_bots.Copy())
 		bot.retire()
+	INVOKE_ASYNC(GLOBAL_PROC, GLOBAL_PROC_REF(clash_clear_loose_gear), get_clash_ground_z())
 	clash_bot_refill()
 	for(var/mob/player as anything in GLOB.player_list)
 		if((isobserver(player) || player.stat == DEAD) && player.timeofdeath)
@@ -986,6 +1041,28 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		player.client?.clash_death_card = null
 		player.hud_used?.clash_death_card?.update(player)
 	log_debug("HVH: arena reset for match [match_number + 1]")
+
+GLOBAL_LIST_EMPTY(clash_map_gear)
+
+/proc/clash_loose_gear(z)
+	. = list()
+	if(!z)
+		return
+	for(var/turf/spot as anything in block(locate(1, 1, z), locate(world.maxx, world.maxy, z)))
+		for(var/obj/item/thing in spot)
+			if(istype(thing, /obj/item/weapon/gun) || istype(thing, /obj/item/ammo_magazine))
+				. += thing
+		CHECK_TICK
+
+/proc/clash_note_map_gear(z)
+	GLOB.clash_map_gear = list()
+	for(var/obj/item/thing as anything in clash_loose_gear(z))
+		GLOB.clash_map_gear[WEAKREF(thing)] = thing.loc
+
+/proc/clash_clear_loose_gear(z)
+	for(var/obj/item/thing as anything in clash_loose_gear(z))
+		if(!QDELETED(thing) && GLOB.clash_map_gear[WEAKREF(thing)] != thing.loc)
+			qdel(thing)
 
 /datum/game_mode/extended/faction_clash/hvh/proc/check_idle()
 	if(round_finished)

@@ -14,16 +14,24 @@
 /datum/clash_bot/var/charging = FALSE
 /datum/clash_bot/var/busy_until = 0
 /datum/clash_bot/var/next_melee = 0
+/datum/clash_bot/var/primary_type
+/datum/clash_bot/var/primary_magazine
+/datum/clash_bot/var/primary_spares = 0
+/datum/clash_bot/var/sidearm_type
+/datum/clash_bot/var/sidearm_magazine
+/datum/clash_bot/var/sidearm_spares = 0
+/datum/clash_bot/var/grenade_type
 
 /datum/clash_bot/proc/arm_up()
-	body.a_intent = INTENT_HARM
 	var/obj/item/weapon/gun/held = body.get_active_hand()
-	if(istype(held))
+	if(istype(held) && !clash_is_sidearm(held))
 		primary = held
 	for(var/obj/item/thing as anything in body.get_contents())
 		if(istype(thing.loc, /obj/item/weapon/gun))
 			continue
-		if(!sidearm && thing != primary && istype(thing, /obj/item/weapon/gun))
+		if(!primary && istype(thing, /obj/item/weapon/gun) && !clash_is_sidearm(thing))
+			primary = thing
+		else if(!sidearm && thing != primary && istype(thing, /obj/item/weapon/gun))
 			sidearm = thing
 		else if(!knife && istype(thing, /obj/item/attachable/bayonet))
 			knife = thing
@@ -32,6 +40,18 @@
 		else
 			continue
 		homes[thing] = thing.loc
+	primary_type = primary?.type
+	primary_magazine = primary?.current_mag?.type
+	sidearm_type = sidearm?.type
+	sidearm_magazine = sidearm?.current_mag?.type
+	grenade_type = grenade?.type
+	for(var/obj/item/ammo_magazine/spare in body.get_contents())
+		if(istype(spare.loc, /obj/item/weapon/gun))
+			continue
+		if(spare.type == primary_magazine)
+			primary_spares++
+		else if(spare.type == sidearm_magazine)
+			sidearm_spares++
 	set_firemode()
 	ready_gun(primary)
 
@@ -160,8 +180,11 @@
 	var/distance = get_dist(body, target)
 	if(distance < CLASH_BOT_GRENADE_MIN || distance > CLASH_BOT_GRENADE_MAX)
 		return FALSE
-	var/turf/landing = get_turf(target)
-	if(!cover_against(landing, get_turf(body)))
+	var/turf/aim = get_turf(target)
+	if(!cover_against(aim, get_turf(body)))
+		return FALSE
+	var/turf/landing = throw_landing(grenade, aim)
+	if(landing != aim)
 		return FALSE
 	for(var/mob/living/carbon/human/ally in range(2, landing))
 		if(ally.faction == body.faction && ally.stat != DEAD)
@@ -171,10 +194,38 @@
 		return FALSE
 	grenade.activate(body)
 	body.drop_inv_item_to_loc(grenade, get_turf(body), force = TRUE)
-	grenade.throw_atom(landing, CLASH_BOT_GRENADE_MAX, SPEED_FAST, body, TRUE)
+	grenade.throw_atom(aim, CLASH_BOT_GRENADE_MAX, SPEED_FAST, body, TRUE)
 	homes -= grenade
 	grenade = null
 	return TRUE
+
+/datum/clash_bot/proc/throw_landing(obj/item/thrown, turf/aim)
+	var/turf/landed = get_turf(body)
+	thrown.add_temp_pass_flags(PASS_OVER_THROW_ITEM)
+	for(var/turf/next as anything in get_line(get_step_towards(landed, aim), aim))
+		if(get_dist(get_turf(body), next) > CLASH_BOT_GRENADE_MAX || throw_blocked(thrown, landed, next))
+			break
+		landed = next
+	thrown.remove_temp_pass_flags(PASS_OVER_THROW_ITEM)
+	return landed
+
+/datum/clash_bot/proc/throw_blocked(obj/item/thrown, turf/from, turf/into)
+	var/direction = get_dir(from, into)
+	if(!(direction in GLOB.cardinals))
+		var/vertical = direction & (NORTH|SOUTH)
+		var/horizontal = direction & (EAST|WEST)
+		var/turf/side_one = get_step(from, vertical)
+		var/turf/side_two = get_step(from, horizontal)
+		return (throw_blocked(thrown, from, side_one) || throw_blocked(thrown, side_one, into)) && (throw_blocked(thrown, from, side_two) || throw_blocked(thrown, side_two, into))
+	if(!into || into.density)
+		return TRUE
+	for(var/atom/movable/thing in from)
+		if(thing != body && thing.BlockedExitDirs(thrown, direction))
+			return TRUE
+	for(var/atom/movable/thing in into)
+		if(thing.BlockedPassDirs(thrown, direction))
+			return TRUE
+	return FALSE
 
 #undef CLASH_BOT_CHARGE_RANGE
 #undef CLASH_BOT_MELEE_DELAY

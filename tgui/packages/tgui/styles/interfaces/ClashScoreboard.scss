@@ -386,6 +386,12 @@ $hot: #ff8a3d;
     text-align: center;
   }
 
+  &__bots {
+    padding: 3px 8px;
+    color: $dim;
+    font-style: italic;
+  }
+
   &__teamFoot {
     padding: 4px 6px;
     color: $dim;

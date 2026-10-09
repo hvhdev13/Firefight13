@@ -4277,7 +4277,7 @@
 /turf/open/floor/almayer/silverfull,
 /area/clash_arena/tdm_kutjevo/upp_base/medbay)
 "amu" = (
-/obj/structure/machinery/door/airlock/multi_tile/upp/medical/autoname{
+/obj/structure/machinery/door/airlock/multi_tile/upp/medical/autoname/clash_base{
 	req_one_access = null
 	},
 /turf/open/floor/corsat/marked,
@@ -4498,7 +4498,7 @@
 /obj/structure/pipes/standard/simple/hidden/supply{
 	dir = 4
 	},
-/obj/structure/machinery/door/airlock/upp/medical/solid/autoname,
+/obj/structure/machinery/door/airlock/upp/medical/solid/autoname/clash_base,
 /turf/open/floor/corsat/marked,
 /area/clash_arena/tdm_kutjevo/upp_base/medbay)
 "anc" = (
@@ -4697,7 +4697,7 @@
 /area/clash_arena/tdm_kutjevo/upp_base/medbay)
 "anD" = (
 /obj/structure/pipes/standard/simple/hidden/supply,
-/obj/structure/machinery/door/airlock/upp/medical/solid/autoname{
+/obj/structure/machinery/door/airlock/upp/medical/solid/autoname/clash_base{
 	dir = 2
 	},
 /turf/open/floor/corsat/marked,
@@ -4811,7 +4811,7 @@
 /area/clash_arena/tdm_kutjevo/upp_base/medbay)
 "anT" = (
 /obj/structure/disposalpipe/segment,
-/obj/structure/machinery/door/airlock/upp/medical/solid/autoname{
+/obj/structure/machinery/door/airlock/upp/medical/solid/autoname/clash_base{
 	dir = 2
 	},
 /turf/open/floor/corsat/marked,
