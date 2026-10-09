@@ -6,7 +6,6 @@
 #define CLASH_BOT_PLAN_DELAY (5 SECONDS)
 #define CLASH_BOT_CLASS_MIN 3
 #define CLASH_BOT_CLASS_SHARE 5
-#define CLASH_BOT_MEDIC_PLAYER_BONUS 8
 #define CLASH_BOT_HEAVY_PREFERENCE 10
 #define CLASH_BOT_FLANK_DISTANCE 6
 #define CLASH_BOT_OVERWATCH_RANGE 6
@@ -16,7 +15,7 @@
 #define CLASH_BOT_STAND_WAIT 4
 #define CLASH_BOT_ESCORTS 2
 #define CLASH_BOT_INTERCEPTORS 2
-#define CLASH_BOT_RUNNER_WAIT (15 SECONDS)
+#define CLASH_BOT_RUNNER_WAIT (5 SECONDS)
 #define CLASH_BOT_FOLLOW_RANGE 3
 #define CLASH_BOT_PUSH_SHARE 0.45
 #define CLASH_BOT_PATROL_SHARE 0.6
@@ -164,13 +163,14 @@ GLOBAL_LIST_INIT(clash_bot_class_jobs, list(
 	var/mob/living/carbon/human/npc = new(home)
 	dress_npc(npc, (team_fill && clash_bot_pick_job(faction)) || job)
 	npc.statistic_exempt = TRUE
-	npc.a_intent = INTENT_HELP
+	npc.a_intent = INTENT_HARM
 	if(clash_fed_spawns())
 		npc.nutrition = NUTRITION_NORMAL
 	npc.AddElement(/datum/element/clash_hit_flinch)
 	npc.AddElement(/datum/element/clash_combat_log)
 	npc.AddElement(/datum/element/clash_suppression)
-	npc.AddElement(/datum/element/clash_iff)
+	if(faction in list(FACTION_MARINE, FACTION_UPP))
+		npc.AddElement(/datum/element/clash_iff)
 	npc.setDir(dir)
 	npc.real_name = "[npc.real_name] \[BOT\]"
 	npc.name = npc.real_name
@@ -330,27 +330,11 @@ GLOBAL_LIST_INIT(clash_bot_class_jobs, list(
 /datum/clash_bot_director/New(new_faction)
 	faction = new_faction
 
-/datum/clash_bot_director/proc/get_bots(medics = FALSE)
+/datum/clash_bot_director/proc/get_bots()
 	. = list()
 	for(var/datum/clash_bot/bot as anything in GLOB.clash_bots)
-		if(bot.body?.faction == faction && bot.body.stat != DEAD && !bot.post?.rally_id && bot.medic == medics)
+		if(bot.body?.faction == faction && bot.body.stat == CONSCIOUS && !bot.post?.rally_id)
 			. += bot
-
-/datum/clash_bot_director/proc/assign_medics()
-	for(var/datum/clash_bot/medic as anything in get_bots(TRUE))
-		var/mob/living/carbon/human/best
-		var/best_score
-		for(var/mob/living/carbon/human/mate as anything in GLOB.alive_human_list)
-			if(mate == medic.body || mate.faction != faction || mate.z != medic.body.z || mate.stat == DEAD || clash_is_medic(mate) || !(mate.client || clash_is_bot(mate)))
-				continue
-			var/score = get_dist(medic.body, mate) - (mate.client ? CLASH_BOT_MEDIC_PLAYER_BONUS : 0)
-			if(isnull(best_score) || score < best_score)
-				best = mate
-				best_score = score
-		if(best)
-			medic.set_task(CLASH_BOT_TASK_ESCORT, get_turf(best), CLASH_BOT_FOLLOW_RANGE, best, best)
-		else
-			hold_posts(list(medic))
 
 /datum/clash_bot_director/proc/plan()
 	next_plan = world.time + CLASH_BOT_PLAN_DELAY
@@ -360,7 +344,6 @@ GLOBAL_LIST_INIT(clash_bot_class_jobs, list(
 		clash_mode.plan_bots(src)
 	else
 		plan_skirmish()
-	assign_medics()
 
 /datum/clash_bot_director/proc/learn_map()
 	if(mapped)
@@ -796,7 +779,6 @@ GLOBAL_LIST_INIT(clash_bot_class_jobs, list(
 	name = "Clash NPC spawner (UPP Soldier)"
 	faction = FACTION_UPP
 	job = JOB_UPP
-	bot_firemode = GUN_FIREMODE_BURSTFIRE
 
 /obj/effect/landmark/clash_npc/upp/fill
 	name = "Clash NPC team fill spawner (UPP Soldier)"
@@ -819,7 +801,6 @@ GLOBAL_LIST_INIT(clash_bot_class_jobs, list(
 #undef CLASH_BOT_PLAN_DELAY
 #undef CLASH_BOT_CLASS_MIN
 #undef CLASH_BOT_CLASS_SHARE
-#undef CLASH_BOT_MEDIC_PLAYER_BONUS
 #undef CLASH_BOT_HEAVY_PREFERENCE
 #undef CLASH_BOT_FLANK_DISTANCE
 #undef CLASH_BOT_OVERWATCH_RANGE

@@ -267,6 +267,8 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	countdown_timer_id = null
 	match_number++
 	match_live = TRUE
+	if(match_number == 1)
+		INVOKE_ASYNC(GLOBAL_PROC, GLOBAL_PROC_REF(clash_note_map_gear), get_clash_ground_z())
 	countdown_end_time = null
 	intermission_end_time = null
 	bases_sealed = FALSE
@@ -1031,6 +1033,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	clash_reset_trials()
 	for(var/datum/clash_bot/bot as anything in GLOB.clash_bots.Copy())
 		bot.retire()
+	INVOKE_ASYNC(GLOBAL_PROC, GLOBAL_PROC_REF(clash_clear_loose_gear), get_clash_ground_z())
 	clash_bot_refill()
 	for(var/mob/player as anything in GLOB.player_list)
 		if((isobserver(player) || player.stat == DEAD) && player.timeofdeath)
@@ -1038,6 +1041,28 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		player.client?.clash_death_card = null
 		player.hud_used?.clash_death_card?.update(player)
 	log_debug("HVH: arena reset for match [match_number + 1]")
+
+GLOBAL_LIST_EMPTY(clash_map_gear)
+
+/proc/clash_loose_gear(z)
+	. = list()
+	if(!z)
+		return
+	for(var/turf/spot as anything in block(locate(1, 1, z), locate(world.maxx, world.maxy, z)))
+		for(var/obj/item/thing in spot)
+			if(istype(thing, /obj/item/weapon/gun) || istype(thing, /obj/item/ammo_magazine))
+				. += thing
+		CHECK_TICK
+
+/proc/clash_note_map_gear(z)
+	GLOB.clash_map_gear = list()
+	for(var/obj/item/thing as anything in clash_loose_gear(z))
+		GLOB.clash_map_gear[WEAKREF(thing)] = thing.loc
+
+/proc/clash_clear_loose_gear(z)
+	for(var/obj/item/thing as anything in clash_loose_gear(z))
+		if(!QDELETED(thing) && GLOB.clash_map_gear[WEAKREF(thing)] != thing.loc)
+			qdel(thing)
 
 /datum/game_mode/extended/faction_clash/hvh/proc/check_idle()
 	if(round_finished)

@@ -757,7 +757,7 @@
 "dA" = (
 /obj/structure/machinery/light,
 /obj/structure/blocker/clash_gate/upp,
-/obj/structure/machinery/door/airlock/upp/medical/solid/autoname{
+/obj/structure/machinery/door/airlock/upp/medical/solid/autoname/clash_base{
 	unacidable = 1;
 	not_weldable = 1;
 	masterkey_resist = 1;
@@ -3922,7 +3922,7 @@
 /area/clash_arena/tdm_forest/battlefield)
 "wT" = (
 /obj/structure/blocker/clash_gate/upp,
-/obj/structure/machinery/door/airlock/upp/medical/solid/autoname{
+/obj/structure/machinery/door/airlock/upp/medical/solid/autoname/clash_base{
 	unacidable = 1;
 	not_weldable = 1;
 	masterkey_resist = 1;
@@ -4723,7 +4723,7 @@
 /turf/open/floor/strata/cyan3/northeast,
 /area/clash_arena/tdm_forest/upp_base)
 "Bz" = (
-/obj/structure/machinery/door/airlock/multi_tile/upp/medical/autoname{
+/obj/structure/machinery/door/airlock/multi_tile/upp/medical/autoname/clash_base{
 	req_one_access = null
 	},
 /turf/open/floor/corsat/marked,

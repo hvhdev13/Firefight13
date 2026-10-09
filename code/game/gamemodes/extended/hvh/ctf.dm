@@ -185,6 +185,7 @@
 		flag.state = CLASH_FLAG_DROPPED
 		flag.dropped_at = world.time
 		flag.show_planted(FALSE)
+		flag.add_filter("clash_flag_dropped", 3, outline_filter(2, faction_color(flag.faction)))
 		announce_flag(flag, "dropped")
 
 /datum/game_mode/extended/faction_clash/hvh/tdm/ctf/proc/take_flag(obj/item/clash_flag/flag, mob/living/carbon/human/runner)
@@ -192,9 +193,11 @@
 		release_carrier(flag)
 	flag.carrier = runner
 	flag.state = CLASH_FLAG_CARRIED
+	flag.remove_filter("clash_flag_dropped")
 	flag.dropped_at = null
 	flag.show_planted(FALSE)
 	RegisterSignal(runner, list(COMSIG_MOB_DEATH, COMSIG_PARENT_QDELETING), PROC_REF(on_carrier_lost), override = TRUE)
+	RegisterSignal(runner, COMSIG_MOB_STATCHANGE, PROC_REF(on_carrier_stat), override = TRUE)
 	runner.add_filter("clash_flag_carrier", 3, outline_filter(2, faction_color(flag.faction)))
 	qdel(runner.GetComponent(/datum/component/clash_spawn_guard))
 	announce_flag(flag, "taken", runner)
@@ -210,8 +213,13 @@
 		if(other != flag && other?.carrier == runner)
 			still_carrying = TRUE
 	if(!still_carrying)
-		UnregisterSignal(runner, list(COMSIG_MOB_DEATH, COMSIG_PARENT_QDELETING))
+		UnregisterSignal(runner, list(COMSIG_MOB_DEATH, COMSIG_PARENT_QDELETING, COMSIG_MOB_STATCHANGE))
 		runner.remove_filter("clash_flag_carrier")
+
+/datum/game_mode/extended/faction_clash/hvh/tdm/ctf/proc/on_carrier_stat(mob/living/carbon/human/runner, new_stat)
+	SIGNAL_HANDLER
+	if(new_stat != CONSCIOUS)
+		on_carrier_lost(runner)
 
 /datum/game_mode/extended/faction_clash/hvh/tdm/ctf/proc/on_carrier_lost(mob/living/carbon/human/runner)
 	SIGNAL_HANDLER
@@ -233,12 +241,14 @@
 		release_carrier(flag)
 	flag.forceMove(flag.home)
 	flag.state = CLASH_FLAG_HOME
+	flag.remove_filter("clash_flag_dropped")
 	flag.dropped_at = null
 	flag.show_planted(TRUE)
 	if(!silent)
 		announce_flag(flag, "returned", returner)
 
 /datum/game_mode/extended/faction_clash/hvh/tdm/ctf/proc/announce_flag(obj/item/clash_flag/flag, event, mob/who)
+	clash_bot_replan()
 	var/owner = flag.faction
 	var/other = owner == FACTION_MARINE ? FACTION_UPP : FACTION_MARINE
 	var/owner_name = owner == FACTION_MARINE ? "USCM" : "UPP"

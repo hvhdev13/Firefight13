@@ -172,9 +172,7 @@
 	if(!hold(knife) || get_dist(body, target) > 1 || world.time < next_melee)
 		return
 	next_melee = world.time + CLASH_BOT_MELEE_DELAY
-	body.a_intent = INTENT_HARM
 	knife.attack(target, body)
-	body.a_intent = INTENT_HELP
 
 /datum/clash_bot/proc/try_grenade()
 	if(!reachable(grenade))
@@ -186,7 +184,7 @@
 	if(!cover_against(aim, get_turf(body)))
 		return FALSE
 	var/turf/landing = throw_landing(grenade, aim)
-	if(get_dist(landing, aim) > 1 || get_dist(landing, body) < CLASH_BOT_GRENADE_MIN)
+	if(landing != aim)
 		return FALSE
 	for(var/mob/living/carbon/human/ally in range(2, landing))
 		if(ally.faction == body.faction && ally.stat != DEAD)

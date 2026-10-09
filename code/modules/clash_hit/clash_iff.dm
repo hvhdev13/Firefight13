@@ -5,7 +5,7 @@ GLOBAL_LIST_EMPTY(clash_iff_markers)
 	anchored = TRUE
 	mouse_opacity = MOUSE_OPACITY_TRANSPARENT
 	layer = ABOVE_FLY_LAYER
-	pixel_y = 7
+	pixel_y = 8
 	appearance_flags = RESET_COLOR|RESET_TRANSFORM|KEEP_APART
 
 /proc/get_clash_iff_marker(faction, bot)
@@ -13,7 +13,7 @@ GLOBAL_LIST_EMPTY(clash_iff_markers)
 	if(GLOB.clash_iff_markers[key])
 		return GLOB.clash_iff_markers[key]
 	var/color = faction == FACTION_MARINE ? "#5a8fe6" : "#e61919"
-	var/list/pixels = bot ? list(list(16, 31), list(15, 30), list(17, 30), list(14, 29), list(18, 29), list(15, 28), list(17, 28), list(16, 27)) : list(list(14, 31), list(18, 31), list(15, 30), list(17, 30), list(16, 29))
+	var/list/pixels = bot ? list(list(14, 31), list(18, 31), list(15, 30), list(17, 30), list(16, 29)) : list(list(16, 31), list(15, 30), list(17, 30), list(14, 29), list(18, 29), list(15, 28), list(17, 28), list(16, 27))
 	var/icon/chevron = icon('icons/effects/effects.dmi', "nothing")
 	for(var/list/pixel as anything in pixels)
 		chevron.DrawBox(rgb(10, 12, 15), pixel[1], pixel[2] - 1)

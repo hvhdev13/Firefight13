@@ -339,7 +339,7 @@
 /turf/open/floor/almayer/plate,
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
 "hb" = (
-/obj/structure/machinery/door/airlock/upp/medical/solid/autoname{
+/obj/structure/machinery/door/airlock/upp/medical/solid/autoname/clash_base{
 	unacidable = 1;
 	not_weldable = 1;
 	masterkey_resist = 1;
@@ -450,9 +450,8 @@
 /turf/open/floor/almayer,
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
 "lK" = (
-/obj/structure/machinery/door/airlock/upp/medical/solid/autoname,
 /obj/structure/blocker/clash_gate/upp,
-/obj/structure/machinery/door/airlock/upp/medical/solid/autoname{
+/obj/structure/machinery/door/airlock/upp/medical/solid/autoname/clash_base{
 	unacidable = 1;
 	not_weldable = 1;
 	masterkey_resist = 1;
@@ -486,7 +485,7 @@
 /turf/open/floor/almayer/blackfull2,
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
 "nF" = (
-/obj/structure/machinery/door/airlock/multi_tile/upp/medical/autoname{
+/obj/structure/machinery/door/airlock/multi_tile/upp/medical/autoname/clash_base{
 	req_one_access = null
 	},
 /turf/open/floor/corsat/marked,
@@ -647,7 +646,7 @@
 "sZ" = (
 /obj/structure/machinery/light,
 /obj/structure/blocker/clash_gate/upp,
-/obj/structure/machinery/door/airlock/upp/medical/solid/autoname{
+/obj/structure/machinery/door/airlock/upp/medical/solid/autoname/clash_base{
 	unacidable = 1;
 	not_weldable = 1;
 	masterkey_resist = 1;
@@ -722,7 +721,7 @@
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "xr" = (
 /obj/structure/blocker/clash_gate/upp,
-/obj/structure/machinery/door/airlock/upp/medical/solid/autoname{
+/obj/structure/machinery/door/airlock/upp/medical/solid/autoname/clash_base{
 	unacidable = 1;
 	not_weldable = 1;
 	masterkey_resist = 1;

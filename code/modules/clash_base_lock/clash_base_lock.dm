@@ -70,3 +70,9 @@
 	name = "UPP base shield"
 	faction = FACTION_UPP
 	color = "#e61919"
+
+/obj/structure/machinery/door/airlock/upp/medical/solid/autoname/clash_base
+	req_one_access = list(ACCESS_UPP_GENERAL)
+
+/obj/structure/machinery/door/airlock/multi_tile/upp/medical/autoname/clash_base
+	req_one_access = list(ACCESS_UPP_GENERAL)
