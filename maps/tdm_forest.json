@@ -3,6 +3,7 @@
     "map_path": "map_files/TDM_Forest",
     "map_file": "TDM_Forest.dmm",
     "disable_ship_map": true,
+    "weather_holder": "/datum/weather_ss_map_holder/faction_clash",
     "disable_hunter_ship": true,
     "perf_mode": 31,
     "camouflage": "jungle",

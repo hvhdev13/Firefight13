@@ -1435,7 +1435,12 @@ GLOBAL_VAR(clash_start_mode)
 		clash_arena_remove_attachment_vendors()
 	for(var/obj/structure/machinery/cm_vending/vendor in GLOB.machines)
 		vendor.vend_delay = 0
-	SSweather.force_weather_holder(/datum/weather_ss_map_holder/faction_clash)
+	if(arena_rules)
+		var/arena_weather = SSmapping.configs[GROUND_MAP].weather_holder
+		if(arena_weather)
+			SSweather.force_weather_holder(arena_weather)
+		else
+			SSweather.map_holder = null
 	for(var/area/area in GLOB.all_areas)
 		if(is_mainship_level(area.z))
 			continue
