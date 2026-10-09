@@ -4,6 +4,10 @@
 #define CALL_MEDIC_WIDTH 144
 #define CALL_MEDIC_HEIGHT 18
 #define GIVE_UP_WIDTH 52
+#define CALL_MEDIC_LOC_DEAD "CENTER-2:8,CENTER-4:-12"
+#define CALL_MEDIC_LOC_CRIT "CENTER-2:8,CENTER-2:22"
+#define GIVE_UP_LOC_DEAD "CENTER+1:28,CENTER-5:-18"
+#define GIVE_UP_LOC_CRIT "CENTER+1:28,CENTER-3:16"
 #define CLASH_MEDIC_NEARBY_RANGE 10
 
 GLOBAL_LIST_EMPTY(clash_medic_marks)
@@ -102,7 +106,7 @@ GLOBAL_LIST_EMPTY(clash_call_medic_icons)
 	name = "Call Medic"
 	desc = "Ping the medics near your body."
 	icon = null
-	screen_loc = "CENTER-2:8,CENTER-4:-12"
+	screen_loc = CALL_MEDIC_LOC_DEAD
 	maptext_width = CALL_MEDIC_WIDTH
 	maptext_height = CALL_MEDIC_HEIGHT
 	mouse_opacity = MOUSE_OPACITY_OPAQUE
@@ -145,7 +149,7 @@ GLOBAL_LIST_EMPTY(clash_call_medic_icons)
 /atom/movable/screen/clash_give_up
 	name = "Give Up"
 	desc = "Succumb to your wounds"
-	screen_loc = "CENTER+1:28,CENTER-5:-18"
+	screen_loc = GIVE_UP_LOC_DEAD
 	maptext_width = GIVE_UP_WIDTH
 	maptext_height = CALL_MEDIC_HEIGHT
 	mouse_opacity = MOUSE_OPACITY_OPAQUE
@@ -196,11 +200,14 @@ GLOBAL_LIST_EMPTY(clash_call_medic_icons)
 		player.clash_call_medic = button
 	if(!(button in player.screen))
 		player.add_to_screen(button)
+	var/dead = viewer.stat == DEAD
+	button.screen_loc = dead ? CALL_MEDIC_LOC_DEAD : CALL_MEDIC_LOC_CRIT
 	button.update(player)
-	button.show_status(viewer.stat == DEAD ? null : clash_revive_status(viewer))
+	button.show_status(dead ? null : clash_revive_status(viewer))
 	if(!give_up)
 		give_up = new
 		player.clash_give_up = give_up
+	give_up.screen_loc = dead ? GIVE_UP_LOC_DEAD : GIVE_UP_LOC_CRIT
 	if(!(give_up in player.screen))
 		player.add_to_screen(give_up)
 
@@ -235,4 +242,8 @@ GLOBAL_LIST_EMPTY(clash_call_medic_icons)
 #undef CALL_MEDIC_WIDTH
 #undef CALL_MEDIC_HEIGHT
 #undef GIVE_UP_WIDTH
+#undef CALL_MEDIC_LOC_DEAD
+#undef CALL_MEDIC_LOC_CRIT
+#undef GIVE_UP_LOC_DEAD
+#undef GIVE_UP_LOC_CRIT
 #undef CLASH_MEDIC_NEARBY_RANGE
