@@ -39,6 +39,8 @@
 		index = smallest
 
 /datum/clash_bot/proc/can_enter(turf/spot)
+	if(istype(spot, /turf/open/clash_void))
+		return FALSE
 	var/area/clash_arena/zone = get_area(spot)
 	if(!istype(zone) || !zone.clash_faction)
 		return TRUE
