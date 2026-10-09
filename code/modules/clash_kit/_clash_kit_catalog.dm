@@ -37,6 +37,7 @@ GLOBAL_LIST_INIT(clash_kit_back_attachment_slots, list(KIT_SLOT_RAIL = KIT_SLOT_
 #define CLASH_KIT_FILL_LIMIT 30
 #define CLASH_KIT_GUN_FILL "gun"
 #define CLASH_KIT_MOVE_LIMIT 40
+#define CLASH_EXPLOSIVE_POUCH_SLOTS 4
 #define CLASH_ATTACHMENT_EFFECTS_SHOWN 5
 #define CLASH_KIT_SPARE_PRIMARY 4
 #define CLASH_KIT_SPARE_SIDEARM 3
@@ -219,7 +220,7 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 	else if(isstorage(sample))
 		var/obj/item/storage/holder = sample
 		if(holder.storage_slots)
-			. += list(list("Slots", holder.storage_slots))
+			. += list(list("Slots", istype(holder, /obj/item/storage/pouch/explosive) ? CLASH_EXPLOSIVE_POUCH_SLOTS : holder.storage_slots))
 	qdel(sample)
 
 /proc/get_clash_kit_option(id)
@@ -347,6 +348,11 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 		/obj/item/weapon/gun/shotgun/combat,
 		/obj/item/weapon/gun/shotgun/double/mou53,
 	)
+
+/obj/item/storage/pouch/explosive/Initialize(mapload, ...)
+	if(clash_fast_medicine())
+		storage_slots = CLASH_EXPLOSIVE_POUCH_SLOTS
+	return ..()
 
 /obj/item/storage/large_holster/m37/clash_upp
 	name = "\improper Type 23 shotgun scabbard"

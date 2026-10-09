@@ -16,6 +16,7 @@
 #define CLASH_OD_CRITICAL_DAMAGE 16
 #define CLASH_SHRAPNEL_SLOW 0.4
 #define CLASH_SHRAPNEL_SLOW_MAX 1.6
+#define CLASH_SHRAPNEL_CHANCE_CUT 0.1
 #define CLASH_STABILIZED_TIME (15 SECONDS)
 #define CLASH_INTERNAL_TOXIN 60
 
@@ -118,6 +119,12 @@ GLOBAL_LIST_INIT(clash_adv_firstaid_stock, list(
 		INVOKE_ASYNC(embedded_human, TYPE_PROC_REF(/mob, emote), "me", 1, pick("winces.", "grimaces.", "flinches."))
 	embedded_human.recalculate_move_delay = TRUE
 	SEND_SIGNAL(embedded_human, COMSIG_HUMAN_SHRAPNEL_REMOVED)
+
+/proc/clash_arena_shrapnel_setup()
+	for(var/ammo_type in GLOB.ammo_list)
+		var/datum/ammo/ammo = GLOB.ammo_list[ammo_type]
+		if(ammo.shrapnel_chance > 0)
+			ammo.shrapnel_chance -= (ammo.shrapnel_chance + floor(ammo.damage / 10)) * CLASH_SHRAPNEL_CHANCE_CUT
 
 /mob/living/carbon/human/movement_delay()
 	. = ..()
@@ -313,6 +320,7 @@ GLOBAL_LIST_INIT(clash_medic_stripped_items, list(
 		SPAN_HELPFUL("[user] <b>[text[2]]</b>[text[3]] your <b>[affecting.display_name]</b>[text[4]]."),
 		SPAN_NOTICE("[user] [text[2]][text[3]] [possessive_their] [affecting.display_name][text[4]]."))
 	clash_heal_feedback(patient, user, damage - (affecting.brute_dam + affecting.burn_dam))
+	clash_refresh_statuses(patient)
 	use(1)
 	if(treat_sound)
 		playsound(user, treat_sound, 25, 1, 2)
@@ -362,6 +370,7 @@ GLOBAL_LIST_INIT(clash_medic_stripped_items, list(
 		affecting.status |= LIMB_SPLINTED_INDESTRUCTIBLE
 	patient.pain.apply_pain(affecting.status & LIMB_BROKEN ? -PAIN_BONE_BREAK_SPLINTED : PAIN_BONE_BREAK_SPLINTED)
 	patient.update_med_icon()
+	clash_refresh_statuses(patient)
 	use(1)
 	playsound(user, 'sound/handling/splint1.ogg', 25, 1, 2)
 
@@ -481,6 +490,7 @@ GLOBAL_LIST_INIT(clash_medic_stripped_items, list(
 	patient.SetEyeBlind(0)
 	clash_heal_feedback(patient, medic, before)
 	clash_update_internal_injuries(patient)
+	clash_refresh_statuses(patient)
 
 /datum/reagent/medical/clash_stabilizer
 	name = "Stabilizer"
@@ -557,17 +567,7 @@ GLOBAL_LIST_INIT(clash_medic_stripped_items, list(
 /proc/clash_has_internal_injuries(mob/living/carbon/human/patient)
 	if(patient.stat == DEAD || (patient.species.flags & IS_SYNTHETIC))
 		return FALSE
-	if(patient.blood_volume <= BLOOD_VOLUME_SAFE || patient.getToxLoss() >= CLASH_INTERNAL_TOXIN)
-		return TRUE
-	for(var/organ_name in list("lungs", "brain", "eyes"))
-		var/datum/internal_organ/organ = patient.internal_organs_by_name[organ_name]
-		if(organ?.organ_status >= ORGAN_BRUISED)
-			return TRUE
-	for(var/organ_name in list("liver", "kidneys"))
-		var/datum/internal_organ/organ = patient.internal_organs_by_name[organ_name]
-		if(organ?.organ_status >= ORGAN_BROKEN)
-			return TRUE
-	return FALSE
+	return patient.blood_volume <= BLOOD_VOLUME_SAFE || patient.getToxLoss() >= CLASH_INTERNAL_TOXIN || clash_failed_organs(patient) > 0
 
 /proc/clash_update_internal_injuries(mob/living/carbon/human/patient)
 	var/injured = !clash_is_bot(patient) && clash_has_internal_injuries(patient)
@@ -606,8 +606,44 @@ GLOBAL_LIST_EMPTY(clash_hud_status_mobs)
 	closeToolTip(usr)
 
 /proc/clash_status_hud_tick(mob/living/carbon/human/patient)
-	if(clash_fast_medicine())
-		clash_update_hud_statuses(patient, !clash_is_bot(patient) && clash_has_internal_injuries(patient))
+	if(!clash_fast_medicine())
+		return
+	clash_update_hud_statuses(patient, !clash_is_bot(patient) && clash_has_internal_injuries(patient))
+	var/datum/hud/hud = patient.hud_used
+	if(!hud)
+		return
+	var/pieces = 0
+	for(var/obj/item/shard/shrapnel/shard in patient.embedded_items)
+		pieces += shard.count
+	clash_status_count(hud.shrapnel_icon, pieces)
+	var/bleeding = 0
+	for(var/obj/limb/limb as anything in patient.limbs)
+		if(clash_limb_bleeding(limb))
+			bleeding++
+	clash_status_count(hud.bleeding_icon, bleeding)
+
+/proc/clash_refresh_statuses(mob/living/carbon/human/patient)
+	if(!QDELETED(patient) && patient.hud_used && clash_fast_medicine())
+		patient.check_status_effects()
+
+/proc/clash_status_count(atom/movable/screen/status, count)
+	var/text = count > 1 ? MAPTEXT("<div style='text-align:right'>[count]</div>") : null
+	if(!status || status.maptext == text)
+		return
+	status.maptext = text
+	status.maptext_width = 26
+	status.maptext_y = -4
+
+/proc/clash_failed_organs(mob/living/carbon/human/patient)
+	. = 0
+	for(var/organ_name in list("lungs", "brain", "eyes"))
+		var/datum/internal_organ/organ = patient.internal_organs_by_name[organ_name]
+		if(organ?.organ_status >= ORGAN_BRUISED)
+			.++
+	for(var/organ_name in list("liver", "kidneys"))
+		var/datum/internal_organ/organ = patient.internal_organs_by_name[organ_name]
+		if(organ?.organ_status >= ORGAN_BROKEN)
+			.++
 
 /proc/clash_fracture_text(mob/living/carbon/human/patient)
 	var/list/broken = list()
@@ -621,9 +657,20 @@ GLOBAL_LIST_EMPTY(clash_hud_status_mobs)
 	if(!clash_is_bot(patient) && patient.stat != DEAD)
 		var/fractures = clash_fracture_text(patient)
 		if(fractures)
-			wanted["break"] = list("Fracture", fractures)
+			var/open = 0
+			var/splinted = 0
+			for(var/obj/limb/limb as anything in patient.limbs)
+				if(limb.status & LIMB_BROKEN)
+					if(limb.status & LIMB_SPLINTED)
+						splinted++
+					else
+						open++
+			if(open)
+				wanted["break"] = list("Fracture", fractures, open)
+			else
+				wanted["splint"] = list("Splinted", fractures, splinted)
 		if(injured)
-			wanted["organ"] = list("Organ damage", "A medic's Fix-all injector heals it.")
+			wanted["organ"] = list("Organ damage", "A medic's Fix-all injector heals it.", clash_failed_organs(patient))
 	var/list/shown = patient.clash_hud_statuses
 	if(!length(wanted) && !length(shown))
 		return
@@ -655,7 +702,7 @@ GLOBAL_LIST_EMPTY(clash_hud_status_mobs)
 	for(var/atom/movable/screen/upstream as anything in list(hud?.bleeding_icon, hud?.slowed_icon, hud?.shrapnel_icon, hud?.tethering_icon, hud?.tethered_icon))
 		if(upstream && upstream.icon_state != "status_0")
 			placement++
-	for(var/kind in list("break", "organ"))
+	for(var/kind in list("break", "splint", "organ"))
 		var/list/info = wanted[kind]
 		if(!info)
 			continue
@@ -666,6 +713,7 @@ GLOBAL_LIST_EMPTY(clash_hud_status_mobs)
 		icon.icon_state = "[style]_[kind]"
 		icon.name = info[1]
 		icon.desc = info[2]
+		clash_status_count(icon, info[3])
 		icon.screen_loc = ui_datum.get_status_loc(placement)
 		placement++
 		if(icon.shown_to != viewer)
@@ -842,5 +890,6 @@ GLOBAL_LIST_EMPTY(clash_hud_status_mobs)
 #undef CLASH_BURST_OXY
 #undef CLASH_SHRAPNEL_SLOW
 #undef CLASH_SHRAPNEL_SLOW_MAX
+#undef CLASH_SHRAPNEL_CHANCE_CUT
 #undef CLASH_STABILIZED_TIME
 #undef CLASH_INTERNAL_TOXIN

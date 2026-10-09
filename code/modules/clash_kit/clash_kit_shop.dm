@@ -202,11 +202,59 @@ GLOBAL_LIST_INIT(clash_shop_counterparts, list(
 		holder = holder.loc
 	return holder == wearer
 
+/proc/clash_kit_visor_problem(obj/item/clothing/head/helmet/marine/helmet, obj/item/device/helmet_visor/visor, optic_name, list/inserted)
+	if(!istype(helmet))
+		return "The [optic_name] needs a combat helmet. It is packed in your gear instead."
+	var/helmet_name = strip_improper(helmet.name)
+	for(var/obj/item/device/helmet_visor/built_in as anything in helmet.built_in_visors)
+		if(built_in.type == visor.type)
+			return "The [helmet_name] already has a [optic_name] built in. The one you bought is packed in your gear."
+	inserted = inserted || helmet.inserted_visors
+	var/taken = length(inserted) >= helmet.max_inserted_visors || !visor.can_attach_to(helmet)
+	for(var/obj/item/device/helmet_visor/fitted as anything in inserted)
+		if(fitted.type == visor.type)
+			taken = TRUE
+	if(taken)
+		return "The [helmet_name] has no free socket for the [optic_name]. It is packed in your gear instead."
+	return null
+
+/proc/clash_kit_fit_visor(mob/living/carbon/human/wearer, obj/item/device/helmet_visor/visor, mode)
+	var/obj/item/clothing/head/helmet/marine/helmet = wearer.head
+	helmet.inserted_visors += visor
+	visor.forceMove(helmet)
+	var/datum/action/item_action/cycle_helmet_huds/cycle_action = locate() in helmet.actions
+	if(!cycle_action)
+		cycle_action = new(helmet)
+	cycle_action.give_to(wearer)
+	if(!istype(visor, /obj/item/device/helmet_visor/medical) || !visor.can_toggle(wearer))
+		return
+	helmet.active_visor = visor
+	cycle_action.set_action_overlay(visor)
+	if(mode == CLASH_KIT_PREVIEW)
+		helmet.update_icon()
+	else
+		helmet.recalculate_visors(wearer)
+
+/proc/clash_kit_unfit_visor(mob/living/carbon/human/wearer, obj/item/clothing/head/helmet/marine/helmet, obj/item/device/helmet_visor/visor)
+	if(helmet.active_visor == visor)
+		helmet.active_visor = null
+		helmet.toggle_visor(wearer, visor, TRUE)
+	helmet.inserted_visors -= visor
+	var/datum/action/item_action/cycle_helmet_huds/cycle_action = locate() in helmet.actions
+	if(!cycle_action)
+		return
+	if(!length(helmet.built_in_visors) && !length(helmet.inserted_visors))
+		qdel(cycle_action)
+	else
+		cycle_action.set_action_overlay(helmet.active_visor)
+
 /proc/stock_clash_kit(mob/living/carbon/human/wearer, datum/clash_kit/kit, job, mode, ckey)
 	for(var/datum/weakref/given_ref as anything in wearer.clash_kit_extras)
 		var/obj/item/given = given_ref.resolve()
 		if(!given || !clash_kit_carried(wearer, given))
 			continue
+		if(istype(given.loc, /obj/item/clothing/head/helmet/marine))
+			clash_kit_unfit_visor(wearer, given.loc, given)
 		qdel(given)
 	wearer.clash_kit_extras = list()
 	wearer.clash_kit_placed = list()
@@ -259,18 +307,26 @@ GLOBAL_LIST_INIT(clash_shop_counterparts, list(
 			continue
 		var/item_type = text2path(id)
 		var/obj/item/bought = new item_type
-		var/wanted = kit.extra_slots[index]
-		var/obj/item/storage/target = wanted && holders[wanted]
-		var/list/tries = target ? list(target) : containers
-		var/obj/item/storage/placed
-		for(var/obj/item/storage/holder as anything in tries)
-			if(holder.can_be_inserted(bought, wearer, TRUE) && holder.handle_item_insertion(bought, TRUE, wearer))
-				placed = holder
-				break
+		var/is_visor = istype(bought, /obj/item/device/helmet_visor)
+		var/visor_problem = is_visor && clash_kit_visor_problem(wearer.head, bought, item["name"])
+		var/obj/item/placed
+		if(is_visor && !visor_problem)
+			clash_kit_fit_visor(wearer, bought, mode)
+			placed = wearer.head
+		else
+			var/wanted = kit.extra_slots[index]
+			var/obj/item/storage/target = wanted && holders[wanted]
+			var/list/tries = target ? list(target) : containers
+			for(var/obj/item/storage/holder as anything in tries)
+				if(holder.can_be_inserted(bought, wearer, TRUE) && holder.handle_item_insertion(bought, TRUE, wearer))
+					placed = holder
+					break
 		if(!placed)
 			qdel(bought)
 			statuses[index] = "room"
 			continue
+		if(visor_problem)
+			clash_kit_problem(wearer, KIT_SLOT_HELMET, visor_problem)
 		if(snowflake)
 			wearer.vendor_snowflake_points -= item["cost"]
 		else

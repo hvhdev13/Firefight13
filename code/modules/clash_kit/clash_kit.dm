@@ -1151,3 +1151,19 @@ GLOBAL_LIST_EMPTY(clash_kit_samples)
 			var/text = holder && clash_kit_carrier_problem(holder, guns, user, TRUE)
 			if(text)
 				.[option.id] = text
+	var/list/by_id = get_clash_shop(job)["by_id"]
+	var/list/visors = list()
+	for(var/id in kit.extras)
+		var/visor_type = text2path(id)
+		if(ispath(visor_type, /obj/item/device/helmet_visor) && by_id[id])
+			visors += list(list(clash_kit_sample(visor_type), by_id[id]["name"]))
+	if(!length(visors))
+		return
+	for(var/datum/clash_kit_option/option as anything in GLOB.clash_kit_menu[clash_kit_faction_for_job(job)]?[KIT_SLOT_HELMET])
+		var/obj/item/helmet = clash_kit_sample(option.item_type)
+		var/list/fitted = list()
+		for(var/list/visor as anything in visors)
+			if(clash_kit_visor_problem(helmet, visor[1], visor[2], fitted))
+				.[option.id] = "Your [visor[2]] will not fit your headgear."
+				break
+			fitted += visor[1]

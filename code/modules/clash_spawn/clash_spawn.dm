@@ -178,7 +178,7 @@ SUBSYSTEM_DEF(clash_spawn)
 		page += "<li>Sentries cannot see through smoke and grenades wreck them. Only engineers can build barricades.</li>"
 		page += "</ul>"
 		page += "<h2>Heavy</h2><ul>"
-		page += "<li>Only Heavies suppress, the Machine Gunners on both sides. Their bullets that hit you or pass close darken your screen, make you cower and slow you, up to 20% at full suppression. It fades a few seconds after the fire stops.</li>"
+		page += "<li>Only Heavies suppress, the Machine Gunners on both sides. Their bullets that hit you or pass close darken your screen, make you cower and slow you, up to 25%. It fades a few seconds after the fire stops.</li>"
 		page += "<li>Heavies get XP for suppressing enemies, and a suppression assist when a teammate kills someone they suppressed.</li>"
 		page += "</ul>"
 		page += "<h2>Perks</h2><ul>"

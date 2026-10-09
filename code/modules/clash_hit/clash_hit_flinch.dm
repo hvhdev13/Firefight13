@@ -20,15 +20,21 @@ SUBSYSTEM_DEF(clash_hit_flinch)
 	if(!ishuman(target))
 		return ELEMENT_INCOMPATIBLE
 	RegisterSignal(target, COMSIG_HUMAN_BULLET_ACT, PROC_REF(on_bullet_act))
+	RegisterSignal(target, COMSIG_HUMAN_SHRAPNEL_REMOVED, PROC_REF(on_shrapnel_removed))
 
 /datum/element/clash_hit_flinch/Detach(datum/source, force)
 	. = ..()
-	UnregisterSignal(source, COMSIG_HUMAN_BULLET_ACT)
+	UnregisterSignal(source, list(COMSIG_HUMAN_BULLET_ACT, COMSIG_HUMAN_SHRAPNEL_REMOVED))
+
+/datum/element/clash_hit_flinch/proc/on_shrapnel_removed(mob/living/carbon/human/source)
+	SIGNAL_HANDLER
+	clash_refresh_statuses(source)
 
 /datum/element/clash_hit_flinch/proc/on_bullet_act(mob/living/carbon/human/source, damage_result, ammo_flags, obj/projectile/bullet)
 	SIGNAL_HANDLER
 	if(damage_result <= 0 || source.stat == DEAD)
 		return
+	addtimer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(clash_refresh_statuses), source), 1, TIMER_UNIQUE)
 	var/direction = get_dir(bullet.starting, source) || bullet.dir
 	var/push_x = 0
 	var/push_y = 0

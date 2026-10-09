@@ -1,5 +1,5 @@
 import { type BooleanLike, classes } from 'common/react';
-import { type ReactNode, useEffect, useState } from 'react';
+import { type ReactNode, useEffect, useRef, useState } from 'react';
 import { resolveAsset } from 'tgui/assets';
 import { useBackend } from 'tgui/backend';
 import {
@@ -962,10 +962,59 @@ const PACK_KIT_SLOTS: Record<string, string> = {
   webbing: 'webbing',
 };
 
+const DRAG_SCROLL_ZONE = 0.25;
+const DRAG_SCROLL_MIN = 4;
+const DRAG_SCROLL_MAX = 20;
+const DRAG_SCROLL_ARM = 24;
+
+const useDragScroll = (dragging: boolean, stop: () => void) => {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const list = ref.current?.parentElement;
+    if (!dragging || !list) return;
+    let start: number | null = null;
+    let pointer: number | null = null;
+    let armed = false;
+    let frame = 0;
+    const track = (event: DragEvent) => {
+      pointer = event.clientY;
+      start = start ?? pointer;
+      armed = armed || Math.abs(pointer - start) > DRAG_SCROLL_ARM;
+    };
+    const step = () => {
+      if (armed && pointer !== null) {
+        const box = list.getBoundingClientRect();
+        const zone = Math.max(48, box.height * DRAG_SCROLL_ZONE);
+        const up = (box.top + zone - pointer) / zone;
+        const down = (pointer - box.bottom + zone) / zone;
+        const push = Math.min(Math.max(up, down), 1);
+        if (push > 0) {
+          list.scrollTop +=
+            Math.sign(down - up) *
+            (DRAG_SCROLL_MIN + (DRAG_SCROLL_MAX - DRAG_SCROLL_MIN) * push);
+        }
+      }
+      frame = requestAnimationFrame(step);
+    };
+    document.addEventListener('dragover', track);
+    document.addEventListener('drop', stop);
+    document.addEventListener('mousedown', stop);
+    frame = requestAnimationFrame(step);
+    return () => {
+      document.removeEventListener('dragover', track);
+      document.removeEventListener('drop', stop);
+      document.removeEventListener('mousedown', stop);
+      cancelAnimationFrame(frame);
+    };
+  }, [dragging]);
+  return ref;
+};
+
 const PackView = () => {
   const { data } = useBackend<Data>();
   const { pack, extras, removed, failed_moves, doll_pending } = data;
   const [drag, setDrag] = useState<PackDrag | null>(null);
+  const scrollRef = useDragScroll(!!drag, () => setDrag(null));
   useEffect(() => {
     document
       .querySelector('.ClashKit__packProblem')
@@ -979,7 +1028,7 @@ const PackView = () => {
         (extra.slot && slots.includes(extra.slot) ? extra.slot : null) === slot,
     );
   return (
-    <>
+    <div ref={scrollRef}>
       {!!doll_pending && (
         <Box className="ClashKit__packNote">
           <Icon name="circle-notch" spin /> Repacking...
@@ -1015,7 +1064,7 @@ const PackView = () => {
         </Box>
       )}
       <LeftBehindBox items={removed} drag={drag} setDrag={setDrag} />
-    </>
+    </div>
   );
 };
 
