@@ -26,6 +26,10 @@
 #define CLASH_BOT_PRIORITY_BONUS 3
 #define CLASH_BOT_CARRIER_BONUS 8
 #define CLASH_BOT_MEDIC_RANGE 7
+#define CLASH_BOT_CALL_RANGE 20
+#define CLASH_BOT_MEDIC_WAIT (15 SECONDS)
+#define CLASH_BOT_MEDIC_SKIP (20 SECONDS)
+#define CLASH_BOT_STAGING_RANGE 3
 #define CLASH_BOT_PATIENT_HEALTH 0.6
 #define CLASH_BOT_PATIENT_SCAN (2 SECONDS)
 #define CLASH_BOT_TREAT_DELAY (2 SECONDS)
@@ -141,6 +145,8 @@ SUBSYSTEM_DEF(clash_bots)
 	var/medic = FALSE
 	var/mob/living/carbon/human/medic_patient
 	var/next_patient_scan = 0
+	var/medic_wait_since = 0
+	var/list/skipped_patients = list()
 	var/next_think = 0
 	var/next_brace = 0
 	var/state = CLASH_BOT_STATE_OBJECTIVE
@@ -207,6 +213,7 @@ SUBSYSTEM_DEF(clash_bots)
 	chase = null
 	wait_for = null
 	medic_patient = null
+	skipped_patients = null
 	danger = null
 	path_card = null
 	anchor = null
@@ -402,7 +409,7 @@ SUBSYSTEM_DEF(clash_bots)
 		return clear_shot(get_turf(turret), null, FALSE)
 	if(QDELETED(candidate) || candidate.stat == DEAD || candidate.faction == body.faction || candidate.GetComponent(/datum/component/clash_spawn_guard))
 		return FALSE
-	if(candidate.z != body.z || get_dist(body, candidate) > CLASH_BOT_SIGHT)
+	if(candidate.z != body.z || get_dist(body, candidate) > CLASH_BOT_SIGHT || candidate.loc == body.loc)
 		return FALSE
 	if(!can_enter(get_turf(candidate)))
 		return FALSE
@@ -707,9 +714,7 @@ SUBSYSTEM_DEF(clash_bots)
 		if(CLASH_BOT_STATE_RECOVER)
 			resupply()
 		if(CLASH_BOT_STATE_MEDIC)
-			if(get_dist(body, medic_patient) > 1)
-				release_cover()
-				set_destination(get_turf(medic_patient))
+			approach_patient()
 		if(CLASH_BOT_STATE_SEEK)
 			var/turf/goal = seek_goal()
 			if(goal)
@@ -921,11 +926,16 @@ SUBSYSTEM_DEF(clash_bots)
 		gun.wield(body)
 
 /datum/clash_bot/proc/update_patient()
+	for(var/skipped in skipped_patients)
+		if(skipped_patients[skipped] <= world.time)
+			skipped_patients -= skipped
 	if(medic_patient && !needs_medic(medic_patient))
 		medic_patient = null
+		medic_wait_since = 0
 	if(!medic_patient && world.time >= next_patient_scan)
 		next_patient_scan = world.time + CLASH_BOT_PATIENT_SCAN
 		medic_patient = find_patient()
+		medic_wait_since = 0
 
 /datum/clash_bot/proc/treat_patient()
 	if(!medic_patient || get_dist(body, medic_patient) > 1 || world.time < next_heal)
@@ -937,8 +947,56 @@ SUBSYSTEM_DEF(clash_bots)
 	next_heal = world.time + CLASH_BOT_TREAT_DELAY
 	INVOKE_ASYNC(src, PROC_REF(heal_with), tool, medic_patient)
 
+/datum/clash_bot/proc/patient_taken(mob/living/carbon/human/patient)
+	for(var/datum/clash_bot/other as anything in GLOB.clash_bots)
+		if(other != src && other.medic_patient == patient)
+			return TRUE
+	return FALSE
+
+/datum/clash_bot/proc/exposed(turf/spot)
+	for(var/mob/living/carbon/human/enemy as anything in known)
+		var/turf/seen_at = known_pos[enemy]
+		if(seen_at && !QDELETED(enemy) && enemy.stat == CONSCIOUS && get_dist(seen_at, spot) <= CLASH_BOT_SIGHT && line_clear(seen_at, spot))
+			return TRUE
+	return FALSE
+
+/datum/clash_bot/proc/approach_patient()
+	var/turf/spot = get_turf(medic_patient)
+	if(!spot || get_dist(body, spot) <= 1)
+		medic_wait_since = 0
+		return
+	release_cover()
+	if(!exposed(spot))
+		medic_wait_since = 0
+		set_destination(spot)
+		return
+	if(!medic_wait_since)
+		medic_wait_since = world.time
+	else if(world.time - medic_wait_since > CLASH_BOT_MEDIC_WAIT)
+		skipped_patients[REF(medic_patient)] = world.time + CLASH_BOT_MEDIC_SKIP
+		medic_patient = null
+		medic_wait_since = 0
+		return
+	if(world.time < next_cover_scan)
+		return
+	next_cover_scan = world.time + rand(CLASH_BOT_COMBAT_RESCAN, CLASH_BOT_COMBAT_RESCAN * 1.5)
+	var/turf/best
+	var/best_score
+	for(var/turf/open/candidate in range(CLASH_BOT_STAGING_RANGE, spot))
+		if(candidate == spot || candidate.density || !can_enter(candidate) || spot_blocked(candidate) || goal_failed(candidate) || exposed(candidate))
+			continue
+		var/score = -get_dist(candidate, spot) * 2 - get_dist(body, candidate) * 0.3 - danger_cost(candidate)
+		if(isnull(best_score) || score > best_score)
+			best = candidate
+			best_score = score
+	if(best)
+		set_destination(best)
+
 /datum/clash_bot/proc/needs_medic(mob/living/carbon/human/patient)
-	if(QDELETED(patient) || patient == body || patient.faction != body.faction || patient.z != body.z || get_dist(body, patient) > CLASH_BOT_MEDIC_RANGE)
+	if(QDELETED(patient) || patient == body || patient.faction != body.faction || patient.z != body.z || skipped_patients[REF(patient)] > world.time)
+		return FALSE
+	var/called = patient == medic_patient || (world.time < patient.clash_called_until && body.health >= body.maxHealth * CLASH_BOT_WOUNDED)
+	if(get_dist(body, patient) > (called ? CLASH_BOT_CALL_RANGE : CLASH_BOT_MEDIC_RANGE))
 		return FALSE
 	if(patient.stat == DEAD)
 		return patient.check_tod() && patient.is_revivable() && !!(locate(/obj/item/device/defibrillator) in body.get_contents())
@@ -948,8 +1006,8 @@ SUBSYSTEM_DEF(clash_bots)
 /datum/clash_bot/proc/find_patient()
 	var/mob/living/carbon/human/best
 	var/best_score
-	for(var/mob/living/carbon/human/patient in range(CLASH_BOT_MEDIC_RANGE, body))
-		if(!needs_medic(patient) || !can_enter(get_turf(patient)))
+	for(var/mob/living/carbon/human/patient as anything in GLOB.human_mob_list)
+		if(!needs_medic(patient) || !can_enter(get_turf(patient)) || patient_taken(patient))
 			continue
 		var/score = get_dist(body, patient) + (patient.stat == DEAD ? 0 : (GLOB.clash_medic_marks[patient] ? 5 : 10))
 		if(isnull(best_score) || score < best_score)
@@ -1377,6 +1435,10 @@ SUBSYSTEM_DEF(clash_bots)
 #undef CLASH_BOT_PRIORITY_BONUS
 #undef CLASH_BOT_CARRIER_BONUS
 #undef CLASH_BOT_MEDIC_RANGE
+#undef CLASH_BOT_CALL_RANGE
+#undef CLASH_BOT_MEDIC_WAIT
+#undef CLASH_BOT_MEDIC_SKIP
+#undef CLASH_BOT_STAGING_RANGE
 #undef CLASH_BOT_PATIENT_HEALTH
 #undef CLASH_BOT_PATIENT_SCAN
 #undef CLASH_BOT_TREAT_DELAY

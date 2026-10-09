@@ -7,6 +7,7 @@
 #define CLASH_REVIVE_GUARD (3 SECONDS)
 
 /mob/living/carbon/human/var/clash_revive_guard_until = 0
+/mob/living/carbon/human/var/clash_dnr = FALSE
 
 /mob/living/carbon/human/GetKnockOutDuration(amount)
 	if(world.time < clash_revive_guard_until)
@@ -23,7 +24,7 @@ GLOBAL_LIST_INIT(clash_revive_health, list(50, 35, 20))
 /mob/living/carbon/human/is_revivable(ignore_heart = FALSE)
 	if(!clash_fast_medicine())
 		return ..()
-	if(!client && !get_ghost())
+	if(clash_dnr || (!client && !get_ghost()))
 		return FALSE
 	return ..(TRUE)
 
@@ -45,6 +46,9 @@ GLOBAL_LIST_INIT(clash_revive_health, list(50, 35, 20))
 		return FALSE
 	if(target.faction != user.faction)
 		to_chat(user, SPAN_WARNING("You can only revive your own team."))
+		return FALSE
+	if(target.clash_dnr)
+		target.balloon_alert(user, "do not resuscitate")
 		return FALSE
 	if(!check_revive(target, user))
 		return FALSE

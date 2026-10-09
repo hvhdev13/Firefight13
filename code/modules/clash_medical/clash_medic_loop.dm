@@ -3,6 +3,7 @@
 #define CLASH_CALL_MEDIC_MARK (20 SECONDS)
 #define CALL_MEDIC_WIDTH 144
 #define CALL_MEDIC_HEIGHT 18
+#define GIVE_UP_WIDTH 52
 #define CLASH_MEDIC_NEARBY_RANGE 10
 
 GLOBAL_LIST_EMPTY(clash_medic_marks)
@@ -10,6 +11,7 @@ GLOBAL_LIST_EMPTY(clash_medic_marks)
 /mob/living/carbon/human/var/clash_called_until = 0
 /client/var/clash_medic_called_until = 0
 /client/var/atom/movable/screen/clash_call_medic/clash_call_medic
+/client/var/atom/movable/screen/clash_give_up/clash_give_up
 
 GLOBAL_LIST_EMPTY(clash_call_medic_icons)
 
@@ -19,19 +21,29 @@ GLOBAL_LIST_EMPTY(clash_call_medic_icons)
 		if((medic.client || clash_is_bot(medic)) && medic.stat == CONSCIOUS && medic.faction == body.faction && medic.z == body.z && clash_is_medic(medic) && get_dist(medic, body) <= CLASH_MEDIC_RANGE)
 			. += medic
 
-/proc/clash_revive_status(mob/viewer)
+/proc/clash_patient_body(mob/viewer)
 	var/mob/living/carbon/human/body = clash_revivable_body(viewer)
+	if(body)
+		return body
+	body = viewer
+	if(istype(body) && body.stat == UNCONSCIOUS && body.health < 0 && !body.clash_dnr)
+		return body
+	return null
+
+/proc/clash_revive_status(mob/viewer)
+	var/mob/living/carbon/human/body = clash_patient_body(viewer)
 	if(!body)
-		return null
+		return clash_gave_up(viewer) ? "STATUS: GAVE UP" : null
+	var/idle_status = body.stat == DEAD ? "STATUS: REVIVABLE" : "NO MEDIC NEARBY"
 	if(!clash_fast_medicine())
-		return "STATUS: REVIVABLE"
+		return idle_status
 	var/closest
 	for(var/mob/living/carbon/human/medic as anything in clash_medics_near(body))
 		var/distance = get_dist(medic, body)
 		if(isnull(closest) || distance < closest)
 			closest = distance
 	if(isnull(closest) || closest > CLASH_MEDIC_NEARBY_RANGE)
-		return "STATUS: REVIVABLE"
+		return idle_status
 	return "MEDIC NEARBY  ·  [closest] TILE\s"
 
 /proc/clash_mark_medic_call(mob/living/carbon/human/patient, duration)
@@ -73,15 +85,15 @@ GLOBAL_LIST_EMPTY(clash_call_medic_icons)
 				player.client.images += mark["image"]
 				viewers += player.client
 
-/proc/get_clash_call_medic_icon(called)
-	var/key = called ? "called" : "ready"
+/proc/get_clash_call_medic_icon(called, width = CALL_MEDIC_WIDTH)
+	var/key = "[called ? "called" : "ready"]-[width]"
 	if(GLOB.clash_call_medic_icons[key])
 		return GLOB.clash_call_medic_icons[key]
 	var/icon/button = icon('icons/effects/effects.dmi', "nothing")
-	button.Scale(CALL_MEDIC_WIDTH, CALL_MEDIC_HEIGHT)
-	button.DrawBox(rgb(10, 12, 15), 1, 1, CALL_MEDIC_WIDTH, CALL_MEDIC_HEIGHT)
-	button.DrawBox(called ? rgb(34, 38, 43) : rgb(70, 30, 30), 2, 2, CALL_MEDIC_WIDTH - 1, CALL_MEDIC_HEIGHT - 1)
-	button.DrawBox(called ? rgb(66, 73, 81) : rgb(200, 70, 70), 2, CALL_MEDIC_HEIGHT - 1, CALL_MEDIC_WIDTH - 1, CALL_MEDIC_HEIGHT - 1)
+	button.Scale(width, CALL_MEDIC_HEIGHT)
+	button.DrawBox(rgb(10, 12, 15), 1, 1, width, CALL_MEDIC_HEIGHT)
+	button.DrawBox(called ? rgb(34, 38, 43) : rgb(70, 30, 30), 2, 2, width - 1, CALL_MEDIC_HEIGHT - 1)
+	button.DrawBox(called ? rgb(66, 73, 81) : rgb(200, 70, 70), 2, CALL_MEDIC_HEIGHT - 1, width - 1, CALL_MEDIC_HEIGHT - 1)
 	button.DrawBox(called ? rgb(80, 87, 95) : rgb(224, 90, 90), 3, 3, 5, CALL_MEDIC_HEIGHT - 2)
 	GLOB.clash_call_medic_icons[key] = button
 	return button
@@ -95,6 +107,7 @@ GLOBAL_LIST_EMPTY(clash_call_medic_icons)
 	maptext_height = CALL_MEDIC_HEIGHT
 	mouse_opacity = MOUSE_OPACITY_OPAQUE
 	var/shown_called
+	var/shown_status
 
 /atom/movable/screen/clash_call_medic/proc/update(client/player)
 	var/called = world.time < player.clash_medic_called_until
@@ -104,14 +117,22 @@ GLOBAL_LIST_EMPTY(clash_call_medic_icons)
 	icon = get_clash_call_medic_icon(called)
 	maptext = "<span style='text-align: center; vertical-align: middle; -dm-text-outline: 1px #0a0c0f; font-family: \"VCR OSD Mono\"; font-size: 8px; color: [called ? "#8a939c" : "#ffd9d9"]'>[called ? "MEDIC CALLED" : "CALL MEDIC"]</span>"
 
+/atom/movable/screen/clash_call_medic/proc/show_status(status)
+	if(status == shown_status)
+		return
+	shown_status = status
+	overlays.Cut()
+	if(status)
+		overlays += clash_score_text("<span style='font-family: \"Small Fonts\"; font-size: 6px; text-align: center; color: #9fc9a4; -dm-text-outline: 1px black'>[status]</span>", 0, -14, CALL_MEDIC_WIDTH, 12)
+
 /atom/movable/screen/clash_call_medic/clicked(mob/user, list/mods)
-	var/mob/living/carbon/human/body = clash_revivable_body(user)
+	var/mob/living/carbon/human/body = clash_patient_body(user)
 	var/client/player = user.client
 	if(!body || !player || world.time < player.clash_medic_called_until)
 		return TRUE
 	player.clash_medic_called_until = world.time + CLASH_CALL_MEDIC_COOLDOWN
 	body.clash_called_until = world.time + CLASH_CALL_MEDIC_MARK
-	clash_mark_medic_call(body, 0)
+	clash_mark_medic_call(body, body.stat == DEAD ? 0 : CLASH_CALL_MEDIC_MARK)
 	var/list/medics = clash_medics_near(body)
 	for(var/mob/living/carbon/human/medic as anything in medics)
 		playsound_client(medic.client, 'sound/machines/twobeep.ogg', null, 50)
@@ -121,14 +142,54 @@ GLOBAL_LIST_EMPTY(clash_call_medic_icons)
 	update(player)
 	return TRUE
 
+/atom/movable/screen/clash_give_up
+	name = "Give Up"
+	desc = "Succumb to your wounds"
+	screen_loc = "CENTER+1:28,CENTER-5:-18"
+	maptext_width = GIVE_UP_WIDTH
+	maptext_height = CALL_MEDIC_HEIGHT
+	mouse_opacity = MOUSE_OPACITY_OPAQUE
+
+/atom/movable/screen/clash_give_up/Initialize(mapload, ...)
+	. = ..()
+	icon = get_clash_call_medic_icon(TRUE, GIVE_UP_WIDTH)
+	maptext = "<span style='text-align: center; vertical-align: middle; -dm-text-outline: 1px #0a0c0f; font-family: \"VCR OSD Mono\"; font-size: 8px; color: #d0d6dc'>GIVE UP</span>"
+
+/atom/movable/screen/clash_give_up/MouseEntered(location, control, params)
+	openToolTip(usr, src, params, title = name, content = desc)
+
+/atom/movable/screen/clash_give_up/MouseExited(location, control, params)
+	closeToolTip(usr)
+
+/atom/movable/screen/clash_give_up/clicked(mob/user, list/mods)
+	var/mob/living/carbon/human/body = clash_patient_body(user)
+	if(!body)
+		return TRUE
+	body.clash_dnr = TRUE
+	closeToolTip(user)
+	if(body.stat != DEAD)
+		body.death(body.last_damage_data)
+	to_chat(user, SPAN_NOTICE("You gave up. Medics can no longer revive you."))
+	clash_refresh_medic_marks()
+	clash_show_call_medic(user)
+	user.hud_used?.clash_respawn?.update(user)
+	return TRUE
+
+/proc/clash_gave_up(mob/viewer)
+	var/mob/living/carbon/human/body = isobserver(viewer) ? viewer.mind?.current : viewer
+	return istype(body) && body.stat == DEAD && body.clash_dnr
+
 /proc/clash_show_call_medic(mob/viewer)
 	var/client/player = viewer.client
 	if(!player)
 		return
 	var/atom/movable/screen/clash_call_medic/button = player.clash_call_medic
-	if(!clash_fast_medicine() || !clash_revivable_body(viewer))
+	var/atom/movable/screen/clash_give_up/give_up = player.clash_give_up
+	if(!clash_fast_medicine() || !clash_patient_body(viewer))
 		if(button)
 			player.remove_from_screen(button)
+		if(give_up)
+			player.remove_from_screen(give_up)
 		return
 	if(!button)
 		button = new
@@ -136,6 +197,12 @@ GLOBAL_LIST_EMPTY(clash_call_medic_icons)
 	if(!(button in player.screen))
 		player.add_to_screen(button)
 	button.update(player)
+	button.show_status(viewer.stat == DEAD ? null : clash_revive_status(viewer))
+	if(!give_up)
+		give_up = new
+		player.clash_give_up = give_up
+	if(!(give_up in player.screen))
+		player.add_to_screen(give_up)
 
 /mob/living/carbon/human/get_pull_multiplier()
 	var/mob/living/carbon/human/body = pulling
@@ -167,4 +234,5 @@ GLOBAL_LIST_EMPTY(clash_call_medic_icons)
 #undef CLASH_CALL_MEDIC_MARK
 #undef CALL_MEDIC_WIDTH
 #undef CALL_MEDIC_HEIGHT
+#undef GIVE_UP_WIDTH
 #undef CLASH_MEDIC_NEARBY_RANGE
