@@ -42,6 +42,8 @@ const HEADER = 96;
 const FOOTER = 64;
 const TITLEBAR = 32;
 const MIN_WIDTH = 760;
+const MAX_ROWS = 3;
+const SCROLLBAR = 16;
 
 const SHAPES = {
   mode: { width: 220, height: 220, cols: 4 },
@@ -267,13 +269,26 @@ export const ClashVote = (props) => {
   const shape = SHAPES[stage === 'mode' ? 'mode' : 'map'];
   const cols = Math.max(1, Math.min(shape.cols, cards.length));
   const rows = Math.max(1, Math.ceil(cards.length / cols));
+  const shownRows = Math.min(rows, MAX_ROWS);
+  const scrolling = rows > MAX_ROWS;
   const cardWidth = shape.width + 2 * INNER;
   const cardHeight = shape.height + 2 * INNER + 64;
   const width = voting
-    ? Math.max(MIN_WIDTH, 2 * PAD + cols * cardWidth + (cols - 1) * GAP)
+    ? Math.max(
+        MIN_WIDTH,
+        2 * PAD +
+          cols * cardWidth +
+          (cols - 1) * GAP +
+          (scrolling ? SCROLLBAR : 0),
+      )
     : MIN_WIDTH;
   const height = voting
-    ? TITLEBAR + HEADER + PAD + rows * cardHeight + (rows - 1) * GAP + FOOTER
+    ? TITLEBAR +
+      HEADER +
+      PAD +
+      shownRows * cardHeight +
+      (shownRows - 1) * GAP +
+      FOOTER
     : TITLEBAR + HEADER + 200;
   const noun = stage === 'mode' ? 'mode' : 'map';
   const title =
@@ -313,6 +328,8 @@ export const ClashVote = (props) => {
                 gap: GAP,
                 padding: `${PAD}px ${PAD}px 0`,
                 alignContent: 'start',
+                minHeight: 0,
+                overflowY: scrolling ? 'auto' : 'hidden',
               }}
             >
               {cards.map((card) => (

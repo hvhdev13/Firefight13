@@ -1042,6 +1042,9 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 			return "UPP wins [upp] to [uscm]."
 	return "Draw at [uscm] each."
 
+/datum/game_mode/extended/faction_clash/hvh/proc/can_start_round_votes()
+	return round_vote_stage == CLASH_VOTES_NONE
+
 /datum/game_mode/extended/faction_clash/hvh/proc/start_round_votes()
 	if(round_vote_stage != CLASH_VOTES_NONE)
 		return
@@ -1229,6 +1232,8 @@ GLOBAL_DATUM_INIT(clash_vote_ui, /datum/clash_vote_ui, new)
 	sync_vote()
 	. = list()
 	var/stage = stage()
+	if(stage == "done")
+		schedule_close()
 	.["stage"] = stage
 	.["mode"] = GLOB.master_mode
 	.["time_left"] = max(SSvote.time_remaining, 0)
@@ -1295,8 +1300,12 @@ GLOBAL_DATUM_INIT(clash_vote_ui, /datum/clash_vote_ui, new)
 	return TRUE
 
 /datum/clash_vote_ui/proc/finish()
+	schedule_close()
 	SStgui.update_uis(src)
-	close_timer_id = addtimer(CALLBACK(src, PROC_REF(close_all)), 10 SECONDS, TIMER_STOPPABLE)
+
+/datum/clash_vote_ui/proc/schedule_close()
+	if(!close_timer_id)
+		close_timer_id = addtimer(CALLBACK(src, PROC_REF(close_all)), 10 SECONDS, TIMER_STOPPABLE)
 
 /datum/clash_vote_ui/proc/close_all()
 	close_timer_id = null
