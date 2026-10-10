@@ -107,6 +107,12 @@
 	message_admins("[key_name_admin(usr)] used HvH Control: [choice].")
 	log_admin("[key_name(usr)] used HvH Control: [choice].")
 
+/client/proc/hvh_control_server()
+	set name = "HvH Control"
+	set desc = "End or skip HvH matches, set scores, move objectives, open the bot and progression panels."
+	set category = "Server"
+	hvh_control()
+
 /client/proc/hvh_change_mode()
 	if(!check_rights(R_EVENT))
 		return
