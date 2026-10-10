@@ -5,6 +5,8 @@
 #define RESPAWN_STATE_COOLDOWN "cooldown"
 #define RESPAWN_STATE_READY "ready"
 #define RESPAWN_STATE_HOVER "hover"
+#define RESPAWN_STATE_OUT "out"
+#define RESPAWN_STATE_LIVE "live"
 
 GLOBAL_VAR(clash_respawn_button_sheet)
 
@@ -98,7 +100,8 @@ GLOBAL_VAR(clash_respawn_button_sheet)
 	return isliving(viewer) && viewer.stat == DEAD && viewer.timeofdeath
 
 /atom/movable/screen/clash_respawn/proc/update(mob/viewer)
-	if(!clash_can_redeploy(viewer))
+	var/live_loadout = isliving(viewer) && viewer.stat != DEAD && clash_uses_kits() && clash_live_regear_open()
+	if(!live_loadout && !clash_can_redeploy(viewer))
 		if(!alpha)
 			return
 		animate(src)
@@ -114,6 +117,17 @@ GLOBAL_VAR(clash_respawn_button_sheet)
 		pixel_y = -8
 		animate(src, alpha = 255, pixel_y = 0, time = 3, easing = CUBIC_EASING|EASE_OUT)
 	mouse_opacity = MOUSE_OPACITY_OPAQUE
+	if(live_loadout)
+		var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
+		var/until_start = max(0, clash_mode.countdown_end_time - world.time)
+		var/start_seconds = CEILING(until_start / 10, 1)
+		if(shown_revivable)
+			shown_revivable = null
+			overlays.Cut()
+		if(state != RESPAWN_STATE_LIVE || start_seconds != shown_seconds)
+			shown_seconds = start_seconds
+			show_state(RESPAWN_STATE_LIVE)
+		return
 	var/revivable = clash_revive_status(viewer)
 	if(revivable != shown_revivable)
 		shown_revivable = revivable
@@ -122,6 +136,17 @@ GLOBAL_VAR(clash_respawn_button_sheet)
 			var/mutable_appearance/status = clash_score_text("<span style='font-family: \"Small Fonts\"; font-size: 6px; text-align: center; color: [clash_gave_up(viewer) ? "#e66e6e" : "#9fc9a4"]; -dm-text-outline: 1px black'>[revivable]</span>", 0, -14, RESPAWN_BUTTON_WIDTH, 12)
 			status.appearance_flags &= ~RESET_ALPHA
 			overlays += status
+	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
+	if(istype(clash_mode) && clash_mode.get_spawn_block())
+		counted_down = TRUE
+		var/match_left = max(0, clash_mode.round_end_time - world.time)
+		var/seconds_left = CEILING(match_left / 10, 1)
+		var/match_step = clamp(floor((1 - match_left / clash_mode.round_time_limit) * RESPAWN_FILL_STEPS), 0, RESPAWN_FILL_STEPS - 1)
+		if(state != RESPAWN_STATE_OUT || seconds_left != shown_seconds || match_step != shown_step)
+			shown_seconds = seconds_left
+			shown_step = match_step
+			show_state(RESPAWN_STATE_OUT)
+		return
 	var/cooldown = clash_respawn_cooldown()
 	var/remaining = clash_respawn_wait(viewer)
 	if(remaining > 0)
@@ -136,7 +161,7 @@ GLOBAL_VAR(clash_respawn_button_sheet)
 	var/wanted_state = hovered ? RESPAWN_STATE_HOVER : RESPAWN_STATE_READY
 	if(wanted_state == state)
 		return
-	var/was_waiting = state == RESPAWN_STATE_COOLDOWN
+	var/was_waiting = state == RESPAWN_STATE_COOLDOWN || state == RESPAWN_STATE_OUT
 	show_state(wanted_state)
 	if(was_waiting && counted_down && viewer.client)
 		playsound_client(viewer.client, 'sound/machines/ping.ogg', vol = 35)
@@ -150,7 +175,7 @@ GLOBAL_VAR(clash_respawn_button_sheet)
 /atom/movable/screen/clash_respawn/proc/show_state(new_state)
 	var/entering = state != new_state
 	state = new_state
-	icon_state = state == RESPAWN_STATE_COOLDOWN ? "[state]-[shown_step]" : state
+	icon_state = state == RESPAWN_STATE_COOLDOWN || state == RESPAWN_STATE_OUT ? "[RESPAWN_STATE_COOLDOWN]-[shown_step]" : (state == RESPAWN_STATE_LIVE ? RESPAWN_STATE_READY : state)
 	var/kits = clash_uses_kits()
 	switch(state)
 		if(RESPAWN_STATE_COOLDOWN)
@@ -158,6 +183,16 @@ GLOBAL_VAR(clash_respawn_button_sheet)
 			desc = kits ? "Pick your loadout while you wait to deploy." : "You can respawn when the wait runs out."
 			var/time = "[floor(shown_seconds / 60)]:[shown_seconds % 60 < 10 ? "0" : ""][shown_seconds % 60]"
 			maptext = "<span style='text-align: center; vertical-align: middle; -dm-text-outline: 1px black'><span style='font-family: \"Small Fonts\"; font-size: 6px; color: #8a939c'>[kits ? "LOADOUT  ·  DEPLOY IN" : "RESPAWN IN"]</span><br><span style='font-family: \"VCR OSD Mono\"; font-size: 11px; color: #d0d6dc'>[time]</span></span>"
+		if(RESPAWN_STATE_OUT)
+			name = kits ? "Loadout" : "Respawn"
+			desc = "You are out until the match ends."
+			var/time = "[floor(shown_seconds / 60)]:[shown_seconds % 60 < 10 ? "0" : ""][shown_seconds % 60]"
+			maptext = "<span style='text-align: center; vertical-align: middle; -dm-text-outline: 1px black'><span style='font-family: \"Small Fonts\"; font-size: 6px; color: #8a939c'>WAIT UNTIL MATCH ENDS</span><br><span style='font-family: \"VCR OSD Mono\"; font-size: 11px; color: #d0d6dc'>[time]</span></span>"
+		if(RESPAWN_STATE_LIVE)
+			name = "Loadout"
+			desc = "Change your loadout until the match starts."
+			var/time = "[floor(shown_seconds / 60)]:[shown_seconds % 60 < 10 ? "0" : ""][shown_seconds % 60]"
+			maptext = "<span style='text-align: center; vertical-align: middle; -dm-text-outline: 1px #0a0c0f'><span style='font-family: \"VCR OSD Mono\"; font-size: 12px; color: #e6f5e8'>LOADOUT</span><br><span style='font-family: \"Small Fonts\"; font-size: 6px; color: #9fc9a4'>MATCH IN [time]</span></span>"
 		if(RESPAWN_STATE_READY, RESPAWN_STATE_HOVER)
 			name = kits ? "Deploy" : "Respawn"
 			desc = kits ? "Pick your loadout and deploy." : "Return to the lobby and pick a role."
@@ -198,6 +233,8 @@ GLOBAL_VAR(clash_respawn_button_sheet)
 #undef RESPAWN_STATE_COOLDOWN
 #undef RESPAWN_STATE_READY
 #undef RESPAWN_STATE_HOVER
+#undef RESPAWN_STATE_OUT
+#undef RESPAWN_STATE_LIVE
 
 #define DEATH_CARD_WIDTH 272
 #define DEATH_CARD_HEIGHT 132

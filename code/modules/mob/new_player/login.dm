@@ -73,6 +73,8 @@
 
 	.["upp_enabled"] = istype(SSticker.mode, /datum/game_mode/extended/faction_clash/hvh) || (GLOB.master_mode in HVH_MODE_TAGS)
 	.["kits_enabled"] = clash_uses_kits()
+	.["ready_sides"] = clash_lobby_ready_sides()
+	.["ready_side"] = clash_lobby_ready_side(src)
 	.["xenomorph_enabled"] = GLOB.master_mode == /datum/game_mode/colonialmarines::name && client.prefs && (client.prefs.get_job_priority(JOB_XENOMORPH) || client.prefs.get_job_priority(JOB_XENOMORPH_QUEEN))
 	.["predator_enabled"] = SSticker.mode?.flags_round_type & MODE_PREDATOR && SSticker.mode.check_predator_late_join(src, FALSE)
 	.["fax_responder_enabled"] = SSticker.mode?.check_fax_responder_late_join(src, FALSE)
@@ -231,6 +233,10 @@
 				ready = TRUE
 				GLOB.readied_players++
 
+			return TRUE
+
+		if("ready_uscm", "ready_upp")
+			clash_ready_side(src, action == "ready_upp" ? FACTION_UPP : FACTION_MARINE)
 			return TRUE
 
 		if("unready")

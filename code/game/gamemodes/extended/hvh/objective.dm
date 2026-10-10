@@ -388,6 +388,7 @@
 			return "Set the hill rotation to [lowertext(picked)][minutes ? ", every [round(minutes)] minute\s" : ""]"
 	return null
 
+// Domination is out of rotation and unused. How to bring it back: docs/hvh_map_objectives.md, "Domination".
 /datum/game_mode/extended/faction_clash/hvh/tdm/objective/domination
 	name = GAMEMODE_DOMINATION
 	config_tag = GAMEMODE_DOMINATION

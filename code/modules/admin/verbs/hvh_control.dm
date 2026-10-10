@@ -22,7 +22,10 @@
 		else if(picked == "Change ground map")
 			admin_holder.change_ground_map()
 		return
-	var/list/actions = list("End match now", "Skip countdown or break", "Set a team's score", "Bot Control Panel", "Progression Panel")
+	var/list/actions = list("End match now", "Skip countdown or break")
+	if(clash_mode.can_set_score())
+		actions += "Set a team's score"
+	actions += list("Bot Control Panel", "Progression Panel")
 	if(clash_mode.can_rebuild_objectives())
 		actions += list("Re-place objectives", "Jump to an objective")
 	var/list/objective_actions = clash_mode.get_admin_objective_actions()
@@ -120,7 +123,7 @@
 		if(block)
 			to_chat(usr, SPAN_WARNING(block))
 			return
-	var/note = new_mode == GAMEMODE_FACTION_CLASH_UPP_CM ? "" : " Team Deathmatch, King of the Hill, Domination and Capture the Flag place their zones and flag stands on any arena map by themselves."
+	var/note = new_mode == GAMEMODE_FACTION_CLASH_UPP_CM ? "" : " King of the Hill and Capture the Flag place their zones and flag stands on any arena map by themselves."
 	if(pregame)
 		if(SSticker.mode || SSticker.current_state != GAME_STATE_PREGAME)
 			to_chat(usr, SPAN_WARNING("The round started while you were choosing. Nothing was changed."))

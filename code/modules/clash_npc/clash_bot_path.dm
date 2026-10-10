@@ -47,7 +47,7 @@
 	var/area/clash_arena/zone = get_area(spot)
 	if(!istype(zone) || !zone.clash_faction)
 		return TRUE
-	return zone.clash_faction == body.faction && !carrying()
+	return zone.clash_faction == body.faction ? !carrying() : clash_bases_open()
 
 /datum/clash_bot/proc/border_blocked(turf/from, turf/into, direction)
 	for(var/obj/structure/thing in from)
