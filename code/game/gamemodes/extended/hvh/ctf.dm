@@ -99,9 +99,8 @@
 	return list(
 		"Each flag stands outside its base.",
 		"Carry the enemy flag to your own flag's stand while yours is home to score.",
-		"Touch your own flag where it lies to send it home. Dropped flag returns home by itself after [flag_return_time / 10] seconds.",
+		"Touch your team's dropped flag to send it back. Dropped flags return home automatically after [flag_return_time / 10] seconds.",
 		"First team to [capture_limit] captures wins, otherwise the most captures when time runs out.",
-		"Flag carriers cannot enter their own base.",
 	)
 
 /datum/game_mode/extended/faction_clash/hvh/tdm/ctf/get_win_condition()
