@@ -5,6 +5,7 @@
 #define CLASH_ELIM_FIRST_COUNTDOWN (30 SECONDS)
 #define CLASH_ELIM_LOBBY_SECONDS 60
 #define CLASH_ELIM_HOPELESS_TOXIN 60
+#define CLASH_ELIM_CRIT_LIMIT (15 SECONDS)
 #define CLASH_ELIM_COUNTDOWN_BEEPS 10
 
 GLOBAL_LIST_EMPTY(clash_ready_sides)
@@ -12,7 +13,8 @@ GLOBAL_LIST_EMPTY(clash_ready_sides)
 /datum/controller/subsystem/ticker/Initialize(timeofday)
 	. = ..()
 	if(GLOB.master_mode == GAMEMODE_ELIMINATION)
-		CONFIG_SET(number/lobby_countdown, CLASH_ELIM_LOBBY_SECONDS)
+		var/datum/config_entry/number/lobby = config.entries_by_type[/datum/config_entry/number/lobby_countdown]
+		lobby.config_entry_value = CLASH_ELIM_LOBBY_SECONDS
 
 /proc/clash_lobby_ready_sides()
 	return SSticker.current_state <= GAME_STATE_PREGAME && GLOB.master_mode == GAMEMODE_ELIMINATION
@@ -59,6 +61,7 @@ GLOBAL_LIST_EMPTY(clash_ready_sides)
 	var/list/last_side = list()
 	var/list/join_queue = list()
 	var/waiting_for_players = FALSE
+	var/list/crit_since = list()
 
 /datum/game_mode/extended/faction_clash/hvh/tdm/elimination/pre_setup()
 	. = ..()
@@ -104,11 +107,10 @@ GLOBAL_LIST_EMPTY(clash_ready_sides)
 /datum/game_mode/extended/faction_clash/hvh/tdm/elimination/get_welcome_rules()
 	return list(
 		"[matches_per_round] matches per round, first to [wins_needed()] match wins takes the round.",
+		"Wipe out the enemy team to win.",
 		"Riflemen only.",
-		"No respawns during a match. Die and you sit out until the next match.",
-		"Wipe out the enemy team to win the match. If time runs out, the team with more fighters standing wins.",
-		"Base shields drop when the match starts.",
-		"Idle for [idle_limit / 10] seconds and you are moved to observer.",
+		"If time runs out, team with more fighters alive wins.",
+		"Base shields disabled when the match starts.",
 		"Kills and assists give [kill_xp_multiplier]x XP.",
 		"Bots fill lowpop and have a grey \[BOT\] tag and a chevron marker. Kills on bots give 25% of regular XP.",
 	)
@@ -117,7 +119,7 @@ GLOBAL_LIST_EMPTY(clash_ready_sides)
 	return list(JOB_SQUAD_MARINE, JOB_UPP)
 
 /datum/game_mode/extended/faction_clash/hvh/tdm/elimination/get_welcome_tagline()
-	return "One life. Make it count."
+	return "One life. No respawns. Make it count."
 
 /datum/game_mode/extended/faction_clash/hvh/tdm/elimination/get_win_condition()
 	return "Each match lasts [round_time_limit / 600] minutes. Wipe out the enemy team to win the match. If time runs out, the team with more fighters standing wins."
@@ -349,6 +351,7 @@ GLOBAL_LIST_EMPTY(clash_ready_sides)
 	fielded = list()
 	last_callouts = list()
 	disconnected = list()
+	crit_since = list()
 	clash_show_gates(FALSE)
 	show_count(0)
 	tick_elimination()
@@ -366,11 +369,18 @@ GLOBAL_LIST_EMPTY(clash_ready_sides)
 		SStgui.update_uis(GLOB.clash_kit_screens[ckey])
 
 /datum/game_mode/extended/faction_clash/hvh/tdm/elimination/proc/finish_hopeless()
+	var/list/still_down = list()
 	for(var/mob/living/carbon/human/fighter as anything in GLOB.alive_human_list.Copy())
-		if(fighter.stat != UNCONSCIOUS || fighter.health >= 0 || !(fighter.faction in list(FACTION_MARINE, FACTION_UPP)) || !is_ground_level(fighter.z) || !beyond_saving(fighter))
+		if(fighter.stat != UNCONSCIOUS || fighter.health >= 0 || !(fighter.faction in list(FACTION_MARINE, FACTION_UPP)) || !is_ground_level(fighter.z))
+			continue
+		var/datum/weakref/ref = WEAKREF(fighter)
+		var/down_since = crit_since[ref] || world.time
+		if(!beyond_saving(fighter) && world.time - down_since < CLASH_ELIM_CRIT_LIMIT)
+			still_down[ref] = down_since
 			continue
 		to_chat(fighter, SPAN_WARNING("Your wounds are beyond saving without a medic."))
 		fighter.death(fighter.last_damage_data)
+	crit_since = still_down
 
 /datum/game_mode/extended/faction_clash/hvh/tdm/elimination/proc/beyond_saving(mob/living/carbon/human/fighter)
 	if((fighter.species.flags & IS_SYNTHETIC) || (fighter.chem_effect_flags & CHEM_EFFECT_ORGAN_STASIS))
@@ -435,4 +445,5 @@ GLOBAL_LIST_EMPTY(clash_ready_sides)
 #undef CLASH_ELIM_FIRST_COUNTDOWN
 #undef CLASH_ELIM_LOBBY_SECONDS
 #undef CLASH_ELIM_HOPELESS_TOXIN
+#undef CLASH_ELIM_CRIT_LIMIT
 #undef CLASH_ELIM_COUNTDOWN_BEEPS
