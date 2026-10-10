@@ -227,13 +227,10 @@
 	return ..()
 
 /datum/game_mode/extended/faction_clash/hvh/tdm/objective/koth/get_objective_rules()
-	. = list("Occupy the \"hill\" with no enemies on it to score points.")
-	switch(rotation)
-		if(CLASH_HILL_TIMED)
-			. += "The hill moves every [rotate_time / (1 MINUTES)] minute\s."
-		if(CLASH_HILL_MATCH)
-			. += "The hill moves after every match."
-	. += "First team to [point_limit] points wins, otherwise the most points when time runs out."
+	return list(
+		"Occupy the \"hill\" with no enemies on it to score points.",
+		"First team to [point_limit] points wins, otherwise the most points when time runs out.",
+	)
 
 /datum/game_mode/extended/faction_clash/hvh/tdm/objective/koth/get_zone_spots()
 	hill_spots = list()
