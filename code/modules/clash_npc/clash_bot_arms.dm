@@ -118,6 +118,7 @@
 	if(!QDELETED(gun))
 		UnregisterSignal(gun, COMSIG_GUN_BEFORE_FIRE)
 	gun = weapon
+	next_round_at = 0
 	if(gun)
 		RegisterSignal(gun, COMSIG_GUN_BEFORE_FIRE, PROC_REF(on_gun_fire))
 

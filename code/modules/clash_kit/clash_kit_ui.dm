@@ -187,6 +187,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 		"class_primaries" = (GLOB.clash_job_classes[job] in GLOB.clash_class_only_primaries),
 		"fits" = fits,
 		"blocked_slots" = clash_kit_blocked_slots(gun_type),
+		"forced_slots" = clash_kit_forced_slots(gun_type),
 		"option_problems" = clash_kit_option_problems(kit, job, user),
 		"problems" = clash_kit_current_marks(render?["problems"], render?["choices"], kit),
 		"notes" = clash_kit_current_marks(render?["notes"], render?["choices"], kit),

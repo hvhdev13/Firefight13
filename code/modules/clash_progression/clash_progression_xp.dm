@@ -137,7 +137,7 @@
 	var/source = "[GLOB.clash_class_names[class]] level [level]"
 	var/found = FALSE
 	var/index = GLOB.clash_class_gear_levels.Find(level)
-	if(index)
+	if(index && index <= length(GLOB.clash_class_gear[class]))
 		var/gear = GLOB.clash_class_gear[class][index]
 		var/item_type = clash_gear_type_for(gear, faction)
 		if(item_type)

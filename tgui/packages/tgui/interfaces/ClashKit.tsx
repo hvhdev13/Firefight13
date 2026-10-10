@@ -50,6 +50,10 @@ interface IssueItem {
   fixed?: BooleanLike;
 }
 
+interface ForcedItem extends IssueItem {
+  reason: string;
+}
+
 interface PackItem {
   type: string;
   name: string;
@@ -178,6 +182,7 @@ interface Data extends StaticData {
   issue: Record<string, IssueItem>;
   fits: string[];
   blocked_slots: Record<string, string>;
+  forced_slots: Record<string, ForcedItem>;
   option_problems: Record<string, string>;
   problems: Record<string, string>;
   notes: Record<string, string>;
@@ -1405,6 +1410,7 @@ const SlotTile = (props: {
   readonly dense?: boolean;
   readonly lock?: string;
   readonly blocked?: string;
+  readonly forced?: ForcedItem;
   readonly problem?: string;
   readonly note?: string;
   readonly fresh?: boolean;
@@ -1421,25 +1427,28 @@ const SlotTile = (props: {
     dense,
     lock,
     blocked,
+    forced,
     problem,
     note,
     fresh,
     nothing,
     onClick,
   } = props;
-  const shown = picked ?? issued;
+  const shown = forced ?? picked ?? issued;
   const perk = PERK_SLOTS.includes(slot.id);
-  const label = blocked
-    ? `${blocked}.`
-    : lock
-      ? `${picked?.name}: locked, ${lock}. ${perk ? 'You spawn without it.' : 'The starting item is used at spawn.'}`
-      : picked
-        ? perk
-          ? `${picked.name}: ${picked.blurb}`
-          : picked.name
-        : issued
-          ? issued.name
-          : `${slot.name}: nothing`;
+  const label = forced
+    ? `${forced.name}: locked. ${forced.reason}.`
+    : blocked
+      ? `${blocked}.`
+      : lock
+        ? `${picked?.name}: locked, ${lock}. ${perk ? 'You spawn without it.' : 'The starting item is used at spawn.'}`
+        : picked
+          ? perk
+            ? `${picked.name}: ${picked.blurb}`
+            : picked.name
+          : issued
+            ? issued.name
+            : `${slot.name}: nothing`;
   const tooltip = (
     <>
       <Box>{label}</Box>
@@ -1462,7 +1471,7 @@ const SlotTile = (props: {
           'ClashKit__slot',
           small && 'ClashKit__slot--small',
           selected && 'ClashKit__slot--selected',
-          (dimmed || lock) && !blocked && 'ClashKit__slot--dimmed',
+          (dimmed || lock || forced) && !blocked && 'ClashKit__slot--dimmed',
           blocked && 'ClashKit__slot--blocked',
           (picked || nothing) && 'ClashKit__slot--set',
         ])}
@@ -1495,9 +1504,10 @@ const SlotTile = (props: {
             className="ClashKit__problemMark ClashKit__slotProblem"
           />
         )}
-        {note && !problem && (
+        {note && !problem && !forced && (
           <Icon name="circle-info" className="ClashKit__slotNote" />
         )}
+        {forced && <Icon name="lock" className="ClashKit__slotNote" />}
         {fresh && <Box className="ClashKit__slotNew">new</Box>}
         {(picked || nothing) && <Box className="ClashKit__slotDot" />}
       </Box>
@@ -1670,6 +1680,7 @@ export const ClashKit = () => {
     issue,
     fits,
     blocked_slots,
+    forced_slots,
     doll,
     doll_pending,
     deploy_state,
@@ -1796,6 +1807,7 @@ export const ClashKit = () => {
       dense={dense}
       lock={choices[id] ? locks[choices[id]] : undefined}
       blocked={blocked_slots[id]}
+      forced={forced_slots[id]}
       problem={data.problems?.[id]}
       note={data.notes?.[id]}
       nothing={choices[id] === NOTHING}

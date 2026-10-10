@@ -117,6 +117,13 @@ GLOBAL_LIST_INIT(clash_attachment_names, list(
 GLOBAL_LIST_EMPTY(clash_kit_menu)
 GLOBAL_LIST_EMPTY(clash_kit_gun_attachables)
 
+GLOBAL_LIST_INIT(clash_role_issued_armor, list(
+	JOB_SQUAD_LEADER = /obj/item/clothing/suit/storage/marine/medium,
+	JOB_UPP_MEDIC = /obj/item/clothing/suit/storage/marine/faction/UPP,
+	JOB_UPP_SPECIALIST = /obj/item/clothing/suit/storage/marine/faction/UPP,
+	JOB_UPP_LEADER = /obj/item/clothing/suit/storage/marine/faction/UPP,
+))
+
 GLOBAL_LIST_INIT(clash_kit_role_kits, list(
 	JOB_SQUAD_MARINE = /datum/equipment_preset/uscm/private_equipped,
 	JOB_SQUAD_ENGI = /datum/equipment_preset/uscm/engineer_equipped,
@@ -202,6 +209,8 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 		. += isnull(webbing.hold.storage_slots) ? list(list("Space", webbing.hold.max_storage_space)) : list(list("Slots", webbing.hold.storage_slots))
 	else if(istype(sample, /obj/item/clothing))
 		var/obj/item/clothing/worn = sample
+		if(istype(worn, /obj/item/clothing/suit/storage/marine) || istype(worn, /obj/item/clothing/head/helmet/marine) || istype(worn, /obj/item/clothing/head/uppcap))
+			clash_armor_standard(worn)
 		if(worn.armor_bullet || worn.armor_melee || worn.armor_bomb)
 			. += list(list("Bullet", worn.armor_bullet), list("Melee", worn.armor_melee), list("Blast", worn.armor_bomb))
 		if(worn.slowdown)
@@ -491,6 +500,8 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 	add_clash_kit_option(faction, KIT_SLOT_ARMOR, "M3 light armor", /obj/item/clothing/suit/storage/marine/light, "Fast. Thinner plates, fewer pockets")
 	add_clash_kit_option(faction, KIT_SLOT_ARMOR, "M3 medium armor", /obj/item/clothing/suit/storage/marine/medium, "The balance. Standard issue")
 	add_clash_kit_option(faction, KIT_SLOT_ARMOR, "M3-EOD heavy armor", /obj/item/clothing/suit/storage/marine/heavy, "Slow. Shrugs off bullets and blasts")
+	var/datum/clash_kit_option/leader_armor = add_clash_kit_option(faction, KIT_SLOT_ARMOR, "B12 armor", /obj/item/clothing/suit/storage/marine/medium/leader, "Squad leader issue. M3 protection, lighter and faster")
+	leader_armor.only_class = GLOB.clash_job_classes[JOB_SQUAD_LEADER]
 	add_clash_kit_option(faction, KIT_SLOT_MASK, "Gas mask", /obj/item/clothing/mask/gas, "Full face")
 	add_clash_kit_option(faction, KIT_SLOT_MASK, "Rebreather", /obj/item/clothing/mask/rebreather, "Low profile")
 	add_clash_kit_option(faction, KIT_SLOT_MASK, "Heat absorbent coif", /obj/item/clothing/mask/rebreather/scarf, "Scarf and rebreather")
@@ -537,6 +548,8 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 	add_clash_kit_option(faction, KIT_SLOT_ARMOR, "UL6 light armor", /obj/item/clothing/suit/storage/marine/faction/UPP/support, "Fast. No neck guard")
 	add_clash_kit_option(faction, KIT_SLOT_ARMOR, "UM5 medium armor", /obj/item/clothing/suit/storage/marine/faction/UPP, "The balance. Standard issue")
 	add_clash_kit_option(faction, KIT_SLOT_ARMOR, "UH7 heavy armor", /obj/item/clothing/suit/storage/marine/faction/UPP/heavy, "Slow. Shrugs off bullets and blasts")
+	var/datum/clash_kit_option/leader_armor = add_clash_kit_option(faction, KIT_SLOT_ARMOR, "UM5CU armor", /obj/item/clothing/suit/storage/marine/faction/UPP/commando, "Squad leader issue. UM5 protection, lighter and faster")
+	leader_armor.only_class = GLOB.clash_job_classes[JOB_SQUAD_LEADER]
 	add_clash_kit_option(faction, KIT_SLOT_MASK, "Tactical mask, green", /obj/item/clothing/mask/rebreather/scarf/tacticalmask/green, "Scarf and rebreather")
 	add_clash_kit_option(faction, KIT_SLOT_MASK, "Tactical mask, black", /obj/item/clothing/mask/rebreather/scarf/tacticalmask/black, "Scarf and rebreather")
 	add_clash_kit_option(faction, KIT_SLOT_MASK, "Tactical mask, tan", /obj/item/clothing/mask/rebreather/scarf/tacticalmask/tan, "Scarf and rebreather")
@@ -553,9 +566,9 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 	add_clash_kit_option(faction, KIT_SLOT_GRENADE, "Type 6 shrapnel", /obj/item/explosive/grenade/high_explosive/upp, "Union pattern, fragments wide", null, 2)
 	add_clash_kit_option(faction, KIT_SLOT_GRENADE, "Type 8 WP", /obj/item/explosive/grenade/phosphorus/upp, "White phosphorus. Burns and blinds", null, 2)
 	add_clash_kit_option(faction, KIT_SLOT_GRENADE, "Smoke grenade", /obj/item/explosive/grenade/smokebomb, "Cover to cross", null, 2)
-	add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "Type 71 pulse rifle", /obj/item/weapon/gun/rifle/type71, "All rounder. Burst and full auto", /obj/item/ammo_magazine/rifle/type71, 4)
-	add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "Type 71 carbine", /obj/item/weapon/gun/rifle/type71/carbine, "Lighter and quicker, less reach", /obj/item/ammo_magazine/rifle/type71/carbine, 4)
-	add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "AK-4047", /obj/item/weapon/gun/rifle/ak4047, "Big magazine, big kick", /obj/item/ammo_magazine/rifle/ak4047, 4)
+	add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "Type 71 pulse rifle", /obj/item/weapon/gun/rifle/type71, "Service rifle of the UPP. Four-round bursts or single shots", /obj/item/ammo_magazine/rifle/type71, 4)
+	add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "Type 71 carbine", /obj/item/weapon/gun/rifle/type71/carbine, "Devastating up close, useless at range", /obj/item/ammo_magazine/rifle/type71/carbine, 4)
+	add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "AK-4047", /obj/item/weapon/gun/rifle/ak4047, "Hits hard, kicks harder", /obj/item/ammo_magazine/rifle/ak4047, 4)
 	add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "Type 64 submachine gun", /obj/item/weapon/gun/smg/bizon, "Fast handling, helical magazine", /obj/item/ammo_magazine/smg/bizon, 4)
 	add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "Type 23 shotgun", /obj/item/weapon/gun/shotgun/type23, "Wins the doorway. Heavy buckshot", /obj/item/ammo_magazine/shotgun/heavy/buckshot, 4)
 	var/datum/clash_kit_option/qyj = add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "QYJ-72 machine gun", /obj/item/weapon/gun/pkp, "Belt fed. Open the feed cover to reload", /obj/item/ammo_magazine/pkp, 4)

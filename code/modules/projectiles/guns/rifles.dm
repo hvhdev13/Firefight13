@@ -1515,7 +1515,7 @@
 
 /obj/item/weapon/gun/rifle/type71
 	name = "\improper Type 71 pulse rifle"
-	desc = "The primary service rifle of the UPP space forces, the Type 71 is an ergonomic, lightweight bullpup pulse rifle chambered in 5.45x39mm. In accordance with UPP doctrine emphasizing overmatch and suppression, the rifle features a high rate of fire and a large-capacity casket magazine. An integrated recoil-dampening mechanism makes the rifle surprisingly controllable, particularly in bursts."
+	desc = "The primary service rifle of the UPP space forces, the Type 71 is a lightweight bullpup pulse rifle chambered in 5.45x39mm. It hits harder per round but never matches the M41A's precision. It fires in four-round bursts or single shots. An integrated recoil-dampening mechanism keeps the bursts controllable."
 	icon = 'icons/obj/items/weapons/guns/guns_by_faction/UPP/assault_rifles.dmi'
 	icon_state = "type71"
 	item_state = "type71"
@@ -1694,7 +1694,7 @@
 /obj/item/weapon/gun/rifle/type71/carbine
 	current_mag = /obj/item/ammo_magazine/rifle/type71/carbine
 	name = "\improper Type 71 pulse carbine"
-	desc = "A carbine variant of the Type 71 featuring a shortened barrel and modified gas system. The reduced length sacrifices some effective range and precision in exchange for improved close-range performance. Favored by assault troops for clearing structures and other confined environments."
+	desc = "A carbine variant of the Type 71 with a cut-down barrel and modified gas system. The gun kicks hard and the rounds hit hard, scattering wide past a few meters. Favored by UPP assault troops who close the distance to clear rooms and trenches."
 	icon_state = "type71c"
 	item_state = "type71c"
 
@@ -1863,7 +1863,7 @@
 
 /obj/item/weapon/gun/rifle/ak4047
 	name = "\improper AK-4047 pulse assault rifle"
-	desc = "The UPP equivalent to the M41A Pulse Rifle, the AK-4047 is a cheap and reliable substitute. As such, the weapon often winds up in the hands of mercenaries and insurgents. While not as accurate as the M41A or Type 71, the AK-4047 is optimized for raw stopping power. Its considerable recoil can make it difficult to control, particularly during sustained fire."
+	desc = "The AK-4047 is a powerful and reliable rifle that often winds up in the hands of mercenaries and insurgents. It trades accuracy for raw stopping power. Each round hits hard, but heavy recoil makes it difficult to control during sustained fire."
 	icon = 'icons/obj/items/weapons/guns/guns_by_faction/UPP/assault_rifles.dmi'
 	icon_state = "ak4047"
 	item_state = "ak4047"

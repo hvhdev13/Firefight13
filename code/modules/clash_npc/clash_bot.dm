@@ -37,6 +37,7 @@
 #define CLASH_BOT_LANE_NEAR 30
 #define CLASH_BOT_LANE_FAR 20
 #define CLASH_BOT_VOLLEY_STALL (2 SECONDS)
+#define CLASH_BOT_CLICK_DELAY 2.5
 #define CLASH_BOT_COMMIT (1.5 SECONDS)
 #define CLASH_BOT_RETREAT_TIME (4 SECONDS)
 #define CLASH_BOT_RETREAT_COOLDOWN (6 SECONDS)
@@ -120,7 +121,10 @@ SUBSYSTEM_DEF(clash_bots)
 	var/firing = FALSE
 	var/last_round_at = 0
 	var/atom/aim_atom
-	var/shots_left = 0
+	var/trigger_until = 0
+	var/next_round_at = 0
+	var/burst_round = 0
+	var/fire_timer
 	var/dry = FALSE
 	var/task
 	var/mob/living/carbon/human/leader
@@ -236,9 +240,7 @@ SUBSYSTEM_DEF(clash_bots)
 	if(!firing)
 		return
 	last_round_at = world.time
-	shots_left--
-	if(shots_left <= 0)
-		stop_volley()
+	schedule_round()
 
 /datum/clash_bot/proc/on_shot(mob/source, damage_result, ammo_flags, obj/projectile/bullet)
 	SIGNAL_HANDLER
@@ -476,7 +478,7 @@ SUBSYSTEM_DEF(clash_bots)
 			lane_blocked_since = world.time
 		return
 	lane_blocked_since = 0
-	start_volley(target, was_suppressed ? rand(2, 3) : (heavy ? rand(8, 14) : rand(4, 8)))
+	start_volley(target, was_suppressed ? rand(4, 8) : (heavy ? rand(25, 40) : rand(15, 25)))
 
 /datum/clash_bot/proc/suppress()
 	var/turf/aim = focus_turf()
@@ -485,7 +487,7 @@ SUBSYSTEM_DEF(clash_bots)
 	if(get_dist(body, aim) > CLASH_BOT_SIGHT || !clear_shot(aim))
 		return
 	body.face_atom(aim)
-	start_volley(aim, heavy ? rand(5, 9) : rand(2, 4))
+	start_volley(aim, heavy ? rand(10, 20) : rand(5, 10))
 
 /datum/clash_bot/proc/decide()
 	var/wanted = pick_state()
@@ -845,34 +847,73 @@ SUBSYSTEM_DEF(clash_bots)
 /datum/clash_bot/proc/has_ammo()
 	return gun && (gun.in_chamber || gun.current_mag?.current_rounds > 0)
 
-/datum/clash_bot/proc/start_volley(atom/aim, rounds)
+/datum/clash_bot/proc/start_volley(atom/aim, hold)
 	firing = TRUE
 	if(prob(1))
 		INVOKE_ASYNC(body, TYPE_PROC_REF(/mob, emote), "warcry")
-	shots_left = rounds
+	trigger_until = world.time + hold
 	last_round_at = world.time
 	aim_atom = aim
 	fire_tick()
 
+/datum/clash_bot/proc/bursting()
+	return gun.gun_firemode == GUN_FIREMODE_BURSTFIRE && gun.burst_amount > BURST_AMOUNT_TIER_1
+
 /datum/clash_bot/proc/fire_tick()
-	if(!firing || !gun || body.get_active_hand() != gun)
+	if(!firing)
 		return
-	if(QDELETED(aim_atom) || !has_ammo() || world.time - last_round_at > CLASH_BOT_VOLLEY_STALL)
+	if(QDELETED(body) || body.is_mob_incapacitated() || HAS_TRAIT(body, TRAIT_FLOORED) || !gun || body.get_active_hand() != gun)
 		stop_volley()
+		return
+	if(QDELETED(aim_atom) || !has_ammo() || world.time - last_round_at > CLASH_BOT_VOLLEY_STALL || (!burst_round && world.time >= trigger_until))
+		stop_volley()
+		return
+	if(world.time < next_round_at)
 		return
 	if(ally_in_lane(aim_atom))
 		if(!lane_blocked_since)
 			lane_blocked_since = world.time
+		if(burst_round)
+			release_trigger()
+			next_round_at = last_round_at + gun.fire_delay + gun.burst_cooldown
 		return
 	body.clash_aim_turf = get_turf(aim_atom)
+	if(burst_round)
+		gun.set_bursting(TRUE)
 	gun.Fire(aim_atom, body)
+	if(burst_round && gun.last_fired != world.time)
+		release_trigger()
+
+/datum/clash_bot/proc/schedule_round()
+	var/delay
+	if(bursting())
+		burst_round++
+		delay = gun.burst_delay
+		if(burst_round >= gun.burst_amount)
+			release_trigger()
+			delay = gun.fire_delay + gun.burst_cooldown
+	else if(gun.gun_firemode == GUN_FIREMODE_AUTOMATIC)
+		delay = gun.fire_delay
+	else
+		delay = max(gun.fire_delay, CLASH_BOT_CLICK_DELAY)
+	next_round_at = world.time + delay
+	fire_timer = addtimer(CALLBACK(src, PROC_REF(fire_tick)), delay, TIMER_UNIQUE|TIMER_OVERRIDE|TIMER_STOPPABLE)
+
+/datum/clash_bot/proc/release_trigger()
+	burst_round = 0
+	if(!QDELETED(gun))
+		gun.set_bursting(FALSE)
+		gun.reset_fire()
 
 /datum/clash_bot/proc/stop_volley()
 	if(!firing)
 		return
 	firing = FALSE
 	aim_atom = null
-	next_fire = world.time + (heavy ? rand(3, 6) : rand(5, 10))
+	deltimer(fire_timer)
+	fire_timer = null
+	release_trigger()
+	next_fire = max(world.time, next_round_at) + rand(2, 5)
 
 /datum/clash_bot/proc/reload()
 	if(QDELETED(body) || body.stat == DEAD)
@@ -1446,6 +1487,7 @@ SUBSYSTEM_DEF(clash_bots)
 #undef CLASH_BOT_LANE_NEAR
 #undef CLASH_BOT_LANE_FAR
 #undef CLASH_BOT_VOLLEY_STALL
+#undef CLASH_BOT_CLICK_DELAY
 #undef CLASH_BOT_COMMIT
 #undef CLASH_BOT_RETREAT_TIME
 #undef CLASH_BOT_RETREAT_COOLDOWN

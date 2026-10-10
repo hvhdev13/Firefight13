@@ -136,14 +136,15 @@ GLOBAL_LIST_INIT(clash_class_gear, list(
 	CLASH_CLASS_RIFLEMAN = list("light_armor", "frag_grenade", "webbing_vest", "heavy_armor", "satchel", "drop_pouch", "second_grenade", "general_pouch", "flare_pouch", "leg_pouch", "utility_belt", "bayonet_sheath", "shoulder_holster", "pistol_pouch", "shotgun_scabbard", "extra_helmet"),
 	CLASH_CLASS_MEDIC = list("general_pouch", "light_armor", "satchel", "frag_grenade", "utility_belt", "drop_pouch", "webbing_vest", "flare_pouch", "pistol_pouch", "leg_pouch", "heavy_armor", "shoulder_holster", "bayonet_sheath", "second_grenade", "shotgun_scabbard", "extra_helmet"),
 	CLASH_CLASS_ENGINEER = list("utility_belt", "general_pouch", "satchel", "extra_helmet", "heavy_armor", "webbing_vest", "drop_pouch", "shotgun_scabbard", "light_armor", "frag_grenade", "flare_pouch", "leg_pouch", "second_grenade", "bayonet_sheath", "shoulder_holster", "pistol_pouch"),
-	CLASH_CLASS_HEAVY = list("heavy_armor", "extra_helmet", "second_grenade", "webbing_vest", "drop_pouch", "satchel", "general_pouch", "frag_grenade", "light_armor", "leg_pouch", "flare_pouch", "utility_belt", "shoulder_holster", "pistol_pouch", "bayonet_sheath", "shotgun_scabbard"),
-	CLASH_CLASS_LEADER = list("frag_grenade", "flare_pouch", "light_armor", "webbing_vest", "second_grenade", "drop_pouch", "satchel", "general_pouch", "heavy_armor", "leg_pouch", "utility_belt", "shoulder_holster", "pistol_pouch", "bayonet_sheath", "shotgun_scabbard", "extra_helmet"),
+	CLASH_CLASS_HEAVY = list("heavy_armor", "extra_helmet", "second_grenade", "webbing_vest", "drop_pouch", "satchel", "general_pouch", "frag_grenade", "leg_pouch", "flare_pouch", "utility_belt", "shoulder_holster", "pistol_pouch", "bayonet_sheath", "shotgun_scabbard"),
+	CLASH_CLASS_LEADER = list("leader_armor", "frag_grenade", "flare_pouch", "light_armor", "webbing_vest", "second_grenade", "drop_pouch", "satchel", "general_pouch", "heavy_armor", "leg_pouch", "utility_belt", "shoulder_holster", "pistol_pouch", "bayonet_sheath", "shotgun_scabbard"),
 	CLASH_CLASS_SUPPORT = list("light_armor", "general_pouch", "satchel", "pistol_pouch", "flare_pouch", "utility_belt", "frag_grenade", "drop_pouch", "webbing_vest", "leg_pouch", "shoulder_holster", "heavy_armor", "bayonet_sheath", "second_grenade", "shotgun_scabbard", "extra_helmet"),
 ))
 
 GLOBAL_LIST_INIT(clash_gear_types, list(
 	"light_armor" = list(/obj/item/clothing/suit/storage/marine/light, /obj/item/clothing/suit/storage/marine/faction/UPP/support),
 	"heavy_armor" = list(/obj/item/clothing/suit/storage/marine/heavy, /obj/item/clothing/suit/storage/marine/faction/UPP/heavy),
+	"leader_armor" = list(/obj/item/clothing/suit/storage/marine/medium/leader, /obj/item/clothing/suit/storage/marine/faction/UPP/commando),
 	"frag_grenade" = list(/obj/item/explosive/grenade/high_explosive, /obj/item/explosive/grenade/high_explosive/upp),
 	"second_grenade" = list(/obj/item/explosive/grenade/high_explosive/m15, /obj/item/explosive/grenade/incendiary, /obj/item/explosive/grenade/phosphorus/upp),
 	"webbing_vest" = list(/obj/item/clothing/accessory/storage/black_vest/brown_vest),
@@ -163,6 +164,7 @@ GLOBAL_LIST_INIT(clash_gear_types, list(
 GLOBAL_LIST_INIT(clash_gear_names, list(
 	"light_armor" = "light armor",
 	"heavy_armor" = "heavy armor",
+	"leader_armor" = "squad leader armor",
 	"frag_grenade" = "frag grenade",
 	"second_grenade" = "second grenade",
 	"webbing_vest" = "webbing vest",

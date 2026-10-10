@@ -85,6 +85,8 @@ SUBSYSTEM_DEF(clash_spawn)
 	if(istype(SSticker.mode, /datum/game_mode/extended/faction_clash/hvh) && spawned.faction == FACTION_MARINE && spawned.assigned_squad && !(spawned.assigned_squad.name in list(SQUAD_MARINE_1, SQUAD_MARINE_2)))
 		INVOKE_ASYNC(GLOBAL_PROC, GLOBAL_PROC_REF(clash_move_to_arena_squad), spawned)
 	spawned.AddElement(/datum/element/clash_iff)
+	if(istype(SSticker.mode, /datum/game_mode/extended/faction_clash/hvh))
+		spawned.AddElement(/datum/element/clash_move_carry)
 	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
 	if(istype(clash_mode) && clash_mode.spawn_protection)
 		spawned.AddComponent(/datum/component/clash_spawn_guard, clash_mode.spawn_protection)

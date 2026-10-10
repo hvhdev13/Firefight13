@@ -237,6 +237,9 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 			full_kit.load_gear(fighter, fighter.client)
 		catch(var/exception/error)
 			stack_trace("Clash kit could not issue [job] their full kit: [error]")
+	if(GLOB.clash_role_issued_armor[job])
+		clash_kit_replace_worn(fighter, WEAR_JACKET, GLOB.clash_role_issued_armor[job])
+	clash_standard_issue_guns(fighter)
 	clash_issue_specialist_armor(fighter)
 	clash_issue_machinegunner_kit(fighter)
 	clash_swap_c4_pouches(fighter)
@@ -299,6 +302,20 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 	if(ispath(primary_type, /obj/item/weapon/gun/smartgun))
 		.[KIT_SLOT_BACK] = "You cannot use a backpack with the M56 harness"
 
+GLOBAL_LIST_EMPTY(clash_kit_forced_items)
+
+/proc/clash_kit_forced_slots(primary_type)
+	. = list()
+	if(!ispath(primary_type, /obj/item/weapon/gun/smartgun))
+		return
+	if(!GLOB.clash_kit_forced_items[KIT_SLOT_ARMOR])
+		var/obj/item/harness = new /obj/item/clothing/suit/storage/marine/smartgunner
+		var/list/info = describe_clash_kit_item(harness)
+		info["reason"] = "The M56A2 only fires with the M56 harness"
+		GLOB.clash_kit_forced_items[KIT_SLOT_ARMOR] = info
+		qdel(harness)
+	.[KIT_SLOT_ARMOR] = GLOB.clash_kit_forced_items[KIT_SLOT_ARMOR]
+
 /proc/clash_kit_smartgun_rig(mob/living/carbon/human/wearer, datum/clash_kit/kit)
 	var/obj/item/pack = wearer.back
 	if(pack && !(pack.flags_item & SMARTGUNNER_BACKPACK_OVERRIDE))
@@ -321,6 +338,9 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 /proc/clash_kit_replace_worn(mob/living/carbon/human/wearer, wear_slot, item_type)
 	var/obj/item/old = wearer.get_item_by_slot(wear_slot)
 	var/list/carried = list()
+	var/obj/item/clipped = wear_slot == WEAR_JACKET ? wearer.s_store : null
+	if(clipped)
+		wearer.drop_inv_item_to_loc(clipped, wearer)
 	if(old)
 		var/obj/item/storage/old_storage = clash_kit_storage_of(old)
 		if(old_storage)
@@ -333,6 +353,8 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 	if(!wearer.equip_to_slot_if_possible(fresh, wear_slot, TRUE, FALSE, TRUE))
 		qdel(fresh)
 		fresh = null
+	if(clipped && !wearer.equip_to_slot_if_possible(clipped, WEAR_J_STORE, TRUE, FALSE, TRUE))
+		clash_kit_hand_or_floor(wearer, clipped)
 	var/obj/item/storage/holder = clash_kit_storage_of(fresh)
 	for(var/obj/item/thing as anything in carried)
 		if(istype(thing, /obj/item/device/flashlight/flare) && !istype(holder, /obj/item/storage/pouch/flare))
