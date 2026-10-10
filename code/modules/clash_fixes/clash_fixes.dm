@@ -81,6 +81,10 @@
 	if(length(langchat_listeners))
 		langchat_speech(message, langchat_listeners, GLOB.all_languages, skip_language_check = TRUE)
 
+/datum/component/automatedfire/autofire/Destroy(force, silent)
+	shooting = FALSE
+	return ..()
+
 /proc/clash_is_bot(mob/living/carbon/human/fighter)
 	return fighter.statistic_exempt && !fighter.client && istype(SSticker.mode, /datum/game_mode/extended/faction_clash/hvh)
 

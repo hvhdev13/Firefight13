@@ -84,7 +84,7 @@ GLOBAL_LIST_INIT(clash_kit_mode_tags, build_clash_kit_mode_tags())
 	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
 	if(istype(clash_mode))
 		return clash_mode.get_roles_list()
-	return (GLOB.master_mode in GLOB.clash_kit_mode_tags) ? GLOB.clash_arena_roles : GLOB.ROLES_CM_VS_UPP
+	return (GLOB.master_mode in GLOB.clash_kit_mode_tags) ? (GLOB.gamemode_roles[GLOB.master_mode] || GLOB.clash_arena_roles) : GLOB.ROLES_CM_VS_UPP
 
 /proc/get_clash_kit_roles()
 	. = list(FACTION_MARINE = list(), FACTION_UPP = list())

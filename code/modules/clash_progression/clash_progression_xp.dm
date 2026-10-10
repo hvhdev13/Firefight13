@@ -208,7 +208,7 @@
 	if(!clash_mode.match_live || !ishuman(killer) || killer.statistic_exempt || killer.faction == victim.faction)
 		return
 	var/list/attackers = clash_mode.last_attackers[victim.real_name]
-	clash_award_xp(killer, CLASH_XP_KILL, CLASH_XP_SOURCE_KILL, clash_kill_weapon(killer, cause, cause_object, attackers?[killer.real_name]))
+	clash_award_xp(killer, clash_kill_xp(CLASH_XP_KILL), CLASH_XP_SOURCE_KILL, clash_kill_weapon(killer, cause, cause_object, attackers?[killer.real_name]))
 	clash_progress_leader_assist(killer)
 	clash_progress_payback(killer, CLASH_XP_PAYBACK)
 
@@ -243,8 +243,12 @@
 	killer.clash_revived_by = null
 	clash_award_xp(medic, amount, CLASH_XP_SOURCE_PAYBACK)
 
+/proc/clash_kill_xp(amount)
+	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
+	return amount * clash_mode.kill_xp_multiplier
+
 /proc/clash_progress_assist(list/hit)
-	clash_grant_xp(hit["ckey"], hit["faction"], GLOB.clash_job_classes[hit["job"]], CLASH_XP_ASSIST, CLASH_XP_SOURCE_ASSIST, hit["weapon"])
+	clash_grant_xp(hit["ckey"], hit["faction"], GLOB.clash_job_classes[hit["job"]], clash_kill_xp(CLASH_XP_ASSIST), CLASH_XP_SOURCE_ASSIST, hit["weapon"])
 
 /proc/clash_progress_revive(mob/living/carbon/human/revived)
 	if(!revived.clash_enemy_death)
@@ -280,7 +284,7 @@
 		return
 	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
 	var/list/hits = clash_mode.recent_damage[body.real_name] || clash_mode.last_attackers[body.real_name]
-	clash_award_xp(killer, CLASH_XP_BOT_KILL, CLASH_XP_SOURCE_BOT_KILL, clash_kill_weapon(killer, body.last_damage_data.cause_name, body.last_damage_data.resolve_cause(), hits?[killer.real_name]), CLASH_XP_KILL)
+	clash_award_xp(killer, clash_kill_xp(CLASH_XP_BOT_KILL), CLASH_XP_SOURCE_BOT_KILL, clash_kill_weapon(killer, body.last_damage_data.cause_name, body.last_damage_data.resolve_cause(), hits?[killer.real_name]), clash_kill_xp(CLASH_XP_KILL))
 	clash_progress_payback(killer, round(CLASH_XP_PAYBACK * CLASH_BOT_DAMAGE_SHARE))
 
 /proc/clash_progress_match_end(winner)
@@ -290,7 +294,7 @@
 	for(var/ckey in GLOB.clash_progress.players)
 		var/datum/clash_progress/progress = GLOB.clash_progress.players[ckey]
 		if(progress.side == winner && GLOB.directory[ckey])
-			clash_grant_xp(ckey, winner, progress.class_id, CLASH_XP_MATCH_WIN, CLASH_XP_SOURCE_MATCH_WIN)
+			clash_grant_xp(ckey, winner, progress.class_id, CLASH_XP_MATCH_WIN * clash_mode.match_win_xp_multiplier, CLASH_XP_SOURCE_MATCH_WIN)
 
 /proc/clash_progress_round_end()
 	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
@@ -396,7 +400,7 @@
 	clash_award_support_xp(src, xp, CLASH_XP_SOURCE_SUPPRESSION, CLASH_XP_SOURCE_SUPPRESSION, CLASH_XP_SUPPRESSION_CAP)
 
 /proc/clash_progress_suppression_assist(list/heavy)
-	clash_grant_support_xp(heavy["ckey"], heavy["faction"], GLOB.clash_job_classes[heavy["job"]], CLASH_XP_SUPPRESSION_ASSIST, CLASH_XP_SOURCE_SUPPRESSION_ASSIST, CLASH_XP_SOURCE_SUPPRESSION, CLASH_XP_SUPPRESSION_CAP)
+	clash_grant_support_xp(heavy["ckey"], heavy["faction"], GLOB.clash_job_classes[heavy["job"]], clash_kill_xp(CLASH_XP_SUPPRESSION_ASSIST), CLASH_XP_SOURCE_SUPPRESSION_ASSIST, CLASH_XP_SOURCE_SUPPRESSION, CLASH_XP_SUPPRESSION_CAP)
 
 /proc/clash_hurt_by_enemy(mob/living/carbon/human/patient)
 	if(!patient.clash_enemy_hurt && (patient.clash_heal_pool > 0 || clash_enemy_share(patient.last_damage_data?.resolve_mob(), patient.faction, 1)))

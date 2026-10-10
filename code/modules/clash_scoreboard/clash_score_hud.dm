@@ -81,10 +81,12 @@ GLOBAL_LIST_EMPTY(clash_score_panel_icons)
 	var/small = "font-family: \"Small Fonts\"; font-size: 6px; -dm-text-outline: 1px black; vertical-align: bottom"
 	var/list/texts = list()
 	texts += clash_score_text("<span style='[small]; color: #e8ecef; text-align: left'>USCM</span>", left + 5, 13, text_width, 10)
-	texts += clash_score_text("<span style='[small]; color: #8a939c; text-align: left'>[uscm_alive] alive</span>", left + 5, 3, text_width, 10)
+	if(shows_alive_count())
+		texts += clash_score_text("<span style='[small]; color: #8a939c; text-align: left'>[uscm_alive] alive</span>", left + 5, 3, text_width, 10)
 	texts += clash_score_text("<span style='[big]; text-align: right'>[uscm]</span>", left + 5, 3, text_width, 22)
 	texts += clash_score_text("<span style='[small]; color: #e8ecef; text-align: right'>UPP</span>", right_start + 5, 13, text_width, 10)
-	texts += clash_score_text("<span style='[small]; color: #8a939c; text-align: right'>[upp_alive] alive</span>", right_start + 5, 3, text_width, 10)
+	if(shows_alive_count())
+		texts += clash_score_text("<span style='[small]; color: #8a939c; text-align: right'>[upp_alive] alive</span>", right_start + 5, 3, text_width, 10)
 	texts += clash_score_text("<span style='[big]; text-align: left'>[upp]</span>", right_start + 5, 3, text_width, 22)
 	var/center_x = left + SCORE_SIDE_WIDTH
 	var/center_width = right_start - center_x
@@ -144,7 +146,7 @@ GLOBAL_LIST_EMPTY(clash_score_panel_icons)
 	alpha = 0
 
 /atom/movable/screen/clash_final_count/proc/show(seconds)
-	maptext = "<span style='font-family: \"VCR OSD Mono\"; font-size: 28px; text-align: center; vertical-align: middle; -dm-text-outline: 2px #0a0c0f; color: [seconds ? "#ff5a4f" : "#ffffff"]'>0:0[seconds]</span>"
+	maptext = "<span style='font-family: \"VCR OSD Mono\"; font-size: 28px; text-align: center; vertical-align: middle; -dm-text-outline: 2px #0a0c0f; color: [seconds ? "#ff5a4f" : "#ffffff"]'>0:[seconds < 10 ? "0" : ""][seconds]</span>"
 	animate(src)
 	transform = matrix(0.6, 0, 0, 0, 0.6, 0)
 	alpha = 255
@@ -158,6 +160,34 @@ GLOBAL_LIST_EMPTY(clash_score_panel_icons)
 	if(!(player.clash_final_count in player.screen))
 		player.screen += player.clash_final_count
 	player.clash_final_count.show(seconds)
+
+/client/var/atom/movable/screen/clash_match_banner/clash_match_banner
+
+/atom/movable/screen/clash_match_banner
+	icon = null
+	mouse_opacity = MOUSE_OPACITY_TRANSPARENT
+	screen_loc = "CENTER-3:97,CENTER+2"
+	maptext_width = 320
+	maptext_height = 64
+	maptext_x = -144
+	maptext_y = -16
+	alpha = 0
+
+/atom/movable/screen/clash_match_banner/proc/show(title, color, detail)
+	maptext = "<span style='text-align: center; vertical-align: middle; -dm-text-outline: 2px #0a0c0f'><span style='font-family: \"VCR OSD Mono\"; font-size: 26px; color: [color]'>[title]</span><br><span style='font-family: \"Small Fonts\"; font-size: 7px; color: #d0d6dc'>[detail]</span></span>"
+	animate(src)
+	transform = matrix(0.8, 0, 0, 0, 0.8, 0)
+	alpha = 0
+	animate(src, alpha = 255, transform = matrix(), time = 3, easing = CUBIC_EASING|EASE_OUT)
+	animate(time = 35)
+	animate(alpha = 0, time = 5)
+
+/proc/clash_show_match_banner(client/player, title, color, detail)
+	if(!player.clash_match_banner)
+		player.clash_match_banner = new
+	if(!(player.clash_match_banner in player.screen))
+		player.screen += player.clash_match_banner
+	player.clash_match_banner.show(title, color, detail)
 
 /proc/clash_place_killfeed_line(atom/movable/screen/faction_killfeed/line, index, below_objectives)
 	line.screen_loc = "CENTER-3,TOP-2:20"

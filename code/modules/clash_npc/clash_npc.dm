@@ -150,7 +150,7 @@ GLOBAL_LIST_INIT(clash_bot_class_jobs, list(
 	return best
 
 /obj/effect/landmark/clash_npc/proc/spawn_npc()
-	if(bot || spawning || !active)
+	if(bot || spawning || !active || clash_spawn_block())
 		return
 	if(!GLOB.clash_bots_enabled || (faction in GLOB.clash_bot_sides_off) || clash_bot_count(faction) >= GLOB.clash_bot_caps[faction])
 		if(temporary)
@@ -289,7 +289,10 @@ GLOBAL_LIST_INIT(clash_bot_class_jobs, list(
 
 /proc/clash_player_count(faction)
 	. = 0
+	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
 	for(var/client/player as anything in GLOB.clients)
+		if(istype(clash_mode) && !clash_mode.counts_for_bot_fill(player))
+			continue
 		var/mob/living/carbon/human/fighter = player.mob
 		if(!ishuman(fighter))
 			fighter = player.mob?.mind?.original
@@ -470,6 +473,33 @@ GLOBAL_LIST_INIT(clash_bot_class_jobs, list(
 	spread_defenders(defend, fronts, CLASH_BOT_DEFEND_LEASH)
 	pair_patrols(patrol)
 
+/datum/clash_bot_director/proc/plan_hunt()
+	var/list/bots = get_bots()
+	if(!length(bots))
+		return
+	var/list/leads = list()
+	for(var/datum/clash_bot/bot as anything in GLOB.clash_bots)
+		if(bot.body?.faction != faction)
+			continue
+		var/turf/lead = bot.focus_turf()
+		if(lead)
+			leads |= lead
+	var/list/sweep = pushes + fronts
+	if(enemy_base)
+		sweep += enemy_base
+	if(!length(leads) && !length(sweep))
+		hold_posts(bots)
+		return
+	for(var/datum/clash_bot/bot as anything in bots)
+		var/turf/goal
+		if(length(leads))
+			for(var/turf/lead as anything in leads)
+				if(!goal || get_dist(bot.body, lead) < get_dist(bot.body, goal))
+					goal = lead
+		else
+			goal = bot.task == CLASH_BOT_TASK_PATROL && (bot.anchor in sweep) ? bot.anchor : pick(sweep)
+		bot.set_task(CLASH_BOT_TASK_PATROL, goal, CLASH_BOT_PATROL_LEASH)
+
 /datum/clash_bot_director/proc/spread_defenders(list/bots, list/spots, leash)
 	var/list/load = list()
 	for(var/turf/spot as anything in spots)
@@ -558,6 +588,7 @@ GLOBAL_LIST_INIT(clash_bot_class_jobs, list(
 		return
 	attack_zone(free, goal)
 
+// Domination is out of rotation and unused. How to bring it back: docs/hvh_map_objectives.md, "Domination".
 /datum/clash_bot_director/proc/plan_domination(list/zones)
 	var/list/free = get_bots()
 	if(!length(free))
@@ -699,9 +730,10 @@ GLOBAL_LIST_INIT(clash_bot_class_jobs, list(
 		if(bot.medic)
 			medics++
 	var/wanted = total >= CLASH_BOT_CLASS_MIN ? max(1, floor(total / CLASH_BOT_CLASS_SHARE)) : 0
-	if(heavies < wanted)
+	var/list/roles = clash_role_list()
+	if(heavies < wanted && (jobs[2] in roles))
 		return jobs[2]
-	if(medics < wanted)
+	if(medics < wanted && (jobs[3] in roles))
 		return jobs[3]
 	return jobs[1]
 

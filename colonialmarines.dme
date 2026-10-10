@@ -900,6 +900,7 @@
 #include "code\game\gamemodes\extended\hvh\_hvh.dm"
 #include "code\game\gamemodes\extended\hvh\cm_vs_upp.dm"
 #include "code\game\gamemodes\extended\hvh\ctf.dm"
+#include "code\game\gamemodes\extended\hvh\elimination.dm"
 #include "code\game\gamemodes\extended\hvh\objective.dm"
 #include "code\game\gamemodes\extended\hvh\tdm.dm"
 #include "code\game\jobs\access.dm"
