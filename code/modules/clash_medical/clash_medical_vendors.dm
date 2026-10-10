@@ -22,6 +22,7 @@ GLOBAL_LIST_INIT(clash_arena_med_removed_families, list(
 	/obj/item/storage/firstaid/o2,
 	/obj/item/storage/firstaid/toxin,
 	/obj/item/storage/firstaid/rad,
+	/obj/item/bodybag/cryobag,
 ))
 
 GLOBAL_LIST_INIT(clash_arena_med_swaps, list(
@@ -43,6 +44,7 @@ GLOBAL_LIST_INIT(clash_arena_med_swaps, list(
 	/obj/item/reagent_container/hypospray/autoinjector/tramadol = list("Tramadol Injector", /obj/item/reagent_container/hypospray/autoinjector/clash_tramadol),
 	/obj/item/reagent_container/hypospray/autoinjector/tramadol/skillless = list("Tramadol Injector", /obj/item/reagent_container/hypospray/autoinjector/clash_tramadol),
 	/obj/item/reagent_container/hypospray/autoinjector/skillless/tramadol = list("Tramadol Injector", /obj/item/reagent_container/hypospray/autoinjector/clash_tramadol),
+	/obj/item/reagent_container/hypospray/autoinjector/oxycodone = list("Oxycodone Injector", /obj/item/reagent_container/hypospray/autoinjector/oxycodone/clash),
 	/obj/item/storage/pouch/pressurized_reagent_canister/revival_tricord = list("Pressurized Reagent Canister Pouch (UNGA)", /obj/item/storage/pouch/pressurized_reagent_canister/clash_unga),
 	/obj/item/storage/pouch/pressurized_reagent_canister/revival_peri = list("Pressurized Reagent Canister Pouch (UNGA)", /obj/item/storage/pouch/pressurized_reagent_canister/clash_unga),
 	/obj/item/storage/pouch/pressurized_reagent_canister/bicaridine = list("Pressurized Reagent Canister Pouch (UNGA)", /obj/item/storage/pouch/pressurized_reagent_canister/clash_unga),
@@ -146,8 +148,6 @@ GLOBAL_LIST_INIT(clash_arena_crate_removed, list(
 	if(clash_fast_medicine())
 		var/mob/living/carbon/human/shopper = user
 		. = clash_arena_med_products(., istype(src, /obj/structure/machinery/cm_vending/sorted/medical) || (ishuman(shopper) && clash_is_medic(shopper)), istype(src, /obj/structure/machinery/cm_vending/sorted), vend_flags & VEND_LIMITED_INVENTORY)
-		if(ishuman(shopper) && clash_is_engineer(shopper) && istype(src, /obj/structure/machinery/cm_vending/gear))
-			. += clash_engineer_vendor_entries(shopper.faction)
 
 /proc/clash_medic_vendor_access(obj/structure/machinery/cm_vending/vendor, mob/user, display)
 	if(!ishuman(user) || skillcheck(user, SKILL_MEDICAL, SKILL_MEDICAL_MEDIC))
@@ -168,20 +168,19 @@ GLOBAL_LIST_INIT(clash_arena_crate_removed, list(
 		list("Healing Injector", floor(scale * 15), /obj/item/reagent_container/hypospray/autoinjector/clash_heal, VENDOR_ITEM_REGULAR),
 		list("UNGA Injector", floor(scale * 10), /obj/item/reagent_container/hypospray/autoinjector/clash_unga, VENDOR_ITEM_REGULAR),
 		list("Tramadol Injector", floor(scale * 15), /obj/item/reagent_container/hypospray/autoinjector/clash_tramadol, VENDOR_ITEM_REGULAR),
-		list("Autoinjector (Oxycodone)", floor(scale * 15), /obj/item/reagent_container/hypospray/autoinjector/oxycodone, VENDOR_ITEM_REGULAR),
+		list("Oxycodone Injector", floor(scale * 15), /obj/item/reagent_container/hypospray/autoinjector/oxycodone/clash, VENDOR_ITEM_REGULAR),
 
 		list("MEDICAL UTILITIES", -1, null, null),
 		list("Emergency Defibrillator", floor(scale * 9), /obj/item/device/defibrillator, VENDOR_ITEM_REGULAR),
 		list("Surgical Line", floor(scale * 6), /obj/item/tool/surgery/surgical_line, VENDOR_ITEM_REGULAR),
 		list("Synth-Graft", floor(scale * 6), /obj/item/tool/surgery/synthgraft, VENDOR_ITEM_REGULAR),
 		list("Health Analyzer", floor(scale * 15), /obj/item/device/healthanalyzer, VENDOR_ITEM_REGULAR),
-		list("Stasis Bag", floor(scale * 9), /obj/item/bodybag/cryobag, VENDOR_ITEM_REGULAR),
 	)
 
 GLOBAL_LIST_INIT(clash_wey_med_refills, list(
 	/obj/item/reagent_container/hypospray/autoinjector/clash_heal,
 	/obj/item/reagent_container/hypospray/autoinjector/clash_tramadol,
-	/obj/item/reagent_container/hypospray/autoinjector/oxycodone,
+	/obj/item/reagent_container/hypospray/autoinjector/oxycodone/clash,
 ))
 
 GLOBAL_LIST_INIT(clash_medic_shop, list(

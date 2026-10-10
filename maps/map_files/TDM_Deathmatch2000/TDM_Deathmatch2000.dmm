@@ -7,7 +7,19 @@
 	icon_state = "N";
 	pixel_y = 3
 	},
-/turf/open/floor/kutjevo/colors/red/tile,
+/obj/structure/prop/hybrisa/misc/floorprops/grate,
+/obj/effect/decal/hybrisa/road/lines1{
+	pixel_x = 6;
+	pixel_y = 0
+	},
+/obj/effect/decal/hybrisa/road/lines1{
+	pixel_x = 10;
+	pixel_y = 0
+	},
+/obj/effect/decal/hybrisa/road{
+	dir = 1
+	},
+/turf/open/floor/strata/red2,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "aj" = (
 /obj/effect/decal/warning_stripes{
@@ -22,26 +34,18 @@
 /turf/open/floor/corsat/squares,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "ak" = (
-/obj/effect/landmark/start/marine/bravo,
-/obj/effect/landmark/late_join/bravo,
-/turf/open/floor/almayer/blackfull2,
+/obj/item/bedsheet/mime,
+/obj/structure/bed,
+/turf/open/floor/shiva/redfull,
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
 "ap" = (
 /obj/structure/blocker/clash_gate/upp,
 /turf/closed/wall/upp_ship/reinforced/outer,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "as" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "NW-out";
-	pixel_y = 3
-	},
-/obj/effect/decal/warning_stripes{
-	icon_state = "SW-out";
-	pixel_x = -1;
-	pixel_y = -1
-	},
-/turf/open/floor/corsat/squares,
-/area/clash_arena/tdm_deathmatch2000/upp_base)
+/obj/structure/machinery/cm_vending/sorted/tech/tool_storage/clash,
+/turf/open/floor/shiva/redfull/west,
+/area/clash_arena/tdm_deathmatch2000/uscm_base)
 "at" = (
 /turf/open/hybrisa/street/cement2,
 /area/clash_arena/tdm_deathmatch2000/battlefield)
@@ -52,18 +56,22 @@
 /turf/closed/wall/almayer,
 /area/clash_arena/tdm_deathmatch2000/battlefield)
 "aE" = (
-/obj/effect/landmark/start/marine/smartgunner/bravo,
-/obj/effect/landmark/late_join/bravo,
-/turf/open/floor/almayer/blackfull2,
+/obj/structure/bed/hybrisa/bunkbed3,
+/turf/open/floor/shiva/redfull/west,
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
 "aG" = (
-/obj/structure/machinery/cm_vending/sorted/tech/electronics_storage/antag,
-/turf/open/floor/corsat/plate,
+/obj/structure/prop/hybrisa/misc/floorprops/grate,
+/obj/effect/decal/hybrisa/road/lines2,
+/obj/effect/decal/hybrisa/road/lines2{
+	pixel_x = 0;
+	pixel_y = -6
+	},
+/turf/open/floor/strata/red2,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "aI" = (
 /obj/effect/landmark/start/marine/medic/alpha,
 /obj/effect/landmark/late_join/alpha,
-/turf/open/floor/almayer/plate,
+/turf/open/floor/shiva/wredcorners/north,
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
 "aO" = (
 /turf/closed/wall/strata_outpost,
@@ -78,16 +86,16 @@
 	icon_state = "N";
 	pixel_y = 1
 	},
-/turf/open/floor/almayer/plate,
+/turf/open/floor/shiva/redfull,
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
 "bb" = (
-/obj/effect/landmark/start/marine/medic/bravo,
-/obj/effect/landmark/late_join/bravo,
-/turf/open/floor/almayer/blackfull2,
+/obj/item/bedsheet/mime,
+/obj/structure/bed,
+/turf/open/floor/strata/blue2,
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
 "bh" = (
-/obj/structure/machinery/cm_vending/sorted/cargo_guns/upp_squad_guns,
-/turf/open/floor/corsat/plate,
+/obj/structure/machinery/cm_vending/sorted/cargo_guns/upp_squad_guns/clash,
+/turf/open/floor/strata/red2,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "bk" = (
 /obj/effect/decal/warning_stripes{
@@ -95,6 +103,7 @@
 	pixel_x = 2;
 	pixel_y = 3
 	},
+/obj/effect/decal/hybrisa/warning/redandwhite_E,
 /turf/open/floor/corsat/squares,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "bp" = (
@@ -102,48 +111,44 @@
 /turf/open/floor/almayer/test_floor4,
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
 "bq" = (
-/obj/effect/landmark/clash_npc/uscm/fill,
-/turf/open/hybrisa/street/cement1,
-/area/clash_arena/tdm_deathmatch2000/battlefield)
+/turf/open/floor/strata/blue2,
+/area/clash_arena/tdm_deathmatch2000/uscm_base)
 "bs" = (
 /obj/effect/landmark/clash_objective/domination_zone/c,
 /turf/open/asphalt/cement/cement9,
 /area/clash_arena/tdm_deathmatch2000/battlefield/zone_3)
-"bu" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "S";
-	pixel_y = -1
-	},
-/turf/open/floor/kutjevo/colors/red/tile,
-/area/clash_arena/tdm_deathmatch2000/upp_base)
 "bw" = (
 /obj/structure/machinery/light{
 	dir = 8
 	},
-/turf/open/floor/almayer/plate,
+/obj/structure/prop/hybrisa/misc/floorprops/grate,
+/turf/open/floor/shiva/redfull/west,
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
 "by" = (
 /obj/effect/decal/cleanable/dirt,
 /obj/structure/bed/hybrisa/bunkbed3,
-/turf/open/floor/almayer/plate,
+/turf/open/floor/strata/blue2,
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
 "bA" = (
-/turf/open/floor,
+/obj/effect/landmark/start/marine/tl/bravo,
+/obj/effect/landmark/late_join/bravo,
+/turf/open/floor/strata/blue2,
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
 "bF" = (
 /obj/effect/decal/warning_stripes{
 	icon_state = "S"
 	},
-/turf/open/floor/almayer/blackfull2,
+/turf/open/floor/shiva/redfull,
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
 "bG" = (
 /obj/structure/machinery/chem_dispenser/corpsman/arena{
 	pixel_y = 3
 	},
-/turf/open/floor/almayer/blackfull2,
+/turf/open/floor/shiva/redfull/west,
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
 "bL" = (
-/turf/open/floor/almayer/plate,
+/obj/structure/prop/hybrisa/misc/floorprops/grate,
+/turf/open/floor/shiva/redfull/west,
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
 "bM" = (
 /turf/closed/wall/strata_outpost,
@@ -152,16 +157,21 @@
 /turf/closed/cordon,
 /area/space)
 "bY" = (
-/obj/structure/machinery/light{
-	dir = 1
+/obj/effect/decal/warning_stripes{
+	icon_state = "NW-out";
+	pixel_y = 3
 	},
-/turf/open/floor/almayer/plate,
-/area/clash_arena/tdm_deathmatch2000/uscm_base)
+/obj/effect/decal/warning_stripes{
+	icon_state = "W"
+	},
+/turf/open/floor/corsat/red/west,
+/area/clash_arena/tdm_deathmatch2000/upp_base)
 "bZ" = (
 /obj/structure/machinery/light{
 	dir = 8
 	},
-/turf/open/floor/corsat/plate,
+/obj/structure/prop/hybrisa/misc/floorprops/grate,
+/turf/open/floor/strata/red2,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "ca" = (
 /obj/structure/machinery/cryopod{
@@ -177,7 +187,12 @@
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "cb" = (
 /obj/structure/bed/hybrisa/bunkbed3,
-/turf/open/floor/almayer/plate,
+/turf/open/floor/strata/blue2,
+/area/clash_arena/tdm_deathmatch2000/uscm_base)
+"ci" = (
+/obj/effect/landmark/start/marine/smartgunner/bravo,
+/obj/effect/landmark/late_join/bravo,
+/turf/open/floor/shiva/wredfull,
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
 "cj" = (
 /obj/structure/machinery/cryopod{
@@ -193,12 +208,19 @@
 	},
 /turf/open/floor/prison/floor_marked/west,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
+"cx" = (
+/turf/open/floor/shiva/wredcorners/west,
+/area/clash_arena/tdm_deathmatch2000/uscm_base)
 "cB" = (
 /obj/effect/decal/warning_stripes{
 	icon_state = "N";
 	pixel_y = 3
 	},
-/turf/open/floor/corsat/plate,
+/obj/structure/machinery/light{
+	dir = 8
+	},
+/obj/structure/prop/hybrisa/misc/floorprops/grate,
+/turf/open/floor/strata/red2,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "cC" = (
 /obj/structure/sign/banners/colonial_marines_flag,
@@ -209,21 +231,12 @@
 /turf/open/asphalt/cement/cement9,
 /area/clash_arena/tdm_deathmatch2000/battlefield/zone_3)
 "cI" = (
-/obj/structure/machinery/light{
-	dir = 8
-	},
-/obj/structure/sign/poster/clf{
-	pixel_x = -30
-	},
-/obj/structure/machinery/cm_vending/sorted/cargo_guns/upp_squad_guns,
-/turf/open/floor/corsat/plate,
-/area/clash_arena/tdm_deathmatch2000/upp_base)
+/obj/structure/largecrate/empty,
+/turf/open/asphalt/cement/cement9,
+/area/clash_arena/tdm_deathmatch2000/battlefield/zone_2)
 "cL" = (
-/obj/structure/machinery/cm_vending/sorted/uniform_supply/squad_prep,
-/obj/structure/machinery/light{
-	dir = 8
-	},
-/turf/open/floor/almayer/plate,
+/obj/structure/machinery/light,
+/turf/open/floor/strata/blue2,
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
 "cM" = (
 /obj/effect/decal/warning_stripes{
@@ -241,13 +254,15 @@
 /turf/open/asphalt/cement/cement9,
 /area/clash_arena/tdm_deathmatch2000/battlefield)
 "de" = (
-/obj/effect/landmark/start/marine/spec/bravo,
-/obj/effect/landmark/late_join/bravo,
-/obj/effect/decal/cleanable/dirt,
-/turf/open/floor/almayer/blackfull2,
-/area/clash_arena/tdm_deathmatch2000/uscm_base)
+/obj/structure/barricade/handrail{
+	dir = 8;
+	pixel_x = -3;
+	pixel_y = 0
+	},
+/turf/open/floor/strata/multi_tiles/southeast,
+/area/clash_arena/tdm_deathmatch2000/upp_base)
 "do" = (
-/turf/open/floor/almayer,
+/turf/open/floor/shiva/wredfull,
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
 "dr" = (
 /obj/structure/largecrate/empty,
@@ -266,14 +281,28 @@
 	icon_state = "N";
 	pixel_y = 3
 	},
-/turf/open/floor/kutjevo/colors/red/tile,
+/obj/structure/prop/hybrisa/misc/floorprops/grate,
+/obj/structure/prop/hybrisa/misc/floorprops/grate,
+/obj/effect/decal/hybrisa/road/lines1{
+	pixel_x = 6;
+	pixel_y = 0
+	},
+/obj/effect/decal/hybrisa/road/lines1{
+	pixel_x = 10;
+	pixel_y = 0
+	},
+/obj/effect/decal/hybrisa/road{
+	dir = 1
+	},
+/turf/open/floor/strata/red2,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "ef" = (
 /obj/structure/sign/flag/upp{
 	pixel_y = 27;
 	pixel_x = -1
 	},
-/turf/open/floor/corsat/squares,
+/obj/effect/decal/hybrisa/warning/redandwhite_S,
+/turf/open/floor/corsat/red/north,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "er" = (
 /turf/open/floor/corsat/red/southwest,
@@ -284,15 +313,9 @@
 /turf/open/asphalt/cement/cement9,
 /area/clash_arena/tdm_deathmatch2000/battlefield/zone_1)
 "eM" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "E";
-	pixel_x = 1
-	},
-/obj/effect/decal/warning_stripes{
-	icon_state = "N";
-	pixel_y = 1
-	},
-/turf/open/floor,
+/obj/effect/landmark/start/marine/smartgunner/bravo,
+/obj/effect/landmark/late_join/bravo,
+/turf/open/floor/strata/blue2,
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
 "eS" = (
 /obj/structure/machinery/cryopod{
@@ -305,9 +328,9 @@
 /turf/open/floor/prison/floor_marked/west,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "eT" = (
-/obj/effect/landmark/start/marine/engineer/bravo,
-/obj/effect/landmark/late_join/bravo,
-/turf/open/floor/almayer/blackfull2,
+/obj/structure/bed,
+/obj/item/bedsheet/mime,
+/turf/open/floor/strata/blue2,
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
 "eX" = (
 /obj/structure/machinery/cryopod{
@@ -320,287 +343,6 @@
 /turf/open/asphalt/cement/cement9,
 /area/clash_arena/tdm_deathmatch2000/battlefield/zone_2)
 "fB" = (
-/obj/structure/machinery/light,
-/turf/open/floor/kutjevo/colors/red/tile,
-/area/clash_arena/tdm_deathmatch2000/upp_base)
-"fE" = (
-/obj/effect/landmark/start/marine/medic/bravo,
-/obj/effect/landmark/late_join/bravo,
-/obj/effect/decal/cleanable/dirt,
-/turf/open/floor/almayer/blackfull2,
-/area/clash_arena/tdm_deathmatch2000/uscm_base)
-"ge" = (
-/turf/open/asphalt/cementalt,
-/area/clash_arena/tdm_deathmatch2000/battlefield/zone_2)
-"gp" = (
-/obj/structure/machinery/chem_dispenser/corpsman/arena{
-	pixel_y = 3
-	},
-/turf/open/floor/almayer/plate,
-/area/clash_arena/tdm_deathmatch2000/uscm_base)
-"hb" = (
-/obj/structure/machinery/door/airlock/upp/medical/solid/autoname/clash_base{
-	unacidable = 1;
-	not_weldable = 1;
-	masterkey_resist = 1;
-	no_panel = 1
-	},
-/obj/structure/blocker/clash_gate/upp,
-/turf/open/floor/strata/multi_tiles,
-/area/clash_arena/tdm_deathmatch2000/upp_base)
-"hk" = (
-/turf/open/floor/almayer/orange/north,
-/area/clash_arena/tdm_deathmatch2000/uscm_base)
-"hw" = (
-/obj/structure/machinery/cm_vending/sorted/cargo_ammo/squad{
-	req_access = null;
-	req_one_access = null;
-	req_one_access_txt = "15;16;21";
-	vend_x_offset = 0
-	},
-/turf/open/floor/almayer/plate,
-/area/clash_arena/tdm_deathmatch2000/uscm_base)
-"hH" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "E";
-	pixel_x = 2
-	},
-/turf/open/floor/corsat/red/east,
-/area/clash_arena/tdm_deathmatch2000/upp_base)
-"hI" = (
-/obj/effect/landmark/start/marine/tl/bravo,
-/obj/effect/landmark/late_join/bravo,
-/turf/open/floor/almayer/blackfull2,
-/area/clash_arena/tdm_deathmatch2000/uscm_base)
-"hJ" = (
-/obj/structure/machinery/cm_vending/sorted/tech/tool_storage/antag,
-/turf/open/floor/corsat/plate,
-/area/clash_arena/tdm_deathmatch2000/upp_base)
-"iA" = (
-/obj/structure/machinery/cm_vending/sorted/uniform_supply/squad_prep,
-/obj/structure/machinery/light{
-	dir = 8
-	},
-/turf/open/floor/almayer/blackfull2,
-/area/clash_arena/tdm_deathmatch2000/uscm_base)
-"iW" = (
-/turf/open/floor/corsat/red,
-/area/clash_arena/tdm_deathmatch2000/upp_base)
-"jc" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "W"
-	},
-/turf/open/floor/corsat/red/west,
-/area/clash_arena/tdm_deathmatch2000/upp_base)
-"jf" = (
-/turf/closed/wall/upp_ship/reinforced,
-/area/clash_arena/tdm_deathmatch2000/upp_base)
-"ji" = (
-/obj/effect/landmark/start/marine/leader/alpha,
-/obj/effect/landmark/late_join/alpha,
-/turf/open/floor/almayer/plate,
-/area/clash_arena/tdm_deathmatch2000/uscm_base)
-"js" = (
-/obj/effect/landmark/start/marine/engineer/alpha,
-/obj/effect/landmark/late_join/alpha,
-/turf/open/floor/almayer/plate,
-/area/clash_arena/tdm_deathmatch2000/uscm_base)
-"jy" = (
-/obj/structure/machinery/cm_vending/clothing/marine/bravo,
-/turf/open/floor/almayer/blackfull2,
-/area/clash_arena/tdm_deathmatch2000/uscm_base)
-"jY" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "SW-out";
-	pixel_x = -1;
-	pixel_y = -1
-	},
-/turf/closed/wall/upp_ship/reinforced/outer,
-/area/clash_arena/tdm_deathmatch2000/upp_base)
-"kr" = (
-/turf/open/asphalt/cementalt,
-/area/clash_arena/tdm_deathmatch2000/battlefield/zone_1)
-"kM" = (
-/obj/structure/window/framed/upp_ship,
-/turf/closed/wall/upp_ship,
-/area/clash_arena/tdm_deathmatch2000/battlefield)
-"kV" = (
-/turf/open/asphalt/cement/cement9,
-/area/clash_arena/tdm_deathmatch2000/battlefield)
-"lf" = (
-/obj/structure/machinery/chem_dispenser/corpsman/arena{
-	pixel_y = 3
-	},
-/turf/open/floor/corsat/squares,
-/area/clash_arena/tdm_deathmatch2000/upp_base)
-"ly" = (
-/turf/open/floor/corsat/red/northwest,
-/area/clash_arena/tdm_deathmatch2000/upp_base)
-"lJ" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "S"
-	},
-/obj/effect/decal/warning_stripes{
-	icon_state = "E";
-	pixel_x = 1
-	},
-/obj/structure/machinery/light{
-	dir = 1
-	},
-/turf/open/floor/almayer,
-/area/clash_arena/tdm_deathmatch2000/uscm_base)
-"lK" = (
-/obj/structure/blocker/clash_gate/upp,
-/obj/structure/machinery/door/airlock/upp/medical/solid/autoname/clash_base{
-	unacidable = 1;
-	not_weldable = 1;
-	masterkey_resist = 1;
-	no_panel = 1
-	},
-/turf/open/floor/strata/multi_tiles,
-/area/clash_arena/tdm_deathmatch2000/upp_base)
-"mv" = (
-/obj/structure/machinery/cm_vending/sorted/cargo_guns/squad{
-	req_access = null;
-	req_one_access = null;
-	req_one_access_txt = "15;16;21";
-	vend_x_offset = 0;
-	vend_y_offset = 0
-	},
-/turf/open/floor/almayer/plate,
-/area/clash_arena/tdm_deathmatch2000/uscm_base)
-"mN" = (
-/obj/structure/machinery/cm_vending/sorted/cargo_guns/squad{
-	req_access = null;
-	req_one_access = null;
-	req_one_access_txt = "15;16;21";
-	vend_x_offset = 0;
-	vend_y_offset = 0
-	},
-/turf/open/floor/almayer/blackfull2,
-/area/clash_arena/tdm_deathmatch2000/uscm_base)
-"ny" = (
-/obj/effect/landmark/start/marine/leader/bravo,
-/obj/effect/landmark/late_join/bravo,
-/turf/open/floor/almayer/blackfull2,
-/area/clash_arena/tdm_deathmatch2000/uscm_base)
-"nF" = (
-/obj/structure/machinery/door/airlock/multi_tile/upp/medical/autoname/clash_base{
-	req_one_access = null
-	},
-/turf/open/floor/corsat/marked,
-/area/clash_arena/tdm_deathmatch2000/upp_base)
-"of" = (
-/obj/structure/window/framed/upp_ship,
-/turf/open/asphalt/cementalt,
-/area/clash_arena/tdm_deathmatch2000/battlefield)
-"op" = (
-/obj/structure/machinery/cryopod{
-	layer = 3.1
-	},
-/turf/open/floor/prison/floor_marked/west,
-/area/clash_arena/tdm_deathmatch2000/upp_base)
-"oT" = (
-/obj/effect/landmark/clash_objective/clash_flag/upp,
-/turf/open/floor/strata/red2,
-/area/clash_arena/tdm_deathmatch2000/battlefield/indoors)
-"oW" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "SW-out";
-	pixel_x = -1;
-	pixel_y = -1
-	},
-/turf/open/floor/corsat/squares,
-/area/clash_arena/tdm_deathmatch2000/upp_base)
-"po" = (
-/obj/structure/flora/pottedplant{
-	desc = "It is made of Fiberbush(tm). It contains asbestos.";
-	icon_state = "pottedplant_22";
-	name = "synthetic potted plant";
-	pixel_y = 8
-	},
-/obj/structure/machinery/light{
-	dir = 8
-	},
-/turf/open/floor/almayer,
-/area/clash_arena/tdm_deathmatch2000/uscm_base)
-"pz" = (
-/obj/structure/medical_supply_link,
-/obj/structure/machinery/cm_vending/sorted/medical/upp/arena,
-/turf/open/floor/corsat/squares,
-/area/clash_arena/tdm_deathmatch2000/upp_base)
-"pB" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "S";
-	pixel_y = -1
-	},
-/turf/open/floor/corsat/plate,
-/area/clash_arena/tdm_deathmatch2000/upp_base)
-"pK" = (
-/obj/structure/machinery/door/firedoor/border_only/almayer{
-	dir = 2
-	},
-/obj/structure/window/framed/almayer,
-/obj/structure/sign/banners/united_americas_flag{
-	pixel_x = 0;
-	pixel_y = -1
-	},
-/turf/open/floor/plating,
-/area/clash_arena/tdm_deathmatch2000/uscm_base)
-"qf" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "SE-out";
-	pixel_x = 2;
-	pixel_y = -1
-	},
-/obj/effect/decal/warning_stripes{
-	icon_state = "NE-out";
-	pixel_x = 2;
-	pixel_y = 3
-	},
-/turf/open/floor/corsat/squares,
-/area/clash_arena/tdm_deathmatch2000/upp_base)
-"qg" = (
-/obj/effect/landmark/start/marine/alpha,
-/obj/effect/landmark/late_join/alpha,
-/turf/open/floor/almayer/plate,
-/area/clash_arena/tdm_deathmatch2000/uscm_base)
-"qQ" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "E";
-	pixel_x = 1
-	},
-/obj/effect/decal/warning_stripes{
-	icon_state = "N";
-	pixel_y = 1
-	},
-/turf/open/floor/almayer,
-/area/clash_arena/tdm_deathmatch2000/uscm_base)
-"qU" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "S"
-	},
-/obj/effect/decal/warning_stripes{
-	icon_state = "E";
-	pixel_x = 1
-	},
-/obj/structure/machinery/light{
-	dir = 1
-	},
-/turf/open/floor,
-/area/clash_arena/tdm_deathmatch2000/uscm_base)
-"rd" = (
-/obj/effect/landmark/clash_objective/clash_flag/uscm,
-/turf/open/hybrisa/street/cement1,
-/area/clash_arena/tdm_deathmatch2000/battlefield)
-"rj" = (
-/obj/effect/decal/cleanable/dirt,
-/obj/effect/decal/warning_stripes{
-	icon_state = "S"
-	},
-/turf/open/floor/almayer/plate,
-/area/clash_arena/tdm_deathmatch2000/uscm_base)
-"rv" = (
 /obj/structure/surface/table/reinforced/rostock_table,
 /obj/effect/decal/warning_stripes{
 	icon_state = "N";
@@ -626,7 +368,303 @@
 /obj/item/tool/shovel/etool/folded,
 /obj/item/tool/shovel/etool/folded,
 /obj/item/tool/shovel/etool/folded,
+/turf/open/floor/strata/red2,
+/area/clash_arena/tdm_deathmatch2000/upp_base)
+"fE" = (
+/obj/effect/decal/cleanable/dirt,
+/obj/item/bedsheet/mime,
+/obj/structure/bed,
+/turf/open/floor/strata/blue2,
+/area/clash_arena/tdm_deathmatch2000/uscm_base)
+"ge" = (
+/turf/open/asphalt/cementalt,
+/area/clash_arena/tdm_deathmatch2000/battlefield/zone_2)
+"gp" = (
+/obj/structure/machinery/chem_dispenser/corpsman/arena{
+	pixel_y = 3
+	},
+/turf/open/floor/shiva/wred,
+/area/clash_arena/tdm_deathmatch2000/uscm_base)
+"hb" = (
+/obj/structure/blocker/clash_gate/upp,
+/obj/effect/decal/hybrisa/warning/redandwhite_E,
+/turf/open/floor/corsat/red/north,
+/area/clash_arena/tdm_deathmatch2000/upp_base)
+"hk" = (
+/turf/open/floor/shiva/wred,
+/area/clash_arena/tdm_deathmatch2000/uscm_base)
+"hw" = (
+/obj/structure/machinery/cm_vending/sorted/tech/tool_storage/clash,
+/turf/open/floor/shiva/wred,
+/area/clash_arena/tdm_deathmatch2000/uscm_base)
+"hH" = (
+/obj/effect/decal/warning_stripes{
+	icon_state = "E";
+	pixel_x = 2
+	},
+/turf/open/floor/corsat/red/east,
+/area/clash_arena/tdm_deathmatch2000/upp_base)
+"hI" = (
+/obj/structure/bed/hybrisa/bunkbed3,
+/turf/open/floor/shiva/wredcorners/north,
+/area/clash_arena/tdm_deathmatch2000/uscm_base)
+"iA" = (
+/obj/structure/machinery/light{
+	dir = 8
+	},
+/turf/open/floor/shiva/wred/north,
+/area/clash_arena/tdm_deathmatch2000/uscm_base)
+"iW" = (
+/turf/open/floor/corsat/red,
+/area/clash_arena/tdm_deathmatch2000/upp_base)
+"jc" = (
+/obj/effect/decal/warning_stripes{
+	icon_state = "W"
+	},
+/turf/open/floor/corsat/red/west,
+/area/clash_arena/tdm_deathmatch2000/upp_base)
+"jf" = (
+/turf/closed/wall/upp_ship/reinforced,
+/area/clash_arena/tdm_deathmatch2000/upp_base)
+"ji" = (
+/obj/effect/landmark/start/marine/leader/alpha,
+/obj/effect/landmark/late_join/alpha,
+/turf/open/floor/shiva/wredfull,
+/area/clash_arena/tdm_deathmatch2000/uscm_base)
+"js" = (
+/obj/effect/landmark/start/marine/engineer/alpha,
+/obj/effect/landmark/late_join/alpha,
+/turf/open/floor/strata/blue2,
+/area/clash_arena/tdm_deathmatch2000/uscm_base)
+"jy" = (
+/turf/open/floor/shiva/wred/northeast,
+/area/clash_arena/tdm_deathmatch2000/uscm_base)
+"jE" = (
+/obj/effect/decal/hybrisa/warning/redandwhite_N,
+/turf/open/floor/corsat/redcorner/west,
+/area/clash_arena/tdm_deathmatch2000/upp_base)
+"jY" = (
+/obj/effect/decal/warning_stripes{
+	icon_state = "SW-out";
+	pixel_x = -1;
+	pixel_y = -1
+	},
+/turf/closed/wall/upp_ship/reinforced/outer,
+/area/clash_arena/tdm_deathmatch2000/upp_base)
+"kn" = (
+/obj/effect/landmark/start/marine/alpha,
+/obj/effect/landmark/late_join/alpha,
+/turf/open/floor/shiva/wredcorners/north,
+/area/clash_arena/tdm_deathmatch2000/uscm_base)
+"kr" = (
+/turf/open/asphalt/cementalt,
+/area/clash_arena/tdm_deathmatch2000/battlefield/zone_1)
+"kB" = (
+/obj/effect/landmark/start/upp{
+	name = "UPP soldier join";
+	job_list = list("UPP Ryadovoy","UPP MSzht Engineer","UPP MSzht Medic","UPP Serzhant","UPP Starshiy Serzhant")
+	},
+/obj/effect/landmark/late_join/upp{
+	name = "UPP late soldier join";
+	job_list = list("UPP Ryadovoy","UPP MSzht Engineer","UPP MSzht Medic","UPP Serzhant","UPP Starshiy Serzhant")
+	},
+/turf/open/floor/corsat/red/west,
+/area/clash_arena/tdm_deathmatch2000/upp_base)
+"kM" = (
+/obj/structure/window/framed/upp_ship,
+/turf/closed/wall/upp_ship,
+/area/clash_arena/tdm_deathmatch2000/battlefield)
+"kV" = (
+/turf/open/asphalt/cement/cement9,
+/area/clash_arena/tdm_deathmatch2000/battlefield)
+"lf" = (
+/obj/structure/machinery/chem_dispenser/corpsman/arena{
+	pixel_y = 3
+	},
+/turf/open/floor/corsat/squares,
+/area/clash_arena/tdm_deathmatch2000/upp_base)
+"ly" = (
+/turf/open/floor/corsat/red/northwest,
+/area/clash_arena/tdm_deathmatch2000/upp_base)
+"lz" = (
+/obj/effect/decal/hybrisa/warning/redandwhite_NEcorner,
+/turf/open/floor/corsat/squares,
+/area/clash_arena/tdm_deathmatch2000/upp_base)
+"lJ" = (
+/obj/structure/machinery/cm_vending/sorted/tech/tool_storage/antag/clash,
+/obj/effect/decal/hybrisa/warning/redandwhite_N,
+/turf/open/floor/corsat/squares,
+/area/clash_arena/tdm_deathmatch2000/upp_base)
+"lK" = (
+/turf/open/floor/shiva/redfull,
+/area/clash_arena/tdm_deathmatch2000/uscm_base)
+"lM" = (
+/obj/structure/machinery/light{
+	dir = 1
+	},
+/turf/open/floor/strata/blue2,
+/area/clash_arena/tdm_deathmatch2000/uscm_base)
+"mE" = (
+/obj/effect/decal/hybrisa/warning/redandwhite_E,
+/turf/open/floor/corsat/squares,
+/area/clash_arena/tdm_deathmatch2000/upp_base)
+"mW" = (
+/obj/structure/blocker/clash_gate/upp,
+/obj/effect/decal/hybrisa/warning/redandwhite_E,
 /turf/open/floor/corsat/plate,
+/area/clash_arena/tdm_deathmatch2000/upp_base)
+"ny" = (
+/obj/structure/bed,
+/obj/item/bedsheet/mime,
+/turf/open/floor/shiva/wredfull,
+/area/clash_arena/tdm_deathmatch2000/uscm_base)
+"nF" = (
+/obj/structure/machinery/door/airlock/multi_tile/upp/medical/autoname/clash_base{
+	req_one_access = null
+	},
+/turf/open/floor/corsat/marked,
+/area/clash_arena/tdm_deathmatch2000/upp_base)
+"oe" = (
+/obj/structure/prop/hybrisa/misc/floorprops/grate2,
+/turf/open/floor/strata/red2,
+/area/clash_arena/tdm_deathmatch2000/upp_base)
+"of" = (
+/obj/structure/window/framed/upp_ship,
+/turf/open/asphalt/cementalt,
+/area/clash_arena/tdm_deathmatch2000/battlefield)
+"om" = (
+/obj/effect/landmark/start/marine/medic/alpha,
+/obj/effect/landmark/late_join/alpha,
+/turf/open/floor/shiva/redfull,
+/area/clash_arena/tdm_deathmatch2000/uscm_base)
+"op" = (
+/obj/structure/machinery/cryopod{
+	layer = 3.1
+	},
+/turf/open/floor/prison/floor_marked/west,
+/area/clash_arena/tdm_deathmatch2000/upp_base)
+"oT" = (
+/obj/effect/landmark/clash_objective/clash_flag/upp,
+/turf/open/floor/strata/red2,
+/area/clash_arena/tdm_deathmatch2000/battlefield/indoors)
+"oU" = (
+/obj/effect/landmark/start/marine/medic/alpha,
+/obj/effect/landmark/late_join/alpha,
+/turf/open/floor/strata/blue2,
+/area/clash_arena/tdm_deathmatch2000/uscm_base)
+"oW" = (
+/obj/effect/decal/warning_stripes{
+	icon_state = "SW-out";
+	pixel_x = -1;
+	pixel_y = -1
+	},
+/turf/open/floor/corsat/squares,
+/area/clash_arena/tdm_deathmatch2000/upp_base)
+"oY" = (
+/obj/structure/machinery/cm_vending/sorted/cargo_guns/squad_prep/clash,
+/turf/open/floor/shiva/redfull/west,
+/area/clash_arena/tdm_deathmatch2000/uscm_base)
+"po" = (
+/obj/structure/flora/pottedplant{
+	desc = "It is made of Fiberbush(tm). It contains asbestos.";
+	icon_state = "pottedplant_22";
+	name = "synthetic potted plant";
+	pixel_y = 8
+	},
+/obj/structure/machinery/light{
+	dir = 8
+	},
+/turf/open/floor/strata/blue2,
+/area/clash_arena/tdm_deathmatch2000/uscm_base)
+"pz" = (
+/obj/structure/medical_supply_link,
+/obj/structure/machinery/cm_vending/sorted/medical/upp/arena,
+/turf/open/floor/corsat/squares,
+/area/clash_arena/tdm_deathmatch2000/upp_base)
+"pB" = (
+/obj/effect/decal/warning_stripes{
+	icon_state = "S";
+	pixel_y = -1
+	},
+/obj/structure/prop/hybrisa/misc/floorprops/grate,
+/turf/open/floor/strata/red2,
+/area/clash_arena/tdm_deathmatch2000/upp_base)
+"pK" = (
+/obj/structure/machinery/door/firedoor/border_only/almayer{
+	dir = 2
+	},
+/obj/structure/window/framed/almayer,
+/obj/structure/sign/banners/united_americas_flag{
+	pixel_x = 0;
+	pixel_y = -1
+	},
+/turf/open/floor/shiva/redfull/west,
+/area/clash_arena/tdm_deathmatch2000/uscm_base)
+"qf" = (
+/obj/effect/decal/warning_stripes{
+	icon_state = "SE-out";
+	pixel_x = 2;
+	pixel_y = -1
+	},
+/obj/effect/decal/warning_stripes{
+	icon_state = "NE-out";
+	pixel_x = 2;
+	pixel_y = 3
+	},
+/turf/open/floor/corsat/squares,
+/area/clash_arena/tdm_deathmatch2000/upp_base)
+"qg" = (
+/obj/effect/landmark/start/marine/alpha,
+/obj/effect/landmark/late_join/alpha,
+/turf/open/floor/shiva/wred/southeast,
+/area/clash_arena/tdm_deathmatch2000/uscm_base)
+"qP" = (
+/obj/item/bedsheet/mime,
+/obj/structure/bed,
+/turf/open/floor/shiva/wredcorners/west,
+/area/clash_arena/tdm_deathmatch2000/uscm_base)
+"qQ" = (
+/obj/effect/decal/warning_stripes{
+	icon_state = "E";
+	pixel_x = 1
+	},
+/obj/effect/decal/warning_stripes{
+	icon_state = "N";
+	pixel_y = 1
+	},
+/turf/open/floor/shiva/redfull,
+/area/clash_arena/tdm_deathmatch2000/uscm_base)
+"qU" = (
+/obj/effect/decal/warning_stripes{
+	icon_state = "S"
+	},
+/obj/effect/decal/warning_stripes{
+	icon_state = "E";
+	pixel_x = 1
+	},
+/obj/structure/machinery/light{
+	dir = 1
+	},
+/turf/open/floor/shiva/redfull,
+/area/clash_arena/tdm_deathmatch2000/uscm_base)
+"rd" = (
+/obj/effect/landmark/clash_objective/clash_flag/uscm,
+/turf/open/hybrisa/street/cement1,
+/area/clash_arena/tdm_deathmatch2000/battlefield)
+"rj" = (
+/obj/effect/decal/cleanable/dirt,
+/obj/effect/decal/warning_stripes{
+	icon_state = "S"
+	},
+/turf/open/floor/shiva/redfull,
+/area/clash_arena/tdm_deathmatch2000/uscm_base)
+"rv" = (
+/obj/effect/decal/warning_stripes{
+	icon_state = "N";
+	pixel_y = 3
+	},
+/obj/structure/surface/table/reinforced/rostock_table,
+/turf/open/floor/strata/red2,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "rA" = (
 /obj/effect/decal/warning_stripes{
@@ -635,10 +673,10 @@
 	},
 /turf/open/floor/corsat/squares,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
-"sg" = (
-/obj/structure/machinery/cm_vending/sorted/cargo_guns/upp_squad,
-/turf/open/floor/corsat/plate,
-/area/clash_arena/tdm_deathmatch2000/upp_base)
+"su" = (
+/obj/structure/machinery/cm_vending/sorted/tech/tool_storage/clash,
+/turf/open/floor/shiva/wred/north,
+/area/clash_arena/tdm_deathmatch2000/uscm_base)
 "sC" = (
 /obj/structure/window/framed/upp_ship,
 /turf/open/floor/plating,
@@ -655,13 +693,14 @@
 /turf/open/floor/corsat/marked,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "te" = (
-/obj/structure/machinery/light,
-/turf/open/floor/almayer/blackfull2,
-/area/clash_arena/tdm_deathmatch2000/uscm_base)
-"to" = (
-/obj/structure/machinery/cm_vending/clothing/marine/bravo,
-/turf/open/floor/almayer/plate,
-/area/clash_arena/tdm_deathmatch2000/uscm_base)
+/obj/effect/decal/hybrisa/warning/redandwhite_S,
+/turf/open/floor/corsat/redcorner/east,
+/area/clash_arena/tdm_deathmatch2000/upp_base)
+"tC" = (
+/obj/effect/decal/hybrisa/warning/redandwhite_S,
+/obj/effect/decal/hybrisa/warning/redandwhite_W,
+/turf/open/floor/corsat/squares,
+/area/clash_arena/tdm_deathmatch2000/upp_base)
 "tL" = (
 /obj/effect/decal/warning_stripes{
 	icon_state = "SW-out";
@@ -672,41 +711,46 @@
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "tS" = (
 /obj/structure/machinery/light,
+/obj/effect/decal/hybrisa/warning/redandwhite_NEcorner,
 /turf/open/floor/corsat/red,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "tW" = (
-/obj/structure/machinery/cm_vending/clothing/antag/upp,
+/obj/structure/machinery/cm_vending/clothing/antag/upp/clash,
+/obj/structure/prop/hybrisa/misc/floorprops/grate,
 /turf/open/floor/corsat/squares,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "uc" = (
-/obj/structure/prop/almayer/ship_memorial{
-	pixel_x = -15;
-	pixel_y = -1
-	},
-/turf/open/floor/almayer/plate,
-/area/clash_arena/tdm_deathmatch2000/uscm_base)
+/turf/open/floor/corsat/redcorner/north,
+/area/clash_arena/tdm_deathmatch2000/upp_base)
 "ut" = (
 /turf/closed/wall/upp_ship,
 /area/clash_arena/tdm_deathmatch2000/battlefield)
+"uC" = (
+/obj/effect/landmark/start/marine/medic/bravo,
+/obj/effect/landmark/late_join/bravo,
+/turf/open/floor/strata/blue2,
+/area/clash_arena/tdm_deathmatch2000/uscm_base)
 "uH" = (
-/obj/structure/machinery/cm_vending/sorted/cargo_guns/squad{
-	req_access = null;
-	req_one_access = null;
-	req_one_access_txt = "15;16;21";
-	vend_x_offset = 0;
-	vend_y_offset = 0
-	},
-/obj/structure/machinery/light{
-	dir = 4
-	},
-/turf/open/floor/almayer/plate,
+/obj/structure/bed/hybrisa/bunkbed3,
+/turf/open/floor/shiva/redfull,
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
 "va" = (
-/obj/structure/machinery/cm_vending/gear/engi,
-/turf/open/floor/almayer/plate,
+/obj/structure/machinery/cm_vending/gear/clash,
+/turf/open/floor/shiva/wred,
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
-"vc" = (
-/turf/open/floor/almayer/blackfull2,
+"vb" = (
+/obj/effect/decal/hybrisa/road/lines2,
+/obj/effect/decal/hybrisa/road/lines2{
+	pixel_x = 0;
+	pixel_y = -6
+	},
+/obj/structure/prop/hybrisa/misc/floorprops/grate,
+/turf/open/floor/strata/red2,
+/area/clash_arena/tdm_deathmatch2000/upp_base)
+"vL" = (
+/obj/effect/landmark/start/marine/bravo,
+/obj/effect/landmark/late_join/bravo,
+/turf/open/floor/shiva/redfull,
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
 "wc" = (
 /obj/effect/decal/cleanable/dirt,
@@ -714,11 +758,8 @@
 	layer = 3.1;
 	pixel_y = 13
 	},
-/turf/open/floor/almayer/plate,
+/turf/open/floor/shiva/redfull/west,
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
-"wT" = (
-/turf/open/floor/corsat/plate,
-/area/clash_arena/tdm_deathmatch2000/upp_base)
 "xr" = (
 /obj/structure/blocker/clash_gate/upp,
 /obj/structure/machinery/door/airlock/upp/medical/solid/autoname/clash_base{
@@ -738,15 +779,14 @@
 	icon_state = "N";
 	pixel_y = 1
 	},
-/turf/open/floor/almayer/blackfull2,
+/turf/open/floor/shiva/redfull,
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
 "xO" = (
 /turf/open/floor/corsat/red/west,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "ye" = (
-/obj/effect/landmark/clash_npc/upp/fill,
-/turf/open/asphalt/cement/cement9,
-/area/clash_arena/tdm_deathmatch2000/battlefield)
+/turf/open/floor/corsat/redcorner/west,
+/area/clash_arena/tdm_deathmatch2000/upp_base)
 "yo" = (
 /obj/structure/sign/flag/upp{
 	pixel_y = 28;
@@ -760,24 +800,23 @@
 	name = "UPP late soldier join";
 	job_list = list("UPP Ryadovoy","UPP MSzht Engineer","UPP MSzht Medic","UPP Serzhant","UPP Starshiy Serzhant")
 	},
-/turf/open/floor/plating/plating_catwalk/prison,
+/turf/open/floor/corsat/red/east,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "yv" = (
 /obj/effect/decal/warning_stripes{
-	icon_state = "NE-out";
-	pixel_x = 2;
-	pixel_y = 3
-	},
-/obj/effect/decal/warning_stripes{
-	icon_state = "SE-out";
-	pixel_x = 2;
+	icon_state = "S";
 	pixel_y = -1
 	},
-/turf/open/floor/corsat/squares,
+/obj/structure/surface/table/reinforced/rostock_table,
+/turf/open/floor/strata/red2,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "yO" = (
 /turf/open/hybrisa/street/cement1,
 /area/clash_arena/tdm_deathmatch2000/battlefield)
+"yS" = (
+/obj/structure/machinery/cm_vending/clothing/marine/clash,
+/turf/open/floor/shiva/wred/northeast,
+/area/clash_arena/tdm_deathmatch2000/uscm_base)
 "yT" = (
 /obj/structure/surface/table/reinforced/rostock_table,
 /obj/item/book/manual/upphistory{
@@ -785,19 +824,15 @@
 	pixel_y = 8
 	},
 /obj/item/book/manual/upphistory{
-	pixel_x = -6;
-	pixel_y = 8
-	},
-/obj/item/book/manual/upphistory{
 	pixel_x = 7;
 	pixel_y = 0
 	},
-/obj/item/book/manual/upphistory{
-	pixel_x = -6;
-	pixel_y = 0
-	},
-/obj/item/book/codebook/upp,
 /turf/open/floor/corsat/plate,
+/area/clash_arena/tdm_deathmatch2000/upp_base)
+"zc" = (
+/obj/structure/blocker/clash_gate/upp,
+/obj/effect/decal/hybrisa/warning/redandwhite_E,
+/turf/open/floor/corsat/red,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "zv" = (
 /obj/structure/window/framed/almayer,
@@ -806,24 +841,25 @@
 "zx" = (
 /turf/open/floor/corsat/marked,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
+"zP" = (
+/obj/effect/landmark/start/marine/spec/bravo,
+/obj/effect/landmark/late_join/bravo,
+/obj/effect/decal/cleanable/dirt,
+/turf/open/floor/strata/blue2,
+/area/clash_arena/tdm_deathmatch2000/uscm_base)
 "Ag" = (
 /obj/structure/window/framed/upp_ship,
 /turf/open/asphalt/cement/cement9,
 /area/clash_arena/tdm_deathmatch2000/battlefield)
 "Ar" = (
-/obj/structure/machinery/cryopod{
-	pixel_y = -6
-	},
-/obj/structure/machinery/cryopod{
-	pixel_y = 20;
-	layer = 2.9
-	},
-/obj/structure/machinery/light{
-	dir = 8;
-	light_color = "#66ccff";
-	invisibility = 101
-	},
-/turf/open/floor/prison/floor_marked/west,
+/obj/item/bedsheet/mime,
+/obj/structure/bed,
+/turf/open/floor/shiva/redfull/west,
+/area/clash_arena/tdm_deathmatch2000/uscm_base)
+"AG" = (
+/obj/structure/machinery/light,
+/obj/effect/decal/hybrisa/warning/redandwhite_N,
+/turf/open/floor/corsat/red,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "AM" = (
 /obj/structure/surface/table/reinforced/rostock_table,
@@ -859,7 +895,16 @@
 	pixel_x = -6;
 	pixel_y = 11
 	},
-/turf/open/floor/corsat/plate,
+/turf/open/floor/strata/red2,
+/area/clash_arena/tdm_deathmatch2000/upp_base)
+"AR" = (
+/obj/structure/prop/hybrisa/misc/floorprops/grate,
+/turf/open/floor/strata/red2,
+/area/clash_arena/tdm_deathmatch2000/upp_base)
+"Bb" = (
+/obj/structure/blocker/clash_gate/upp,
+/obj/effect/decal/hybrisa/warning/redandwhite_E,
+/turf/open/floor/corsat/squares,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "Bi" = (
 /obj/structure/machinery/cryopod{
@@ -873,7 +918,13 @@
 /obj/structure/machinery/light{
 	dir = 4
 	},
-/turf/open/floor/corsat/plate,
+/obj/structure/barricade/handrail{
+	dir = 8;
+	pixel_x = -3;
+	pixel_y = 0
+	},
+/obj/structure/prop/hybrisa/misc/floorprops/grate2,
+/turf/open/floor/strata/red2,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "BL" = (
 /obj/structure/sign/banners/united_americas_flag{
@@ -883,23 +934,34 @@
 /turf/closed/wall/almayer/outer,
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
 "BN" = (
-/turf/open/floor/kutjevo/colors/red/tile,
+/obj/structure/machinery/cm_vending/sorted/tech/tool_storage/antag/clash,
+/obj/effect/decal/hybrisa/road/lines1{
+	pixel_x = 10;
+	pixel_y = 0
+	},
+/obj/effect/decal/hybrisa/warning/redandwhite_N,
+/turf/open/floor/corsat/squares,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "Cn" = (
-/obj/effect/landmark/clash_npc/upp/fill,
-/turf/open/hybrisa/street/cement2,
-/area/clash_arena/tdm_deathmatch2000/battlefield)
+/turf/open/floor/shiva/redfull/west,
+/area/clash_arena/tdm_deathmatch2000/uscm_base)
 "CF" = (
 /turf/closed/wall/strata_outpost/reinforced/hull,
 /area/clash_arena/tdm_deathmatch2000/battlefield)
+"CY" = (
+/obj/structure/machinery/light{
+	dir = 1
+	},
+/turf/open/floor/shiva/wredfull,
+/area/clash_arena/tdm_deathmatch2000/uscm_base)
 "DB" = (
 /obj/effect/landmark/start/marine/tl/alpha,
 /obj/effect/landmark/late_join/alpha,
-/turf/open/floor/almayer/plate,
+/turf/open/floor/strata/blue2,
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
 "DE" = (
-/obj/structure/machinery/cm_vending/sorted/uniform_supply/squad_prep,
-/turf/open/floor/almayer/blackfull2,
+/obj/structure/machinery/cm_vending/clothing/marine/clash,
+/turf/open/floor/shiva/wred/north,
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
 "DV" = (
 /obj/structure/machinery/cryopod{
@@ -919,36 +981,105 @@
 	},
 /turf/open/floor/prison/floor_marked/west,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
+"Ea" = (
+/obj/effect/decal/hybrisa/warning/redandwhite_S,
+/turf/open/floor/corsat/redcorner/north,
+/area/clash_arena/tdm_deathmatch2000/upp_base)
+"En" = (
+/obj/effect/landmark/start/marine/medic/bravo,
+/obj/effect/landmark/late_join/bravo,
+/turf/open/floor/shiva/redfull,
+/area/clash_arena/tdm_deathmatch2000/uscm_base)
+"Es" = (
+/obj/effect/decal/hybrisa/road{
+	dir = 1
+	},
+/obj/effect/decal/hybrisa/road/lines1{
+	pixel_x = 6;
+	pixel_y = 0
+	},
+/obj/effect/decal/hybrisa/road/lines1{
+	pixel_x = 10;
+	pixel_y = 0
+	},
+/obj/effect/decal/hybrisa/road/lines2,
+/obj/effect/decal/hybrisa/road/lines2{
+	pixel_x = 0;
+	pixel_y = -6
+	},
+/obj/structure/prop/hybrisa/misc/floorprops/grate,
+/turf/open/floor/strata/red2,
+/area/clash_arena/tdm_deathmatch2000/upp_base)
 "Et" = (
-/turf/open/floor/almayer/red,
+/turf/open/floor/shiva/wred/north,
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
 "EL" = (
 /turf/open/asphalt/cement/cement9,
 /area/clash_arena/tdm_deathmatch2000/battlefield/zone_3)
+"EP" = (
+/obj/structure/machinery/light{
+	dir = 8
+	},
+/turf/open/floor/shiva/wred,
+/area/clash_arena/tdm_deathmatch2000/uscm_base)
 "ES" = (
 /turf/open/space/basic,
 /area/space)
 "Fp" = (
 /obj/effect/landmark/start/marine/smartgunner/alpha,
 /obj/effect/landmark/late_join/alpha,
-/turf/open/floor/almayer/plate,
+/turf/open/floor/strata/blue2,
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
+"FF" = (
+/obj/structure/window/framed/upp_ship,
+/obj/effect/decal/hybrisa/road/lines1{
+	pixel_x = 6;
+	pixel_y = 0
+	},
+/obj/effect/decal/hybrisa/road{
+	dir = 1
+	},
+/obj/structure/sign/poster/upp,
+/turf/open/floor/plating,
+/area/clash_arena/tdm_deathmatch2000/upp_base)
 "FJ" = (
-/obj/effect/landmark/clash_npc/uscm/fill,
-/turf/open/asphalt/cement/cement9,
-/area/clash_arena/tdm_deathmatch2000/battlefield)
+/obj/structure/machinery/light{
+	dir = 1
+	},
+/obj/effect/decal/hybrisa/warning/redandwhite_S,
+/turf/open/floor/corsat/red/north,
+/area/clash_arena/tdm_deathmatch2000/upp_base)
 "FS" = (
-/obj/structure/machinery/cm_vending/gear/engi,
-/turf/open/floor/almayer/blackfull2,
+/obj/structure/machinery/cm_vending/gear/clash,
+/turf/open/floor/shiva/wred/north,
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
 "Gb" = (
 /turf/open/asphalt/cementalt,
 /area/clash_arena/tdm_deathmatch2000/battlefield/zone_3)
-"GI" = (
-/obj/structure/machinery/light{
+"Gf" = (
+/obj/item/bedsheet/mime,
+/obj/structure/bed,
+/turf/open/floor/shiva/wredfull,
+/area/clash_arena/tdm_deathmatch2000/uscm_base)
+"Gk" = (
+/obj/structure/machinery/cm_vending/clothing/antag/upp/clash,
+/obj/structure/prop/hybrisa/misc/floorprops/grate,
+/obj/effect/decal/hybrisa/road/lines1{
+	pixel_x = 6;
+	pixel_y = 0
+	},
+/obj/effect/decal/hybrisa/road/lines1{
+	pixel_x = 10;
+	pixel_y = 0
+	},
+/obj/effect/decal/hybrisa/road{
 	dir = 1
 	},
 /turf/open/floor/corsat/squares,
+/area/clash_arena/tdm_deathmatch2000/upp_base)
+"GI" = (
+/obj/effect/decal/hybrisa/warning/redandwhite_S,
+/turf/open/floor/corsat/red/north,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "GJ" = (
 /obj/structure/blocker/clash_gate/uscm,
@@ -962,17 +1093,21 @@
 	},
 /turf/open/floor/almayer/test_floor4,
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
-"GN" = (
-/obj/structure/machinery/cm_vending/sorted/cargo_ammo/squad{
-	req_access = null;
-	req_one_access = null;
-	req_one_access_txt = "15;16;21";
-	vend_x_offset = 0
-	},
-/turf/open/floor/almayer/blackfull2,
+"GV" = (
+/obj/effect/landmark/start/marine/alpha,
+/obj/effect/landmark/late_join/alpha,
+/turf/open/floor/shiva/redfull/west,
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
 "Hk" = (
-/turf/open/floor/strata/multi_tiles,
+/obj/effect/decal/hybrisa/warning/redandwhite_S,
+/turf/open/floor/corsat/plate,
+/area/clash_arena/tdm_deathmatch2000/upp_base)
+"Hm" = (
+/obj/structure/machinery/cm_vending/gear/antag/clash{
+	name = "\improper Response Team Automated Gear Rack"
+	},
+/obj/structure/prop/hybrisa/misc/floorprops/grate,
+/turf/open/floor/corsat/squares,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "Hr" = (
 /obj/effect/decal/warning_stripes{
@@ -986,7 +1121,7 @@
 	pixel_y = 26;
 	pixel_x = -17
 	},
-/turf/open/floor/corsat/plate,
+/turf/open/floor/corsat/red/north,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "Iz" = (
 /obj/structure/sign/flag/upp{
@@ -1002,13 +1137,21 @@
 	name = "UPP late soldier join";
 	job_list = list("UPP Ryadovoy","UPP MSzht Engineer","UPP MSzht Medic","UPP Serzhant","UPP Starshiy Serzhant")
 	},
-/turf/open/floor/plating/plating_catwalk/prison,
+/turf/open/floor/corsat/squares,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "IB" = (
-/obj/structure/bed,
-/obj/item/bedsheet/mime,
-/turf/open/floor/almayer/blackfull2,
+/obj/effect/landmark/start/marine/bravo,
+/obj/effect/landmark/late_join/bravo,
+/turf/open/floor/shiva/wred/northeast,
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
+"IE" = (
+/obj/effect/decal/warning_stripes{
+	icon_state = "N";
+	pixel_y = 3
+	},
+/obj/structure/prop/hybrisa/misc/floorprops/grate,
+/turf/open/floor/strata/red2,
+/area/clash_arena/tdm_deathmatch2000/upp_base)
 "IN" = (
 /obj/structure/flora/pottedplant{
 	desc = "It is made of Fiberbush(tm). It contains asbestos.";
@@ -1019,15 +1162,14 @@
 /obj/structure/machinery/light{
 	dir = 4
 	},
-/turf/open/floor/almayer,
+/turf/open/floor/strata/blue2,
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
 "Jt" = (
-/obj/structure/machinery/cm_vending/sorted/uniform_supply/squad_prep,
-/turf/open/floor/almayer/plate,
+/obj/structure/machinery/cm_vending/clothing/marine/clash,
+/turf/open/floor/shiva/wred,
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
 "Jx" = (
 /obj/effect/landmark/clash_objective/domination_zone/a,
-/obj/structure/largecrate/empty,
 /turf/open/asphalt/cement/cement9,
 /area/clash_arena/tdm_deathmatch2000/battlefield/zone_2)
 "JY" = (
@@ -1038,19 +1180,75 @@
 /turf/open/floor/prison/floor_marked/west,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "Kf" = (
-/obj/structure/machinery/cm_vending/gear/antag{
+/obj/structure/machinery/cm_vending/gear/antag/clash{
 	name = "\improper Response Team Automated Gear Rack"
+	},
+/obj/structure/prop/hybrisa/misc/floorprops/grate,
+/obj/effect/decal/hybrisa/road/lines1{
+	pixel_x = 6;
+	pixel_y = 0
+	},
+/obj/effect/decal/hybrisa/road/lines1{
+	pixel_x = 10;
+	pixel_y = 0
+	},
+/obj/effect/decal/hybrisa/road{
+	dir = 1
 	},
 /turf/open/floor/corsat/squares,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
-"Lk" = (
-/obj/structure/sign/goldenplaque/upp,
-/turf/closed/wall/upp_ship/reinforced/outer,
-/area/clash_arena/tdm_deathmatch2000/upp_base)
-"LT" = (
-/obj/structure/machinery/cm_vending/sorted/cargo_guns/squad_prep,
-/turf/open/floor/almayer/plate,
+"Kv" = (
+/obj/effect/landmark/start/marine/engineer/bravo,
+/obj/effect/landmark/late_join/bravo,
+/turf/open/floor/strata/blue2,
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
+"KP" = (
+/obj/effect/decal/hybrisa/road/lines1{
+	pixel_x = 6;
+	pixel_y = 0
+	},
+/obj/effect/decal/hybrisa/road/lines1{
+	pixel_x = 10;
+	pixel_y = 0
+	},
+/obj/effect/decal/hybrisa/road{
+	dir = 1
+	},
+/obj/structure/prop/hybrisa/misc/floorprops/grate,
+/turf/open/floor/strata/red2,
+/area/clash_arena/tdm_deathmatch2000/upp_base)
+"KR" = (
+/obj/effect/landmark/start/upp{
+	name = "UPP soldier join";
+	job_list = list("UPP Ryadovoy","UPP MSzht Engineer","UPP MSzht Medic","UPP Serzhant","UPP Starshiy Serzhant")
+	},
+/obj/effect/landmark/late_join/upp{
+	name = "UPP late soldier join";
+	job_list = list("UPP Ryadovoy","UPP MSzht Engineer","UPP MSzht Medic","UPP Serzhant","UPP Starshiy Serzhant")
+	},
+/turf/open/floor/corsat/red/east,
+/area/clash_arena/tdm_deathmatch2000/upp_base)
+"Lj" = (
+/obj/item/bedsheet/mime,
+/obj/structure/bed,
+/turf/open/floor/shiva/wred/northeast,
+/area/clash_arena/tdm_deathmatch2000/uscm_base)
+"LT" = (
+/obj/structure/machinery/cm_vending/sorted/cargo_guns/squad_prep/clash,
+/turf/open/floor/shiva/wred,
+/area/clash_arena/tdm_deathmatch2000/uscm_base)
+"Mg" = (
+/obj/effect/decal/warning_stripes{
+	icon_state = "S";
+	pixel_y = -1
+	},
+/obj/effect/decal/warning_stripes{
+	icon_state = "N";
+	pixel_y = 3
+	},
+/obj/structure/prop/hybrisa/misc/floorprops/grate,
+/turf/open/floor/strata/red2,
+/area/clash_arena/tdm_deathmatch2000/upp_base)
 "My" = (
 /obj/effect/landmark/start/upp{
 	name = "UPP soldier join";
@@ -1060,22 +1258,23 @@
 	name = "UPP late soldier join";
 	job_list = list("UPP Ryadovoy","UPP MSzht Engineer","UPP MSzht Medic","UPP Serzhant","UPP Starshiy Serzhant")
 	},
-/turf/open/floor/plating/plating_catwalk/prison,
+/turf/open/floor/corsat/squares,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
+"MF" = (
+/obj/effect/landmark/start/marine/bravo,
+/obj/effect/landmark/late_join/bravo,
+/turf/open/floor/shiva/wredfull,
+/area/clash_arena/tdm_deathmatch2000/uscm_base)
 "MH" = (
-/obj/structure/machinery/cm_vending/sorted/cargo_guns/squad_prep,
+/obj/structure/machinery/cm_vending/sorted/cargo_guns/squad_prep/clash,
 /turf/open/floor/almayer/blackfull2,
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
-"MM" = (
-/obj/structure/machinery/cm_vending/sorted/uniform_supply/squad_prep/upp_squad_prep,
-/turf/open/floor/corsat/plate,
-/area/clash_arena/tdm_deathmatch2000/upp_base)
 "Nc" = (
 /obj/structure/machinery/door/firedoor/border_only/almayer{
 	dir = 2
 	},
 /obj/structure/window/framed/almayer,
-/turf/open/floor/plating,
+/turf/open/floor/shiva/redfull/west,
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
 "Ne" = (
 /obj/effect/decal/warning_stripes{
@@ -1087,15 +1286,28 @@
 /turf/open/asphalt/cement/cement9,
 /area/clash_arena/tdm_deathmatch2000/battlefield/zone_1)
 "NF" = (
-/turf/open/floor/plating/plating_catwalk,
+/obj/effect/landmark/start/marine/spec/bravo,
+/obj/effect/landmark/late_join/bravo,
+/obj/effect/decal/cleanable/dirt,
+/turf/open/floor/shiva/wredfull,
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
 "Ob" = (
 /obj/effect/decal/warning_stripes{
 	icon_state = "NW-out";
 	pixel_y = 3
 	},
+/obj/effect/decal/hybrisa/warning/redandwhite_W,
 /turf/open/floor/corsat/squares,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
+"OF" = (
+/obj/effect/landmark/start/marine/engineer/bravo,
+/obj/effect/landmark/late_join/bravo,
+/turf/open/floor/shiva/wredfull,
+/area/clash_arena/tdm_deathmatch2000/uscm_base)
+"OJ" = (
+/obj/structure/machinery/cm_vending/clothing/marine/clash,
+/turf/open/floor/shiva/wred/southeast,
+/area/clash_arena/tdm_deathmatch2000/uscm_base)
 "OX" = (
 /obj/effect/decal/warning_stripes{
 	icon_state = "NE-out";
@@ -1105,6 +1317,23 @@
 /turf/open/floor/corsat/red/east,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "Pa" = (
+/obj/structure/barricade/handrail{
+	dir = 8;
+	pixel_x = -3;
+	pixel_y = 0
+	},
+/obj/structure/prop/hybrisa/misc/floorprops/grate2,
+/obj/effect/decal/hybrisa/road/lines1{
+	pixel_x = 6;
+	pixel_y = 0
+	},
+/obj/effect/decal/hybrisa/road/lines1{
+	pixel_x = 10;
+	pixel_y = 0
+	},
+/obj/effect/decal/hybrisa/road{
+	dir = 1
+	},
 /turf/open/floor/strata/red2,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "Pg" = (
@@ -1120,45 +1349,91 @@
 /obj/effect/landmark/start/marine/alpha,
 /obj/effect/landmark/late_join/alpha,
 /obj/effect/decal/cleanable/dirt,
-/turf/open/floor/almayer/plate,
+/turf/open/floor/shiva/wredfull,
+/area/clash_arena/tdm_deathmatch2000/uscm_base)
+"Qn" = (
+/obj/effect/decal/cleanable/dirt,
+/obj/structure/bed/hybrisa/bunkbed3,
+/turf/open/floor/shiva/wredfull,
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
 "QA" = (
 /obj/structure/sign/safety/ammunition{
 	pixel_x = -17;
 	pixel_y = -7
 	},
-/obj/structure/machinery/cm_vending/sorted/cargo_guns/upp_squad_guns,
-/turf/open/floor/corsat/plate,
+/obj/structure/machinery/cm_vending/sorted/cargo_guns/upp_squad_guns/clash,
+/turf/open/floor/strata/red2,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "QB" = (
 /obj/structure/machinery/cryopod/right{
 	layer = 3.1;
 	pixel_y = 13
 	},
-/turf/open/floor/almayer/blackfull2,
+/turf/open/floor/shiva/redfull/west,
+/area/clash_arena/tdm_deathmatch2000/uscm_base)
+"Rt" = (
+/turf/open/floor/shiva/wredcorners/north,
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
 "RQ" = (
 /obj/structure/window/framed/upp_ship,
-/obj/structure/sign/poster/upp,
 /turf/open/floor/strata/floor2,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "Sj" = (
-/obj/effect/landmark/clash_npc/upp/fill,
-/turf/open/asphalt/cementalt,
-/area/clash_arena/tdm_deathmatch2000/battlefield)
-"SC" = (
 /obj/effect/decal/warning_stripes{
-	icon_state = "N";
+	icon_state = "NE-out";
+	pixel_x = 2;
 	pixel_y = 3
 	},
+/obj/effect/decal/warning_stripes{
+	icon_state = "E";
+	pixel_x = 2
+	},
+/turf/open/floor/corsat/red/east,
+/area/clash_arena/tdm_deathmatch2000/upp_base)
+"Sk" = (
+/obj/effect/landmark/start/marine/spec/alpha,
+/obj/effect/landmark/late_join/alpha,
+/turf/open/floor/shiva/wredfull,
+/area/clash_arena/tdm_deathmatch2000/uscm_base)
+"SC" = (
 /obj/effect/decal/warning_stripes{
 	icon_state = "S";
 	pixel_y = -1
 	},
-/turf/open/floor/kutjevo/colors/red/tile,
+/obj/effect/decal/hybrisa/road/lines1{
+	pixel_x = 6;
+	pixel_y = 0
+	},
+/obj/effect/decal/hybrisa/road/lines1{
+	pixel_x = 10;
+	pixel_y = 0
+	},
+/obj/effect/decal/hybrisa/road{
+	dir = 1
+	},
+/obj/structure/prop/hybrisa/misc/floorprops/grate,
+/turf/open/floor/strata/red2,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
-"TV" = (
-/turf/open/floor/corsat/red/east,
+"SJ" = (
+/obj/effect/decal/hybrisa/warning/redandwhite_N,
+/turf/open/floor/corsat/red,
+/area/clash_arena/tdm_deathmatch2000/upp_base)
+"SO" = (
+/obj/structure/bed/hybrisa/bunkbed3,
+/turf/open/floor/shiva/wred/southeast,
+/area/clash_arena/tdm_deathmatch2000/uscm_base)
+"Tz" = (
+/obj/structure/machinery/chem_dispenser/corpsman/arena{
+	pixel_y = 3
+	},
+/turf/open/floor/shiva/wred/north,
+/area/clash_arena/tdm_deathmatch2000/uscm_base)
+"TS" = (
+/turf/open/floor/shiva/wred/southeast,
+/area/clash_arena/tdm_deathmatch2000/uscm_base)
+"Uc" = (
+/obj/effect/decal/hybrisa/warning/redandwhite_NWcorner,
+/turf/open/floor/corsat/squares,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "Uy" = (
 /obj/effect/decal/warning_stripes{
@@ -1167,11 +1442,16 @@
 	},
 /turf/open/floor/corsat/red/west,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
+"UB" = (
+/obj/effect/landmark/start/marine/bravo,
+/obj/effect/landmark/late_join/bravo,
+/turf/open/floor/shiva/wredcorners/west,
+/area/clash_arena/tdm_deathmatch2000/uscm_base)
 "UO" = (
 /obj/effect/landmark/start/marine/tl/alpha,
 /obj/effect/landmark/late_join/alpha,
 /obj/effect/decal/cleanable/dirt,
-/turf/open/floor/almayer/plate,
+/turf/open/floor/strata/blue2,
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
 "Vm" = (
 /turf/closed/wall/upp_ship/reinforced/outer,
@@ -1184,12 +1464,13 @@
 /obj/structure/machinery/light{
 	dir = 4
 	},
-/turf/open/floor/corsat/plate,
+/obj/structure/prop/hybrisa/misc/floorprops/grate,
+/turf/open/floor/strata/red2,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "VW" = (
 /obj/effect/landmark/start/marine/spec/alpha,
 /obj/effect/landmark/late_join/alpha,
-/turf/open/floor/almayer/plate,
+/turf/open/floor/strata/blue2,
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
 "Wr" = (
 /obj/effect/decal/warning_stripes{
@@ -1205,32 +1486,39 @@
 	},
 /turf/open/floor/prison/floor_marked/west,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
-"WB" = (
-/obj/structure/machinery/cm_vending/sorted/cargo_ammo/upp_squad,
+"Xb" = (
+/obj/structure/bed/hybrisa/bunkbed3,
+/turf/open/floor/shiva/wredfull,
+/area/clash_arena/tdm_deathmatch2000/uscm_base)
+"Xy" = (
+/obj/effect/landmark/start/marine/leader/bravo,
+/obj/effect/landmark/late_join/bravo,
+/turf/open/floor/strata/blue2,
+/area/clash_arena/tdm_deathmatch2000/uscm_base)
+"XD" = (
+/obj/effect/decal/hybrisa/warning/redandwhite_N,
 /turf/open/floor/corsat/plate,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "Yh" = (
 /obj/structure/sign/poster/clf{
 	pixel_x = -30
 	},
-/obj/structure/machinery/cm_vending/sorted/cargo_guns/upp_squad_guns,
-/turf/open/floor/corsat/plate,
+/obj/structure/machinery/cm_vending/sorted/cargo_guns/upp_squad_guns/clash,
+/turf/open/floor/strata/red2,
 /area/clash_arena/tdm_deathmatch2000/upp_base)
 "Yt" = (
 /turf/closed/wall/almayer/outer,
 /area/clash_arena/tdm_deathmatch2000/battlefield)
 "Zf" = (
-/obj/structure/machinery/cm_vending/sorted/cargo_guns/squad{
-	req_access = null;
-	req_one_access = null;
-	req_one_access_txt = "15;16;21";
-	vend_x_offset = 0;
-	vend_y_offset = 0
-	},
 /obj/structure/machinery/light{
 	dir = 4
 	},
-/turf/open/floor/almayer/blackfull2,
+/turf/open/floor/shiva/redfull/west,
+/area/clash_arena/tdm_deathmatch2000/uscm_base)
+"Zt" = (
+/obj/effect/landmark/late_join/bravo,
+/obj/effect/landmark/start/marine/medic/bravo,
+/turf/open/floor/shiva/wredcorners/west,
 /area/clash_arena/tdm_deathmatch2000/uscm_base)
 "ZT" = (
 /obj/effect/decal/warning_stripes{
@@ -7213,10 +7501,10 @@ ES
 ES
 ES
 ES
-Vm
-Vm
-Vm
-Vm
+ES
+ES
+ES
+ES
 Vm
 Vm
 Vm
@@ -7325,27 +7613,27 @@ ES
 ES
 ES
 ES
+ES
+ES
+ES
+ES
 Vm
 JY
 Ws
-Ar
+eS
 op
-wT
-wT
+bZ
 pB
-bh
-Yh
-bh
 rv
 AM
 bh
 QA
-cI
+Yh
 cB
 sC
-af
+AR
 bZ
-af
+AR
 Vm
 ES
 ES
@@ -7437,19 +7725,19 @@ ES
 ES
 ES
 ES
+ES
+ES
+ES
+ES
 Vm
-My
-My
-My
-My
-PX
-xO
+kB
+kB
+kB
+kB
+de
 tL
+bY
 jc
-jc
-jc
-Uy
-tL
 jc
 jc
 jc
@@ -7549,26 +7837,26 @@ ES
 ES
 ES
 ES
+ES
+ES
+ES
+ES
 Vm
 Iz
 My
 My
 My
 PX
-af
 cM
-rA
-rA
-yv
 rA
 qf
 rA
 rA
 bk
-af
+lz
 zx
-af
-wT
+mE
+mE
 tS
 Vm
 ES
@@ -7661,27 +7949,27 @@ ES
 ES
 ES
 ES
+ES
+ES
+ES
+ES
 Vm
 DV
 Bi
 ca
 eX
 Pa
-Pa
-bu
-tW
-Kf
 SC
 pz
 dQ
-tW
+Gk
 Kf
 ag
 BN
-sC
-af
-wT
-iW
+FF
+KP
+Es
+SJ
 Vm
 ES
 ES
@@ -7773,27 +8061,27 @@ ES
 ES
 ES
 ES
+ES
+ES
+ES
+ES
 Vm
 JY
 Ws
 eS
 op
-Pa
-Pa
-bu
-tW
-Kf
-SC
+oe
+pB
 lf
-dQ
+Mg
 tW
-Kf
-ag
-fB
+Hm
+IE
+lJ
 RQ
-af
-wT
-iW
+AR
+vb
+SJ
 Vm
 ES
 ES
@@ -7885,27 +8173,27 @@ ES
 ES
 ES
 ES
+ES
+ES
+ES
+ES
 Vm
 My
 My
 My
 My
-PX
-af
+de
 oW
-Hr
-Hr
-as
 Hr
 aj
 Hr
 Hr
 Ob
-af
+Uc
 nF
-af
-wT
-iW
+tC
+aG
+SJ
 Vm
 ES
 ES
@@ -7997,27 +8285,27 @@ ES
 ES
 ES
 ES
+ES
+ES
+ES
+ES
 Vm
 yo
-My
-My
-My
+KR
+KR
+KR
 PX
-TV
 ZT
+Sj
 hH
-hH
-hH
-OX
-ZT
 hH
 hH
 hH
 OX
 zx
-af
-wT
-iW
+te
+aG
+SJ
 Vm
 ES
 ES
@@ -8109,27 +8397,27 @@ ES
 ES
 ES
 ES
+ES
+ES
+ES
+ES
 Vm
 cj
 Bi
 ca
 eX
 Bl
-wT
 pB
-MM
-sg
-WB
-VI
-pB
-aG
-hJ
-aG
+fB
+yv
+bh
+bh
+bh
 VI
 jf
 ef
-wT
-iW
+aG
+SJ
 Vm
 ES
 ES
@@ -8221,6 +8509,10 @@ ES
 ES
 ES
 ES
+ES
+ES
+ES
+ES
 Vm
 Vm
 Vm
@@ -8228,10 +8520,6 @@ Vm
 Vm
 Vm
 Vm
-Vm
-Ne
-Ne
-Ne
 Wr
 jY
 Ne
@@ -8239,9 +8527,9 @@ Ne
 Ne
 Wr
 Vm
-af
-wT
-iW
+GI
+aG
+SJ
 Vm
 ES
 ES
@@ -8351,9 +8639,9 @@ ES
 ES
 ES
 Vm
-af
-wT
-tS
+GI
+aG
+AG
 Vm
 ES
 ES
@@ -8462,10 +8750,10 @@ ES
 ES
 ES
 ES
-Vm
-af
-wT
-iW
+aP
+GI
+aG
+SJ
 Vm
 ES
 ES
@@ -8575,9 +8863,9 @@ ES
 ES
 ES
 Vm
-af
-wT
-iW
+FJ
+aG
+SJ
 Vm
 ES
 ES
@@ -8686,10 +8974,10 @@ ES
 ES
 ES
 ES
-Lk
-af
-wT
-iW
+Vm
+GI
+aG
+SJ
 Vm
 ES
 ES
@@ -8799,9 +9087,9 @@ ES
 ES
 ES
 aP
-af
-wT
-iW
+GI
+aG
+SJ
 Vm
 ES
 ES
@@ -8910,10 +9198,10 @@ ES
 ES
 ES
 ES
-aP
+Vm
 GI
 yT
-iW
+SJ
 Vm
 ES
 ES
@@ -9135,9 +9423,9 @@ ES
 Vm
 aP
 ly
-xO
-xO
-xO
+Ea
+aG
+jE
 er
 Vm
 Vm
@@ -9245,13 +9533,13 @@ ES
 ES
 ES
 Vm
-wT
+ly
+uc
 Hk
-Hk
-Hk
-Hk
-Hk
-wT
+aG
+XD
+ye
+er
 Vm
 ES
 ES
@@ -9358,12 +9646,12 @@ PG
 PG
 Vm
 Ht
+af
 Hk
-wT
-Hk
-wT
-Hk
-wT
+aG
+XD
+af
+iW
 Vm
 PG
 PG
@@ -9470,12 +9758,12 @@ at
 at
 Vm
 hb
+mW
 Vm
-hb
 Vm
-lK
 Vm
-hb
+Bb
+zc
 Vm
 at
 at
@@ -9693,7 +9981,7 @@ at
 at
 at
 at
-Cn
+at
 at
 at
 oT
@@ -9807,9 +10095,9 @@ ut
 at
 at
 at
-ut
 at
-ut
+at
+at
 at
 ut
 at
@@ -10359,13 +10647,13 @@ kV
 kV
 kV
 kV
-ye
 kV
 kV
 kV
 kV
 kV
-ye
+kV
+kV
 kV
 kV
 kV
@@ -10483,7 +10771,7 @@ kV
 kV
 kV
 Pg
-Sj
+Pg
 kV
 kV
 kV
@@ -12393,7 +12681,7 @@ kV
 kV
 fc
 fc
-fc
+cI
 fc
 fc
 kV
@@ -13615,8 +13903,8 @@ kV
 kV
 kV
 kV
-xs
-xs
+kV
+kV
 kV
 kV
 kV
@@ -13727,7 +14015,7 @@ kV
 kV
 Pg
 cV
-FJ
+kV
 kV
 cV
 kV
@@ -13943,14 +14231,9 @@ kV
 kV
 kV
 kV
-FJ
 kV
 kV
 kV
-kV
-kV
-kV
-Pg
 kV
 kV
 kV
@@ -13960,7 +14243,12 @@ kV
 kV
 kV
 kV
-FJ
+Pg
+kV
+kV
+kV
+kV
+kV
 kV
 kV
 kV
@@ -14287,8 +14575,8 @@ kV
 Pg
 aC
 zv
-zv
-zv
+yO
+yO
 zv
 aC
 kV
@@ -14847,7 +15135,7 @@ yO
 yO
 yO
 yO
-bq
+yO
 yO
 yO
 yO
@@ -15517,13 +15805,13 @@ ES
 ES
 BL
 po
-bL
+bq
 Et
-do
-bw
-do
 hk
-bL
+bw
+Et
+hk
+bq
 po
 az
 ES
@@ -15628,15 +15916,15 @@ ES
 ES
 ES
 az
-do
-NF
+bq
+bq
 Et
-do
-bL
-do
 hk
-NF
-do
+bL
+Et
+hk
+bq
+bq
 az
 ES
 ES
@@ -15740,15 +16028,15 @@ ES
 ES
 ES
 az
-do
-bL
+bq
+bq
 Et
-do
-bL
-do
 hk
 bL
-do
+Et
+hk
+bq
+bq
 az
 ES
 ES
@@ -15852,15 +16140,15 @@ ES
 ES
 ES
 az
-do
-bL
+bq
+bq
 Et
-do
-uc
-do
 hk
 bL
-do
+Et
+hk
+bq
+bq
 az
 ES
 ES
@@ -15964,15 +16252,15 @@ ES
 ES
 ES
 cC
-do
-bL
+bq
+bq
 Et
-do
-bL
-do
 hk
 bL
-do
+Et
+hk
+bq
+bq
 az
 ES
 ES
@@ -16076,15 +16364,15 @@ ES
 ES
 ES
 az
-do
-NF
+bq
+bq
 Et
-do
-bL
-do
 hk
-NF
-do
+bL
+Et
+hk
+bq
+bq
 az
 ES
 ES
@@ -16189,13 +16477,13 @@ ES
 ES
 az
 IN
-bL
+bq
 Et
-do
-bL
-do
 hk
 bL
+Et
+hk
+bq
 IN
 az
 ES
@@ -16313,7 +16601,7 @@ az
 az
 az
 az
-az
+ES
 ES
 ES
 ES
@@ -16409,23 +16697,23 @@ ES
 ES
 ES
 az
-by
-ji
-by
-ji
 do
+bq
 do
-cL
+bq
+bq
+Et
+EP
 Nc
 iA
-bA
-bA
-bA
-ny
-IB
-ny
-IB
+hk
+bq
+do
+bq
+do
+bq
 az
+ES
 ES
 ES
 ES
@@ -16521,23 +16809,23 @@ ES
 ES
 ES
 az
-bL
-do
-do
-do
-do
-do
+by
+ji
+by
+ji
+bq
+Et
 va
 Nc
 FS
-bA
-bA
-bA
-bA
-bA
-bA
-vc
+hk
+bq
+Xy
+ny
+Xy
+eT
 az
+ES
 ES
 ES
 ES
@@ -16633,23 +16921,23 @@ ES
 ES
 ES
 az
-cb
-UO
-cb
-DB
+CY
+bq
 do
-do
-gp
+bq
+bq
+Et
+Jt
 Nc
-bG
-bA
-bA
-bA
-hI
-IB
-hI
-IB
+DE
+hk
+bq
+do
+bq
+do
+cL
 az
+ES
 ES
 ES
 ES
@@ -16745,23 +17033,23 @@ ES
 ES
 ES
 az
-bY
-do
-do
-do
-do
-do
-hw
+cb
+UO
+cb
+DB
+bq
+Et
+LT
 az
-GN
+MH
+hk
+bq
 bA
+eT
 bA
-bA
-bA
-bA
-bA
-te
+eT
 az
+ES
 ES
 ES
 ES
@@ -16857,23 +17145,23 @@ ES
 ES
 ES
 az
-by
-VW
-cb
-Fp
-do
-do
-LT
+bq
+bq
+bq
+bq
+bq
+Et
+hk
 az
-MH
-bA
-bA
-bA
-aE
-IB
-de
-IB
+Et
+hk
+bq
+bq
+bq
+bq
+bq
 az
+ES
 ES
 ES
 ES
@@ -16969,23 +17257,23 @@ ES
 ES
 ES
 az
-by
+Qn
 VW
-cb
+Xb
 Fp
-do
-do
-to
+bq
+Et
+gp
 az
-jy
-bA
-bA
-bA
-aE
-IB
-de
-IB
+Tz
+hk
+bq
+eM
+eT
+zP
+eT
 az
+ES
 ES
 ES
 ES
@@ -17081,23 +17369,23 @@ ES
 ES
 ES
 az
-bL
-do
-do
-do
-do
-do
-mv
+by
+Sk
+cb
+Fp
+bq
+Et
+hw
 Nc
-mN
-bA
-bA
-bA
-bA
-bA
-bA
-vc
+su
+hk
+bq
+ci
+eT
+NF
+eT
 az
+ES
 ES
 ES
 ES
@@ -17193,23 +17481,23 @@ ES
 ES
 ES
 az
-cb
-js
-cb
-js
+CY
+bq
 do
-do
-bL
+bq
+bq
+Et
+hk
 pK
-vc
-bA
-bA
-bA
-eT
-IB
-eT
-IB
+Et
+hk
+bq
+bq
+do
+bq
+cL
 az
+ES
 ES
 ES
 ES
@@ -17309,19 +17597,19 @@ cb
 js
 cb
 js
-do
-do
-bL
+bq
+Et
+hk
 Nc
-vc
-bA
-bA
-bA
+Et
+hk
+bq
+OF
 eT
-IB
+OF
 eT
-IB
 az
+ES
 ES
 ES
 ES
@@ -17417,23 +17705,23 @@ ES
 ES
 ES
 az
-bL
-do
-do
-do
-do
-do
-bL
+cb
+js
+cb
+js
+bq
+Et
+hk
 Nc
-vc
-bA
-bA
-bA
-bA
-bA
-bA
-vc
+Et
+hk
+bq
+Kv
+eT
+Kv
+eT
 az
+ES
 ES
 ES
 ES
@@ -17529,23 +17817,23 @@ ES
 ES
 ES
 az
-cb
-aI
-cb
-aI
-do
-do
-Jt
+bq
+bq
+bq
+bq
+lK
+Rt
+va
 az
-DE
-bA
-bA
-bA
-bb
-IB
-fE
-IB
+FS
+cx
+lK
+bq
+bq
+bq
+bq
 az
+ES
 ES
 ES
 ES
@@ -17642,22 +17930,22 @@ ES
 ES
 az
 cb
-aI
+oU
 cb
-aI
+om
+Rt
 do
-do
-va
+OJ
 az
-FS
-bA
-bA
-bA
+yS
+do
+cx
+En
 bb
-IB
+uC
 fE
-IB
 az
+ES
 ES
 ES
 ES
@@ -17753,23 +18041,23 @@ ES
 ES
 ES
 az
-bY
+cb
+oU
+uH
+aI
 do
-do
-do
-do
-do
-gp
+TS
+oY
 az
-bG
-bA
-bA
-bA
-bA
-bA
-bA
-te
+oY
+jy
+do
+Zt
+ak
+uC
+fE
 az
+ES
 ES
 ES
 ES
@@ -17865,23 +18153,23 @@ ES
 ES
 ES
 az
-cb
-qg
-cb
-qg
+lM
+lK
+Rt
 do
+TS
+lK
+Cn
+az
+Cn
+lK
+jy
 do
-hw
+cx
+lK
+cL
 az
-GN
-bA
-bA
-bA
-ak
-IB
-ak
-IB
-az
+ES
 ES
 ES
 ES
@@ -17977,23 +18265,23 @@ ES
 ES
 ES
 az
-cb
-Qc
-cb
+uH
+kn
+Xb
 qg
-do
-do
-LT
+Cn
+lK
+bG
 az
-MH
-bA
-bA
-bA
-ak
+bG
+lK
+Cn
 IB
+Gf
+UB
 ak
-IB
 az
+ES
 ES
 ES
 ES
@@ -18089,23 +18377,23 @@ ES
 ES
 ES
 az
-cb
-qg
-cb
-qg
-do
-do
-to
+hI
+Qc
+SO
+GV
+Cn
+lK
+as
 az
-jy
-bA
-bA
-bA
-ak
-IB
-ak
-IB
+as
+lK
+Cn
+vL
+Lj
+MF
+qP
 az
+ES
 ES
 ES
 ES
@@ -18201,23 +18489,23 @@ ES
 ES
 ES
 az
-bL
-do
-do
-do
-do
-do
-uH
+Xb
+qg
+aE
+GV
+Cn
+lK
+Zf
 az
 Zf
-bA
-bA
-bA
-bA
-bA
-bA
-vc
+lK
+Cn
+vL
+Ar
+IB
+Gf
 az
+ES
 ES
 ES
 ES
@@ -18316,20 +18604,20 @@ az
 az
 az
 az
-do
-do
-do
+lK
+Cn
+lK
 az
 az
 az
-bA
-bA
-bA
+lK
+Cn
+lK
 az
 az
 az
 az
-az
+ES
 ES
 ES
 ES
@@ -18428,15 +18716,15 @@ ES
 ES
 ES
 az
-lJ
-bL
+qU
+Cn
 qQ
 az
 ES
 az
 qU
-vc
-eM
+Cn
+qQ
 az
 ES
 ES

@@ -115,12 +115,13 @@
 /turf/open/asphalt/cement_sunbleached,
 /area/kutjevo/exterior/lz_dunes)
 "aaF" = (
-/obj/structure/machinery/cryopod{
-	pixel_y = 8;
-	layer = 2.7;
-	dir = 1
+/obj/structure/machinery/cm_vending/sorted/tech/tool_storage/antag/clash,
+/obj/effect/decal/hybrisa/road/lines1{
+	pixel_x = 10;
+	pixel_y = 0
 	},
-/turf/open/floor/prison/floor_marked/west,
+/obj/effect/decal/hybrisa/warning/redandwhite_N,
+/turf/open/floor/corsat/squares,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "aaG" = (
 /obj/effect/decal/warning_stripes{
@@ -234,15 +235,11 @@
 /area/kutjevo/exterior/lz_dunes)
 "abk" = (
 /obj/effect/decal/warning_stripes{
-	icon_state = "NW-out";
-	pixel_y = 3
-	},
-/obj/effect/decal/warning_stripes{
-	icon_state = "SW-out";
-	pixel_x = -1;
+	icon_state = "S";
 	pixel_y = -1
 	},
-/turf/open/floor/corsat/squares,
+/obj/structure/prop/hybrisa/misc/floorprops/grate,
+/turf/open/floor/strata/red2,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "abl" = (
 /obj/item/tool/warning_cone{
@@ -282,9 +279,10 @@
 /turf/open/floor/grass,
 /area/kutjevo/exterior/stonyfields)
 "abK" = (
-/obj/structure/machinery/cm_vending/gear/antag{
+/obj/structure/machinery/cm_vending/gear/antag/clash{
 	name = "\improper Response Team Automated Gear Rack"
 	},
+/obj/structure/prop/hybrisa/misc/floorprops/grate,
 /turf/open/floor/corsat/squares,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "abO" = (
@@ -296,15 +294,11 @@
 /turf/open/floor/kutjevo/plate,
 /area/clash_arena/tdm_kutjevo/battlefield/zone_2/indoors)
 "abR" = (
-/obj/effect/landmark/start/upp{
-	name = "UPP soldier join";
-	job_list = list("UPP Ryadovoy","UPP MSzht Engineer","UPP MSzht Medic","UPP Serzhant","UPP Starshiy Serzhant")
+/obj/structure/sign/poster/clf{
+	pixel_x = -30
 	},
-/obj/effect/landmark/late_join/upp{
-	name = "UPP late soldier join";
-	job_list = list("UPP Ryadovoy","UPP MSzht Engineer","UPP MSzht Medic","UPP Serzhant","UPP Starshiy Serzhant")
-	},
-/turf/open/floor/plating/plating_catwalk/prison,
+/obj/structure/machinery/cm_vending/sorted/cargo_guns/upp_squad_guns/clash,
+/turf/open/floor/strata/red2,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "abX" = (
 /obj/effect/landmark/start/marine/smartgunner/bravo,
@@ -330,20 +324,16 @@
 /turf/open/floor/interior/wood,
 /area/clash_arena/tdm_kutjevo/uscm_base)
 "ack" = (
-/obj/structure/sign/flag/upp{
-	dir = 1;
-	pixel_y = 26;
-	pixel_x = -17
+/obj/structure/machinery/light{
+	dir = 4
 	},
-/obj/effect/landmark/start/upp{
-	name = "UPP soldier join";
-	job_list = list("UPP Ryadovoy","UPP MSzht Engineer","UPP MSzht Medic","UPP Serzhant","UPP Starshiy Serzhant")
+/obj/structure/barricade/handrail{
+	dir = 8;
+	pixel_x = -3;
+	pixel_y = 0
 	},
-/obj/effect/landmark/late_join/upp{
-	name = "UPP late soldier join";
-	job_list = list("UPP Ryadovoy","UPP MSzht Engineer","UPP MSzht Medic","UPP Serzhant","UPP Starshiy Serzhant")
-	},
-/turf/open/floor/plating/plating_catwalk/prison,
+/obj/structure/prop/hybrisa/misc/floorprops/grate2,
+/turf/open/floor/strata/red2,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "acv" = (
 /obj/effect/landmark/start/marine/leader/alpha,
@@ -405,11 +395,15 @@
 /turf/open/floor/interior/wood,
 /area/clash_arena/tdm_kutjevo/uscm_base)
 "acV" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "S";
-	pixel_y = -1
+/obj/effect/landmark/start/upp{
+	name = "UPP soldier join";
+	job_list = list("UPP Ryadovoy","UPP MSzht Engineer","UPP MSzht Medic","UPP Serzhant","UPP Starshiy Serzhant")
 	},
-/turf/open/floor/kutjevo/colors/red/tile,
+/obj/effect/landmark/late_join/upp{
+	name = "UPP late soldier join";
+	job_list = list("UPP Ryadovoy","UPP MSzht Engineer","UPP MSzht Medic","UPP Serzhant","UPP Starshiy Serzhant")
+	},
+/turf/open/floor/corsat/red/west,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "adc" = (
 /obj/structure/machinery/door/firedoor/border_only/almayer,
@@ -453,19 +447,8 @@
 /turf/closed/wall/kutjevo/rock,
 /area/kutjevo/interior/power)
 "adE" = (
-/obj/structure/sign/flag/upp{
-	pixel_y = 28;
-	pixel_x = -17
-	},
-/obj/effect/landmark/start/upp{
-	name = "UPP soldier join";
-	job_list = list("UPP Ryadovoy","UPP MSzht Engineer","UPP MSzht Medic","UPP Serzhant","UPP Starshiy Serzhant")
-	},
-/obj/effect/landmark/late_join/upp{
-	name = "UPP late soldier join";
-	job_list = list("UPP Ryadovoy","UPP MSzht Engineer","UPP MSzht Medic","UPP Serzhant","UPP Starshiy Serzhant")
-	},
-/turf/open/floor/plating/plating_catwalk/prison,
+/obj/effect/decal/hybrisa/warning/redandwhite_NWcorner,
+/turf/open/floor/corsat/squares,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "adH" = (
 /obj/structure/flora/grass/desert/heavygrass_8,
@@ -918,16 +901,11 @@
 	pixel_x = -17;
 	pixel_y = -7
 	},
-/obj/structure/machinery/cm_vending/sorted/cargo_guns/upp_squad_guns,
-/turf/open/floor/corsat/plate,
+/obj/structure/machinery/cm_vending/sorted/cargo_guns/upp_squad_guns/clash,
+/turf/open/floor/strata/red2,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "agF" = (
-/obj/structure/machinery/cm_vending/sorted/cargo_ammo/squad{
-	req_access = null;
-	req_one_access = null;
-	req_one_access_txt = "15;16;21";
-	vend_x_offset = 0
-	},
+/obj/structure/machinery/cm_vending/sorted/tech/tool_storage/clash,
 /turf/open/floor/almayer/floor,
 /area/clash_arena/tdm_kutjevo/uscm_base)
 "agI" = (
@@ -965,7 +943,22 @@
 /turf/open/floor/almayer,
 /area/clash_arena/tdm_kutjevo/uscm_base)
 "ahm" = (
-/turf/open/floor/strata/red2,
+/obj/structure/machinery/cryopod{
+	pixel_y = 8;
+	layer = 2.7;
+	dir = 1
+	},
+/obj/structure/machinery/light{
+	dir = 1;
+	pixel_x = 14;
+	light_color = "#66ccff";
+	invisibility = 101
+	},
+/obj/structure/sign/safety/cryo{
+	pixel_y = 30;
+	pixel_x = 24
+	},
+/turf/open/floor/prison/floor_marked/west,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "ahv" = (
 /obj/effect/decal/warning_stripes{
@@ -1035,7 +1028,7 @@
 /turf/open/auto_turf/sand/layer1,
 /area/kutjevo/exterior/lz_dunes)
 "ahQ" = (
-/obj/structure/machinery/cm_vending/gear/engi,
+/obj/structure/machinery/cm_vending/gear/clash,
 /turf/open/floor/almayer/floor,
 /area/clash_arena/tdm_kutjevo/uscm_base)
 "ahV" = (
@@ -1072,7 +1065,7 @@
 	pixel_x = -6;
 	pixel_y = 11
 	},
-/turf/open/floor/corsat/plate,
+/turf/open/floor/strata/red2,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "ahW" = (
 /obj/structure/barricade/handrail/hybrisa/road/metal/metaldark2/middle{
@@ -1134,7 +1127,19 @@
 /turf/open/floor/grass,
 /area/kutjevo/exterior/stonyfields)
 "aiO" = (
-/obj/structure/machinery/cm_vending/clothing/antag/upp,
+/obj/structure/machinery/cm_vending/clothing/antag/upp/clash,
+/obj/structure/prop/hybrisa/misc/floorprops/grate,
+/obj/effect/decal/hybrisa/road/lines1{
+	pixel_x = 6;
+	pixel_y = 0
+	},
+/obj/effect/decal/hybrisa/road/lines1{
+	pixel_x = 10;
+	pixel_y = 0
+	},
+/obj/effect/decal/hybrisa/road{
+	dir = 1
+	},
 /turf/open/floor/corsat/squares,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "aiQ" = (
@@ -1175,7 +1180,6 @@
 /turf/open/floor/interior/wood,
 /area/clash_arena/tdm_kutjevo/uscm_base)
 "ajt" = (
-/obj/structure/machinery/cm_vending/clothing/marine/bravo,
 /turf/open/floor/almayer/floor,
 /area/clash_arena/tdm_kutjevo/uscm_base)
 "ajx" = (
@@ -1234,12 +1238,15 @@
 /turf/open/auto_turf/sand/layer0,
 /area/clash_arena/tdm_kutjevo/battlefield/zone_1)
 "aki" = (
-/obj/structure/machinery/light{
-	dir = 8;
-	light_color = "#66ccff";
-	invisibility = 101
+/obj/effect/landmark/start/upp{
+	name = "UPP soldier join";
+	job_list = list("UPP Ryadovoy","UPP MSzht Engineer","UPP MSzht Medic","UPP Serzhant","UPP Starshiy Serzhant")
 	},
-/turf/open/floor/corsat/plate,
+/obj/effect/landmark/late_join/upp{
+	name = "UPP late soldier join";
+	job_list = list("UPP Ryadovoy","UPP MSzht Engineer","UPP MSzht Medic","UPP Serzhant","UPP Starshiy Serzhant")
+	},
+/turf/open/floor/corsat/squares,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "ako" = (
 /obj/structure/flora/grass/desert/lightgrass_11,
@@ -1248,13 +1255,6 @@
 "akx" = (
 /obj/structure/machinery/light{
 	dir = 4
-	},
-/obj/structure/machinery/cm_vending/sorted/cargo_guns/squad{
-	req_access = null;
-	req_one_access = null;
-	req_one_access_txt = "15;16;21";
-	vend_x_offset = 0;
-	vend_y_offset = 0
 	},
 /turf/open/floor/almayer/floor,
 /area/clash_arena/tdm_kutjevo/uscm_base)
@@ -1281,6 +1281,7 @@
 	icon_state = "NW-out";
 	pixel_y = 3
 	},
+/obj/effect/decal/hybrisa/warning/redandwhite_W,
 /turf/open/floor/corsat/squares,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "alk" = (
@@ -1334,7 +1335,7 @@
 /turf/open/floor/corsat/red/west,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "amb" = (
-/obj/structure/machinery/cm_vending/sorted/uniform_supply/squad_prep,
+/obj/structure/machinery/cm_vending/clothing/marine/clash,
 /turf/open/floor/almayer,
 /area/clash_arena/tdm_kutjevo/uscm_base)
 "amk" = (
@@ -1342,15 +1343,25 @@
 /turf/open/floor/grass,
 /area/kutjevo/exterior/stonyfields)
 "amn" = (
-/obj/structure/sign/poster/clf{
-	pixel_x = -30
+/obj/structure/machinery/light{
+	dir = 8
 	},
-/obj/structure/machinery/cm_vending/sorted/cargo_guns/upp_squad_guns,
-/turf/open/floor/corsat/plate,
+/obj/structure/prop/hybrisa/misc/floorprops/grate,
+/turf/open/floor/strata/red2,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "amF" = (
-/obj/structure/machinery/cm_vending/sorted/cargo_ammo/upp_squad,
-/turf/open/floor/corsat/plate,
+/obj/structure/machinery/cryopod{
+	pixel_y = 8;
+	layer = 2.7;
+	dir = 1
+	},
+/obj/structure/machinery/light{
+	dir = 1;
+	pixel_x = 14;
+	light_color = "#66ccff";
+	invisibility = 101
+	},
+/turf/open/floor/prison/floor_marked/west,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "ane" = (
 /obj/structure/closet/coffin/woodencrate{
@@ -1408,10 +1419,15 @@
 /turf/open/auto_turf/sand/layer0,
 /area/kutjevo/exterior/lz_river)
 "anJ" = (
-/obj/structure/machinery/light{
-	dir = 4
+/obj/effect/landmark/start/upp{
+	name = "UPP soldier join";
+	job_list = list("UPP Ryadovoy","UPP MSzht Engineer","UPP MSzht Medic","UPP Serzhant","UPP Starshiy Serzhant")
 	},
-/turf/open/floor/corsat/plate,
+/obj/effect/landmark/late_join/upp{
+	name = "UPP late soldier join";
+	job_list = list("UPP Ryadovoy","UPP MSzht Engineer","UPP MSzht Medic","UPP Serzhant","UPP Starshiy Serzhant")
+	},
+/turf/open/floor/corsat/red/east,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "anN" = (
 /turf/open/auto_turf/sand/layer0,
@@ -1429,35 +1445,12 @@
 /turf/open/floor/almayer/research/containment/floor1,
 /area/clash_arena/tdm_kutjevo/battlefield/zone_3/indoors)
 "aoa" = (
-/obj/structure/surface/table/reinforced/rostock_table,
 /obj/effect/decal/warning_stripes{
 	icon_state = "N";
 	pixel_y = 3
 	},
-/obj/item/stack/sheet/cardboard/small_stack{
-	pixel_y = 2;
-	pixel_x = -3;
-	layer = 3.01
-	},
-/obj/item/stack/sheet/cardboard/small_stack{
-	pixel_y = 2;
-	pixel_x = -3;
-	layer = 3.01
-	},
-/obj/item/tool/shovel/etool/folded,
-/obj/item/tool/shovel/etool/folded,
-/obj/item/tool/shovel/etool/folded,
-/obj/item/tool/shovel/etool/folded,
-/obj/item/tool/shovel/etool/folded,
-/obj/item/tool/shovel/etool/folded,
-/obj/item/tool/shovel/etool/folded,
-/obj/item/tool/shovel/etool/folded,
-/obj/item/tool/shovel/etool/folded,
-/obj/item/tool/shovel/etool/folded,
-/obj/structure/machinery/light{
-	dir = 8
-	},
-/turf/open/floor/corsat/plate,
+/obj/structure/surface/table/reinforced/rostock_table,
+/turf/open/floor/strata/red2,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "aof" = (
 /obj/structure/machinery/light,
@@ -1481,8 +1474,12 @@
 /turf/open/floor/kutjevo/multi_tiles,
 /area/clash_arena/tdm_kutjevo/battlefield/zone_3/indoors)
 "aoH" = (
-/obj/structure/machinery/cm_vending/sorted/tech/tool_storage/antag,
-/turf/open/floor/corsat/plate,
+/obj/structure/barricade/handrail{
+	dir = 8;
+	pixel_x = -3;
+	pixel_y = 0
+	},
+/turf/open/floor/strata/multi_tiles/southeast,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "aoJ" = (
 /turf/open/floor/kutjevo/multi_tiles/east,
@@ -1502,7 +1499,19 @@
 	icon_state = "N";
 	pixel_y = 3
 	},
-/turf/open/floor/kutjevo/colors/red/tile,
+/obj/structure/prop/hybrisa/misc/floorprops/grate,
+/obj/effect/decal/hybrisa/road/lines1{
+	pixel_x = 6;
+	pixel_y = 0
+	},
+/obj/effect/decal/hybrisa/road/lines1{
+	pixel_x = 10;
+	pixel_y = 0
+	},
+/obj/effect/decal/hybrisa/road{
+	dir = 1
+	},
+/turf/open/floor/strata/red2,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "aoW" = (
 /obj/effect/decal/cleanable/dirt,
@@ -1586,23 +1595,24 @@
 /turf/open/floor/kutjevo/colors/orange,
 /area/clash_arena/tdm_kutjevo/battlefield/zone_3/indoors)
 "apX" = (
-/obj/structure/machinery/cm_vending/sorted/cargo_guns/upp_squad_guns,
-/turf/open/floor/corsat/plate,
+/obj/structure/machinery/cm_vending/sorted/cargo_guns/upp_squad_guns/clash,
+/turf/open/floor/strata/red2,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "aqa" = (
 /obj/structure/platform_decoration/stone/kutjevo/west,
 /turf/closed/wall/strata_ice/dirty/rock,
 /area/kutjevo/exterior/stonyfields)
 "aqg" = (
-/obj/structure/machinery/cryopod{
-	pixel_y = 14;
-	layer = 2.8;
-	dir = 8
+/obj/effect/decal/warning_stripes{
+	icon_state = "NE-out";
+	pixel_x = 2;
+	pixel_y = 3
 	},
-/obj/structure/machinery/light{
-	dir = 4
+/obj/effect/decal/warning_stripes{
+	icon_state = "E";
+	pixel_x = 2
 	},
-/turf/open/floor/prison/floor_marked/west,
+/turf/open/floor/corsat/red/east,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "aql" = (
 /obj/structure/platform/stone/kutjevo/east,
@@ -1653,14 +1663,22 @@
 /area/clash_arena/tdm_kutjevo/battlefield/zone_3)
 "ari" = (
 /obj/effect/decal/warning_stripes{
-	icon_state = "N";
-	pixel_y = 3
-	},
-/obj/effect/decal/warning_stripes{
 	icon_state = "S";
 	pixel_y = -1
 	},
-/turf/open/floor/kutjevo/colors/red/tile,
+/obj/effect/decal/hybrisa/road/lines1{
+	pixel_x = 6;
+	pixel_y = 0
+	},
+/obj/effect/decal/hybrisa/road/lines1{
+	pixel_x = 10;
+	pixel_y = 0
+	},
+/obj/effect/decal/hybrisa/road{
+	dir = 1
+	},
+/obj/structure/prop/hybrisa/misc/floorprops/grate,
+/turf/open/floor/strata/red2,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "arp" = (
 /obj/structure/flora/grass/desert/lightgrass_11,
@@ -1789,7 +1807,8 @@
 	icon_state = "S";
 	pixel_y = -1
 	},
-/turf/open/floor/corsat/plate,
+/obj/structure/surface/table/reinforced/rostock_table,
+/turf/open/floor/strata/red2,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "asU" = (
 /obj/structure/flora/bush/ausbushes/reedbush,
@@ -1977,16 +1996,8 @@
 /turf/open/floor/grass,
 /area/kutjevo/exterior/stonyfields)
 "aus" = (
-/obj/structure/machinery/cryopod{
-	pixel_y = 14;
-	layer = 2.8
-	},
-/obj/structure/machinery/light{
-	dir = 8;
-	light_color = "#66ccff";
-	invisibility = 101
-	},
-/turf/open/floor/prison/floor_marked/west,
+/obj/effect/decal/hybrisa/warning/redandwhite_NEcorner,
+/turf/open/floor/corsat/squares,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "auu" = (
 /obj/effect/landmark/start/marine/smartgunner/alpha,
@@ -2008,7 +2019,7 @@
 /turf/open/gm/grass/gbcorner/north_east,
 /area/kutjevo/exterior/stonyfields)
 "auC" = (
-/obj/structure/machinery/cm_vending/sorted/cargo_guns/squad_prep,
+/obj/structure/machinery/cm_vending/sorted/cargo_guns/squad_prep/clash,
 /turf/open/floor/almayer/floor,
 /area/clash_arena/tdm_kutjevo/uscm_base)
 "auO" = (
@@ -2169,7 +2180,8 @@
 /obj/structure/machinery/light{
 	dir = 8
 	},
-/turf/open/floor/corsat/plate,
+/obj/structure/prop/hybrisa/misc/floorprops/grate,
+/turf/open/floor/strata/red2,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "awB" = (
 /obj/structure/prop/hybrisa/misc/floorprops/grate2{
@@ -2231,7 +2243,7 @@
 /turf/open/gm/river/desert/deep,
 /area/kutjevo/exterior/lz_river)
 "axk" = (
-/obj/structure/machinery/cm_vending/sorted/uniform_supply/squad_prep,
+/obj/structure/machinery/cm_vending/clothing/marine/clash,
 /turf/open/floor/plating/plating_catwalk,
 /area/clash_arena/tdm_kutjevo/uscm_base)
 "axu" = (
@@ -2276,6 +2288,7 @@
 	pixel_x = 2;
 	pixel_y = 3
 	},
+/obj/effect/decal/hybrisa/warning/redandwhite_E,
 /turf/open/floor/corsat/squares,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "ayj" = (
@@ -2327,9 +2340,6 @@
 /obj/structure/flora/grass/desert/heavygrass_5,
 /turf/open/auto_turf/sand/layer0,
 /area/kutjevo/exterior/lz_dunes)
-"azy" = (
-/turf/open/floor/almayer/floor,
-/area/clash_arena/tdm_kutjevo/uscm_base)
 "azG" = (
 /obj/structure/platform/metal/kutjevo/north,
 /turf/open/gm/river/desert/shallow_corner/west,
@@ -2400,16 +2410,8 @@
 /turf/open/floor/interior/wood,
 /area/clash_arena/tdm_kutjevo/uscm_base)
 "aBa" = (
-/obj/effect/decal/warning_stripes{
-	icon_state = "NE-out";
-	pixel_x = 2;
-	pixel_y = 3
-	},
-/obj/effect/decal/warning_stripes{
-	icon_state = "SE-out";
-	pixel_x = 2;
-	pixel_y = -1
-	},
+/obj/structure/machinery/cm_vending/clothing/antag/upp/clash,
+/obj/structure/prop/hybrisa/misc/floorprops/grate,
 /turf/open/floor/corsat/squares,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "aBb" = (
@@ -2474,7 +2476,20 @@
 	icon_state = "N";
 	pixel_y = 3
 	},
-/turf/open/floor/kutjevo/colors/red/tile,
+/obj/structure/prop/hybrisa/misc/floorprops/grate,
+/obj/structure/prop/hybrisa/misc/floorprops/grate,
+/obj/effect/decal/hybrisa/road/lines1{
+	pixel_x = 6;
+	pixel_y = 0
+	},
+/obj/effect/decal/hybrisa/road/lines1{
+	pixel_x = 10;
+	pixel_y = 0
+	},
+/obj/effect/decal/hybrisa/road{
+	dir = 1
+	},
+/turf/open/floor/strata/red2,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "aCK" = (
 /turf/open/floor/coagulation/icon8_3,
@@ -2561,14 +2576,6 @@
 /obj/structure/platform_decoration/metal/kutjevo/west,
 /turf/open/gm/dirt/brown,
 /area/kutjevo/exterior/stonyfields)
-"aEo" = (
-/obj/structure/machinery/cm_vending/sorted/tech/electronics_storage/antag,
-/turf/open/floor/corsat/plate,
-/area/clash_arena/tdm_kutjevo/upp_base)
-"aEp" = (
-/obj/structure/machinery/cm_vending/sorted/uniform_supply/squad_prep/upp_squad_prep,
-/turf/open/floor/corsat/plate,
-/area/clash_arena/tdm_kutjevo/upp_base)
 "aEt" = (
 /obj/structure/barricade/sandbags/weak_wired,
 /turf/open/auto_turf/sand/layer1,
@@ -2603,14 +2610,32 @@
 /turf/open/floor/interior/wood,
 /area/clash_arena/tdm_kutjevo/uscm_base)
 "aFl" = (
+/obj/structure/surface/table/reinforced/rostock_table,
 /obj/effect/decal/warning_stripes{
 	icon_state = "N";
 	pixel_y = 3
 	},
-/obj/structure/machinery/light{
-	dir = 4
+/obj/item/stack/sheet/cardboard/small_stack{
+	pixel_y = 2;
+	pixel_x = -3;
+	layer = 3.01
 	},
-/turf/open/floor/corsat/plate,
+/obj/item/stack/sheet/cardboard/small_stack{
+	pixel_y = 2;
+	pixel_x = -3;
+	layer = 3.01
+	},
+/obj/item/tool/shovel/etool/folded,
+/obj/item/tool/shovel/etool/folded,
+/obj/item/tool/shovel/etool/folded,
+/obj/item/tool/shovel/etool/folded,
+/obj/item/tool/shovel/etool/folded,
+/obj/item/tool/shovel/etool/folded,
+/obj/item/tool/shovel/etool/folded,
+/obj/item/tool/shovel/etool/folded,
+/obj/item/tool/shovel/etool/folded,
+/obj/item/tool/shovel/etool/folded,
+/turf/open/floor/strata/red2,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "aFu" = (
 /turf/open/floor/coagulation/icon7_0,
@@ -2621,10 +2646,6 @@
 	},
 /turf/open/floor/kutjevo/colors/orange,
 /area/kutjevo/exterior/Northwest_Colony)
-"aFH" = (
-/obj/structure/machinery/cm_vending/sorted/cargo_guns/upp_squad,
-/turf/open/floor/corsat/plate,
-/area/clash_arena/tdm_kutjevo/upp_base)
 "aFO" = (
 /obj/structure/machinery/power/smes/buildable/charged,
 /turf/open/floor/kutjevo/multi_tiles,
@@ -2813,6 +2834,26 @@
 "cvm" = (
 /turf/open/floor/kutjevo/multi_tiles/southeast,
 /area/kutjevo/interior/power)
+"cDh" = (
+/obj/structure/barricade/handrail{
+	dir = 8;
+	pixel_x = -3;
+	pixel_y = 0
+	},
+/obj/structure/prop/hybrisa/misc/floorprops/grate2,
+/obj/effect/decal/hybrisa/road/lines1{
+	pixel_x = 6;
+	pixel_y = 0
+	},
+/obj/effect/decal/hybrisa/road/lines1{
+	pixel_x = 10;
+	pixel_y = 0
+	},
+/obj/effect/decal/hybrisa/road{
+	dir = 1
+	},
+/turf/open/floor/strata/red2,
+/area/clash_arena/tdm_kutjevo/upp_base)
 "cDM" = (
 /obj/structure/platform_decoration/metal/kutjevo/east,
 /obj/structure/platform/metal/kutjevo_smooth/north,
@@ -3212,6 +3253,22 @@
 "hSA" = (
 /turf/closed/cordon,
 /area/space)
+"icZ" = (
+/obj/structure/sign/flag/upp{
+	dir = 1;
+	pixel_y = 26;
+	pixel_x = -17
+	},
+/obj/effect/landmark/start/upp{
+	name = "UPP soldier join";
+	job_list = list("UPP Ryadovoy","UPP MSzht Engineer","UPP MSzht Medic","UPP Serzhant","UPP Starshiy Serzhant")
+	},
+/obj/effect/landmark/late_join/upp{
+	name = "UPP late soldier join";
+	job_list = list("UPP Ryadovoy","UPP MSzht Engineer","UPP MSzht Medic","UPP Serzhant","UPP Starshiy Serzhant")
+	},
+/turf/open/floor/corsat/squares,
+/area/clash_arena/tdm_kutjevo/upp_base)
 "iin" = (
 /turf/open/auto_turf/sand/layer2,
 /area/kutjevo/exterior/Northwest_Colony)
@@ -3230,16 +3287,8 @@
 /turf/open/space/basic,
 /area/sky)
 "iNH" = (
-/obj/structure/machinery/cryopod{
-	pixel_y = 8;
-	layer = 2.7;
-	dir = 1
-	},
-/obj/structure/sign/safety/cryo{
-	pixel_y = 30;
-	pixel_x = 24
-	},
-/turf/open/floor/prison/floor_marked/west,
+/obj/structure/prop/hybrisa/misc/floorprops/grate2,
+/turf/open/floor/strata/red2,
 /area/clash_arena/tdm_kutjevo/upp_base)
 "iOS" = (
 /turf/open/slippery/hull,
@@ -3285,6 +3334,18 @@
 "jFf" = (
 /turf/closed/wall/kutjevo/colony/reinforced,
 /area/kutjevo/exterior/telecomm/lz2_south)
+"jGa" = (
+/obj/effect/decal/warning_stripes{
+	icon_state = "S";
+	pixel_y = -1
+	},
+/obj/effect/decal/warning_stripes{
+	icon_state = "N";
+	pixel_y = 3
+	},
+/obj/structure/prop/hybrisa/misc/floorprops/grate,
+/turf/open/floor/strata/red2,
+/area/clash_arena/tdm_kutjevo/upp_base)
 "jXq" = (
 /turf/open/auto_turf/sand/layer2,
 /area/kutjevo/exterior/lz_river)
@@ -3299,6 +3360,17 @@
 /obj/structure/machinery/power/power_generator/reactor/colony,
 /turf/open/floor/kutjevo/colors/orange,
 /area/kutjevo/interior/power)
+"khe" = (
+/obj/effect/decal/warning_stripes{
+	icon_state = "N";
+	pixel_y = 3
+	},
+/obj/structure/machinery/light{
+	dir = 4
+	},
+/obj/structure/prop/hybrisa/misc/floorprops/grate,
+/turf/open/floor/strata/red2,
+/area/clash_arena/tdm_kutjevo/upp_base)
 "ktU" = (
 /obj/structure/platform_decoration/metal/kutjevo,
 /turf/open/floor/kutjevo/multi_tiles,
@@ -3343,6 +3415,14 @@
 /obj/structure/flora/grass/desert/lightgrass_11,
 /turf/open/auto_turf/sand/layer1,
 /area/kutjevo/exterior/lz_dunes)
+"lkj" = (
+/obj/effect/decal/warning_stripes{
+	icon_state = "N";
+	pixel_y = 3
+	},
+/obj/structure/prop/hybrisa/misc/floorprops/grate,
+/turf/open/floor/strata/red2,
+/area/clash_arena/tdm_kutjevo/upp_base)
 "lkp" = (
 /turf/open/desert/desert_shore,
 /area/kutjevo/exterior/Northwest_Colony)
@@ -3410,6 +3490,11 @@
 "mBD" = (
 /turf/closed/wall/kutjevo/colony,
 /area/kutjevo/exterior/stonyfields)
+"mBZ" = (
+/obj/structure/machinery/cm_vending/sorted/tech/tool_storage/antag/clash,
+/obj/effect/decal/hybrisa/warning/redandwhite_N,
+/turf/open/floor/corsat/squares,
+/area/clash_arena/tdm_kutjevo/upp_base)
 "mOh" = (
 /turf/open_space,
 /area/space)
@@ -3682,6 +3767,21 @@
 "qOu" = (
 /turf/open_space,
 /area/sky)
+"qZm" = (
+/obj/structure/sign/flag/upp{
+	pixel_y = 28;
+	pixel_x = -17
+	},
+/obj/effect/landmark/start/upp{
+	name = "UPP soldier join";
+	job_list = list("UPP Ryadovoy","UPP MSzht Engineer","UPP MSzht Medic","UPP Serzhant","UPP Starshiy Serzhant")
+	},
+/obj/effect/landmark/late_join/upp{
+	name = "UPP late soldier join";
+	job_list = list("UPP Ryadovoy","UPP MSzht Engineer","UPP MSzht Medic","UPP Serzhant","UPP Starshiy Serzhant")
+	},
+/turf/open/floor/corsat/red/east,
+/area/clash_arena/tdm_kutjevo/upp_base)
 "rbh" = (
 /obj/structure/platform/metal/kutjevo_smooth/north,
 /turf/open/hybrisa/street/asphalt,
@@ -3802,16 +3902,6 @@
 	},
 /turf/open/desert/desert_shore/shore_corner2/east,
 /area/kutjevo/exterior/lz_river)
-"twn" = (
-/obj/structure/machinery/cm_vending/sorted/cargo_guns/squad{
-	req_access = null;
-	req_one_access = null;
-	req_one_access_txt = "15;16;21";
-	vend_x_offset = 0;
-	vend_y_offset = 0
-	},
-/turf/open/floor/almayer/floor,
-/area/clash_arena/tdm_kutjevo/uscm_base)
 "tAX" = (
 /obj/structure/flora/grass/desert/lightgrass_8,
 /obj/structure/platform/stone/kutjevo/west,
@@ -3862,9 +3952,6 @@
 "uGd" = (
 /turf/open/gm/river/desert/shallow_edge/north,
 /area/kutjevo/exterior/lz_river)
-"uML" = (
-/turf/open/floor/corsat/plate,
-/area/clash_arena/tdm_kutjevo/upp_base)
 "uQJ" = (
 /obj/structure/flora/grass/desert/lightgrass_2,
 /turf/open/auto_turf/sand/layer1,
@@ -3903,6 +3990,16 @@
 "vin" = (
 /turf/open/floor/coagulation/icon2_0,
 /area/kutjevo/exterior/lz_river)
+"vlg" = (
+/obj/effect/decal/warning_stripes{
+	icon_state = "NW-out";
+	pixel_y = 3
+	},
+/obj/effect/decal/warning_stripes{
+	icon_state = "W"
+	},
+/turf/open/floor/corsat/red/west,
+/area/clash_arena/tdm_kutjevo/upp_base)
 "voI" = (
 /obj/structure/flora/grass/tallgrass/desert,
 /turf/open/auto_turf/sand/layer1,
@@ -3937,6 +4034,24 @@
 /obj/structure/platform_decoration/stone/kutjevo/east,
 /turf/closed/wall/kutjevo/rock,
 /area/kutjevo/exterior/lz_dunes)
+"vSe" = (
+/obj/structure/machinery/cm_vending/gear/antag/clash{
+	name = "\improper Response Team Automated Gear Rack"
+	},
+/obj/structure/prop/hybrisa/misc/floorprops/grate,
+/obj/effect/decal/hybrisa/road/lines1{
+	pixel_x = 6;
+	pixel_y = 0
+	},
+/obj/effect/decal/hybrisa/road/lines1{
+	pixel_x = 10;
+	pixel_y = 0
+	},
+/obj/effect/decal/hybrisa/road{
+	dir = 1
+	},
+/turf/open/floor/corsat/squares,
+/area/clash_arena/tdm_kutjevo/upp_base)
 "vTc" = (
 /obj/structure/prop/dam/boulder/boulder1,
 /turf/open/auto_turf/sand/layer1,
@@ -14148,10 +14263,10 @@ dCP
 dCP
 dCP
 dCP
-ahN
-ahN
-ahN
-ahN
+dCP
+dCP
+dCP
+dCP
 ahN
 ahN
 ahN
@@ -14370,22 +14485,22 @@ dCP
 dCP
 dCP
 dCP
+dCP
+dCP
+dCP
+dCP
 ahN
 aau
-aus
+aax
 adr
 aaC
-uML
-aki
-asS
-apX
 amn
-apX
+abk
 aoa
 ahV
 apX
 agy
-amn
+abR
 awA
 ahN
 ahN
@@ -14592,19 +14707,19 @@ dCP
 dCP
 dCP
 dCP
+dCP
+dCP
+dCP
+dCP
 ahN
-abR
-abR
-abR
-abR
-abZ
-ctw
+acV
+acV
+acV
+acV
+aoH
 aaL
+vlg
 ahF
-ahF
-ahF
-aGN
-aaL
 ahF
 ahF
 ahF
@@ -14814,23 +14929,23 @@ dCP
 dCP
 dCP
 dCP
+dCP
+dCP
+dCP
+dCP
 ahN
-ack
-abR
-abR
-abR
+icZ
+aki
+aki
+aki
 abZ
-gcl
 acz
-alV
-alV
-aBa
 alV
 aAz
 alV
 alV
 ayi
-gcl
+aus
 eAL
 gcl
 gcl
@@ -15036,23 +15151,23 @@ dCP
 dCP
 dCP
 dCP
+dCP
+dCP
+dCP
+dCP
 ahN
-iNH
+ahm
 acD
 acE
 acH
-ahm
-ahm
-acV
-aiO
-abK
+cDh
 ari
 afe
 aCF
 aiO
-abK
+vSe
 aoV
-aii
+aaF
 aqv
 aEv
 aEv
@@ -15258,23 +15373,23 @@ dCP
 dCP
 dCP
 dCP
+dCP
+dCP
+dCP
+dCP
 ahN
 aau
 aax
 adr
 aaC
-ahm
-ahm
-acV
-aiO
-abK
-ari
+iNH
+abk
 azK
-aCF
-aiO
+jGa
+aBa
 abK
-aoV
-aii
+lkj
+mBZ
 aaD
 anp
 aEv
@@ -15480,23 +15595,23 @@ dCP
 dCP
 dCP
 dCP
+dCP
+dCP
+dCP
+dCP
 ahN
-abR
-abR
-abR
-abR
-abZ
-gcl
+aki
+aki
+aki
+aki
+aoH
 apl
-axK
-axK
-abk
 axK
 alR
 axK
 axK
 alc
-gcl
+adE
 aie
 gcl
 gcl
@@ -15702,19 +15817,19 @@ dCP
 dCP
 dCP
 dCP
+dCP
+dCP
+dCP
+dCP
 ahN
-adE
-abR
-abR
-abR
+qZm
+anJ
+anJ
+anJ
 abZ
-gYL
 awu
+aqg
 vEW
-vEW
-vEW
-aaG
-awu
 vEW
 vEW
 vEW
@@ -15924,23 +16039,23 @@ dCP
 dCP
 dCP
 dCP
+dCP
+dCP
+dCP
+dCP
 ahN
-aaF
-aqg
+amF
+acD
 acE
 acH
-uML
-anJ
-asS
-aEp
-aFH
-amF
+ack
+abk
 aFl
 asS
-aEo
-aoH
-aEo
-aFl
+apX
+apX
+apX
+khe
 ahN
 ahN
 ahN
@@ -16146,10 +16261,10 @@ dCP
 dCP
 dCP
 dCP
-ahN
-ahN
-ahN
-ahN
+dCP
+dCP
+dCP
+dCP
 ahN
 ahN
 ahN
@@ -29105,7 +29220,7 @@ lVo
 aqT
 ayZ
 apr
-azy
+ajt
 awZ
 aBc
 ayj
@@ -29327,7 +29442,7 @@ ate
 aqT
 ayZ
 apr
-azy
+ajt
 awZ
 aBc
 ayj
@@ -29549,10 +29664,10 @@ lVo
 eYR
 ayZ
 alq
-azy
+ajt
 awZ
 aBc
-azy
+ajt
 auC
 auC
 avK
@@ -29771,15 +29886,15 @@ eYR
 eYR
 ayZ
 apr
-azy
+ajt
 awF
 aBc
-azy
+ajt
 ajt
 ajt
 avK
 awF
-azy
+ajt
 apr
 dCP
 dCP
@@ -29996,9 +30111,9 @@ apr
 atJ
 awZ
 aBc
-azy
+ajt
 akx
-twn
+ajt
 avK
 awZ
 ahG

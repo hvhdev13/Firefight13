@@ -44,6 +44,8 @@ GLOBAL_LIST_INIT(clash_kit_back_attachment_slots, list(KIT_SLOT_RAIL = KIT_SLOT_
 #define CLASH_SHOP_POINTS "points"
 #define CLASH_SHOP_SNOWFLAKE "snowflake"
 #define CLASH_SHOP_AMMO_COST 5
+#define CLASH_CAN_BUY_FLASHLIGHT "clash_flashlight"
+#define CLASH_CAN_BUY_FLARES "clash_flares"
 
 GLOBAL_LIST_INIT(clash_kit_slots, list(
 	KIT_SLOT_HELMET = list("name" = "Helmet", "image" = "inventory-head.png", "wear" = WEAR_HEAD),

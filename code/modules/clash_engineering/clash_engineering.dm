@@ -111,11 +111,21 @@ GLOBAL_LIST_INIT(clash_arena_eng_removed, list(
 	LAZYADDASSOCLIST(GLOB.clash_engineer_crates, engineer.ckey, crate)
 	return crate
 
-/proc/clash_engineer_vendor_entries(faction)
-	. = list(list("ENGINEER BUILDS", 0, null, null, null))
+/proc/clash_engineer_vendor_entries(mob/living/carbon/human/engineer)
+	. = list(list("ENGINEER BUILDS", -1, null, null))
 	for(var/tier in GLOB.clash_sentry_tiers)
-		. += list(list(GLOB.clash_sentry_tiers[tier]["name"], 0, clash_sentry_kit_for(faction, tier), null, VENDOR_ITEM_REGULAR))
-	. += list(list("Ammo Crate", 0, faction == FACTION_UPP ? /obj/item/clash_ammo_crate/upp : /obj/item/clash_ammo_crate, null, VENDOR_ITEM_REGULAR))
+		var/level = GLOB.clash_sentry_tiers[tier]["level"]
+		var/name = GLOB.clash_sentry_tiers[tier]["name"]
+		if(clash_engineer_level(engineer.ckey) < level)
+			name = "[name] (Unlocks at Engineer level [level])"
+		. += list(list(name, 1, clash_sentry_kit_for(engineer.faction, tier), VENDOR_ITEM_REGULAR))
+	. += list(list("Ammo Crate", 1, engineer.faction == FACTION_UPP ? /obj/item/clash_ammo_crate/upp : /obj/item/clash_ammo_crate, VENDOR_ITEM_REGULAR))
+
+/proc/clash_engineer_build_icons()
+	. = list(list("Ammo Crate", 0, /obj/item/clash_ammo_crate), list("Ammo Crate", 0, /obj/item/clash_ammo_crate/upp))
+	for(var/faction in GLOB.clash_sentry_kits)
+		for(var/tier in GLOB.clash_sentry_kits[faction])
+			. += list(list(GLOB.clash_sentry_tiers[tier]["name"], 0, GLOB.clash_sentry_kits[faction][tier]))
 
 /proc/clash_build_owned_text(mob/living/carbon/human/engineer, list/owned, label)
 	for(var/atom/build as anything in owned)

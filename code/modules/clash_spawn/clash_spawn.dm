@@ -78,6 +78,8 @@ SUBSYSTEM_DEF(clash_spawn)
 		spawned.skills?.set_skill(SKILL_MEDICAL, SKILL_MEDICAL_DEFAULT)
 	if(clash_uses_kits())
 		clash_raise_vendor_points(spawned, spawned.ckey, spawned.job)
+		spawned.vendor_buyable_categories[CLASH_CAN_BUY_FLASHLIGHT] = 1
+		spawned.vendor_buyable_categories[CLASH_CAN_BUY_FLARES] = 1
 	spawned.clash_spawn_points = list(spawned.vendor_points, spawned.vendor_snowflake_points)
 	clash_progress_join(spawned)
 	if(istype(SSticker.mode, /datum/game_mode/extended/faction_clash/hvh) && spawned.faction == FACTION_MARINE && spawned.assigned_squad && !(spawned.assigned_squad.name in list(SQUAD_MARINE_1, SQUAD_MARINE_2)))

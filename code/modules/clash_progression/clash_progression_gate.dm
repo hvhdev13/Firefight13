@@ -492,6 +492,10 @@ GLOBAL_VAR_INIT(clash_trial_packs_built, FALSE)
 	if(build_refusal)
 		to_chat(user, SPAN_WARNING(build_refusal))
 		return TRUE
+	var/rack_lock = clash_rack_lock_text(user, itemspec)
+	if(rack_lock)
+		to_chat(user, SPAN_WARNING("[itemspec[1]] is locked. [rack_lock]."))
+		return TRUE
 	if(!clash_vendor_laddered(itemspec[3]))
 		return FALSE
 	to_chat(user, SPAN_WARNING("[itemspec[1]] is not sold here. [clash_vendor_label(user, itemspec[3]) || "Unlocked, take it from your loadout"]."))
@@ -504,7 +508,7 @@ GLOBAL_VAR_INIT(clash_trial_packs_built, FALSE)
 	for(var/list/category as anything in categories)
 		for(var/list/display_item as anything in category["items"])
 			var/list/itemspec = products[display_item["prod_index"]]
-			var/label = clash_vendor_label(user, itemspec[3])
+			var/label = clash_vendor_label(user, itemspec[3]) || clash_rack_lock_text(user, itemspec)
 			if(label)
 				display_item["prod_name"] = "[display_item["prod_name"]] ([label])"
 
@@ -515,7 +519,7 @@ GLOBAL_VAR_INIT(clash_trial_packs_built, FALSE)
 	var/list/products = vendor.get_available_products(user)
 	for(var/index in 1 to min(length(listing), length(products)))
 		var/list/itemspec = products[index]
-		if(clash_vendor_laddered(itemspec[3]))
+		if(clash_vendor_laddered(itemspec[3]) || clash_rack_lock_text(user, itemspec))
 			listing[index] = (vendor.vend_flags & VEND_LIMITED_INVENTORY) ? 0 : FALSE
 
 /proc/clash_attachment_allowed(mob/user, obj/item/attachable/attachment, obj/item/weapon/gun/gun)

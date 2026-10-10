@@ -43,14 +43,14 @@ GLOBAL_LIST_INIT(clash_pouch_stock, list(
 
 GLOBAL_LIST_INIT(clash_medic_pouch_stock, list(
 	/obj/item/reagent_container/hypospray/autoinjector/clash_heal = 2,
-	/obj/item/reagent_container/hypospray/autoinjector/oxycodone = 1,
+	/obj/item/reagent_container/hypospray/autoinjector/oxycodone/clash = 1,
 	/obj/item/stack/medical/bruise_pack/field_dressing = 2,
 	/obj/item/stack/medical/advanced/bruise_pack/healing_kit = 1,
 ))
 
 GLOBAL_LIST_INIT(clash_large_medic_pouch_stock, list(
 	/obj/item/reagent_container/hypospray/autoinjector/clash_heal = 3,
-	/obj/item/reagent_container/hypospray/autoinjector/oxycodone = 1,
+	/obj/item/reagent_container/hypospray/autoinjector/oxycodone/clash = 1,
 	/obj/item/reagent_container/hypospray/autoinjector/clash_unga = 1,
 	/obj/item/stack/medical/bruise_pack/field_dressing = 2,
 	/obj/item/stack/medical/advanced/bruise_pack/healing_kit = 1,
@@ -62,7 +62,7 @@ GLOBAL_LIST_INIT(clash_medic_belt_stock, list(
 	/obj/item/reagent_container/hypospray/autoinjector/clash_unga = 2,
 	/obj/item/stack/medical/bruise_pack/field_dressing = 2,
 	/obj/item/stack/medical/splint = 2,
-	/obj/item/reagent_container/hypospray/autoinjector/oxycodone = 2,
+	/obj/item/reagent_container/hypospray/autoinjector/oxycodone/clash = 2,
 	/obj/item/reagent_container/hypospray/autoinjector/clash_tramadol = 1,
 	/obj/item/reagent_container/hypospray/autoinjector/clash_fixall = 2,
 	/obj/item/device/defibrillator/compact = 1,
@@ -414,6 +414,9 @@ GLOBAL_LIST_INIT(clash_medic_stripped_items, list(
 	skilllock = SKILL_MEDICAL_DEFAULT
 	display_maptext = TRUE
 	maptext_label = "Tr"
+
+/obj/item/reagent_container/hypospray/autoinjector/oxycodone/clash
+	name = "oxycodone injector"
 
 /obj/item/reagent_container/hypospray/autoinjector/clash_unga
 	name = "UNGA injector"

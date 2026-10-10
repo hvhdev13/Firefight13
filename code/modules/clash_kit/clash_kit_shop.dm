@@ -427,3 +427,338 @@ GLOBAL_LIST_INIT(clash_shop_counterparts, list(
 		var/obj/item/moving = text2path(move[1])
 		var/obj/item/storage/source = holders[move[2]]
 		. += list(list("index" = index, "name" = capitalize(strip_improper(initial(moving.name))), "icon" = "[initial(moving.icon)]", "icon_state" = initial(moving.icon_state), "from" = source ? capitalize(source.name) : null, "to" = move[3]))
+
+GLOBAL_LIST_EMPTY(clash_rack_cache)
+GLOBAL_LIST_EMPTY(clash_rack_entries)
+GLOBAL_LIST_INIT(clash_rack_swaps, list(
+	/obj/item/storage/pouch/bayonet/upp = /obj/item/storage/pouch/bayonet,
+))
+GLOBAL_LIST_INIT(clash_squad_headsets, list(
+	SQUAD_MARINE_1 = /obj/item/device/radio/headset/almayer/marine/alpha,
+	SQUAD_MARINE_2 = /obj/item/device/radio/headset/almayer/marine/bravo,
+))
+
+GLOBAL_LIST_INIT(clash_uscm_rack_extras, list(
+	list("POUCHES", list("Explosive Pouch", 0, /obj/item/storage/pouch/explosive, MARINE_CAN_BUY_POUCH, VENDOR_ITEM_REGULAR)),
+	list("POUCHES", list("Large Pistol Magazine Pouch", 0, /obj/item/storage/pouch/magazine/pistol/large, MARINE_CAN_BUY_POUCH, VENDOR_ITEM_REGULAR)),
+	list("COSMETICS", list("Firearm Lubricant", 0, /obj/item/prop/helmetgarb/gunoil, null, VENDOR_ITEM_REGULAR)),
+	list("COSMETICS", list("Attachable Dogtags", 0, /obj/item/clothing/accessory/dogtags, null, VENDOR_ITEM_REGULAR)),
+	list("COSMETICS", list("Diving Ospreys Shoulder Patch", 0, /obj/item/clothing/accessory/patch/falcon, null, VENDOR_ITEM_REGULAR)),
+	list("COSMETICS", list("Diving Ospreys UA Shoulder Patch", 0, /obj/item/clothing/accessory/patch/falconalt, null, VENDOR_ITEM_REGULAR)),
+	list("COSMETICS", list("USCM Large Chest Patch", 0, /obj/item/clothing/accessory/patch/uscmlarge, null, VENDOR_ITEM_REGULAR)),
+	list("COSMETICS", list("USCM Shoulder Patch", 0, /obj/item/clothing/accessory/patch/uscmpatch, null, VENDOR_ITEM_REGULAR)),
+	list("COSMETICS", list("United Americas Shoulder Patch", 0, /obj/item/clothing/accessory/patch/ua, null, VENDOR_ITEM_REGULAR)),
+	list("COSMETICS", list("United Americas Flag Shoulder Patch", 0, /obj/item/clothing/accessory/patch/uasquare, null, VENDOR_ITEM_REGULAR)),
+))
+
+GLOBAL_LIST_INIT(clash_upp_rack_extras, list(
+	list("HELMET", list("UL3 Armored Beret", 0, /obj/item/clothing/head/uppcap/beret, MARINE_CAN_BUY_HELMET, VENDOR_ITEM_REGULAR)),
+	list("MASK", list("Rebreather", 0, /obj/item/clothing/mask/rebreather, MARINE_CAN_BUY_MASK, VENDOR_ITEM_REGULAR)),
+	list("POUCHES", list("Explosive Pouch", 0, /obj/item/storage/pouch/explosive, MARINE_CAN_BUY_POUCH, VENDOR_ITEM_REGULAR)),
+	list("POUCHES", list("Large Pistol Magazine Pouch", 0, /obj/item/storage/pouch/magazine/pistol/large, MARINE_CAN_BUY_POUCH, VENDOR_ITEM_REGULAR)),
+	list("COSMETICS", list("Firearm Lubricant", 0, /obj/item/prop/helmetgarb/gunoil, null, VENDOR_ITEM_REGULAR)),
+	list("COSMETICS", list("Attachable Dogtags", 0, /obj/item/clothing/accessory/dogtags, null, VENDOR_ITEM_REGULAR)),
+	list("COSMETICS", list("UPP Patch", 0, /obj/item/clothing/accessory/patch/upp, null, VENDOR_ITEM_REGULAR)),
+	list("COSMETICS", list("UPP Naval Infantry Patch", 0, /obj/item/clothing/accessory/patch/upp/naval, null, VENDOR_ITEM_REGULAR)),
+))
+
+GLOBAL_LIST_INIT(clash_gear_rack_extras, list(
+	list("FLARE AND LIGHT", list("Combat Flashlight", 0, /obj/item/device/flashlight/combat, CLASH_CAN_BUY_FLASHLIGHT, VENDOR_ITEM_REGULAR)),
+	list("FLARE AND LIGHT", list("M94 Marking Flare Pack", 0, /obj/item/storage/box/m94, CLASH_CAN_BUY_FLARES, VENDOR_ITEM_REGULAR)),
+))
+
+GLOBAL_LIST_INIT(clash_rack_role_extras, list(
+	JOB_SQUAD_SMARTGUN = list(
+		list("SPECIAL AMMUNITION", list("M41AE2 Box Magazine (10x24mm)", 5, /obj/item/ammo_magazine/rifle/lmg, null, VENDOR_ITEM_REGULAR)),
+		list("SPECIAL AMMUNITION", list("M56 Smartgun Drum", 10, /obj/item/ammo_magazine/smartgun, null, VENDOR_ITEM_REGULAR)),
+	),
+	JOB_UPP_SPECIALIST = list(
+		list("SPECIAL AMMUNITION", list("QYJ-72 Ammo Box (7.62x54mmR)", 5, /obj/item/ammo_magazine/pkp, null, VENDOR_ITEM_REGULAR)),
+		list("SPECIAL AMMUNITION", list("Rotating Ammo Drum (7.62x51mm)", 5, /obj/item/ammo_magazine/minigun, null, VENDOR_ITEM_REGULAR)),
+	),
+))
+
+GLOBAL_LIST_INIT(clash_clothing_role_extras, list(
+	JOB_UPP_ENGI = list(list("BACKPACK (CHOOSE 1)", list("Combat Pack", 0, /obj/item/storage/backpack/lightpack/upp, MARINE_CAN_BUY_BACKPACK, VENDOR_ITEM_REGULAR))),
+))
+
+GLOBAL_LIST_INIT(clash_rack_dropped_categories, list(MARINE_CAN_BUY_ESSENTIALS, MARINE_CAN_BUY_KIT))
+
+GLOBAL_LIST_INIT(clash_gun_rack_ammo, list(
+	/obj/item/ammo_magazine/shotgun/flechette,
+	/obj/item/ammo_magazine/shotgun/buckshot,
+	/obj/item/ammo_magazine/shotgun/slugs,
+	/obj/item/ammo_magazine/rifle/m4ra,
+	/obj/item/ammo_magazine/smg/m39,
+	/obj/item/ammo_magazine/rifle,
+	/obj/item/ammo_magazine/flamer_tank,
+	/obj/item/ammo_magazine/pistol/m10,
+	/obj/item/ammo_magazine/pistol/mod88/normalpoint,
+	/obj/item/ammo_magazine/revolver,
+	/obj/item/ammo_magazine/pistol,
+	/obj/item/ammo_magazine/pistol/vp78,
+	/obj/item/ammo_magazine/pistol/m1911,
+	/obj/item/ammo_magazine/handful/lever_action/xm88,
+	/obj/item/ammo_magazine/rifle/type71,
+	/obj/item/ammo_magazine/rifle/type71/carbine,
+	/obj/item/ammo_magazine/rifle/ak4047,
+	/obj/item/ammo_magazine/smg/bizon,
+	/obj/item/ammo_magazine/shotgun/heavy/buckshot,
+	/obj/item/ammo_magazine/shotgun/heavy/slug,
+	/obj/item/ammo_magazine/shotgun/heavy/flechette,
+	/obj/item/ammo_magazine/pistol/t73,
+	/obj/item/ammo_magazine/revolver/upp,
+	/obj/item/ammo_magazine/pistol/np92,
+	/obj/item/ammo_magazine/sniper/svd,
+))
+
+/proc/clash_drop_vendor_sections(list/products, list/headers)
+	. = list()
+	var/dropping = FALSE
+	for(var/list/entry as anything in products)
+		if(!entry[3])
+			dropping = (entry[1] in headers)
+		if(!dropping)
+			. += list(entry)
+
+/proc/clash_drop_vendor_types(list/products, list/types)
+	. = list()
+	for(var/list/entry as anything in products)
+		if(!(entry[3] in types))
+			. += list(entry)
+
+/proc/clash_vendor_insert(list/products, section, list/entry, list/header, merge_stock)
+	var/at = 0
+	for(var/index in 1 to length(products))
+		var/list/listed = products[index]
+		if(listed[3] == entry[3])
+			if(merge_stock)
+				listed[2] += entry[2]
+			return
+		if(!at && !listed[3] && findtext(uppertext(listed[1]), section))
+			at = index
+	if(!at)
+		products += list(header, entry)
+		return
+	at++
+	while(at <= length(products) && products[at][3])
+		at++
+	products.Insert(at, list(entry))
+
+/proc/clash_uscm_role_list(job, gear)
+	switch(job)
+		if(JOB_SQUAD_MARINE)
+			return gear ? list() : GLOB.cm_vending_clothing_marine
+		if(JOB_SQUAD_ENGI)
+			return gear ? GLOB.cm_vending_gear_engi : GLOB.cm_vending_clothing_engi
+		if(JOB_SQUAD_MEDIC)
+			return gear ? GLOB.cm_vending_gear_medic : GLOB.cm_vending_clothing_medic
+		if(JOB_SQUAD_SMARTGUN)
+			return gear ? GLOB.cm_vending_gear_smartgun : GLOB.cm_vending_clothing_smartgun
+		if(JOB_SQUAD_LEADER)
+			return gear ? GLOB.cm_vending_gear_leader : GLOB.cm_vending_clothing_leader
+	return list()
+
+/proc/clash_uscm_rack_all(gear)
+	. = list()
+	for(var/job in list(JOB_SQUAD_MARINE, JOB_SQUAD_ENGI, JOB_SQUAD_MEDIC, JOB_SQUAD_SMARTGUN, JOB_SQUAD_LEADER))
+		. += clash_uscm_role_list(job, gear)
+
+/proc/clash_rack_icon_entries()
+	. = list()
+	for(var/item_type in GLOB.clash_arena_med_swaps)
+		var/list/swap = GLOB.clash_arena_med_swaps[item_type]
+		. += list(list(swap[1], 0, swap[2]))
+	for(var/list/extra as anything in GLOB.clash_uscm_rack_extras + GLOB.clash_upp_rack_extras + GLOB.clash_gear_rack_extras)
+		. += list(extra[2])
+	for(var/list/role_extras as anything in list(GLOB.clash_rack_role_extras, GLOB.clash_clothing_role_extras))
+		for(var/job in role_extras)
+			for(var/list/extra as anything in role_extras[job])
+				. += list(extra[2])
+
+/proc/clash_rack_paid(list/entry)
+	return ispath(entry[3]) && !entry[4] && entry[2] > 0
+
+/proc/clash_rack_source(kind, job)
+	var/list/clothing
+	var/list/gear
+	if(kind == "uscm_clothing" || kind == "uscm_gear")
+		clothing = clash_uscm_role_list(job, FALSE)
+		gear = clash_uscm_role_list(job, TRUE)
+	else
+		var/datum/job/role = GLOB.RoleAuthority.roles_by_name[job]
+		var/datum/equipment_preset/preset = role?.gear_preset && GLOB.equipment_presets.gear_path_presets_list[role.gear_preset]
+		if(!preset)
+			return list()
+		clothing = preset.get_antag_clothing_equipment()
+		gear = preset.get_antag_gear_equipment()
+	. = list()
+	if(kind == "uscm_clothing" || kind == "upp_clothing")
+		for(var/list/entry as anything in clothing)
+			if(!clash_rack_paid(entry))
+				. += list(entry)
+		return
+	. += gear
+	var/list/header
+	for(var/list/entry as anything in clothing)
+		if(!entry[3])
+			header = entry
+		else if(clash_rack_paid(entry))
+			clash_vendor_insert(., uppertext(header[1]), entry, header)
+
+/proc/clash_rack_entry(list/listed, list/shop, medic)
+	if(listed[4] in GLOB.clash_rack_dropped_categories)
+		return null
+	var/list/entry = listed.Copy()
+	entry[3] = GLOB.clash_rack_swaps[entry[3]] || entry[3]
+	if(!ispath(entry[3]))
+		return entry
+	entry = clash_arena_med_entry(entry, medic, FALSE)
+	if(!entry || !clash_rack_paid(entry))
+		return entry
+	var/list/item = !(entry[3] in GLOB.clash_gun_rack_ammo) && shop["[entry[3]]"]
+	if(!item)
+		return null
+	entry[2] = item["cost"]
+	GLOB.clash_rack_entries[entry] = TRUE
+	return entry
+
+/proc/clash_rack_products(list/source, job, list/extras)
+	var/list/shop = get_clash_shop(job)["by_id"]
+	var/medic = clash_job_is_medic(job)
+	var/list/products = list()
+	for(var/list/listed as anything in source)
+		var/list/entry = clash_rack_entry(listed, shop, medic)
+		if(entry)
+			products += list(entry)
+	for(var/list/extra as anything in extras)
+		var/list/entry = clash_rack_entry(extra[2], shop, medic)
+		if(entry)
+			clash_vendor_insert(products, extra[1], entry, list(extra[1], 0, null, null, null))
+	. = list()
+	for(var/index in 1 to length(products))
+		var/list/entry = products[index]
+		if(entry[3] || (index < length(products) && products[index + 1][3]))
+			. += list(entry)
+
+/proc/clash_rack_for(mob/living/carbon/human/user, kind)
+	if(!ishuman(user))
+		return list()
+	var/key = "[kind]|[user.job]"
+	if(!GLOB.clash_rack_cache[key])
+		var/list/extras
+		switch(kind)
+			if("uscm_clothing")
+				extras = (GLOB.clash_clothing_role_extras[user.job] || list()) + GLOB.clash_uscm_rack_extras
+			if("upp_clothing")
+				extras = (GLOB.clash_clothing_role_extras[user.job] || list()) + GLOB.clash_upp_rack_extras
+			else
+				extras = GLOB.clash_gear_rack_extras + (GLOB.clash_rack_role_extras[user.job] || list())
+		GLOB.clash_rack_cache[key] = clash_rack_products(clash_rack_source(kind, user.job), user.job, extras)
+	return GLOB.clash_rack_cache[key]
+
+/proc/clash_rack_lock_text(mob/living/carbon/human/user, list/itemspec)
+	if(!ishuman(user) || !GLOB.clash_rack_entries[itemspec])
+		return null
+	return clash_shop_item_lock_text(user.mind?.ckey || user.ckey, user.job, itemspec[2], itemspec[3])
+
+/obj/structure/machinery/cm_vending/clothing/marine/clash
+	req_access = list(ACCESS_MARINE_PREP)
+	vendor_role = list()
+
+/obj/structure/machinery/cm_vending/clothing/marine/clash/get_listed_products(mob/user)
+	if(!user)
+		return clash_uscm_rack_all(FALSE) + clash_rack_icon_entries()
+	return clash_rack_for(user, "uscm_clothing")
+
+/obj/structure/machinery/cm_vending/clothing/marine/clash/vendor_successful_vend_one(prod_type, mob/living/carbon/human/user, turf/target_turf, insignas_override, stack_amount)
+	headset_type = GLOB.clash_squad_headsets[user.assigned_squad?.name] || initial(headset_type)
+	return ..()
+
+/obj/structure/machinery/cm_vending/gear/clash
+	req_access = list(ACCESS_MARINE_PREP)
+
+/obj/structure/machinery/cm_vending/gear/clash/get_listed_products(mob/user)
+	if(!user)
+		return clash_uscm_rack_all(TRUE)
+	return clash_rack_for(user, "uscm_gear")
+
+/obj/structure/machinery/cm_vending/clothing/antag/upp/clash/get_listed_products(mob/user)
+	if(!user)
+		return ..() + clash_rack_icon_entries()
+	return clash_rack_for(user, "upp_clothing")
+
+/obj/structure/machinery/cm_vending/gear/antag/clash/get_listed_products(mob/user)
+	if(!user)
+		return ..()
+	return clash_rack_for(user, "upp_gear")
+
+/obj/structure/machinery/cm_vending/sorted/cargo_guns/squad_prep/clash/populate_product_list(scale)
+	..()
+	listed_products = clash_drop_vendor_types(listed_products, list(/obj/item/storage/box/m94))
+	var/list/extras = list(
+		list("PRIMARY AMMUNITION", list("M4RA Magazine (10x24mm)", 1.8, /obj/item/ammo_magazine/rifle/m4ra, VENDOR_ITEM_REGULAR)),
+		list("PRIMARY AMMUNITION", list("M39 Magazine (10x20mm)", 1.8, /obj/item/ammo_magazine/smg/m39, VENDOR_ITEM_REGULAR)),
+		list("PRIMARY AMMUNITION", list("M41A Magazine (10x24mm)", 1.9, /obj/item/ammo_magazine/rifle, VENDOR_ITEM_REGULAR)),
+		list("PRIMARY AMMUNITION", list("M240 Incinerator Tank", floor(scale * 3), /obj/item/ammo_magazine/flamer_tank, VENDOR_ITEM_REGULAR)),
+		list("SIDEARM AMMUNITION", list("M10 HV Magazine (10x20mm-APC)", floor(scale * 4), /obj/item/ammo_magazine/pistol/m10, VENDOR_ITEM_REGULAR)),
+		list("SIDEARM AMMUNITION", list("VP78 Magazine", floor(scale * 5), /obj/item/ammo_magazine/pistol/vp78, VENDOR_ITEM_REGULAR)),
+		list("PRIMARY AMMUNITION", list("XM88 .458 SOCOM Rounds", floor(scale * 10), /obj/item/ammo_magazine/handful/lever_action/xm88, VENDOR_ITEM_REGULAR)),
+		list("SIDEARM AMMUNITION", list("M1911 Magazine (.45)", floor(scale * 10), /obj/item/ammo_magazine/pistol/m1911, VENDOR_ITEM_REGULAR)),
+	)
+	for(var/list/extra as anything in extras)
+		clash_vendor_insert(listed_products, extra[1], extra[2], list(extra[1], -1, null, null), TRUE)
+
+/obj/structure/machinery/cm_vending/sorted/cargo_guns/upp_squad_guns/clash/populate_product_list(scale)
+	..()
+	listed_products = clash_drop_vendor_types(listed_products, list(/obj/item/storage/box/m94))
+	var/list/extras = list(
+		list("PRIMARY AMMUNITION", list("Type 71 Magazine (5.45x39mm)", 1.9, /obj/item/ammo_magazine/rifle/type71, VENDOR_ITEM_REGULAR)),
+		list("PRIMARY AMMUNITION", list("Type 71 Carbine Magazine (5.45x39mm)", 1.8, /obj/item/ammo_magazine/rifle/type71/carbine, VENDOR_ITEM_REGULAR)),
+		list("PRIMARY AMMUNITION", list("AK-4047 Magazine (10x24mm)", 1.8, /obj/item/ammo_magazine/rifle/ak4047, VENDOR_ITEM_REGULAR)),
+		list("PRIMARY AMMUNITION", list("Type 64 Helical Magazine (7.62x19mm)", 1.8, /obj/item/ammo_magazine/smg/bizon, VENDOR_ITEM_REGULAR)),
+		list("PRIMARY AMMUNITION", list("M240 Incinerator Tank", floor(scale * 8), /obj/item/ammo_magazine/flamer_tank, VENDOR_ITEM_REGULAR)),
+		list("PRIMARY AMMUNITION", list("Type 88 Magazine (7.62x54mmR)", floor(scale * 10), /obj/item/ammo_magazine/sniper/svd, VENDOR_ITEM_REGULAR)),
+	)
+	for(var/list/extra as anything in extras)
+		clash_vendor_insert(listed_products, extra[1], extra[2], list(extra[1], -1, null, null), TRUE)
+
+/proc/clash_tool_products(list/products, mob/living/carbon/human/user)
+	if(!user)
+		return products + clash_engineer_build_icons()
+	if(!ishuman(user) || !clash_is_engineer(user))
+		return products
+	return products + clash_engineer_vendor_entries(user)
+
+/proc/clash_engineer_vendor_access(obj/structure/machinery/cm_vending/vendor, mob/user, display)
+	if(!ishuman(user) || clash_is_engineer(user))
+		return TRUE
+	if(display)
+		to_chat(user, SPAN_WARNING("Access denied."))
+		vendor.vend_fail()
+	return FALSE
+
+/obj/structure/machinery/cm_vending/sorted/tech/tool_storage/clash
+	req_access = list()
+	req_one_access = list(ACCESS_MARINE_PREP)
+	vendor_theme = VENDOR_THEME_USCM
+
+/obj/structure/machinery/cm_vending/sorted/tech/tool_storage/clash/populate_product_list(scale)
+	..()
+	listed_products = clash_drop_vendor_sections(listed_products, list("SCANNERS"))
+
+/obj/structure/machinery/cm_vending/sorted/tech/tool_storage/clash/get_available_products(mob/user)
+	return clash_tool_products(..(), user)
+
+/obj/structure/machinery/cm_vending/sorted/tech/tool_storage/clash/can_access_to_vend(mob/user, display = TRUE, ignore_hack = FALSE)
+	return clash_engineer_vendor_access(src, user, display) && ..()
+
+/obj/structure/machinery/cm_vending/sorted/tech/tool_storage/antag/clash/populate_product_list(scale)
+	..()
+	listed_products = clash_drop_vendor_sections(listed_products, list("SCANNERS"))
+
+/obj/structure/machinery/cm_vending/sorted/tech/tool_storage/antag/clash/get_available_products(mob/user)
+	return clash_tool_products(..(), user)
+
+/obj/structure/machinery/cm_vending/sorted/tech/tool_storage/antag/clash/can_access_to_vend(mob/user, display = TRUE, ignore_hack = FALSE)
+	return clash_engineer_vendor_access(src, user, display) && ..()
