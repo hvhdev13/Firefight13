@@ -285,6 +285,13 @@ GLOBAL_LIST_EMPTY(clash_option_gates)
 	var/list/entry = GLOB.clash_class_primaries[faction]?[class]
 	return (item_type in entry?["blocked"])
 
+/proc/clash_class_hidden_options(job)
+	. = list()
+	var/faction = clash_kit_faction_for_job(job)
+	var/list/entry = GLOB.clash_class_primaries[faction]?[GLOB.clash_job_classes[job]]
+	for(var/item_type in entry?["blocked"])
+		. += clash_kit_option_id(faction, KIT_SLOT_PRIMARY, item_type)
+
 /proc/clash_class_primary_level(faction, class, item_type)
 	var/list/entry = GLOB.clash_class_primaries[faction]?[class]
 	for(var/list/rung as anything in entry?["unlocks"])

@@ -188,6 +188,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 		"sentry_slot" = clash_job_is_engineer(job),
 		"job_class" = GLOB.clash_job_classes[job],
 		"class_primaries" = (GLOB.clash_job_classes[job] in GLOB.clash_class_only_primaries),
+		"hidden_options" = clash_class_hidden_options(job),
 		"fits" = fits,
 		"blocked_slots" = clash_kit_blocked_slots(gun_type),
 		"option_problems" = clash_kit_option_problems(kit, job, user),
