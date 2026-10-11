@@ -92,6 +92,34 @@ GLOBAL_LIST_INIT(clash_kit_shells, list(
 ))
 GLOBAL_LIST_INIT(clash_kit_shell_names, list("Buckshot", "Slug", "Flechette"))
 
+/proc/clash_arena_ammo_setup()
+	for(var/ammo_type in GLOB.ammo_list)
+		if(ispath(ammo_type, /datum/ammo/bullet/shotgun/heavy))
+			var/datum/ammo/ammo = GLOB.ammo_list[ammo_type]
+			ammo.damage += 1
+
+/obj/item/weapon/gun/var/clash_burst_default = FALSE
+
+/obj/item/weapon/gun/rifle/ak4047
+	clash_burst_default = TRUE
+
+/obj/item/weapon/gun/rifle/type71
+	clash_burst_default = TRUE
+
+/obj/item/weapon/gun/rifle/type71/carbine
+	clash_burst_default = FALSE
+
+/obj/item/weapon/gun/rifle/setup_firemodes()
+	var/old_firemode = gun_firemode
+	. = ..()
+	if(!clash_burst_default || !clash_fast_medicine() || !(GUN_FIREMODE_BURSTFIRE in gun_firemode_list))
+		return
+	gun_firemode_list -= GUN_FIREMODE_BURSTFIRE
+	gun_firemode_list.Insert(1, GUN_FIREMODE_BURSTFIRE)
+	if(!(old_firemode in gun_firemode_list))
+		gun_firemode = GUN_FIREMODE_BURSTFIRE
+		SEND_SIGNAL(src, COMSIG_GUN_FIRE_MODE_TOGGLE, gun_firemode)
+
 GLOBAL_LIST_EMPTY(clash_kit_options)
 GLOBAL_LIST_INIT(clash_attachment_purposes, list(
 	/obj/item/attachable/flashlight = "Light you can switch on",
@@ -513,7 +541,7 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 	add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "M41A pulse rifle", /obj/item/weapon/gun/rifle/m41a, "All rounder. Burst and full auto", /obj/item/ammo_magazine/rifle, 4)
 	add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "M4RA battle rifle", /obj/item/weapon/gun/rifle/m4ra, "Hits hard at range. Semi auto", /obj/item/ammo_magazine/rifle/m4ra, 4)
 	add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "M37A2 pump shotgun", /obj/item/weapon/gun/shotgun/pump/m37a, "Wins the doorway. Buckshot", /obj/item/ammo_magazine/shotgun/buckshot, 4)
-	add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "M39 submachine gun", /obj/item/weapon/gun/smg/m39, "Fast handling, fast firing, short reach", /obj/item/ammo_magazine/smg/m39, 4)
+//	add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "M39 submachine gun", /obj/item/weapon/gun/smg/m39, "Fast handling, fast firing, short reach", /obj/item/ammo_magazine/smg/m39, 4)
 	var/datum/clash_kit_option/lmg = add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "M41AE2 heavy pulse rifle", /obj/item/weapon/gun/rifle/lmg, "Big drum, steady fire. Fires wielded only", /obj/item/ammo_magazine/rifle/lmg, 4)
 	lmg.only_class = GLOB.clash_job_classes[JOB_SQUAD_SMARTGUN]
 	var/datum/clash_kit_option/smartgun = add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "M56A2 smartgun", /obj/item/weapon/gun/smartgun, "IFF rounds fly past your teammates. Needs the M56 harness", /obj/item/ammo_magazine/smartgun, 2)
@@ -556,7 +584,7 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 	add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "Type 71 pulse rifle", /obj/item/weapon/gun/rifle/type71, "All rounder. Burst and full auto", /obj/item/ammo_magazine/rifle/type71, 4)
 	add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "Type 71 carbine", /obj/item/weapon/gun/rifle/type71/carbine, "Lighter and quicker, less reach", /obj/item/ammo_magazine/rifle/type71/carbine, 4)
 	add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "AK-4047", /obj/item/weapon/gun/rifle/ak4047, "Big magazine, big kick", /obj/item/ammo_magazine/rifle/ak4047, 4)
-	add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "Type 64 submachine gun", /obj/item/weapon/gun/smg/bizon, "Fast handling, helical magazine", /obj/item/ammo_magazine/smg/bizon, 4)
+//	add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "Type 64 submachine gun", /obj/item/weapon/gun/smg/bizon, "Fast handling, helical magazine", /obj/item/ammo_magazine/smg/bizon, 4)
 	add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "Type 23 shotgun", /obj/item/weapon/gun/shotgun/type23, "Wins the doorway. Heavy buckshot", /obj/item/ammo_magazine/shotgun/heavy/buckshot, 4)
 	var/datum/clash_kit_option/qyj = add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "QYJ-72 machine gun", /obj/item/weapon/gun/pkp, "Belt fed. Open the feed cover to reload", /obj/item/ammo_magazine/pkp, 4)
 	qyj.only_class = GLOB.clash_job_classes[JOB_UPP_SPECIALIST]

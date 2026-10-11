@@ -182,7 +182,20 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 /proc/clash_gate_lock_text(datum/clash_progress/progress, faction, item_type, job)
 	if(item_type in GLOB.clash_role_free_gear[job])
 		return null
+	var/class = GLOB.clash_job_classes[job]
+	if(item_type == clash_class_start_primary(faction, class))
+		return null
+	if(clash_class_primary_blocked(faction, class, item_type))
+		return "Not issued to this role"
 	var/list/gate = clash_gate_for(faction, item_type)
+	var/class_level = clash_class_primary_level(faction, class, item_type)
+	if(class_level)
+		if(progress.class_level(class) >= class_level)
+			return null
+		var/class_text = "Unlocks at [GLOB.clash_class_names[class]] level [class_level]"
+		if(gate?["kind"] != CLASH_GATE_FACTION)
+			return class_text
+		return progress.faction_level(faction) < gate["level"] ? "[class_text] or [clash_side_name(faction)] level [gate["level"]]" : null
 	if(!gate)
 		return null
 	switch(gate["kind"])
@@ -452,6 +465,13 @@ GLOBAL_VAR_INIT(clash_trial_packs_built, FALSE)
 		GLOB.clash_vendor_hidden[key] = clash_trial_item(item_type)
 	return GLOB.clash_vendor_hidden[key]
 
+/proc/clash_vendor_withheld(mob/living/carbon/human/user, item_type)
+	if(clash_vendor_laddered(item_type))
+		return TRUE
+	if(!ishuman(user) || !ispath(item_type, /obj/item/weapon/gun) || !clash_progression_gating())
+		return FALSE
+	return !!clash_class_primary_level(user.faction, GLOB.clash_job_classes[user.job], item_type)
+
 /proc/clash_attachment_unlock_text(datum/clash_progress/progress, attachment_type)
 	build_clash_kit_catalog()
 	var/tracked = FALSE
@@ -483,7 +503,7 @@ GLOBAL_VAR_INIT(clash_trial_packs_built, FALSE)
 	return clash_gate_lock_text(progress, user.faction, item_type, user.job)
 
 /proc/clash_vendor_label(mob/living/carbon/human/user, item_type)
-	if(!ishuman(user) || !clash_vendor_laddered(item_type))
+	if(!ishuman(user) || !clash_vendor_withheld(user, item_type))
 		return null
 	return clash_vendor_lock_text(user, item_type) || "Unlocked, take it from your loadout"
 
@@ -496,7 +516,7 @@ GLOBAL_VAR_INIT(clash_trial_packs_built, FALSE)
 	if(rack_lock)
 		to_chat(user, SPAN_WARNING("[itemspec[1]] is locked. [rack_lock]."))
 		return TRUE
-	if(!clash_vendor_laddered(itemspec[3]))
+	if(!clash_vendor_withheld(user, itemspec[3]))
 		return FALSE
 	to_chat(user, SPAN_WARNING("[itemspec[1]] is not sold here. [clash_vendor_label(user, itemspec[3]) || "Unlocked, take it from your loadout"]."))
 	return TRUE
@@ -519,7 +539,7 @@ GLOBAL_VAR_INIT(clash_trial_packs_built, FALSE)
 	var/list/products = vendor.get_available_products(user)
 	for(var/index in 1 to min(length(listing), length(products)))
 		var/list/itemspec = products[index]
-		if(clash_vendor_laddered(itemspec[3]) || clash_rack_lock_text(user, itemspec))
+		if(clash_vendor_withheld(user, itemspec[3]) || clash_rack_lock_text(user, itemspec))
 			listing[index] = (vendor.vend_flags & VEND_LIMITED_INVENTORY) ? 0 : FALSE
 
 /proc/clash_attachment_allowed(mob/user, obj/item/attachable/attachment, obj/item/weapon/gun/gun)

@@ -154,6 +154,14 @@
 		if(rung[1] == level && clash_item_option(faction, rung[2]))
 			found = TRUE
 			clash_notify_unlock(ckey, CLASH_UNLOCK_GUN, clash_item_name(faction, rung[2]), source, rung[2])
+	var/list/class_primaries = GLOB.clash_class_primaries[faction]?[class]
+	for(var/list/rung as anything in class_primaries?["unlocks"])
+		var/list/gate = clash_gate_for(faction, rung[2])
+		if(gate?["kind"] == CLASH_GATE_FACTION && faction_level(faction) >= gate["level"])
+			continue
+		if(rung[1] == level && clash_item_option(faction, rung[2]))
+			found = TRUE
+			clash_notify_unlock(ckey, CLASH_UNLOCK_GUN, clash_item_name(faction, rung[2]), source, rung[2])
 	if(class == CLASH_CLASS_ENGINEER)
 		for(var/tier in GLOB.clash_sentry_tiers)
 			var/list/stats = GLOB.clash_sentry_tiers[tier]

@@ -29,7 +29,7 @@ GLOBAL_LIST_INIT(clash_faction_ladders, list(
 		list(2, /obj/item/clothing/head/helmet/marine/jungle),
 		list(3, /obj/item/weapon/gun/shotgun/pump/m37a),
 		list(4, /obj/item/clothing/mask/rebreather),
-		list(5, /obj/item/weapon/gun/smg/m39),
+//		list(5, /obj/item/weapon/gun/smg/m39),
 		list(5, /obj/item/storage/pouch/magazine/large),
 		list(6, /obj/item/clothing/mask/rebreather/scarf),
 		list(7, /obj/item/weapon/gun/pistol/mod88),
@@ -55,7 +55,7 @@ GLOBAL_LIST_INIT(clash_faction_ladders, list(
 		list(2, /obj/item/clothing/head/helmet/marine/veteran/UPP/army),
 		list(3, /obj/item/weapon/gun/shotgun/type23),
 		list(4, /obj/item/clothing/mask/rebreather),
-		list(5, /obj/item/weapon/gun/smg/bizon),
+//		list(5, /obj/item/weapon/gun/smg/bizon),
 		list(5, /obj/item/storage/pouch/magazine/large),
 		list(6, /obj/item/clothing/mask/rebreather/scarf/tacticalmask/green),
 		list(7, /obj/item/weapon/gun/pistol/np92),
@@ -98,6 +98,24 @@ GLOBAL_LIST_INIT(clash_class_weapons, list(
 ))
 
 GLOBAL_LIST_INIT(clash_class_only_primaries, list(CLASH_CLASS_HEAVY))
+
+GLOBAL_LIST_INIT(clash_class_primaries, list(
+	FACTION_MARINE = list(
+		CLASH_CLASS_RIFLEMAN = list("unlocks" = list(list(2, /obj/item/weapon/gun/rifle/m4ra))),
+//		CLASH_CLASS_MEDIC = list("start" = /obj/item/weapon/gun/smg/m39, "unlocks" = list(list(2, /obj/item/weapon/gun/rifle/m41a))),
+		CLASH_CLASS_MEDIC = list("start" = /obj/item/weapon/gun/rifle/m4ra, "blocked" = list(/obj/item/weapon/gun/lever_action/xm88)),
+		CLASH_CLASS_ENGINEER = list("start" = /obj/item/weapon/gun/shotgun/pump/m37a, "unlocks" = list(list(2, /obj/item/weapon/gun/rifle/m4ra), list(3, /obj/item/weapon/gun/rifle/m41a))),
+		CLASH_CLASS_LEADER = list("unlocks" = list(list(2, /obj/item/weapon/gun/rifle/m4ra))),
+	),
+	FACTION_UPP = list(
+		CLASH_CLASS_RIFLEMAN = list("unlocks" = list(list(2, /obj/item/weapon/gun/rifle/type71/carbine), list(3, /obj/item/weapon/gun/rifle/ak4047))),
+//		CLASH_CLASS_MEDIC = list("start" = /obj/item/weapon/gun/smg/bizon, "unlocks" = list(list(2, /obj/item/weapon/gun/rifle/type71))),
+		CLASH_CLASS_MEDIC = list("start" = /obj/item/weapon/gun/rifle/ak4047),
+//		CLASH_CLASS_ENGINEER = list("start" = /obj/item/weapon/gun/shotgun/type23, "unlocks" = list(list(2, /obj/item/weapon/gun/rifle/type71/carbine), list(3, /obj/item/weapon/gun/rifle/type71), list(4, /obj/item/weapon/gun/smg/bizon)), "blocked" = list(/obj/item/weapon/gun/rifle/ak4047)),
+		CLASH_CLASS_ENGINEER = list("start" = /obj/item/weapon/gun/shotgun/type23, "unlocks" = list(list(2, /obj/item/weapon/gun/rifle/type71/carbine), list(3, /obj/item/weapon/gun/rifle/type71)), "blocked" = list(/obj/item/weapon/gun/rifle/ak4047)),
+		CLASH_CLASS_LEADER = list("start" = /obj/item/weapon/gun/rifle/ak4047),
+	),
+))
 
 GLOBAL_LIST_INIT(clash_role_names, list(
 	JOB_SQUAD_SMARTGUN = "Machine Gunner",
@@ -258,6 +276,21 @@ GLOBAL_LIST_EMPTY(clash_option_gates)
 				gates[key]["level"] = rung[1]
 			else
 				gates[key] = list("kind" = CLASH_GATE_FACTION, "level" = rung[1])
+
+/proc/clash_class_start_primary(faction, class)
+	var/list/entry = GLOB.clash_class_primaries[faction]?[class]
+	return entry?["start"]
+
+/proc/clash_class_primary_blocked(faction, class, item_type)
+	var/list/entry = GLOB.clash_class_primaries[faction]?[class]
+	return (item_type in entry?["blocked"])
+
+/proc/clash_class_primary_level(faction, class, item_type)
+	var/list/entry = GLOB.clash_class_primaries[faction]?[class]
+	for(var/list/rung as anything in entry?["unlocks"])
+		if(rung[2] == item_type)
+			return rung[1]
+	return null
 
 /proc/clash_class_gear_level(class, gear)
 	var/list/order = GLOB.clash_class_gear[class]

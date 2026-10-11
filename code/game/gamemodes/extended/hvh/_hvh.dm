@@ -1485,6 +1485,7 @@ GLOBAL_VAR(clash_start_mode)
 		clash_arena_engineering_setup()
 		clash_arena_remove_attachment_vendors()
 		clash_arena_shrapnel_setup()
+		clash_arena_ammo_setup()
 	for(var/obj/structure/machinery/cm_vending/vendor in GLOB.machines)
 		vendor.vend_delay = 0
 	if(arena_rules)

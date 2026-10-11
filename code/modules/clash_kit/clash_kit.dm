@@ -225,7 +225,7 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 				kit.name = customs > 1 ? "Custom [customs]" : "Custom"
 		by_job[job] = kits
 
-/proc/issue_clash_role_kit(mob/living/carbon/human/fighter, job)
+/proc/issue_clash_role_kit(mob/living/carbon/human/fighter, job, bot = FALSE)
 	var/kit_path = GLOB.clash_kit_role_kits[job]
 	var/datum/equipment_preset/full_kit = kit_path && GLOB.equipment_presets.gear_path_presets_list[kit_path]
 	if(full_kit)
@@ -239,8 +239,19 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 			stack_trace("Clash kit could not issue [job] their full kit: [error]")
 	clash_issue_specialist_armor(fighter)
 	clash_issue_machinegunner_kit(fighter)
+	clash_issue_class_primary(fighter, job, bot)
 	clash_swap_c4_pouches(fighter)
 	clash_kit_default_webbing(fighter)
+
+/proc/clash_issue_class_primary(mob/living/carbon/human/fighter, job, bot)
+	var/start_type = clash_class_start_primary(clash_kit_faction_for_job(job), GLOB.clash_job_classes[job])
+	if(!start_type || istype(clash_kit_primary_of(fighter), start_type) || (bot && ispath(start_type, /obj/item/weapon/gun/shotgun)))
+		return
+	clash_kit_purge_guns(fighter, FALSE)
+	var/obj/item/weapon/gun/start_gun = new start_type(fighter)
+	if(!fighter.equip_to_slot_if_possible(start_gun, WEAR_J_STORE, TRUE, FALSE, TRUE) && !fighter.equip_to_appropriate_slot(start_gun))
+		clash_kit_hand_or_floor(fighter, start_gun)
+	clash_kit_purge_stray_magazines(fighter)
 
 /proc/clash_issue_specialist_armor(mob/living/carbon/human/fighter)
 	var/found = FALSE
