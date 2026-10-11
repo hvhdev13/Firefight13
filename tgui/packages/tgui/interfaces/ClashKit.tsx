@@ -202,6 +202,7 @@ interface Data extends StaticData {
   sentry_slot: BooleanLike;
   job_class: string;
   class_primaries: BooleanLike;
+  hidden_options: string[];
   hint: string | null;
   pack: PackContainer[];
   extras: Extra[];
@@ -1690,6 +1691,7 @@ export const ClashKit = () => {
     sentry_slot,
     job_class,
     class_primaries,
+    hidden_options,
     hint,
     progress,
   } = data;
@@ -1732,10 +1734,12 @@ export const ClashKit = () => {
   const current = slotById[selectedSlot];
   const ranks = progress?.ranks ?? {};
   const slotOptions = (id: string) =>
-    (menus[faction]?.[id] ?? []).filter((option) =>
-      id === 'primary' && class_primaries
-        ? option.only_class === job_class
-        : !option.only_class || option.only_class === job_class,
+    (menus[faction]?.[id] ?? []).filter(
+      (option) =>
+        !hidden_options.includes(option.id) &&
+        (id === 'primary' && class_primaries
+          ? option.only_class === job_class
+          : !option.only_class || option.only_class === job_class),
     );
   const hasClassPerks = slotOptions('class_perk').length > 0;
   useEffect(() => {

@@ -197,7 +197,7 @@ GLOBAL_LIST_INIT(clash_bot_class_jobs, list(
 		npc.job = spawn_job
 		if(clash_uses_kits())
 			build_clash_kit_catalog()
-			issue_clash_role_kit(npc, spawn_job)
+			issue_clash_role_kit(npc, spawn_job, TRUE)
 			apply_clash_kit(npc, new /datum/clash_kit, CLASH_KIT_SPAWN, spawn_job)
 			clash_issue_medic_gear(npc)
 	if(bot_grenade && !(locate(/obj/item/explosive/grenade) in npc.get_contents()))

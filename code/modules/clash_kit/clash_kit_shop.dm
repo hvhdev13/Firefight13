@@ -489,7 +489,7 @@ GLOBAL_LIST_INIT(clash_gun_rack_ammo, list(
 	/obj/item/ammo_magazine/shotgun/buckshot,
 	/obj/item/ammo_magazine/shotgun/slugs,
 	/obj/item/ammo_magazine/rifle/m4ra,
-	/obj/item/ammo_magazine/smg/m39,
+//	/obj/item/ammo_magazine/smg/m39,
 	/obj/item/ammo_magazine/rifle,
 	/obj/item/ammo_magazine/flamer_tank,
 	/obj/item/ammo_magazine/pistol/m10,
@@ -502,7 +502,7 @@ GLOBAL_LIST_INIT(clash_gun_rack_ammo, list(
 	/obj/item/ammo_magazine/rifle/type71,
 	/obj/item/ammo_magazine/rifle/type71/carbine,
 	/obj/item/ammo_magazine/rifle/ak4047,
-	/obj/item/ammo_magazine/smg/bizon,
+//	/obj/item/ammo_magazine/smg/bizon,
 	/obj/item/ammo_magazine/shotgun/heavy/buckshot,
 	/obj/item/ammo_magazine/shotgun/heavy/slug,
 	/obj/item/ammo_magazine/shotgun/heavy/flechette,
@@ -695,10 +695,10 @@ GLOBAL_LIST_INIT(clash_gun_rack_ammo, list(
 
 /obj/structure/machinery/cm_vending/sorted/cargo_guns/squad_prep/clash/populate_product_list(scale)
 	..()
-	listed_products = clash_drop_vendor_types(listed_products, list(/obj/item/storage/box/m94))
+	listed_products = clash_drop_vendor_types(listed_products, list(/obj/item/storage/box/m94, /obj/item/weapon/gun/smg/m39, /obj/item/ammo_magazine/smg/m39))
 	var/list/extras = list(
 		list("PRIMARY AMMUNITION", list("M4RA Magazine (10x24mm)", 1.8, /obj/item/ammo_magazine/rifle/m4ra, VENDOR_ITEM_REGULAR)),
-		list("PRIMARY AMMUNITION", list("M39 Magazine (10x20mm)", 1.8, /obj/item/ammo_magazine/smg/m39, VENDOR_ITEM_REGULAR)),
+//		list("PRIMARY AMMUNITION", list("M39 Magazine (10x20mm)", 1.8, /obj/item/ammo_magazine/smg/m39, VENDOR_ITEM_REGULAR)),
 		list("PRIMARY AMMUNITION", list("M41A Magazine (10x24mm)", 1.9, /obj/item/ammo_magazine/rifle, VENDOR_ITEM_REGULAR)),
 		list("PRIMARY AMMUNITION", list("M240 Incinerator Tank", floor(scale * 3), /obj/item/ammo_magazine/flamer_tank, VENDOR_ITEM_REGULAR)),
 		list("SIDEARM AMMUNITION", list("M10 HV Magazine (10x20mm-APC)", floor(scale * 4), /obj/item/ammo_magazine/pistol/m10, VENDOR_ITEM_REGULAR)),
@@ -711,12 +711,12 @@ GLOBAL_LIST_INIT(clash_gun_rack_ammo, list(
 
 /obj/structure/machinery/cm_vending/sorted/cargo_guns/upp_squad_guns/clash/populate_product_list(scale)
 	..()
-	listed_products = clash_drop_vendor_types(listed_products, list(/obj/item/storage/box/m94))
+	listed_products = clash_drop_vendor_types(listed_products, list(/obj/item/storage/box/m94, /obj/item/weapon/gun/smg/bizon/upp, /obj/item/ammo_magazine/smg/bizon))
 	var/list/extras = list(
 		list("PRIMARY AMMUNITION", list("Type 71 Magazine (5.45x39mm)", 1.9, /obj/item/ammo_magazine/rifle/type71, VENDOR_ITEM_REGULAR)),
 		list("PRIMARY AMMUNITION", list("Type 71 Carbine Magazine (5.45x39mm)", 1.8, /obj/item/ammo_magazine/rifle/type71/carbine, VENDOR_ITEM_REGULAR)),
 		list("PRIMARY AMMUNITION", list("AK-4047 Magazine (10x24mm)", 1.8, /obj/item/ammo_magazine/rifle/ak4047, VENDOR_ITEM_REGULAR)),
-		list("PRIMARY AMMUNITION", list("Type 64 Helical Magazine (7.62x19mm)", 1.8, /obj/item/ammo_magazine/smg/bizon, VENDOR_ITEM_REGULAR)),
+//		list("PRIMARY AMMUNITION", list("Type 64 Helical Magazine (7.62x19mm)", 1.8, /obj/item/ammo_magazine/smg/bizon, VENDOR_ITEM_REGULAR)),
 		list("PRIMARY AMMUNITION", list("M240 Incinerator Tank", floor(scale * 8), /obj/item/ammo_magazine/flamer_tank, VENDOR_ITEM_REGULAR)),
 		list("PRIMARY AMMUNITION", list("Type 88 Magazine (7.62x54mmR)", floor(scale * 10), /obj/item/ammo_magazine/sniper/svd, VENDOR_ITEM_REGULAR)),
 	)

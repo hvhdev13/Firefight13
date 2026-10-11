@@ -88,7 +88,7 @@
 				locks[option.id] = lock_text
 				continue
 			var/list/gate = GLOB.clash_option_gates[clash_gate_key(faction, option.item_type)]
-			if((GLOB.clash_perks[option.item_type] || (attachment ? slot_gun && clash_kit_attachment_fits(option.item_type, slot_gun) : gate && gate["kind"] != CLASH_GATE_FREE)) && !(option.id in progress.seen))
+			if((GLOB.clash_perks[option.item_type] || clash_class_primary_level(faction, class, option.item_type) || (attachment ? slot_gun && clash_kit_attachment_fits(option.item_type, slot_gun) : gate && gate["kind"] != CLASH_GATE_FREE)) && !(option.id in progress.seen))
 				fresh += option.id
 	var/list/role_locks = list()
 	var/client/player = GLOB.directory[ckey]
@@ -128,6 +128,11 @@
 		return perk.level
 	if(clash_is_attachment_slot(option.slot))
 		return GLOB.clash_weapon_unlock_levels[clash_track_type(primary_type)]?[option.item_type] || 1
+	if(option.item_type == clash_class_start_primary(option.faction, class))
+		return 1
+	var/class_level = clash_class_primary_level(option.faction, class, option.item_type)
+	if(class_level)
+		return class_level
 	var/list/gate = clash_gate_for(option.faction, option.item_type)
 	switch(gate?["kind"])
 		if(CLASH_GATE_FACTION)

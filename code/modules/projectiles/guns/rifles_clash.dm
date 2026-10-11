@@ -41,17 +41,6 @@
 	set_fire_delay(FIRE_DELAY_TIER_8)
 	damage_mult = BASE_BULLET_DAMAGE_MULT + BULLET_DAMAGE_MULT_TIER_5
 
-/obj/item/weapon/gun/rifle/ak4047/setup_firemodes()
-	var/old_firemode = gun_firemode
-	. = ..()
-	if(!clash_hvh_rules() || !(GUN_FIREMODE_BURSTFIRE in gun_firemode_list))
-		return
-	gun_firemode_list -= GUN_FIREMODE_BURSTFIRE
-	gun_firemode_list.Insert(1, GUN_FIREMODE_BURSTFIRE)
-	if(!(old_firemode in gun_firemode_list))
-		gun_firemode = GUN_FIREMODE_BURSTFIRE
-		SEND_SIGNAL(src, COMSIG_GUN_FIRE_MODE_TOGGLE, gun_firemode)
-
 /obj/item/weapon/gun/rifle/ak4047/recalculate_attachment_bonuses()
 	. = ..()
 	if(clash_hvh_rules())
