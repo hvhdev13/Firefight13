@@ -64,6 +64,8 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	var/intermission_timer_id
 	var/intermission_end_time
 	var/intermission_time = CLASH_INTERMISSION
+	/// ckeys still alive at match end; the scoreboard opens for them 2 seconds after they die
+	var/list/scoreboard_pending = list()
 	var/holding_fire = FALSE
 	var/list/round_scores = list()
 	var/list/round_faction_kills = list()
@@ -1037,10 +1039,32 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	var/line = get_match_result_line(result)
 	for(var/faction in list(FACTION_MARINE, FACTION_UPP))
 		announce_to_faction(faction, "[result["reason"]]. [line][result["mvp"] ? " MVP: [result["mvp"]]." : ""] Next match in [intermission_time / 10] seconds.")
+	scoreboard_pending = list()
 	for(var/mob/player as anything in GLOB.player_list)
-		if(!get_open_clash_kit_screen(player))
+		if(get_open_clash_kit_screen(player))
+			continue
+		if(isobserver(player) || player.stat == DEAD)
 			GLOB.clash_scoreboard.tgui_interact(player)
+		else if(player.ckey)
+			scoreboard_pending += player.ckey
+			to_chat(player, SPAN_NOTICE("Press TAB to view scoreboard."))
 	update_score_huds()
+
+/// A fighter who was alive at match end died; show them the scoreboard shortly after.
+/datum/game_mode/extended/faction_clash/hvh/proc/scoreboard_on_death(mob/victim)
+	var/ckey = victim.mind?.ckey || victim.ckey
+	if(!ckey || !(ckey in scoreboard_pending))
+		return
+	scoreboard_pending -= ckey
+	addtimer(CALLBACK(src, PROC_REF(show_pending_scoreboard), ckey), 2 SECONDS)
+
+/datum/game_mode/extended/faction_clash/hvh/proc/show_pending_scoreboard(ckey)
+	if(!intermission_end_time)
+		return
+	var/client/player = GLOB.directory[ckey]
+	if(!player?.mob || get_open_clash_kit_screen(player.mob))
+		return
+	GLOB.clash_scoreboard.tgui_interact(player.mob)
 
 /datum/game_mode/extended/faction_clash/hvh/proc/end_intermission()
 	if(round_finished || !intermission_end_time)
@@ -1048,6 +1072,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	deltimer(intermission_timer_id)
 	intermission_timer_id = null
 	intermission_end_time = null
+	scoreboard_pending = list()
 	archive_match()
 	reset_arena()
 	killfeed.Cut()
