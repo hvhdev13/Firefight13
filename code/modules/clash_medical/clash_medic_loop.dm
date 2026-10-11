@@ -38,6 +38,8 @@ GLOBAL_LIST_EMPTY(clash_call_medic_icons)
 	var/mob/living/carbon/human/body = clash_patient_body(viewer)
 	if(!body)
 		return clash_gave_up(viewer) ? "STATUS: GAVE UP" : null
+	if(!clash_mode_has_medics())
+		return null
 	var/idle_status = body.stat == DEAD ? "STATUS: REVIVABLE" : "NO MEDIC NEARBY"
 	if(!clash_fast_medicine())
 		return idle_status
@@ -189,21 +191,25 @@ GLOBAL_LIST_EMPTY(clash_call_medic_icons)
 		return
 	var/atom/movable/screen/clash_call_medic/button = player.clash_call_medic
 	var/atom/movable/screen/clash_give_up/give_up = player.clash_give_up
-	if(!clash_fast_medicine() || !clash_patient_body(viewer))
+	var/medics = clash_mode_has_medics()
+	if(!clash_fast_medicine() || !clash_patient_body(viewer) || (!medics && viewer.stat == DEAD))
 		if(button)
 			player.remove_from_screen(button)
 		if(give_up)
 			player.remove_from_screen(give_up)
 		return
-	if(!button)
-		button = new
-		player.clash_call_medic = button
-	if(!(button in player.screen))
-		player.add_to_screen(button)
 	var/dead = viewer.stat == DEAD
-	button.screen_loc = dead ? CALL_MEDIC_LOC_DEAD : CALL_MEDIC_LOC_CRIT
-	button.update(player)
-	button.show_status(dead ? null : clash_revive_status(viewer))
+	if(medics)
+		if(!button)
+			button = new
+			player.clash_call_medic = button
+		if(!(button in player.screen))
+			player.add_to_screen(button)
+		button.screen_loc = dead ? CALL_MEDIC_LOC_DEAD : CALL_MEDIC_LOC_CRIT
+		button.update(player)
+		button.show_status(dead ? null : clash_revive_status(viewer))
+	else if(button)
+		player.remove_from_screen(button)
 	if(!give_up)
 		give_up = new
 		player.clash_give_up = give_up

@@ -1,5 +1,9 @@
+/proc/clash_bases_open()
+	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
+	return istype(clash_mode) && clash_mode.bases_open()
+
 /proc/clash_is_intruder(atom/movable/mover, faction)
-	if(!faction || !SSticker.mode || !MODE_HAS_FLAG(MODE_FACTION_CLASH))
+	if(!faction || !SSticker.mode || !MODE_HAS_FLAG(MODE_FACTION_CLASH) || clash_bases_open())
 		return FALSE
 	var/mob/living/intruder = isliving(mover) ? mover : mover?.launch_metadata?.thrower
 	return istype(intruder) && intruder.faction != faction
@@ -32,6 +36,8 @@
 		return FALSE
 	return ..()
 
+GLOBAL_LIST_EMPTY(clash_gates)
+
 /obj/structure/blocker/clash_gate
 	name = "base shield"
 	desc = "A faction-keyed barrier. Friendly personnel pass through, hostiles do not. Nothing fired, thrown or burning gets across."
@@ -40,8 +46,21 @@
 	layer = ABOVE_OBJ_LAYER
 	var/faction
 
+/obj/structure/blocker/clash_gate/Initialize(mapload, ...)
+	. = ..()
+	GLOB.clash_gates += src
+
+/obj/structure/blocker/clash_gate/Destroy()
+	GLOB.clash_gates -= src
+	return ..()
+
+/proc/clash_show_gates(shown)
+	for(var/obj/structure/blocker/clash_gate/gate as anything in GLOB.clash_gates)
+		animate(gate, alpha = shown ? 255 : 0, time = 1 SECONDS)
+		gate.mouse_opacity = shown ? MOUSE_OPACITY_ICON : MOUSE_OPACITY_TRANSPARENT
+
 /proc/clash_gate_stops(atom/movable/mover)
-	return mover.throwing || istype(mover, /obj/flamer_fire)
+	return !clash_bases_open() && (mover.throwing || istype(mover, /obj/flamer_fire))
 
 /obj/structure/blocker/clash_gate/BlockedPassDirs(atom/movable/mover, target_dir)
 	return clash_gate_stops(mover) || clash_is_intruder(mover, faction) ? BLOCKED_MOVEMENT : NO_BLOCKED_MOVEMENT
@@ -50,11 +69,11 @@
 	return clash_gate_stops(mover) ? BLOCKED_MOVEMENT : NO_BLOCKED_MOVEMENT
 
 /obj/structure/blocker/clash_gate/get_projectile_hit_boolean(obj/projectile/bullet)
-	return TRUE
+	return !clash_bases_open()
 
 /obj/structure/blocker/clash_gate/Uncrossed(atom/movable/mover)
 	. = ..()
-	if(istype(mover, /obj/projectile))
+	if(istype(mover, /obj/projectile) && !clash_bases_open())
 		var/obj/projectile/bullet = mover
 		bullet.speed = 0
 

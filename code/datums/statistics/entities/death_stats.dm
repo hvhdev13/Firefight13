@@ -83,13 +83,16 @@
 
 	attack_log += "[log_message]."
 
+	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
+	if(istype(clash_mode))
+		clash_mode.scoreboard_on_death(src)
+
 	if(!mind || statistic_exempt)
 		return
 
 	var/area/area = get_area(death_loc)
 	handle_observer_message(cause_data, cause_mob, death_loc, area)
 
-	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
 	if(istype(clash_mode))
 		var/cause_name = cause_data?.cause_name
 		var/cause_faction = cause_data?.faction

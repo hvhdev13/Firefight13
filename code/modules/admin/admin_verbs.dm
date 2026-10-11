@@ -194,6 +194,7 @@ GLOBAL_LIST_INIT(admin_verbs_server, list(
 	/datum/admins/proc/change_ship_map,
 	/datum/admins/proc/vote_ground_map,
 	/datum/admins/proc/override_ground_map,
+	/client/proc/hvh_control_server,
 	/client/proc/cmd_admin_delete, /*delete an instance/object/mob/etc*/
 	/client/proc/cmd_debug_del_all,
 	/datum/admins/proc/togglejoin,

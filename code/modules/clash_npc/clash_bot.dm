@@ -418,10 +418,11 @@ SUBSYSTEM_DEF(clash_bots)
 	return clear_shot(get_turf(candidate), candidate, FALSE)
 
 /datum/clash_bot/proc/clear_shot(turf/aim, mob/candidate, check_allies = TRUE)
-	if(locate(/obj/structure/blocker/clash_gate) in get_turf(body))
+	var/gates_up = !clash_bases_open()
+	if(gates_up && (locate(/obj/structure/blocker/clash_gate) in get_turf(body)))
 		return FALSE
 	for(var/turf/line_turf as anything in get_line(body, aim, include_start_atom = FALSE))
-		if(line_turf.density || line_turf.opacity || (locate(/obj/structure/blocker/clash_gate) in line_turf))
+		if(line_turf.density || line_turf.opacity || (gates_up && (locate(/obj/structure/blocker/clash_gate) in line_turf)))
 			return FALSE
 		for(var/obj/thing in line_turf)
 			if(thing.opacity || (thing.density && thing.projectile_coverage >= PROJECTILE_COVERAGE_HIGH && line_turf != aim))
@@ -1175,7 +1176,7 @@ SUBSYSTEM_DEF(clash_bots)
 		qdel(old_post)
 
 /datum/clash_bot/proc/can_vanish()
-	if(QDELETED(body) || body.stat == DEAD)
+	if(QDELETED(body) || body.stat == DEAD || clash_live_regear_open())
 		return TRUE
 	for(var/mob/viewer in viewers(world.view, body))
 		if(viewer.client)

@@ -82,6 +82,20 @@ What players see on a timed move:
 
 ## Domination
 
+Domination is out of rotation; Elimination took its place. The mode
+(`/datum/game_mode/extended/faction_clash/hvh/tdm/objective/domination`), its bot plan
+(`plan_domination`), the zone markers and the vote icon (`clash_modes/domination.png`) are kept,
+unused. Markers already on maps stay valid. To bring it back:
+
+- Put `GAMEMODE_DOMINATION` back in `HVH_MODE_TAGS` (`code/__DEFINES/__game.dm`).
+- Add `"Domination"` to the `gamemodes` list of each map json, and `tdm_domination_point_limit` if the
+  map wants a limit other than 300.
+- Add `GAMEMODE_DOMINATION = "clash_mode_domination.png"` to `GLOB.clash_vote_mode_icons` and the
+  png to `/datum/asset/simple/clash_vote` (`_hvh.dm`).
+- Name it again in the HvH Control mode note (`hvh_control.dm`) and `strings/hvh_motd.txt`.
+
+Placing the zones:
+
 - Place all three: `domination_zone/a`, `/b` and `/c`.
 - If any of the three is missing or unusable, all three zones are placed automatically. Marked and
   automatic zones are never mixed, since that could stack two zones on top of each other.

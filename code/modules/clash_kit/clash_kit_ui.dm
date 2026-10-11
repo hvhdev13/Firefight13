@@ -23,6 +23,9 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 	screen.pick_job_for(user)
 	if(faction)
 		screen.show_side(faction)
+		var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
+		if(isnewplayer(user) && istype(clash_mode) && clash_mode.join_from_lobby(user, faction, screen))
+			return
 	screen.tgui_interact(user)
 
 /proc/get_open_clash_kit_screen(mob/user)
@@ -58,7 +61,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 	var/mob/living/carbon/human/fighter = ishuman(user) ? user : user.mind?.original
 	if(ishuman(fighter) && fighter.job && (fighter.job in clash_role_list()))
 		set_job(fighter.job)
-	else if(!job)
+	else if(!(job in clash_role_list()))
 		set_job(clash_role_list()[1])
 
 /datum/clash_kit_screen/proc/set_job(new_job)
@@ -172,7 +175,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 		if(fighter.job != job)
 			hint = "Editing [clash_role_name(job)]. You are playing [clash_role_name(fighter.job)]."
 		else
-			hint = "Changes go on at your next spawn."
+			hint = clash_live_regear_open() ? "Changes go on now, until the match starts." : "Changes go on at your next spawn."
 	else if(deploy_state)
 		hint = "Choose a role and a kit, then deploy."
 	return list(
@@ -244,11 +247,14 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 		return "Joining is locked right now"
 	if(get_deploy_state(user) == "dead" && !CONFIG_GET(flag/respawn) && !check_client_rights(user.client, R_ADMIN, FALSE))
 		return "Respawning is off"
+	var/spawn_block = clash_spawn_block()
+	if(spawn_block)
+		return spawn_block
 	var/datum/job/role = GLOB.RoleAuthority.roles_for_mode[job]
 	if(!role)
 		return "That role is not in this round"
 	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
-	if(istype(clash_mode) && !clash_mode.can_join_side(job))
+	if(istype(clash_mode) && !clash_mode.can_join_side(job, user))
 		return "Your side is full. Even the teams by joining the other side"
 	if(get_held_job(user) == job)
 		return null
@@ -529,13 +535,33 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 				if(get_clash_kit_option(id) && !(id in progress.seen))
 					progress.seen += id
 					progress.dirty = TRUE
+	if(!(action in list("role", "side", "rename", "deploy", "seen")))
+		queue_live_regear(user)
 	return TRUE
+
+/datum/clash_kit_screen/proc/queue_live_regear(mob/user)
+	var/mob/living/carbon/human/fighter = user
+	if(!ishuman(fighter) || fighter.stat == DEAD || fighter.job != job || !clash_live_regear_open())
+		return
+	addtimer(CALLBACK(src, PROC_REF(live_regear), fighter), 1 SECONDS, TIMER_UNIQUE|TIMER_OVERRIDE)
+
+/datum/clash_kit_screen/proc/live_regear(mob/living/carbon/human/fighter)
+	if(QDELETED(fighter) || fighter.stat == DEAD || fighter.job != job || !clash_live_regear_open())
+		return
+	var/datum/clash_kit/kit = get_clash_active_kit(ckey, job)
+	if(!kit)
+		return
+	if(length(fighter.clash_spawn_points))
+		fighter.vendor_points = fighter.clash_spawn_points[1]
+		fighter.vendor_snowflake_points = fighter.clash_spawn_points[2]
+	regear_clash_fighter(fighter, kit)
 
 /datum/clash_kit_screen/proc/confirm_reset(mob/user, datum/clash_kit/kit)
 	if(tgui_alert(user, "Are you sure you want to reset your loadout?", "Reset loadout", list("Reset", "Cancel")) != "Reset")
 		return
 	kit.clear()
 	save_clash_kits(ckey)
+	queue_live_regear(user)
 	SStgui.update_uis(src)
 	var/datum/clash_kit_screen/own = GLOB.clash_kit_screens[ckey]
 	if(own && own != src)

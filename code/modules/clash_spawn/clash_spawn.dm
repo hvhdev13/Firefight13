@@ -130,7 +130,6 @@ SUBSYSTEM_DEF(clash_spawn)
 
 /datum/controller/subsystem/clash_spawn/proc/show_welcome(mob/viewer)
 	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
-	var/kits = clash_uses_kits()
 	var/list/page = list()
 	page += "<style>"
 	page += "body{background:repeating-linear-gradient(0deg,#141715 0 1px,#111412 1px 4px);color:#e4e8de;font-family:Bahnschrift,'Segoe UI',sans-serif;font-size:13px;margin:0}"
@@ -148,8 +147,9 @@ SUBSYSTEM_DEF(clash_spawn)
 	page += ".tagline{margin:0 0 6px;color:#e4e8de;font-size:15px;font-weight:bold;text-transform:uppercase}"
 	page += ".discord{margin-top:8px;color:#848e80;font-weight:600}.discord a{color:#ffb840;font-weight:bold;text-decoration:none}"
 	page += "</style>"
-	page += "<div class='head'><h1>Welcome to Firefight13.</h1><div class='sub'>\[The server is actively being playtested and updated. Everything is subject to change without notice.\]</div>"
-	page += "<div class='discord'>Join us on Discord: <a href='byond://?src=[REF(src)];clash_discord=1'>[GLOB.clash_discord_link]</a></div></div>"
+	page += "<div class='head'><h1>Welcome to the Firefight13 playtest.</h1>"
+	page += "<div class='discord'>Join us on Discord: <a href='byond://?src=[REF(src)];clash_discord=1'>[GLOB.clash_discord_link]</a></div>"
+	page += "<div class='sub'>We need your feedback and suggestions.</div></div>"
 	page += "<div class='body'>"
 	if(istype(clash_mode))
 		page += "<h2>[clash_mode.name]</h2>"
@@ -160,39 +160,31 @@ SUBSYSTEM_DEF(clash_spawn)
 		for(var/line in clash_mode.get_welcome_rules())
 			page += "<li>[line]</li>"
 		page += "</ul>"
-	page += "<h2>Controls/Verbs</h2><table class='keys'>"
-	page += "<tr><td><span class='key'>Tab</span></td><td>Show/hide the scoreboard.</td></tr>"
-	if(kits)
-		page += "<tr><td><span class='key'>Loadout</span></td><td>Build custom kits. The selected kit is on you every time you spawn as that role. Open it from the lobby, the Deploy button when you are down, or the Loadout verb.</td></tr>"
-	else
-		page += "<tr><td><span class='key'>Respawn</span></td><td>The button in the middle of the screen when you are down.</td></tr>"
-		page += "<tr><td><span class='key'>Vendors</span></td><td>Save your loadout with Save current in the Saved Loadouts section, 3 slots per role.</td></tr>"
-	page += "<tr><td><span class='key'>Stats</span></td><td>The Career Stats verb, or the button on the scoreboard, shows your career and the leaderboard.</td></tr>"
-	page += "</table>"
-	if(clash_fast_medicine())
-		page += "<h2>Medical</h2><ul>"
-		page += "<li>Click a teammate or yourself with a dressing, kit or splint. It treats the worst injury, no need to aim at body parts.</li>"
-		page += "<li>Hurt? Shout <b>*medic</b>. Down but revivable? Press <b>Call Medic</b>. A red cross shows over you for your team.</li>"
-		page += "<li>Medics revive teammates with a quick defibrillator zap.</li>"
-		page += "</ul>"
-		page += "<h2>Engineering</h2><ul>"
-		page += "<li>Engineers carry a sentry and an ammo crate. Use either in hand to set it down in front of you. Once one is destroyed, the engineer vendor in your base gives you a new one.</li>"
-		page += "<li>Out of ammo? Click a friendly ammo crate with your gun or an empty hand to take a magazine for that gun.</li>"
-		page += "<li>On a sentry, a wrench packs it up, a welder repairs it, metal reloads it and a flamer fuel tank refuels the Flamer Sentry. Stronger sentries unlock with Engineer level.</li>"
-		page += "<li>Sentries cannot see through smoke and grenades wreck them. Only engineers can build barricades.</li>"
-		page += "</ul>"
-		page += "<h2>Heavy</h2><ul>"
-		page += "<li>Only Heavies suppress, the Machine Gunners on both sides. Their bullets that hit you or pass close darken your screen, make you cower and slow you, up to 25%. It fades a few seconds after the fire stops.</li>"
-		page += "<li>Heavies get XP for suppressing enemies, and a suppression assist when a teammate kills someone they suppressed.</li>"
-		page += "</ul>"
-		page += "<h2>Perks</h2><ul>"
-		page += "<li>Pick one class perk and one general perk in your loadout. Class perks unlock with class level, general perks with faction level. Your killer's perks show on your death card.</li>"
-		page += "<li>Firing without a suppressor, or firing a flamer or underbarrel weapon, shows you as a red mark on the radar of enemies with the Keen Ears perk.</li>"
-		page += "</ul>"
-	page += "<h2>Other notes</h2><ul>"
-	page += "<li>Friendly fire is on and explosions have a high chance of taking off limbs.</li>"
-	page += "<li>Two end-of-round votes: one for the next mode and then one for the map that can run it.</li>"
-	page += "<li>Only rounds that finish on their own count toward career stats.</li>"
+	page += "<h2>Overview</h2><ul>"
+	page += "<li>Teams: USCM vs UPP. Pick a side and a role in the lobby. Bots fill empty slots and carry a grey \[BOT\] tag.</li>"
+	page += "<li>Modes: Team Deathmatch, King of the Hill, Elimination, and Capture the Flag.</li>"
+	page += "<li>Roles: Everyone starts as Rifleman. Hospital Corpsman unlocks at faction level 3, Combat Technician at 5, Machine Gunner at 7, Squad Leader at 11.</li>"
+	page += "<li>Loadout: Open the Loadout window from the lobby, the Deploy button, or the Loadout verb.</li>"
+	page += "<li>Loadout Shop: 45 points per kit, 7 kits per role, saved between rounds. The kit you select is on you every time you spawn as that role.</li>"
+	page += "<li>Bases: Your base sits behind a faction barrier. Enemies, bullets, grenades and fire do not cross it. Inside: clothing rack, gear rack, gun rack with free guns and ammo (need to unlock them first), and a Tool Storage Machine for engineers.</li>"
+	page += "</ul>"
+	page += "<h2>Health</h2><ul>"
+	page += "<li>Injuries: Injuries show top-right. You can self-treat all conditions except for organ damage which only a medic can treat with a Fix-All Injector.</li>"
+	page += "<li>Healing: Use Healing Injectors to heal damage and stabilize organ damage. Use Field Dressing to stop bleeding and heal a small amount. Use splints to treat broken bones and prevent worsening resulting injuries.</li>"
+	page += "<li>Dying: Down but revivable? Press \"Call Medic\" and wait, or press \"Give Up\". Dead? Wait 15 to 30 seconds depending on the map, then press Deploy. Your Death recap shows who killed you, with what, and their perks.</li>"
+	page += "<li>Friendly fire is on. Explosions have a high chance to tear off limbs.</li>"
+	page += "</ul>"
+	page += "<h2>HUD</h2><ul>"
+	page += "<li>Scoreboard: \"Tab\" opens the scoreboard.</li>"
+	page += "<li>Radar: The radar top left shows teammates, your Squad Leader, friendly sentries and ammo crates, and enemies who give themselves away. Minimizable.</li>"
+	page += "<li>Player indicators: Chevron = bot, diamond = player. Icons on players show bleeding, breaks, splints and suppression. Injuries show top right.</li>"
+	page += "<li>Chat: T talks to people nearby, U to your whole team, Y to everyone. OOC is out of character. Minimizable.</li>"
+	page += "</ul>"
+	page += "<h2>Leveling</h2><ul>"
+	page += "<li>XP and levels: Kills reward 100 xp, assists 50, revives 100, objectives, match wins 500, round wins 1000.</li>"
+	page += "<li>Faction level unlocks roles and general perks. Class level unlocks gear slots, guns and class perks.</li>"
+	page += "<li>Perks: Pick one class perk and one general perk in your loadout. Your killer's perks show on your death card.</li>"
+	page += "<li>Firing without a suppressor, or firing a flamer or underbarrel weapon, shows you as a red mark on the radar of enemies with the Keen Ears perk.</li>"
 	page += "</ul>"
 	page += "<h2>Playtest notes</h2><ul>"
 	page += "<li>This is a playtest, <i>everything</i> is subject to change and accrued player unlocks, levels, and ranks will be changed and reset eventually because mechanics are being worked and reworked.</li>"
@@ -240,9 +232,85 @@ SUBSYSTEM_DEF(clash_spawn)
 	if(!new_human?.loc || !new_human.client)
 		return
 	var/role_name = clash_role_name(title)
-	to_chat_spaced(new_human, html = boxed_message("\
-		[SPAN_ROLE_BODY("|______________________|")] \n\
-		[SPAN_ROLE_HEADER("You are \a [lowertext(role_name)]")] \n\
-		[SPAN_ROLE_BODY("You are the [role_name]!")] \n\
-		[SPAN_ROLE_BODY("|______________________|")] \
-	"))
+	var/list/lines = list(
+		SPAN_ROLE_BODY("|______________________|"),
+		SPAN_ROLE_HEADER("You are \a [lowertext(role_name)]"),
+		SPAN_ROLE_BODY("You are the [role_name]."),
+	)
+	var/brief_key = "[new_human.ckey]|[title]"
+	if(clash_fast_medicine() && !(brief_key in GLOB.clash_class_briefed))
+		GLOB.clash_class_briefed += brief_key
+		for(var/line in clash_class_brief(GLOB.clash_job_classes[title]))
+			lines += SPAN_ROLE_BODY(line)
+	lines += SPAN_ROLE_BODY("|______________________|")
+	to_chat_spaced(new_human, html = boxed_message(lines.Join(" \n")))
+
+GLOBAL_LIST_EMPTY(clash_class_briefed)
+
+/proc/clash_class_brief(class)
+	switch(class)
+		if(CLASH_CLASS_MEDIC)
+			return list(
+				"Your job is to heal and revive your teammates.",
+				"Revive: Hold defibrillator, use it in hand (\"Z\" by default) to take out paddles, click on dead teammate to revive. No need to remove their armor. Reviving restores blood, heals organs, and stops bleeding, and heals them to 50 health, then 35, then 20 if revived again within 60 seconds. Does not fix broken bones.",
+				"Healing: Use a Field Dressing, Advanced Healing Kit, Splint, or Injectors to heal a teammate. Healing treats the worst injury first with no need to aim at body parts.",
+				"Field Dressing: Stops bleeding, heals 10 on one body part. Instant for you.",
+				"Advanced Healing Kit: Stops bleeding, heals 20 on one body part. Instant for you.",
+				"Splint: Treats broken bones. 1 second for you.",
+				"Healing Injector: 2 doses. Heals wounds and burns over time and gives Stabilized for 15 seconds: organs and blood loss paused, no suffocation. Reinjecting resets the timer.",
+				"Oxycodone/Tramadol Injectors: Painkillers. Pain slows you and makes you drop things. Oxycodone is the strong one.",
+				"Fix-All Injector: 1 dose. Restores blood, heals organs, eyes and brain, clears oxygen and toxin damage. Does not fix bones or bleeding.",
+				"Internal injuries: Use your Fix-all injector. Teammates who need an injection have a pink heart over them.",
+				"Call Medic: Teammates who press \"Call Medic\" or cry for a *medic get a red cross and show up on your radar. Revive them.",
+				"XP gain: Objectives, killing, healing, splints, revives and Fix-all all give XP.",
+			)
+		if(CLASH_CLASS_ENGINEER)
+			return list(
+				"Your job is to construct defenses, replenish ammo, and take down enemy defenses.",
+				"Sentry: Use it in hand to place it in front of you.",
+				"Light Sentry: covers 4 tiles in every direction, 150 rounds.",
+				"Sentry Gun (CT level 4): covers 6 tiles the way it faces, 250 health, 200 rounds.",
+				"Flamer Sentry (CT level 12): burns 4 tiles the way it faces, 20 shots.",
+				"Repair: Click the sentry with a welder.",
+				"Reload: Click the sentry with metal, 10 sheets for a full load. Flamer Sentry takes a flamer fuel tank instead.",
+				"Pack up: Click the sentry with a wrench.",
+				"New sentry: One out at a time unless you have the Twin Sentries perk (CT level 18). When it is destroyed, take a new one from the Tool Storage Machine in your base.",
+				"Ammo Crate: You spawn with one. Use it in hand to place it. Teammates click it with their gun or an empty hand for a magazine. Holds 10, refills 1 every 15 seconds. One out at a time, new one from the Tool Storage Machine when destroyed.",
+				"Barricades: Only engineers build them. Metal and plasteel from your pouch.",
+				"Sentries cannot see through smoke. Grenades wreck them.",
+				"XP gain: Objectives, killing, repairs, resupplies from your crate and damage your barricades soak all give XP.",
+			)
+		if(CLASH_CLASS_HEAVY)
+			return list(
+				"Your job is to suppress the enemy by raining down bullets on them.",
+				"Suppression: Your bullets suppress. A hit adds 20 suppression points, a bullet passing within 1.5 tiles of the target adds 10. Up to 100 suppression. Starts fading 1.5 seconds after you stop firing.",
+				"Suppression effect on enemies: Screen darkens, they cower and move up to 25% slower. Past 50 a Suppressed icon (red chevron) shows on them.",
+				"Bipod: Deploy it on the ground to hold fire with less recoil and scatter.",
+				"Guns: Smartgun (USCM) and minigun (UPP) unlock at Machine Gunner level 8.",
+				"XP gain: Objectives, killing and suppression give XP, plus a suppression assist when a teammate kills someone you suppressed.",
+			)
+		if(CLASH_CLASS_LEADER)
+			return list(
+				"Your job is to issue orders to your team to buff them.",
+				"Orders: Issue Order verb, or the button on your HUD. Reach 7 tiles around you, last 25 seconds (30 for the UPP), one order every 80 seconds.",
+				"Move Order: Your team runs faster and dodges more bullets. Use it to cross open ground or push a position.",
+				"Hold Order: Your team takes less wound damage and shrugs off pain. Use it when you are dug in and getting hammered.",
+				"Focus Order: Your team shoots tighter and further. Use it when you have the firing line and they are coming to you.",
+				"Stay with your team. Orders only reach who is near you and your assist XP only counts kills within 7 tiles.",
+				"Perks: Wide Orders (level 4, 10 tiles), Long Orders (level 7, last 50% longer), Quick Orders (level 10, ready after 50 seconds).",
+				"XP gain: Objectives and killing give XP, plus an assist for every kill by a teammate within 7 tiles.",
+			)
+		if(CLASH_CLASS_RIFLEMAN)
+			return list(
+				"Your job is to kill.",
+				"Gear: Rifle, sidearm, grenades, armor and pouches are bought with loadout points in the Loadout window. More slots unlock with Rifleman level. Use the Loadout Shop to buy more gear.",
+				"Armor: Light armor is fast, heavy armor is slow but shrugs off blasts.",
+				"Grenades: Blasts easily tear off limbs. Cook them with care, friendly fire is on.",
+				"Ammo: Out? Get more from your base vendor or a friendly Combat Technician's ammo crate.",
+				"Healing: Use a Healing Injector to heal yourself, use a Field Dressing to stop bleeding and heal for a small amount, use a Splint to treat a broken bone. All healing automatically treats the worst wound first. Injuries appear top-right of your screen.",
+				"Call Medic: Type *medic to call for a medic. Down? Press \"Call Medic\" and wait to be revived, medics see you on the radar, or just respawn.",
+				"Perks: Pick one class perk and one general perk in the Loadout window.",
+				"Other classes unlock with faction level: Medic 3, Engineer 5, Machine Gunner 7, Squad Leader 11.",
+				"XP gain: Objectives, kills and assists give XP.",
+			)
+	return list()

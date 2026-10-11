@@ -6,6 +6,7 @@
 #define CLASH_VOTE_LEAD (5 MINUTES)
 #define CLASH_VOTE_GAP (3 SECONDS)
 #define CLASH_VOTE_RETRY (10 SECONDS)
+#define CLASH_ARENA_VOTE_PERIOD (30 SECONDS)
 #define CLASH_REBOOT_AFTER_VOTES (30 SECONDS)
 #define CLASH_REBOOT_HOLD_LIMIT (5 MINUTES)
 #define CLASH_VOTES_NONE 0
@@ -63,12 +64,17 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	var/countdown_timer_id
 	var/intermission_timer_id
 	var/intermission_end_time
+	var/intermission_time = CLASH_INTERMISSION
+	/// ckeys still alive at match end; the scoreboard opens for them 2 seconds after they die
+	var/list/scoreboard_pending = list()
 	var/holding_fire = FALSE
 	var/list/round_scores = list()
 	var/list/round_faction_kills = list()
 	var/list/round_faction_deaths = list()
 	var/list/round_environment_kills = list()
 	var/idle_limit = 0
+	var/idle_warning = 1 MINUTES
+	var/idle_check_time = 30 SECONDS
 	var/list/idle_warned = list()
 	var/idle_timer_id
 	var/list/faction_kills = list()
@@ -106,6 +112,9 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	var/round_finished_at
 	var/progression = FALSE
 	var/arena_rules = FALSE
+	var/kill_xp_multiplier = 1
+	var/team_gap = CLASH_TEAM_GAP
+	var/match_win_xp_multiplier = 1
 
 /proc/clash_respawn_cooldown()
 	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
@@ -146,6 +155,9 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		else
 			. += "Time Left: [clock[1]]"
 	if(viewer.timeofdeath && (isobserver(viewer) || viewer.stat == DEAD))
+		if(get_spawn_block())
+			. += "Respawn: when the match ends"
+			return
 		var/wait = CEILING(clash_respawn_wait(viewer) / 10, 1)
 		. += wait ? "Respawn In: [floor(wait / 60)]:[wait % 60 < 10 ? "0" : ""][wait % 60]" : "Respawn: ready"
 
@@ -257,8 +269,14 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	var/label = matches_per_round > 1 ? "Match [match_number + 1] of [matches_per_round]" : "Match"
 	for(var/faction in list(FACTION_MARINE, FACTION_UPP))
 		announce_to_faction(faction, "[label] starts in [countdown_time / 10] seconds. Gear up, you are held in your base until then.")
-	countdown_timer_id = addtimer(CALLBACK(src, PROC_REF(start_match)), countdown_time, TIMER_STOPPABLE)
+	countdown_timer_id = addtimer(CALLBACK(src, PROC_REF(countdown_done)), countdown_time, TIMER_STOPPABLE)
 	log_debug("HVH: countdown armed for [countdown_time / 10]s")
+
+/datum/game_mode/extended/faction_clash/hvh/proc/countdown_done()
+	start_match()
+
+/datum/game_mode/extended/faction_clash/hvh/proc/join_from_lobby(mob/new_player/user, faction, datum/clash_kit_screen/screen)
+	return FALSE
 
 /datum/game_mode/extended/faction_clash/hvh/proc/start_match()
 	if(match_live || round_finished)
@@ -339,12 +357,48 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 			count++
 	return count
 
-/datum/game_mode/extended/faction_clash/hvh/proc/can_join_side(rank)
-	var/uscm = count_side(FACTION_MARINE)
-	var/upp = count_side(FACTION_UPP)
+/datum/game_mode/extended/faction_clash/hvh/proc/get_spawn_block()
+	return null
+
+/datum/game_mode/extended/faction_clash/hvh/proc/can_set_score()
+	return TRUE
+
+/datum/game_mode/extended/faction_clash/hvh/proc/bases_open()
+	return FALSE
+
+/datum/game_mode/extended/faction_clash/hvh/proc/live_regear_open()
+	return FALSE
+
+/datum/game_mode/extended/faction_clash/hvh/proc/shows_alive_count()
+	return TRUE
+
+/datum/game_mode/extended/faction_clash/hvh/proc/has_medics()
+	return TRUE
+
+/proc/clash_mode_has_medics()
+	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
+	return !istype(clash_mode) || clash_mode.has_medics()
+
+/proc/clash_live_regear_open()
+	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
+	return istype(clash_mode) && clash_mode.live_regear_open()
+
+/datum/game_mode/extended/faction_clash/hvh/proc/counts_for_bot_fill(client/player)
+	return TRUE
+
+/proc/clash_spawn_block()
+	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
+	return istype(clash_mode) ? clash_mode.get_spawn_block() : null
+
+/datum/game_mode/extended/faction_clash/hvh/proc/count_for_balance(faction, mob/joiner)
+	return count_side(faction)
+
+/datum/game_mode/extended/faction_clash/hvh/proc/can_join_side(rank, mob/joiner)
+	var/uscm = count_for_balance(FACTION_MARINE, joiner)
+	var/upp = count_for_balance(FACTION_UPP, joiner)
 	if(rank in UPP_JOB_LIST)
-		return upp - uscm < CLASH_TEAM_GAP
-	return uscm - upp < CLASH_TEAM_GAP
+		return upp - uscm < team_gap
+	return uscm - upp < team_gap
 
 /datum/game_mode/extended/faction_clash/hvh/proc/faction_color(faction)
 	switch(faction)
@@ -980,16 +1034,38 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	GLOB.clash_progress.save_dirty()
 
 /datum/game_mode/extended/faction_clash/hvh/proc/begin_intermission()
-	intermission_end_time = world.time + CLASH_INTERMISSION
-	intermission_timer_id = addtimer(CALLBACK(src, PROC_REF(end_intermission)), CLASH_INTERMISSION, TIMER_STOPPABLE)
+	intermission_end_time = world.time + intermission_time
+	intermission_timer_id = addtimer(CALLBACK(src, PROC_REF(end_intermission)), intermission_time, TIMER_STOPPABLE)
 	var/list/result = match_results[length(match_results)]
 	var/line = get_match_result_line(result)
 	for(var/faction in list(FACTION_MARINE, FACTION_UPP))
-		announce_to_faction(faction, "[result["reason"]]. [line][result["mvp"] ? " MVP: [result["mvp"]]." : ""] Next match in [CLASH_INTERMISSION / 10] seconds.")
+		announce_to_faction(faction, "[result["reason"]]. [line][result["mvp"] ? " MVP: [result["mvp"]]." : ""] Next match in [intermission_time / 10] seconds.")
+	scoreboard_pending = list()
 	for(var/mob/player as anything in GLOB.player_list)
-		if(!get_open_clash_kit_screen(player))
+		if(get_open_clash_kit_screen(player))
+			continue
+		if(isobserver(player) || player.stat == DEAD)
 			GLOB.clash_scoreboard.tgui_interact(player)
+		else if(player.ckey)
+			scoreboard_pending += player.ckey
+			to_chat(player, SPAN_NOTICE("Press TAB to view scoreboard."))
 	update_score_huds()
+
+/// A fighter who was alive at match end died; show them the scoreboard shortly after.
+/datum/game_mode/extended/faction_clash/hvh/proc/scoreboard_on_death(mob/victim)
+	var/ckey = victim.mind?.ckey || victim.ckey
+	if(!ckey || !(ckey in scoreboard_pending))
+		return
+	scoreboard_pending -= ckey
+	addtimer(CALLBACK(src, PROC_REF(show_pending_scoreboard), ckey), 2 SECONDS)
+
+/datum/game_mode/extended/faction_clash/hvh/proc/show_pending_scoreboard(ckey)
+	if(!intermission_end_time)
+		return
+	var/client/player = GLOB.directory[ckey]
+	if(!player?.mob || get_open_clash_kit_screen(player.mob))
+		return
+	GLOB.clash_scoreboard.tgui_interact(player.mob)
 
 /datum/game_mode/extended/faction_clash/hvh/proc/end_intermission()
 	if(round_finished || !intermission_end_time)
@@ -997,6 +1073,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	deltimer(intermission_timer_id)
 	intermission_timer_id = null
 	intermission_end_time = null
+	scoreboard_pending = list()
 	archive_match()
 	reset_arena()
 	killfeed.Cut()
@@ -1081,10 +1158,10 @@ GLOBAL_LIST_EMPTY(clash_map_gear)
 			to_chat(fighter, SPAN_WARNING("You were idle for [idle_limit / 600] minutes and have been moved to observer. Respawn when you are back."))
 			fighter.ghostize(FALSE)
 			qdel(fighter)
-		else if(player.inactivity >= idle_limit - 1 MINUTES)
+		else if(player.inactivity >= idle_limit - idle_warning)
 			if(!(player.ckey in idle_warned))
 				idle_warned += player.ckey
-				to_chat(fighter, SPAN_WARNING("You have been idle a while. In about a minute you will be moved to observer to free your slot."))
+				to_chat(fighter, SPAN_WARNING("You have been idle a while. In about [DisplayTimeText(idle_warning)] you will be moved to observer to free your slot."))
 		else
 			idle_warned -= player.ckey
 
@@ -1130,6 +1207,9 @@ GLOBAL_LIST_EMPTY(clash_map_gear)
 	if(round_vote_stage != CLASH_VOTES_NONE)
 		return
 	round_vote_stage = CLASH_VOTES_MODE
+	if(arena_rules)
+		var/datum/config_entry/number/period = config.entries_by_type[/datum/config_entry/number/vote_period]
+		period.config_entry_value = CLASH_ARENA_VOTE_PERIOD
 	log_debug("HVH: next round votes opening")
 	open_mode_vote()
 
@@ -1180,7 +1260,6 @@ GLOBAL_LIST_EMPTY(clash_map_gear)
 
 /datum/game_mode/extended/faction_clash/hvh/roundend_reboot()
 	if(arena_rules)
-		SSticker.Reboot(null, CLASH_FINAL_REBOOT_DELAY)
 		return
 	if(round_vote_stage == CLASH_VOTES_DONE)
 		return ..()
@@ -1227,7 +1306,7 @@ GLOBAL_LIST_EMPTY(clash_map_gear)
 GLOBAL_LIST_INIT(clash_vote_mode_icons, list(
 	GAMEMODE_TDM = "clash_mode_tdm.png",
 	GAMEMODE_KOTH = "clash_mode_koth.png",
-	GAMEMODE_DOMINATION = "clash_mode_domination.png",
+	GAMEMODE_ELIMINATION = "clash_mode_elimination.png",
 	GAMEMODE_CTF = "clash_mode_ctf.png",
 ))
 
@@ -1250,7 +1329,7 @@ GLOBAL_DATUM_INIT(clash_vote_ui, /datum/clash_vote_ui, new)
 	assets = list(
 		"clash_mode_tdm.png" = 'icons/images/ui_images/clash_modes/tdm.png',
 		"clash_mode_koth.png" = 'icons/images/ui_images/clash_modes/koth.png',
-		"clash_mode_domination.png" = 'icons/images/ui_images/clash_modes/domination.png',
+		"clash_mode_elimination.png" = 'icons/images/ui_images/clash_modes/elimination.png',
 		"clash_mode_ctf.png" = 'icons/images/ui_images/clash_modes/ctf.png',
 	)
 
@@ -1377,6 +1456,9 @@ GLOBAL_DATUM_INIT(clash_vote_ui, /datum/clash_vote_ui, new)
 		return
 	SSvote.choices[choice]++
 	picks[ckey] = choice
+	if(length(SSvote.voted) >= length(GLOB.clients))
+		SSvote.result()
+		SSvote.reset()
 	SStgui.update_uis(src)
 	return TRUE
 
@@ -1427,7 +1509,7 @@ GLOBAL_VAR(clash_start_mode)
 	SSradio.faction_coms_clarity[FACTION_MARINE] = 100
 	respawn_timer_id = addtimer(CALLBACK(src, PROC_REF(update_respawn_huds)), 1 SECONDS, TIMER_LOOP|TIMER_STOPPABLE)
 	if(idle_limit)
-		idle_timer_id = addtimer(CALLBACK(src, PROC_REF(check_idle)), 30 SECONDS, TIMER_LOOP|TIMER_STOPPABLE)
+		idle_timer_id = addtimer(CALLBACK(src, PROC_REF(check_idle)), idle_check_time, TIMER_LOOP|TIMER_STOPPABLE)
 	open_first_match()
 	if(arena_rules)
 		clash_arena_med_supply()
@@ -1520,6 +1602,8 @@ GLOBAL_VAR(clash_start_mode)
 	announce_scoreboard()
 	announce_personal_stats()
 	export_round_stats()
+	if(arena_rules)
+		SSticker.Reboot(null, CLASH_FINAL_REBOOT_DELAY)
 
 	return TRUE
 
