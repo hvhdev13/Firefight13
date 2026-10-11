@@ -17,6 +17,9 @@ GLOBAL_LIST_INIT(clash_attachment_groups, list(
 	list(/obj/item/attachable/bayonet),
 ))
 
+GLOBAL_LIST_INIT(clash_built_in_attachments, list(
+	/obj/item/weapon/gun/rifle/lmg = list(/obj/item/attachable/bipod/m41ae2),
+))
 GLOBAL_LIST_EMPTY(clash_weapon_tracks)
 GLOBAL_LIST_EMPTY(clash_weapon_unlock_levels)
 
@@ -41,7 +44,8 @@ GLOBAL_LIST_EMPTY(clash_weapon_unlock_levels)
 
 /proc/build_clash_weapon_track(gun_type)
 	var/list/by_group = list()
-	for(var/attachment_type in get_clash_gun_attachables(gun_type))
+	var/list/built_in = GLOB.clash_built_in_attachments[gun_type] || list()
+	for(var/attachment_type in get_clash_gun_attachables(gun_type) - built_in)
 		var/group = clash_attachment_group(attachment_type)
 		if(group)
 			LAZYADD(by_group["[group]"], attachment_type)
@@ -69,6 +73,8 @@ GLOBAL_LIST_EMPTY(clash_weapon_unlock_levels)
 		unlock["xp"] = clash_weapon_unlock_xp(index, count)
 		for(var/attachment_type in unlock["types"])
 			levels[attachment_type] = index + 1
+	for(var/attachment_type in built_in)
+		levels[attachment_type] = 1
 	GLOB.clash_weapon_tracks[gun_type] = unlocks
 	GLOB.clash_weapon_unlock_levels[gun_type] = levels
 

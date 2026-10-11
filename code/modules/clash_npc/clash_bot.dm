@@ -877,7 +877,6 @@ SUBSYSTEM_DEF(clash_bots)
 			release_trigger()
 			next_round_at = last_round_at + gun.fire_delay + gun.burst_cooldown
 		return
-	body.clash_aim_turf = get_turf(aim_atom)
 	if(burst_round)
 		gun.set_bursting(TRUE)
 	gun.Fire(aim_atom, body)

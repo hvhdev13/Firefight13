@@ -201,7 +201,7 @@
 
 /datum/clash_perk/wide_fire
 	name = "Wide Fire"
-	desc = "Your bullets suppress enemies up to 2.5 tiles from their path (from 1.5)"
+	desc = "Your bullets suppress enemies up to 2 tiles from their path (from 1)"
 	class = CLASH_CLASS_HEAVY
 	level = 10
 	icon_type = /obj/item/ammo_magazine/pkp

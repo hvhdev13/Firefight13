@@ -48,12 +48,25 @@ GLOBAL_LIST_INIT(clash_issued_gun_swaps, list(
 	effective_range_max = 10
 	damage_falloff = 1.5
 
+/datum/ammo/bullet/smartgun/setup_faction_clash_values()
+	. = ..()
+	if(!clash_hvh_rules())
+		return
+	if(type == /datum/ammo/bullet/smartgun)
+		damage = 30 * DAMAGE_MULT
+
+/datum/ammo/bullet/minigun/setup_faction_clash_values()
+	. = ..()
+	if(!clash_hvh_rules())
+		return
+	damage = 8
+
 /datum/ammo/bullet/rifle/m41a/heavy/setup_faction_clash_values()
 	. = ..()
 	if(!clash_hvh_rules())
 		return
 	damage = initial(damage) * DAMAGE_MULT
-	accurate_range = min(initial(accurate_range), 10 - penetration / 5)
+	accurate_range = min(initial(accurate_range), 10 - penetration * 0.2)
 	accuracy_falloff_per_tile = initial(accuracy_falloff_per_tile)
 	effective_range_max = initial(effective_range_max)
 	damage_falloff = initial(damage_falloff)

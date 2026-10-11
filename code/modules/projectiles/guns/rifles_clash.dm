@@ -41,6 +41,17 @@
 	set_fire_delay(FIRE_DELAY_TIER_8)
 	damage_mult = BASE_BULLET_DAMAGE_MULT + BULLET_DAMAGE_MULT_TIER_5
 
+/obj/item/weapon/gun/rifle/ak4047/setup_firemodes()
+	var/old_firemode = gun_firemode
+	. = ..()
+	if(!clash_hvh_rules() || !(GUN_FIREMODE_BURSTFIRE in gun_firemode_list))
+		return
+	gun_firemode_list -= GUN_FIREMODE_BURSTFIRE
+	gun_firemode_list.Insert(1, GUN_FIREMODE_BURSTFIRE)
+	if(!(old_firemode in gun_firemode_list))
+		gun_firemode = GUN_FIREMODE_BURSTFIRE
+		SEND_SIGNAL(src, COMSIG_GUN_FIRE_MODE_TOGGLE, gun_firemode)
+
 /obj/item/weapon/gun/rifle/ak4047/recalculate_attachment_bonuses()
 	. = ..()
 	if(clash_hvh_rules())
@@ -68,3 +79,21 @@
 		to_chat(user, SPAN_WARNING("That magazine doesn't fit in there!"))
 		return
 	return ..()
+
+/obj/item/attachable/bipod/m41ae2/activate_attachment(obj/item/weapon/gun/gun, mob/living/user, turn_off)
+	. = ..()
+	if(bipod_deployed && clash_hvh_rules())
+		delay_mod = -0.5
+		accuracy_mod = 0.4
+		gun.recalculate_attachment_bonuses()
+
+/obj/item/attachable/bipod/pkp/activate_attachment(obj/item/weapon/gun/gun, mob/living/user, turn_off)
+	. = ..()
+	if(bipod_deployed && clash_hvh_rules())
+		accuracy_mod = 0.1
+		gun.recalculate_attachment_bonuses()
+
+/obj/item/weapon/gun/Initialize(mapload, spawn_empty)
+	. = ..()
+	if(clash_suppression_scale && clash_hvh_rules())
+		add_bullet_traits(list(BULLET_TRAIT_ENTRY(/datum/element/bullet_trait_clash_suppression)))
