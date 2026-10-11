@@ -6,6 +6,7 @@
 #define CLASH_VOTE_LEAD (5 MINUTES)
 #define CLASH_VOTE_GAP (3 SECONDS)
 #define CLASH_VOTE_RETRY (10 SECONDS)
+#define CLASH_ARENA_VOTE_PERIOD (30 SECONDS)
 #define CLASH_REBOOT_AFTER_VOTES (30 SECONDS)
 #define CLASH_REBOOT_HOLD_LIMIT (5 MINUTES)
 #define CLASH_VOTES_NONE 0
@@ -1206,6 +1207,9 @@ GLOBAL_LIST_EMPTY(clash_map_gear)
 	if(round_vote_stage != CLASH_VOTES_NONE)
 		return
 	round_vote_stage = CLASH_VOTES_MODE
+	if(arena_rules)
+		var/datum/config_entry/number/period = config.entries_by_type[/datum/config_entry/number/vote_period]
+		period.config_entry_value = CLASH_ARENA_VOTE_PERIOD
 	log_debug("HVH: next round votes opening")
 	open_mode_vote()
 
@@ -1256,7 +1260,6 @@ GLOBAL_LIST_EMPTY(clash_map_gear)
 
 /datum/game_mode/extended/faction_clash/hvh/roundend_reboot()
 	if(arena_rules)
-		SSticker.Reboot(null, CLASH_FINAL_REBOOT_DELAY)
 		return
 	if(round_vote_stage == CLASH_VOTES_DONE)
 		return ..()
@@ -1453,6 +1456,9 @@ GLOBAL_DATUM_INIT(clash_vote_ui, /datum/clash_vote_ui, new)
 		return
 	SSvote.choices[choice]++
 	picks[ckey] = choice
+	if(length(SSvote.voted) >= length(GLOB.clients))
+		SSvote.result()
+		SSvote.reset()
 	SStgui.update_uis(src)
 	return TRUE
 
@@ -1596,6 +1602,8 @@ GLOBAL_VAR(clash_start_mode)
 	announce_scoreboard()
 	announce_personal_stats()
 	export_round_stats()
+	if(arena_rules)
+		SSticker.Reboot(null, CLASH_FINAL_REBOOT_DELAY)
 
 	return TRUE
 
