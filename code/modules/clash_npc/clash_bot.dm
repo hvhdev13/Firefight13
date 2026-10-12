@@ -274,8 +274,12 @@ SUBSYSTEM_DEF(clash_bots)
 		for(var/mob/living/carbon/human/enemy in oview(CLASH_BOT_SIGHT, body))
 			if(enemy.faction != body.faction && enemy.stat != DEAD && line_clear(here, get_turf(enemy)))
 				remember(enemy)
-	if(medic && hands == 2 && !carrying())
+	if(!medic)
+		return
+	if(hands == 2 && !carrying())
 		update_patient()
+	else
+		medic_patient = null
 
 /datum/clash_bot/proc/latest_known()
 	var/mob/living/carbon/human/latest
@@ -333,7 +337,7 @@ SUBSYSTEM_DEF(clash_bots)
 	if(!ceasefire)
 		grab_nearby_flag()
 	var/obj/item/weapon/gun/wanted = pick_gun()
-	charging = !ceasefire && should_charge(wanted)
+	charging = !ceasefire && !medic_patient && should_charge(wanted)
 	bleed_out(HAS_TRAIT(body, TRAIT_FLOORED) && !(wanted && gun_ready(wanted)))
 	decide()
 	try_brace()
@@ -346,19 +350,18 @@ SUBSYSTEM_DEF(clash_bots)
 			gun.wield(body)
 		if(ceasefire)
 			stop_volley()
-		else if(target)
-			if(carrying() && get_dist(body, target) > CLASH_BOT_CLOSE_RANGE)
+		else if(!(state == CLASH_BOT_STATE_MEDIC && treat_patient()))
+			if(target)
+				if(carrying() && get_dist(body, target) > CLASH_BOT_CLOSE_RANGE)
+					stop_volley()
+				else if(state == CLASH_BOT_STATE_RETREAT || carrying() || !try_grenade())
+					fight()
+			else if(firing)
 				stop_volley()
-			else if(state == CLASH_BOT_STATE_RETREAT || carrying() || !try_grenade())
-				fight()
-		else if(firing)
-			stop_volley()
-		else if(state == CLASH_BOT_STATE_MEDIC)
-			treat_patient()
-		else if(contact_recent() && prob(heavy ? 60 : 25))
-			suppress()
-		else if(state == CLASH_BOT_STATE_OBJECTIVE || state == CLASH_BOT_STATE_RECOVER)
-			try_heal()
+			else if(contact_recent() && prob(heavy ? 60 : 25))
+				suppress()
+			else if(state == CLASH_BOT_STATE_OBJECTIVE || state == CLASH_BOT_STATE_RECOVER)
+				try_heal()
 	if(QDELETED(body))
 		return
 	fire_tick()
@@ -492,7 +495,7 @@ SUBSYSTEM_DEF(clash_bots)
 	var/wanted = pick_state()
 	if(wanted == state)
 		return
-	if(world.time < state_since + CLASH_BOT_COMMIT && !(wanted in list(CLASH_BOT_STATE_DODGE, CLASH_BOT_STATE_COMBAT, CLASH_BOT_STATE_RETREAT, CLASH_BOT_STATE_CARRY)))
+	if(world.time < state_since + CLASH_BOT_COMMIT && !(wanted in list(CLASH_BOT_STATE_DODGE, CLASH_BOT_STATE_COMBAT, CLASH_BOT_STATE_RETREAT, CLASH_BOT_STATE_CARRY, CLASH_BOT_STATE_MEDIC)))
 		return
 	enter_state(wanted)
 
@@ -501,6 +504,8 @@ SUBSYSTEM_DEF(clash_bots)
 		return CLASH_BOT_STATE_DODGE
 	if(carrying())
 		return CLASH_BOT_STATE_CARRY
+	if(medic_patient)
+		return CLASH_BOT_STATE_MEDIC
 	if(should_retreat())
 		return CLASH_BOT_STATE_RETREAT
 	if(charging || target)
@@ -509,8 +514,6 @@ SUBSYSTEM_DEF(clash_bots)
 		return CLASH_BOT_STATE_COMBAT
 	if(hands == 2 && (dry || !primary))
 		return CLASH_BOT_STATE_RECOVER
-	if(medic_patient)
-		return CLASH_BOT_STATE_MEDIC
 	if(seek_goal())
 		return CLASH_BOT_STATE_SEEK
 	return CLASH_BOT_STATE_OBJECTIVE
@@ -902,7 +905,7 @@ SUBSYSTEM_DEF(clash_bots)
 		return
 	if(body.health >= body.maxHealth * CLASH_BOT_WOUNDED)
 		return
-	var/obj/item/medicine = find_medicine()
+	var/obj/item/medicine = find_medicine(body)
 	if(!medicine)
 		return
 	next_heal = world.time + CLASH_BOT_HEAL_DELAY
@@ -933,20 +936,27 @@ SUBSYSTEM_DEF(clash_bots)
 	if(medic_patient && !needs_medic(medic_patient))
 		medic_patient = null
 		medic_wait_since = 0
-	if(!medic_patient && world.time >= next_patient_scan)
-		next_patient_scan = world.time + CLASH_BOT_PATIENT_SCAN
-		medic_patient = find_patient()
+	if(world.time < next_patient_scan || (medic_patient && patient_urgent(medic_patient)))
+		return
+	next_patient_scan = world.time + CLASH_BOT_PATIENT_SCAN
+	var/mob/living/carbon/human/best = find_patient()
+	if(!medic_patient || (best && patient_urgent(best)))
+		medic_patient = best
 		medic_wait_since = 0
+
+/datum/clash_bot/proc/patient_urgent(mob/living/carbon/human/patient)
+	return patient.stat == DEAD || patient.health < patient.health_threshold_crit
 
 /datum/clash_bot/proc/treat_patient()
 	if(!medic_patient || get_dist(body, medic_patient) > 1 || world.time < next_heal)
-		return
+		return FALSE
 	var/obj/item/tool = medic_tool(medic_patient)
 	if(!tool)
 		medic_patient = null
-		return
+		return FALSE
 	next_heal = world.time + CLASH_BOT_TREAT_DELAY
 	INVOKE_ASYNC(src, PROC_REF(heal_with), tool, medic_patient)
+	return TRUE
 
 /datum/clash_bot/proc/patient_taken(mob/living/carbon/human/patient)
 	for(var/datum/clash_bot/other as anything in GLOB.clash_bots)
@@ -1000,9 +1010,13 @@ SUBSYSTEM_DEF(clash_bots)
 	if(get_dist(body, patient) > (called ? CLASH_BOT_CALL_RANGE : CLASH_BOT_MEDIC_RANGE))
 		return FALSE
 	if(patient.stat == DEAD)
-		return patient.check_tod() && patient.is_revivable() && !!(locate(/obj/item/device/defibrillator) in body.get_contents())
-	var/list/mark = GLOB.clash_medic_marks[patient]
-	return (mark && mark["until"]) || patient.health < patient.maxHealth * CLASH_BOT_PATIENT_HEALTH || (!clash_is_bot(patient) && clash_has_internal_injuries(patient))
+		if(!patient.check_tod() || !patient.is_revivable())
+			return FALSE
+	else
+		var/list/mark = GLOB.clash_medic_marks[patient]
+		if(!(mark && mark["until"]) && patient.health >= patient.maxHealth * CLASH_BOT_PATIENT_HEALTH && (clash_is_bot(patient) || !clash_has_internal_injuries(patient)))
+			return FALSE
+	return !!medic_tool(patient)
 
 /datum/clash_bot/proc/find_patient()
 	var/mob/living/carbon/human/best
@@ -1010,7 +1024,7 @@ SUBSYSTEM_DEF(clash_bots)
 	for(var/mob/living/carbon/human/patient as anything in GLOB.human_mob_list)
 		if(!needs_medic(patient) || !can_enter(get_turf(patient)) || patient_taken(patient))
 			continue
-		var/score = get_dist(body, patient) + (patient.stat == DEAD ? 0 : (GLOB.clash_medic_marks[patient] ? 5 : 10))
+		var/score = get_dist(body, patient) + (patient_urgent(patient) ? 0 : (GLOB.clash_medic_marks[patient] ? 5 : 10))
 		if(isnull(best_score) || score < best_score)
 			best = patient
 			best_score = score
@@ -1023,15 +1037,25 @@ SUBSYSTEM_DEF(clash_bots)
 		for(var/obj/item/reagent_container/hypospray/autoinjector/clash_fixall/fixall in body.get_contents())
 			if(fixall.uses_left > 0)
 				return fixall
-	return find_medicine()
+	return find_medicine(patient)
 
-/datum/clash_bot/proc/find_medicine()
+/datum/clash_bot/proc/find_medicine(mob/living/carbon/human/patient)
 	for(var/obj/item/reagent_container/hypospray/autoinjector/shot in body.get_contents())
-		if(shot.uses_left > 0 && !istype(shot, /obj/item/reagent_container/hypospray/autoinjector/clash_fixall))
+		if(shot.uses_left > 0 && !istype(shot, /obj/item/reagent_container/hypospray/autoinjector/clash_fixall) && !would_overdose(shot, patient))
 			return shot
 	for(var/obj/item/stack/medical/dressing in body.get_contents())
 		return dressing
 	return null
+
+/datum/clash_bot/proc/would_overdose(obj/item/reagent_container/hypospray/autoinjector/shot, mob/living/carbon/human/patient)
+	if(!shot.reagents.total_volume)
+		return TRUE
+	var/share = min(1, shot.amount_per_transfer_from_this / shot.reagents.total_volume)
+	for(var/datum/reagent/dose as anything in shot.reagents.reagent_list)
+		var/limit = clash_overdose_limit(dose)
+		if(limit && patient.reagents.get_reagent_amount(dose.id) + dose.volume * share > limit)
+			return TRUE
+	return FALSE
 
 /datum/clash_bot/proc/find_loose_magazine()
 	var/obj/item/ammo_magazine/closest
