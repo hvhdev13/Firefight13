@@ -90,6 +90,12 @@ GLOBAL_LIST_EMPTY(clash_gates)
 	faction = FACTION_UPP
 	color = "#e61919"
 
+/obj/structure/blocker/clash_gate/uscm/horizontal
+	dir = EAST
+
+/obj/structure/blocker/clash_gate/upp/horizontal
+	dir = EAST
+
 /obj/structure/machinery/door/airlock/upp/medical/solid/autoname/clash_base
 	req_one_access = list(ACCESS_UPP_GENERAL)
 

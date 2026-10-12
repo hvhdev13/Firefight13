@@ -238,11 +238,14 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 			addtimer(CALLBACK(src, PROC_REF(match_countdown_beep), match, FALSE), round_time_limit - seconds_left SECONDS)
 	if(!arena_rules && match_number >= matches_per_round)
 		vote_timer_id = addtimer(CALLBACK(src, PROC_REF(start_round_votes)), max(1, round_time_limit - CLASH_VOTE_LEAD), TIMER_STOPPABLE)
+	start_clash_huds()
+	log_debug("HVH: match [match_number] timer armed for [round_time_limit / 600] minutes")
+
+/datum/game_mode/extended/faction_clash/hvh/proc/start_clash_huds()
 	if(!radar_timer_id)
 		start_clash_radar()
 	if(arena_rules && !ammo_timer_id)
 		start_clash_ammo_counters()
-	log_debug("HVH: match [match_number] timer armed for [round_time_limit / 600] minutes")
 
 /datum/game_mode/extended/faction_clash/hvh/proc/get_display_match()
 	if(match_live || intermission_end_time || round_finished)
@@ -262,6 +265,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	begin_countdown()
 
 /datum/game_mode/extended/faction_clash/hvh/proc/begin_countdown()
+	start_clash_huds()
 	if(!countdown_time)
 		start_match()
 		return

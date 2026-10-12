@@ -9,12 +9,25 @@
 		)
 	)
 
+	var/shift = 0
+	if(clash_uses_kits())
+		shift = 1
+		page_holder.give_screen_object(
+			new /atom/movable/screen/escape_menu/home_button(
+				null,
+				src,
+				"Loadout",
+				/* offset = */ 1,
+				CALLBACK(src, PROC_REF(home_open_loadout)),
+			)
+		)
+
 	page_holder.give_screen_object(
 		new /atom/movable/screen/escape_menu/home_button(
 			null,
 			src,
 			"Edit Character",
-			/* offset = */ 1,
+			/* offset = */ 1 + shift,
 			CALLBACK(src, PROC_REF(home_open_settings)),
 		)
 	)
@@ -24,7 +37,7 @@
 			null,
 			src,
 			"Edit Hotkeys",
-			/* offset = */ 2,
+			/* offset = */ 2 + shift,
 			CALLBACK(src, PROC_REF(home_open_hotkeys)),
 		)
 	)
@@ -34,7 +47,7 @@
 			null,
 			src,
 			"Admin Help",
-			/* offset = */ 3,
+			/* offset = */ 3 + shift,
 		)
 	)
 
@@ -43,7 +56,7 @@
 			null,
 			src,
 			"Mentor Help",
-			/* offset = */ 4,
+			/* offset = */ 4 + shift,
 			CALLBACK(src, PROC_REF(home_mentor_help)),
 		)
 	)
@@ -58,7 +71,7 @@
 			null,
 			src,
 			"Admin Panels",
-			/* offset = */ 6,
+			/* offset = */ 6 + shift,
 			CALLBACK(src, PROC_REF(view_admin_buttons)),
 		)
 	)
@@ -68,7 +81,7 @@
 			null,
 			src,
 			"AGhost",
-			/* offset = */ 7,
+			/* offset = */ 7 + shift,
 			CALLBACK(src, PROC_REF(home_aghost)),
 		)
 	)
@@ -78,7 +91,7 @@
 			null,
 			src,
 			"Open STUI",
-			/* offset = */ 8,
+			/* offset = */ 8 + shift,
 			CALLBACK(src, PROC_REF(home_open_stui)),
 		)
 	)
@@ -88,7 +101,7 @@
 			null,
 			src,
 			"Open Player Panel",
-			/* offset = */ 9,
+			/* offset = */ 9 + shift,
 			CALLBACK(src, PROC_REF(home_open_player_panel)),
 		)
 	)
