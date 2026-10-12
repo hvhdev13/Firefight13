@@ -667,6 +667,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	clash_progress_kill(victim, killer, cause, cause_object)
 	if(istype(cause_object, /obj/structure/machinery/defenses))
 		score_sentry_kill(killer)
+		clash_sentry_scored(cause_object)
 	if(killer.statistic_exempt && !victim.statistic_exempt && killer.faction != victim.faction && (killer.faction in list(FACTION_MARINE, FACTION_UPP)))
 		note_bot_side_kill(killer.faction)
 		if(scores_bot_kills())
@@ -687,6 +688,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		recent_damage -= victim.real_name
 		return
 	add_killfeed(killer.real_name, killer.faction, victim.real_name, victim.faction, cause.cause_name)
+	clash_sentry_scored(cause.resolve_cause())
 	if(killer.statistic_exempt)
 		note_bot_side_kill(killer.faction)
 	else

@@ -74,6 +74,7 @@ GLOBAL_LIST_INIT(clash_kit_slots, list(
 	KIT_SLOT_BACK_STOCK = list("name" = "Stock", "image" = null, "wear" = null),
 	KIT_SLOT_WEBBING = list("name" = "Accessory", "image" = "inventory-uniform.png", "wear" = null),
 	KIT_SLOT_SENTRY = list("name" = "Sentry", "image" = null, "wear" = null),
+	KIT_SLOT_SENTRY_MODULE = list("name" = "Module", "image" = null, "wear" = null),
 	KIT_SLOT_CLASS_PERK = list("name" = "Class perk", "image" = null, "wear" = null),
 	KIT_SLOT_GENERAL_PERK = list("name" = "General perk", "image" = null, "wear" = null),
 ))

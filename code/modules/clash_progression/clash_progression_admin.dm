@@ -292,7 +292,7 @@ GLOBAL_DATUM_INIT(clash_progression_admin, /datum/clash_progression_admin, new)
 	for(var/gun_type in GLOB.clash_weapon_tracks)
 		var/list/unlocks = GLOB.clash_weapon_tracks[gun_type]
 		var/list/entry = progress.weapon_entry(gun_type)
-		entry["xp"] = max(entry["xp"], CLASH_WEAPON_MASTERY_XP, length(unlocks) ? unlocks[length(unlocks)]["xp"] : 0)
+		entry["xp"] = max(entry["xp"], clash_track_mastery_xp(gun_type), length(unlocks) ? unlocks[length(unlocks)]["xp"] : 0)
 		entry["best"] = length(unlocks) + 1
 		entry["mastered"] = TRUE
 	for(var/family in GLOB.clash_carrier_tracks)

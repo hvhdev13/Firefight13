@@ -38,6 +38,10 @@ GLOBAL_LIST_EMPTY(clash_weapon_unlock_levels)
 			for(var/datum/clash_kit_option/gun as anything in GLOB.clash_kit_menu[faction][slot])
 				if(!GLOB.clash_weapon_tracks[gun.item_type])
 					build_clash_weapon_track(gun.item_type)
+	build_clash_sentry_tracks()
+
+/proc/clash_track_mastery_xp(track_type)
+	return ispath(track_type, /obj/structure/machinery/defenses/sentry) ? CLASH_SENTRY_MASTERY_XP : CLASH_WEAPON_MASTERY_XP
 
 /proc/build_clash_weapon_track(gun_type)
 	var/list/by_group = list()

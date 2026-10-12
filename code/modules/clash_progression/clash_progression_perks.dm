@@ -103,14 +103,14 @@
 
 /datum/clash_perk/efficient_reload
 	name = "Efficient Reload"
-	desc = "Your sentries reload with half the metal"
+	desc = "Your sentries and machine gun reload with half the metal"
 	class = CLASH_CLASS_ENGINEER
 	level = 6
 	icon_type = /obj/item/stack/sheet/metal
 
 /datum/clash_perk/quick_build
 	name = "Quick Build"
-	desc = "Your sentries and ammo crate set up and pack up twice as fast"
+	desc = "Your sentries, machine gun and ammo crate set up and pack up twice as fast"
 	class = CLASH_CLASS_ENGINEER
 	level = 8
 	icon_type = /obj/item/tool/wrench
@@ -131,17 +131,17 @@
 
 /datum/clash_perk/hardened
 	name = "Hardened"
-	desc = "Your sentries and barricades have 25% more health"
+	desc = "Your sentries, machine gun and barricades have 25% more health"
 	class = CLASH_CLASS_ENGINEER
 	level = 16
 	icon_type = /obj/item/stack/sheet/plasteel
 
 /datum/clash_perk/twin_sentries
 	name = "Twin Sentries"
-	desc = "Keep two sentries up at once"
+	desc = "Keep two sentries or machine guns up at once"
 	class = CLASH_CLASS_ENGINEER
 	level = 18
-	icon_type = /obj/item/defenses/handheld/sentry/mini/clash
+	icon_type = /obj/item/defenses/handheld/sentry/clash
 
 /datum/clash_perk/wide_orders
 	name = "Wide Orders"

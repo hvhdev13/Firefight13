@@ -28,6 +28,9 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 		. = "[copytext(., 1, index + 1)],[copytext(., index + 1)]"
 
 /proc/clash_track_type(gun_type)
+	var/sentry_track = clash_sentry_track_key(gun_type)
+	if(sentry_track)
+		return sentry_track
 	var/check = gun_type
 	while(ispath(check, /obj/item/weapon/gun))
 		if(GLOB.clash_weapon_tracks[check])
@@ -165,6 +168,10 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 	if(option.slot == KIT_SLOT_SENTRY)
 		var/level = GLOB.clash_sentry_tiers[clash_sentry_tier_of(option.item_type)]["level"]
 		return progress.class_level(CLASH_CLASS_ENGINEER) < level ? "Unlocks at Engineer level [level]" : null
+	if(option.slot == KIT_SLOT_SENTRY_MODULE)
+		if(ispath(primary_type, /obj/item/device/clash_mg))
+			return "Machine guns take no module"
+		return primary_type ? clash_attachment_lock_text(progress, option.item_type, primary_type) : null
 	if(clash_is_attachment_slot(option.slot))
 		if(!primary_type || !clash_kit_attachment_fits(option.item_type, primary_type))
 			return null
