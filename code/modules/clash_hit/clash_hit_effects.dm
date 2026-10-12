@@ -121,16 +121,11 @@ GLOBAL_LIST_INIT(clash_hit_zone_heights, list(
 #define CLASH_MARKER_HIT 2
 #define CLASH_MARKER_DOWN 3
 #define CLASH_MARKER_KILL 4
-#define CLASH_THREAT_MARKS 3
-#define CLASH_THREAT_HOLD (2 DECISECONDS)
-#define CLASH_THREAT_FADE (3 DECISECONDS)
-#define CLASH_THREAT_GAP (1 DECISECONDS)
 
 GLOBAL_LIST_EMPTY(clash_hit_marker_cursors)
 GLOBAL_LIST_INIT(clash_hit_marker_states, list("ff", "hit", "down", "kill"))
 GLOBAL_LIST_INIT(clash_hit_marker_times, list(5 DECISECONDS, 5 DECISECONDS, 7 DECISECONDS, 9 DECISECONDS))
 GLOBAL_LIST_INIT(clash_hit_marker_sounds, list(null, null, 'sound/weapons/gun_xm88_directhit_high.ogg', 'sound/weapons/gun_xm88_directhit_low.ogg'))
-GLOBAL_DATUM(clash_threat_icon, /icon)
 
 /client/var/clash_marker_base
 /client/var/clash_marker_shown
@@ -142,9 +137,6 @@ GLOBAL_DATUM(clash_threat_icon, /icon)
 /client/var/clash_marker_damage = 0
 /client/var/clash_marker_tier = 1
 /client/var/clash_down_sound_at = 0
-/client/var/list/clash_threat_marks
-/client/var/list/clash_threat_sources
-/client/var/list/clash_threat_until
 
 /proc/get_clash_hit_marker_cursor(shape, kind, frame, tier)
 	var/state = "[GLOB.clash_hit_marker_states[kind]][frame]_[tier]"
@@ -240,57 +232,6 @@ GLOBAL_DATUM(clash_threat_icon, /icon)
 	player.clash_marker_shown = null
 	player.clash_marker_kind = 0
 
-/proc/clash_show_threat(mob/living/carbon/human/victim, source_ref, turf/origin)
-	var/client/player = victim.client
-	var/turf/victim_turf = get_turf(victim)
-	if(!player || !origin || !victim_turf || origin.z != victim_turf.z || origin == victim_turf)
-		return
-	if(!player.clash_threat_marks)
-		player.clash_threat_marks = list()
-		player.clash_threat_sources = list()
-		player.clash_threat_until = list()
-	var/slot = player.clash_threat_sources.Find(source_ref)
-	var/image/mark
-	if(slot)
-		if(world.time < player.clash_threat_until[slot] - CLASH_THREAT_HOLD - CLASH_THREAT_FADE + CLASH_THREAT_GAP)
-			return
-		mark = player.clash_threat_marks[slot]
-	else if(length(player.clash_threat_marks) < CLASH_THREAT_MARKS)
-		if(!GLOB.clash_threat_icon)
-			GLOB.clash_threat_icon = icon('icons/effects/Targeted.dmi', "sniper_lockon_direction", NORTH)
-		mark = image(GLOB.clash_threat_icon)
-		mark.plane = ABOVE_LIGHTING_PLANE
-		mark.appearance_flags = RESET_COLOR|RESET_TRANSFORM|RESET_ALPHA|KEEP_APART
-	else
-		slot = CLASH_THREAT_MARKS
-		mark = player.clash_threat_marks[slot]
-	if(slot)
-		player.clash_threat_marks.Cut(slot, slot + 1)
-		player.clash_threat_sources.Cut(slot, slot + 1)
-		player.clash_threat_until.Cut(slot, slot + 1)
-	player.clash_threat_marks.Insert(1, mark)
-	player.clash_threat_sources.Insert(1, source_ref)
-	player.clash_threat_until.Insert(1, world.time + CLASH_THREAT_HOLD + CLASH_THREAT_FADE)
-	mark.loc = victim
-	if(!(mark in player.images))
-		player.images += mark
-	var/matrix/placement = matrix()
-	placement.Translate(0, 8)
-	placement.Turn(get_clash_turn_sign() * Get_Angle(victim_turf, origin))
-	animate(mark)
-	mark.transform = placement
-	mark.alpha = 255
-	animate(mark, alpha = 255, time = CLASH_THREAT_HOLD)
-	animate(alpha = 0, time = CLASH_THREAT_FADE)
-	addtimer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(clash_drop_threat), player, mark), CLASH_THREAT_HOLD + CLASH_THREAT_FADE)
-
-/proc/clash_drop_threat(client/player, image/mark)
-	if(!player)
-		return
-	var/slot = player.clash_threat_marks.Find(mark)
-	if(slot && world.time >= player.clash_threat_until[slot])
-		mark.loc = null
-
 #undef CLASH_HIT_MARKER_FRAMES
 #undef CLASH_HIT_MARKER_SIZE
 #undef CLASH_HIT_MARKER_MEDIUM
@@ -299,7 +240,3 @@ GLOBAL_DATUM(clash_threat_icon, /icon)
 #undef CLASH_MARKER_HIT
 #undef CLASH_MARKER_DOWN
 #undef CLASH_MARKER_KILL
-#undef CLASH_THREAT_MARKS
-#undef CLASH_THREAT_HOLD
-#undef CLASH_THREAT_FADE
-#undef CLASH_THREAT_GAP

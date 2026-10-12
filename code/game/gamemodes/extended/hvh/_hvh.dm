@@ -1502,8 +1502,12 @@ GLOBAL_VAR(clash_start_mode)
 /datum/game_mode/extended/faction_clash/hvh/get_roles_list()
 	return arena_rules ? GLOB.clash_arena_roles : GLOB.ROLES_CM_VS_UPP
 
+/datum/game_mode/extended/faction_clash/hvh/check_predator_late_join(mob/pred_candidate, show_warning = TRUE)
+	return FALSE
+
 /datum/game_mode/extended/faction_clash/hvh/post_setup()
 	. = ..()
+	flags_round_type &= ~MODE_PREDATOR
 	for(var/hivenumber in GLOB.hive_datum)
 		var/datum/hive_status/hive = GLOB.hive_datum[hivenumber]
 		hive.UnregisterSignal(SSdcs, COMSIG_GLOB_POST_SETUP)
