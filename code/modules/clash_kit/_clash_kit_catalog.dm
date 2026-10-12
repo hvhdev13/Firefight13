@@ -263,6 +263,7 @@ GLOBAL_LIST_INIT(clash_kit_blocked_attachments, list(
 ))
 
 /proc/get_clash_gun_attachables(gun_type)
+	RETURN_TYPE(/list)
 	if(!gun_type)
 		return list()
 	var/list/allowed = GLOB.clash_kit_gun_attachables[gun_type]

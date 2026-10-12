@@ -857,8 +857,14 @@ SUBSYSTEM_DEF(clash_bots)
 	aim_atom = aim
 	fire_tick()
 
+/obj/item/weapon/gun/proc/clash_burst_amount()
+	return burst_amount
+
+/obj/item/weapon/gun/proc/clash_burst_delay()
+	return burst_delay
+
 /datum/clash_bot/proc/bursting()
-	return gun.gun_firemode == GUN_FIREMODE_BURSTFIRE && gun.burst_amount > BURST_AMOUNT_TIER_1
+	return gun.gun_firemode == GUN_FIREMODE_BURSTFIRE && gun.clash_burst_amount() > BURST_AMOUNT_TIER_1
 
 /datum/clash_bot/proc/fire_tick()
 	if(!firing)
@@ -876,7 +882,7 @@ SUBSYSTEM_DEF(clash_bots)
 			lane_blocked_since = world.time
 		if(burst_round)
 			release_trigger()
-			next_round_at = last_round_at + gun.fire_delay + gun.burst_cooldown
+			next_round_at = last_round_at + gun.get_fire_delay() + gun.burst_cooldown
 		return
 	if(burst_round)
 		gun.set_bursting(TRUE)
@@ -888,14 +894,14 @@ SUBSYSTEM_DEF(clash_bots)
 	var/delay
 	if(bursting())
 		burst_round++
-		delay = gun.burst_delay
-		if(burst_round >= gun.burst_amount)
+		delay = gun.clash_burst_delay()
+		if(burst_round >= gun.clash_burst_amount())
 			release_trigger()
-			delay = gun.fire_delay + gun.burst_cooldown
+			delay = gun.get_fire_delay() + gun.burst_cooldown
 	else if(gun.gun_firemode == GUN_FIREMODE_AUTOMATIC)
-		delay = gun.fire_delay
+		delay = gun.get_fire_delay()
 	else
-		delay = max(gun.fire_delay, CLASH_BOT_CLICK_DELAY)
+		delay = max(gun.get_fire_delay(), CLASH_BOT_CLICK_DELAY)
 	next_round_at = world.time + delay
 	fire_timer = addtimer(CALLBACK(src, PROC_REF(fire_tick)), delay, TIMER_UNIQUE|TIMER_OVERRIDE|TIMER_STOPPABLE)
 
