@@ -35,6 +35,8 @@ SUBSYSTEM_DEF(clash_hit_flinch)
 	if(damage_result <= 0 || source.stat == DEAD)
 		return
 	addtimer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(clash_refresh_statuses), source), 1, TIMER_UNIQUE)
+	if(source.client && bullet.firer != source && clash_fast_medicine())
+		clash_show_threat(source, REF(bullet.firer || bullet), bullet.starting)
 	var/direction = get_dir(bullet.starting, source) || bullet.dir
 	var/push_x = 0
 	var/push_y = 0

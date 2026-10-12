@@ -240,6 +240,8 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		vote_timer_id = addtimer(CALLBACK(src, PROC_REF(start_round_votes)), max(1, round_time_limit - CLASH_VOTE_LEAD), TIMER_STOPPABLE)
 	if(!radar_timer_id)
 		start_clash_radar()
+	if(arena_rules && !ammo_timer_id)
+		start_clash_ammo_counters()
 	log_debug("HVH: match [match_number] timer armed for [round_time_limit / 600] minutes")
 
 /datum/game_mode/extended/faction_clash/hvh/proc/get_display_match()

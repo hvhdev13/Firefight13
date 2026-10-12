@@ -38,9 +38,14 @@
 	if(istype(clash_mode))
 		clash_mode.record_damage(source, firer, bullet.shot_from?.type, damage_result)
 		source.clash_heal_pool += clash_enemy_share(firer, source.faction, damage_result)
-	if(firer.client && firer.faction != source.faction && world.time >= firer.clash_next_hit_sound)
+	if(!firer.client)
+		return
+	var/friendly = firer.faction == source.faction
+	if(clash_fast_medicine())
+		clash_on_marker_hit(firer.client, source, bullet.shot_from, damage_result, friendly)
+	if(!friendly && world.time >= firer.clash_next_hit_sound)
 		firer.clash_next_hit_sound = world.time + CLASH_HIT_SOUND_GAP
-		playsound_client(firer.client, CLASH_HIT_SOUND, null, 35)
+		playsound_client(firer.client, CLASH_HIT_SOUND, null, 50)
 
 /datum/element/clash_combat_log/proc/on_melee(mob/living/carbon/human/source, mob/living/target, obj/item/weapon)
 	SIGNAL_HANDLER
