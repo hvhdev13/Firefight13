@@ -960,7 +960,7 @@
 /obj/effect/decal/strata_decals/mud_corner{
 	dir = 10
 	},
-/turf/open/auto_turf/tyrargo_grass/layer1,
+/turf/open/auto_turf/tyrargo_grass/layer1/no_edges,
 /area/clash_arena/tdm_forest/battlefield)
 "eO" = (
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
@@ -981,7 +981,7 @@
 /obj/effect/decal/strata_decals/mud_corner{
 	dir = 7
 	},
-/turf/open/auto_turf/tyrargo_grass/layer1,
+/turf/open/auto_turf/tyrargo_grass/layer1/no_edges,
 /area/clash_arena/tdm_forest/battlefield)
 "ff" = (
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
@@ -1166,7 +1166,7 @@
 "gy" = (
 /obj/structure/prop/tyrargo/boards/boards_2,
 /obj/effect/landmark/clash_objective/domination_zone/a,
-/turf/open/auto_turf/strata_grass/layer1,
+/turf/open/auto_turf/strata_grass/layer1/no_edges,
 /area/clash_arena/tdm_forest/battlefield/zone_2)
 "gA" = (
 /turf/open/floor/strata/fake_wood{
@@ -1605,7 +1605,7 @@
 /area/clash_arena/tdm_forest/uscm_base)
 "kg" = (
 /obj/effect/landmark/clash_npc/upp/fill,
-/turf/open/auto_turf/tyrargo_grass/layer1,
+/turf/open/auto_turf/tyrargo_grass/layer1/no_edges,
 /area/clash_arena/tdm_forest/battlefield)
 "kh" = (
 /obj/structure/sign/flag/upp{
@@ -1877,7 +1877,7 @@
 "mZ" = (
 /obj/effect/decal/strata_decals/grasses,
 /obj/effect/decal/strata_decals/grasses,
-/turf/open/auto_turf/strata_grass/layer1,
+/turf/open/auto_turf/strata_grass/layer1/no_edges,
 /area/clash_arena/tdm_forest/battlefield)
 "nc" = (
 /obj/structure/barricade/sandbags/weak_wired{
@@ -2231,7 +2231,7 @@
 /obj/effect/decal/strata_decals/mud_corner{
 	dir = 5
 	},
-/turf/open/auto_turf/strata_grass/layer1,
+/turf/open/auto_turf/strata_grass/layer1/no_edges,
 /area/clash_arena/tdm_forest/battlefield)
 "qd" = (
 /obj/effect/decal/strata_decals/mud_corner{
@@ -2608,7 +2608,7 @@
 /turf/open/auto_turf/tyrargo_grass/layer0_mud,
 /area/clash_arena/tdm_forest/battlefield/zone_3)
 "th" = (
-/turf/open/auto_turf/strata_grass/layer1,
+/turf/open/auto_turf/strata_grass/layer1/no_edges,
 /area/clash_arena/tdm_forest/battlefield/zone_2)
 "ti" = (
 /obj/structure/flora/grass/ice/brown/snowgrassbb_1,
@@ -2674,14 +2674,14 @@
 /obj/effect/decal/strata_decals/mud_corner{
 	dir = 6
 	},
-/turf/open/auto_turf/tyrargo_grass/layer1,
+/turf/open/auto_turf/tyrargo_grass/layer1/no_edges,
 /area/clash_arena/tdm_forest/battlefield)
 "tF" = (
 /obj/structure/flora/grass/ice/brown/snowgrassbb_1,
 /turf/open/auto_turf/snow/brown_base/layer3,
 /area/clash_arena/tdm_forest/battlefield)
 "tJ" = (
-/turf/open/auto_turf/tyrargo_grass/layer1,
+/turf/open/auto_turf/tyrargo_grass/layer1/no_edges,
 /area/clash_arena/tdm_forest/battlefield)
 "tQ" = (
 /obj/structure/flora/tree/tyrargo/tree_2,
@@ -3041,7 +3041,7 @@
 	pixel_y = -10;
 	pixel_x = 15
 	},
-/turf/open/auto_turf/tyrargo_grass/layer1,
+/turf/open/auto_turf/tyrargo_grass/layer1/no_edges,
 /area/clash_arena/tdm_forest/battlefield)
 "yl" = (
 /obj/structure/barricade/sandbags/weak_wired{
@@ -3464,7 +3464,7 @@
 /obj/effect/decal/strata_decals/mud_corner{
 	dir = 10
 	},
-/turf/open/auto_turf/strata_grass/layer1,
+/turf/open/auto_turf/strata_grass/layer1/no_edges,
 /area/clash_arena/tdm_forest/battlefield)
 "Bw" = (
 /obj/structure/flora/tree/tyrargo/tree_5,
@@ -3512,7 +3512,7 @@
 /area/clash_arena/tdm_forest/battlefield)
 "BJ" = (
 /obj/structure/flora/tree/tyrargo/tree_2,
-/turf/open/auto_turf/strata_grass/layer1,
+/turf/open/auto_turf/strata_grass/layer1/no_edges,
 /area/clash_arena/tdm_forest/battlefield)
 "BS" = (
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
@@ -3590,7 +3590,7 @@
 /obj/effect/decal/strata_decals/mud_corner{
 	dir = 10
 	},
-/turf/open/auto_turf/strata_grass/layer1,
+/turf/open/auto_turf/strata_grass/layer1/no_edges,
 /area/clash_arena/tdm_forest/battlefield)
 "Cw" = (
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
@@ -3645,7 +3645,7 @@
 /obj/effect/decal/strata_decals/mud_corner{
 	dir = 5
 	},
-/turf/open/auto_turf/tyrargo_grass/layer1,
+/turf/open/auto_turf/tyrargo_grass/layer1/no_edges,
 /area/clash_arena/tdm_forest/battlefield)
 "CN" = (
 /obj/effect/decal/warning_stripes{
@@ -3782,7 +3782,7 @@
 /area/clash_arena/tdm_forest/battlefield)
 "EC" = (
 /obj/structure/prop/tyrargo/boards/boards_2,
-/turf/open/auto_turf/tyrargo_grass/layer1,
+/turf/open/auto_turf/tyrargo_grass/layer1/no_edges,
 /area/clash_arena/tdm_forest/battlefield/zone_2)
 "EE" = (
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{
@@ -3965,7 +3965,7 @@
 "Ha" = (
 /obj/effect/decal/strata_decals/grasses,
 /obj/effect/decal/strata_decals/grasses,
-/turf/open/auto_turf/tyrargo_grass/layer1,
+/turf/open/auto_turf/tyrargo_grass/layer1/no_edges,
 /area/clash_arena/tdm_forest/battlefield)
 "Hb" = (
 /obj/structure/prop/tyrargo/boards/boards_1{
@@ -4006,7 +4006,7 @@
 /area/clash_arena/tdm_forest/uscm_base)
 "Hq" = (
 /obj/effect/decal/strata_decals/grasses,
-/turf/open/auto_turf/strata_grass/layer1,
+/turf/open/auto_turf/strata_grass/layer1/no_edges,
 /area/clash_arena/tdm_forest/battlefield)
 "Hv" = (
 /obj/structure/machinery/light{
@@ -4284,7 +4284,7 @@
 /obj/effect/decal/strata_decals/mud_corner{
 	dir = 6
 	},
-/turf/open/auto_turf/tyrargo_grass/layer1,
+/turf/open/auto_turf/tyrargo_grass/layer1/no_edges,
 /area/clash_arena/tdm_forest/battlefield)
 "JT" = (
 /obj/structure/flora/tree/tyrargo/tree_5,
@@ -4379,7 +4379,7 @@
 /obj/effect/decal/strata_decals/mud_corner{
 	dir = 9
 	},
-/turf/open/auto_turf/strata_grass/layer1,
+/turf/open/auto_turf/strata_grass/layer1/no_edges,
 /area/clash_arena/tdm_forest/battlefield)
 "KL" = (
 /obj/structure/flora/tree/tyrargo/tree_3,
@@ -4465,7 +4465,7 @@
 /obj/effect/decal/strata_decals/mud_corner{
 	dir = 9
 	},
-/turf/open/auto_turf/tyrargo_grass/layer1,
+/turf/open/auto_turf/tyrargo_grass/layer1/no_edges,
 /area/clash_arena/tdm_forest/battlefield)
 "Li" = (
 /obj/structure/machinery/light{
@@ -4522,7 +4522,7 @@
 	pixel_x = 0;
 	pixel_y = -9
 	},
-/turf/open/auto_turf/tyrargo_grass/layer1,
+/turf/open/auto_turf/tyrargo_grass/layer1/no_edges,
 /area/clash_arena/tdm_forest/battlefield)
 "LL" = (
 /obj/structure/barricade/sandbags/weak_wired{
@@ -4606,7 +4606,7 @@
 /area/clash_arena/tdm_forest/uscm_base)
 "MQ" = (
 /obj/effect/decal/strata_decals/grasses,
-/turf/open/auto_turf/tyrargo_grass/layer1,
+/turf/open/auto_turf/tyrargo_grass/layer1/no_edges,
 /area/clash_arena/tdm_forest/battlefield)
 "MU" = (
 /obj/structure/flora/bush/ausbushes/var3/fullgrass,
@@ -5260,7 +5260,7 @@
 /turf/open/gm/dirt/dark_brown,
 /area/clash_arena/tdm_forest/battlefield)
 "Up" = (
-/turf/open/auto_turf/strata_grass/layer1,
+/turf/open/auto_turf/strata_grass/layer1/no_edges,
 /area/clash_arena/tdm_forest/battlefield)
 "UF" = (
 /obj/structure/machinery/cm_vending/sorted/tech/tool_storage/antag/clash,
@@ -5344,7 +5344,7 @@
 	pixel_x = -15;
 	pixel_y = -1
 	},
-/turf/open/auto_turf/tyrargo_grass/layer1,
+/turf/open/auto_turf/tyrargo_grass/layer1/no_edges,
 /area/clash_arena/tdm_forest/battlefield)
 "UW" = (
 /obj/effect/decal/strata_decals/grasses,
@@ -5445,7 +5445,7 @@
 /area/clash_arena/tdm_forest/battlefield)
 "Wn" = (
 /obj/structure/flora/tree/tyrargo/tree_2,
-/turf/open/auto_turf/tyrargo_grass/layer1,
+/turf/open/auto_turf/tyrargo_grass/layer1/no_edges,
 /area/clash_arena/tdm_forest/battlefield)
 "Wo" = (
 /obj/structure/blocker/clash_gate/upp,
@@ -5654,7 +5654,7 @@
 /area/clash_arena/tdm_forest/battlefield)
 "YI" = (
 /obj/effect/decal/siding,
-/turf/open/auto_turf/tyrargo_grass/layer1,
+/turf/open/auto_turf/tyrargo_grass/layer1/no_edges,
 /area/clash_arena/tdm_forest/battlefield)
 "YT" = (
 /obj/effect/decal/strata_decals/tyrargo_mud_corner{

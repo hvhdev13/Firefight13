@@ -338,6 +338,11 @@
 	icon_state = "grass_1"
 	bleed_layer = 1
 
+/turf/open/auto_turf/strata_grass/layer1/no_edges
+
+/turf/open/auto_turf/strata_grass/layer1/no_edges/layers_over(turf/open/other_turf)
+	return FALSE
+
 /turf/open/auto_turf/tyrargo_grass
 	name = "matted grass"
 	icon = 'icons/turf/floors/auto_tyrargo_turf.dmi'
@@ -369,6 +374,11 @@
 /turf/open/auto_turf/tyrargo_grass/layer1
 	icon_state = "grass_1"
 	bleed_layer = 1
+
+/turf/open/auto_turf/tyrargo_grass/layer1/no_edges
+
+/turf/open/auto_turf/tyrargo_grass/layer1/no_edges/layers_over(turf/open/other_turf)
+	return FALSE
 
 //Chance's Claim / Hadley Shale dirt
 
