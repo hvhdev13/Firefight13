@@ -190,6 +190,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 		"sentry_slot" = clash_job_is_engineer(job),
 		"sentry_image" = sentry_type ? clash_sentry_preview(sentry_type) : null,
 		"sentry_modules" = !!clash_sentry_track_key(sentry_type),
+		"sentry_rebuild" = clash_job_is_engineer(job) ? clash_next_rebuild_data(ckey) : null,
 		"sentry_kills" = clash_sentry_track_key(sentry_type) ? "This round: [clash_sentry_rank_text(clash_sentry_kills_now(ckey, clash_sentry_tier_of(sentry_type)))]" : null,
 		"job_class" = GLOB.clash_job_classes[job],
 		"class_primaries" = (GLOB.clash_job_classes[job] in GLOB.clash_class_only_primaries),

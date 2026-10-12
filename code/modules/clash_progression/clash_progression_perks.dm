@@ -136,6 +136,13 @@
 	level = 16
 	icon_type = /obj/item/stack/sheet/plasteel
 
+/datum/clash_perk/field_fabricator
+	name = "Field Fabricator"
+	desc = "New sentries and machine guns arrive in 20 seconds (from 45)"
+	class = CLASH_CLASS_ENGINEER
+	level = 12
+	icon_type = /obj/item/device/multitool
+
 /datum/clash_perk/twin_sentries
 	name = "Twin Sentries"
 	desc = "Keep two sentries or machine guns up at once"

@@ -11,6 +11,13 @@
 #define CLASH_MG_ACCURACY -10
 #define CLASH_MG_ACCURATE_RANGE 9
 #define CLASH_MG_RELOAD_TIME (1 SECONDS)
+#define CLASH_REBUILD_TIME (45 SECONDS)
+#define CLASH_REBUILD_TIME_FAST (20 SECONDS)
+#define CLASH_REBUILD_WELD_TIME (8 SECONDS)
+#define CLASH_REBUILD_METAL 10
+#define CLASH_WRECK_HEALTH 100
+#define CLASH_WRECK_BULLET_SHARE 0.5
+#define CLASH_WRECK_COLOR "#6e6e6e"
 
 GLOBAL_LIST_INIT(clash_arena_eng_removed, list(
 	/obj/item/circuitboard,
@@ -93,6 +100,7 @@ GLOBAL_LIST_INIT(clash_arena_eng_removed, list(
 	for(var/obj/structure/machinery/m56d_hmg/auto/clash/nest in guns?.Copy())
 		if(nest.clash_faction != engineer.faction)
 			qdel(nest)
+	clash_cancel_rebuilds(ckey)
 	var/sentry_tier = clash_engineer_sentry_choice(engineer)
 	if(sentry_tier)
 		clash_give_engineer_item(engineer, clash_new_build(engineer, sentry_tier))
@@ -204,6 +212,8 @@ GLOBAL_LIST_INIT(clash_arena_eng_removed, list(
 	for(var/obj/build as anything in guns?.Copy())
 		if(include_deployed || isitem(build))
 			qdel(build)
+	if(include_deployed)
+		clash_cancel_rebuilds(ckey)
 
 /proc/clash_engineer_sentry_choice(mob/living/carbon/human/engineer)
 	var/datum/clash_kit/kit = get_clash_active_kit(engineer.ckey, engineer.job)
@@ -235,7 +245,7 @@ GLOBAL_LIST_INIT(clash_arena_eng_removed, list(
 		item.forceMove(get_turf(engineer))
 
 /proc/clash_clear_engineer_builds()
-	for(var/ckey in GLOB.clash_engineer_sentries | GLOB.clash_engineer_crates | GLOB.clash_engineer_mgs)
+	for(var/ckey in GLOB.clash_engineer_sentries | GLOB.clash_engineer_crates | GLOB.clash_engineer_mgs | GLOB.clash_engineer_rebuilds)
 		clash_remove_engineer_builds(ckey, TRUE)
 
 /proc/clash_forget_build(list/registry, ckey, build)
@@ -334,6 +344,204 @@ GLOBAL_LIST_INIT(clash_arena_eng_removed, list(
 		qdel(oldest)
 
 GLOBAL_LIST_EMPTY(clash_engineer_mgs)
+GLOBAL_LIST_EMPTY(clash_engineer_rebuilds)
+
+/datum/clash_rebuild
+	var/ckey
+	var/faction
+	var/tier
+	var/obj/item/kit_type
+	var/name
+	var/kills = 0
+	var/due
+	var/timer
+	var/datum/weakref/alerted
+	var/obj/structure/clash_build_wreck/wreck
+
+/proc/clash_start_rebuild(atom/movable/build, ckey, faction, tier, kit_type, kills = 0)
+	if(!ckey || !clash_fast_medicine())
+		return
+	var/datum/clash_rebuild/rebuild = new
+	rebuild.ckey = ckey
+	rebuild.faction = faction
+	rebuild.tier = tier
+	rebuild.kit_type = kit_type
+	rebuild.name = initial(build.name)
+	rebuild.kills = kills
+	rebuild.due = world.time + (clash_has_perk(rebuild.owner_mob(), /datum/clash_perk/field_fabricator) ? CLASH_REBUILD_TIME_FAST : CLASH_REBUILD_TIME)
+	if(isturf(build.loc))
+		rebuild.wreck = new(build.loc, build, rebuild)
+	LAZYADDASSOCLIST(GLOB.clash_engineer_rebuilds, ckey, rebuild)
+	rebuild.timer = addtimer(CALLBACK(rebuild, TYPE_PROC_REF(/datum/clash_rebuild, tick)), 1 SECONDS, TIMER_LOOP|TIMER_STOPPABLE|TIMER_DELETE_ME)
+	rebuild.tick()
+
+/proc/clash_cancel_rebuilds(ckey)
+	var/list/pending = GLOB.clash_engineer_rebuilds[ckey]
+	for(var/datum/clash_rebuild/rebuild as anything in pending?.Copy())
+		qdel(rebuild)
+
+/proc/clash_next_rebuild_data(ckey)
+	var/datum/clash_rebuild/next
+	for(var/datum/clash_rebuild/rebuild as anything in GLOB.clash_engineer_rebuilds[ckey])
+		if(!next || rebuild.due < next.due)
+			next = rebuild
+	if(next)
+		return list("name" = next.name, "seconds" = max(0, CEILING((next.due - world.time) / (1 SECONDS), 1)))
+	return null
+
+/datum/clash_rebuild/Destroy(force)
+	deltimer(timer)
+	var/mob/shown = alerted?.resolve()
+	shown?.clear_alert("clash_rebuild_[REF(src)]")
+	if(wreck)
+		wreck.rebuild = null
+		QDEL_NULL(wreck)
+	clash_forget_build(GLOB.clash_engineer_rebuilds, ckey, src)
+	return ..()
+
+/datum/clash_rebuild/proc/owner_mob()
+	var/client/player = GLOB.directory[ckey]
+	var/mob/living/carbon/human/owner = player?.mob
+	if(ishuman(owner) && owner.stat != DEAD && owner.faction == faction && clash_is_engineer(owner))
+		return owner
+	return null
+
+/datum/clash_rebuild/proc/tick()
+	var/seconds = CEILING((due - world.time) / (1 SECONDS), 1)
+	if(seconds <= 0)
+		arrive()
+		return
+	var/mob/living/carbon/human/owner = owner_mob()
+	if(!owner)
+		return
+	var/category = "clash_rebuild_[REF(src)]"
+	var/atom/movable/screen/alert/clash_rebuild/shown = owner.alerts[category] || owner.throw_alert(category, /atom/movable/screen/alert/clash_rebuild)
+	alerted = WEAKREF(owner)
+	shown?.clash_show(src, seconds)
+
+/datum/clash_rebuild/proc/arrive()
+	var/mob/living/carbon/human/owner = owner_mob()
+	if(owner && length(GLOB.clash_engineer_sentries[ckey]) + length(GLOB.clash_engineer_mgs[ckey]) < clash_engineer_build_limit(owner))
+		clash_give_engineer_item(owner, clash_new_build(owner, tier))
+		to_chat(owner, SPAN_NOTICE("Your new [name] has arrived."))
+		playsound_client(owner.client, 'sound/machines/ping.ogg', null, 40)
+	qdel(src)
+
+/datum/clash_rebuild/proc/rebuild_at(turf/spot, facing, mob/living/carbon/human/builder)
+	var/mob/living/carbon/human/owner = owner_mob() || builder
+	if(tier == CLASH_SENTRY_MG)
+		var/obj/item/device/clash_mg/gun = clash_new_mg(owner)
+		gun.clash_place(spot, facing, owner)
+	else
+		var/obj/item/defenses/handheld/kit = clash_new_sentry(owner, tier)
+		var/obj/structure/machinery/defenses/sentry/turret = kit.TR
+		turret.clash_kills = max(turret.clash_kills, kills)
+		turret.clash_apply_rank()
+		turret.forceMove(spot)
+		turret.setDir(facing)
+		turret.placed = 1
+		kit.dropped = 0
+		kit.forceMove(turret)
+		turret.update_icon()
+		turret.clash_activate(owner)
+	qdel(src)
+
+/atom/movable/screen/alert/clash_rebuild
+	icon_state = "template"
+	maptext_width = 30
+	maptext_height = 10
+	maptext_y = 1
+
+/atom/movable/screen/alert/clash_rebuild/proc/clash_show(datum/clash_rebuild/rebuild, seconds)
+	if(!length(overlays))
+		var/obj/item/kit_type = rebuild.kit_type
+		overlays += image(initial(kit_type.icon), initial(kit_type.icon_state))
+	name = rebuild.name
+	desc = "A new one arrives in your backpack in [seconds] second\s."
+	maptext = "<span style='text-align: right; -dm-text-outline: 1px #0a0c0f; font-family: \"VCR OSD Mono\"; font-size: 8px; color: #ffffff'>[seconds]</span>"
+
+/obj/structure/clash_build_wreck
+	anchored = TRUE
+	density = FALSE
+	health = CLASH_WRECK_HEALTH
+	var/datum/clash_rebuild/rebuild
+	var/faction
+
+/obj/structure/clash_build_wreck/Initialize(mapload, atom/movable/build, datum/clash_rebuild/rebuild)
+	. = ..()
+	src.rebuild = rebuild
+	faction = rebuild.faction
+	name = "wrecked [rebuild.name]"
+	desc = "What is left of a [rebuild.name]."
+	setDir(build.dir)
+	var/obj/structure/machinery/defenses/sentry/turret = build
+	if(istype(turret))
+		icon = turret.icon
+		icon_state = turret.composite_icon ? "defense_base_off" : null
+		overlays += image(icon, "[turret.defense_type] [turret.sentry_type]_destroyed")
+		return
+	var/obj/structure/machinery/m56d_hmg/auto/clash/nest = build
+	icon = nest.icon
+	icon_state = nest.icon_empty
+	color = CLASH_WRECK_COLOR
+
+/obj/structure/clash_build_wreck/Destroy()
+	if(rebuild)
+		rebuild.wreck = null
+		rebuild = null
+	return ..()
+
+/obj/structure/clash_build_wreck/get_examine_text(mob/user)
+	. = ..()
+	. += SPAN_HELPFUL("An engineer on its team can rebuild it with a welder and [CLASH_REBUILD_METAL] metal.")
+
+/obj/structure/clash_build_wreck/attackby(obj/item/tool, mob/living/carbon/human/user)
+	if(!iswelder(tool) || user.faction != faction)
+		return ..()
+	if(!clash_is_engineer(user))
+		to_chat(user, SPAN_WARNING("Only engineers can rebuild it."))
+		return
+	var/obj/item/tool/weldingtool/welder = tool
+	if(!welder.isOn())
+		to_chat(user, SPAN_WARNING("Turn the welder on first."))
+		return
+	var/obj/item/stack/sheet/metal/sheets = clash_metal_on(user)
+	if(!sheets)
+		to_chat(user, SPAN_WARNING("You need [CLASH_REBUILD_METAL] metal to rebuild it."))
+		return
+	playsound(loc, 'sound/items/Welder2.ogg', 25, 1)
+	if(!do_after(user, CLASH_REBUILD_WELD_TIME * clash_build_time_mult(user), INTERRUPT_ALL|BEHAVIOR_IMMOBILE, BUSY_ICON_BUILD, src) || QDELETED(src) || !rebuild || QDELETED(sheets) || !sheets.use(CLASH_REBUILD_METAL))
+		return
+	playsound(loc, 'sound/items/Welder2.ogg', 25, 1)
+	to_chat(user, SPAN_NOTICE("You rebuild the [rebuild.name]."))
+	rebuild.rebuild_at(get_turf(src), dir, user)
+
+/obj/structure/clash_build_wreck/get_projectile_hit_boolean(obj/projectile/bullet)
+	var/mob/shooter = bullet.firer
+	if(ismob(shooter) && shooter.faction == faction)
+		return FALSE
+	return ..()
+
+/obj/structure/clash_build_wreck/bullet_act(obj/projectile/bullet)
+	bullet_ping(bullet)
+	clash_wreck_damage(bullet.damage * CLASH_WRECK_BULLET_SHARE)
+	return TRUE
+
+/obj/structure/clash_build_wreck/ex_act(severity)
+	clash_wreck_damage(severity)
+
+/obj/structure/clash_build_wreck/proc/clash_wreck_damage(amount)
+	health -= amount
+	if(health > 0)
+		return
+	visible_message(SPAN_WARNING("[src] falls apart."))
+	qdel(src)
+
+/proc/clash_metal_on(mob/living/carbon/human/user)
+	for(var/obj/item/stack/sheet/metal/sheets in user.get_contents())
+		if(sheets.amount >= CLASH_REBUILD_METAL)
+			return sheets
+	return null
 
 /proc/clash_new_mg(mob/living/carbon/human/engineer)
 	var/gun_type = clash_sentry_kit_for(engineer.faction, CLASH_SENTRY_MG)
@@ -386,8 +594,14 @@ GLOBAL_LIST_EMPTY(clash_engineer_mgs)
 	if(problem)
 		to_chat(user, SPAN_WARNING(problem))
 		return
-	var/obj/structure/machinery/m56d_hmg/auto/clash/nest = new nest_type(get_turf(user))
-	nest.setDir(user.dir)
+	var/obj/structure/machinery/m56d_hmg/auto/clash/nest = clash_place(get_turf(user), user.dir, user)
+	to_chat(user, SPAN_NOTICE("You set up [nest]."))
+	if(nest.rounds)
+		nest.try_mount_gun(user)
+
+/obj/item/device/clash_mg/proc/clash_place(turf/spot, facing, mob/living/carbon/human/user)
+	var/obj/structure/machinery/m56d_hmg/auto/clash/nest = new nest_type(spot)
+	nest.setDir(facing)
 	nest.rounds = rounds
 	nest.health_max = initial(nest.health_max) * (clash_has_perk(user, /datum/clash_perk/hardened) ? CLASH_HARDENED_MULT : 1)
 	nest.health = round(nest.health_max * health / health_max)
@@ -402,10 +616,8 @@ GLOBAL_LIST_EMPTY(clash_engineer_mgs)
 	if(user.ckey == clash_owner_ckey)
 		clash_engineer_make_room(user, nest)
 	playsound(nest, 'sound/items/m56dauto_setup.ogg', 75, TRUE)
-	to_chat(user, SPAN_NOTICE("You set up [nest]."))
 	qdel(src)
-	if(nest.rounds)
-		nest.try_mount_gun(user)
+	return nest
 
 /obj/item/device/clash_mg/proc/clash_setup_problem(mob/living/carbon/human/user)
 	if(!clash_is_engineer(user) || user.faction != clash_faction)
@@ -436,11 +648,11 @@ GLOBAL_LIST_EMPTY(clash_engineer_mgs)
 
 /obj/item/device/clash_mg/t37
 	name = "T37 machine gun"
-	desc = "Use it in hand to set it up where you stand. It hits hard but sprays wide, overheats and hits teammates."
+	desc = "Use it in hand to set it up where you stand. It hits hard, overheats and hits teammates."
 	icon_state = "M2C_gun_mount"
 	item_state = "M2C_gun_mount"
 	nest_type = /obj/structure/machinery/m56d_hmg/auto/clash/t37
-	kit_blurb = "Mounted machine gun, hits hard, sprays wide, hits teammates"
+	kit_blurb = "Mounted machine gun, hits hard, overheats, hits teammates"
 
 /obj/structure/machinery/m56d_hmg/auto/clash
 	var/obj/item/device/clash_mg/carry_type
@@ -448,7 +660,6 @@ GLOBAL_LIST_EMPTY(clash_engineer_mgs)
 	var/clash_faction
 	var/clash_deployed_at = 0
 	var/clash_enemy_damage = 0
-	var/clash_spread = 0
 	var/obj/item/ammo_magazine/clash_ammo_box
 
 /obj/structure/machinery/m56d_hmg/auto/clash/Initialize()
@@ -464,9 +675,6 @@ GLOBAL_LIST_EMPTY(clash_engineer_mgs)
 	. = ..()
 	. += SPAN_INFO("It has [SPAN_HELPFUL("[health]/[health_max]")] health.")
 	. += SPAN_HELPFUL("Click it from behind with empty hands to man it, or with its ammo box to reload it. Engineers also reload it with metal, [clash_reload_metal(user)] sheets for a full load, repair it with a welder and drag it onto themselves to pack it up.")
-
-/obj/structure/machinery/m56d_hmg/auto/clash/get_scatter()
-	return ..() + clash_spread
 
 /obj/structure/machinery/m56d_hmg/auto/clash/try_mount_gun(mob/living/carbon/user)
 	if(user.faction != clash_faction)
@@ -487,6 +695,7 @@ GLOBAL_LIST_EMPTY(clash_engineer_mgs)
 		return
 	visible_message(SPAN_WARNING("[src] breaks apart!"))
 	playsound(loc, 'sound/mecha/critdestrsyndi.ogg', 25, 1)
+	clash_start_rebuild(src, clash_owner_ckey, clash_faction, CLASH_SENTRY_MG, carry_type)
 	var/client/owner = GLOB.directory[clash_owner_ckey]
 	if(owner)
 		to_chat(owner, SPAN_WARNING("Your [name] was destroyed."))
@@ -603,7 +812,7 @@ GLOBAL_LIST_EMPTY(clash_engineer_mgs)
 
 /obj/structure/machinery/m56d_hmg/auto/clash/t37
 	name = "T37 machine gun"
-	desc = "A machine gun on a tripod. It hits hard but sprays wide, overheats and hits teammates."
+	desc = "A machine gun on a tripod. It hits hard, overheats and hits teammates."
 	icon = 'icons/obj/items/weapons/guns/guns_by_faction/UPP/hmg.dmi'
 	icon_state = "t37"
 	icon_full = "t37"
@@ -614,7 +823,6 @@ GLOBAL_LIST_EMPTY(clash_engineer_mgs)
 	fire_delay = 0.35 SECONDS
 	overheat_threshold = 35
 	passive_cooldown = 1
-	clash_spread = SCATTER_AMOUNT_TIER_6
 	carry_type = /obj/item/device/clash_mg/t37
 
 /datum/ammo/bullet/machinegun/medium/clash/setup_faction_clash_values()
@@ -623,6 +831,7 @@ GLOBAL_LIST_EMPTY(clash_engineer_mgs)
 	accuracy = CLASH_MG_ACCURACY
 	accurate_range = CLASH_MG_ACCURATE_RANGE
 	shell_speed = AMMO_SPEED_TIER_6
+	scatter = 0
 
 /obj/item/ammo_magazine/m2c/t37/clash
 	w_class = SIZE_MEDIUM
@@ -632,6 +841,7 @@ GLOBAL_LIST_EMPTY(clash_engineer_mgs)
 	damage = CLASH_M56D_DAMAGE
 	accuracy = CLASH_MG_ACCURACY
 	shell_speed = AMMO_SPEED_TIER_6
+	scatter = 0
 
 /obj/structure/machinery/m56d_hmg/auto/clash/proc/clash_box_reload(mob/living/carbon/human/user, obj/item/ammo_magazine/box)
 	if(rounds >= rounds_max)
@@ -666,3 +876,10 @@ GLOBAL_LIST_EMPTY(clash_engineer_mgs)
 #undef CLASH_MG_ACCURACY
 #undef CLASH_MG_ACCURATE_RANGE
 #undef CLASH_MG_RELOAD_TIME
+#undef CLASH_REBUILD_TIME
+#undef CLASH_REBUILD_TIME_FAST
+#undef CLASH_REBUILD_WELD_TIME
+#undef CLASH_REBUILD_METAL
+#undef CLASH_WRECK_HEALTH
+#undef CLASH_WRECK_BULLET_SHARE
+#undef CLASH_WRECK_COLOR

@@ -175,6 +175,8 @@ GLOBAL_LIST_INIT(clash_sentry_kits, list(
 /obj/structure/machinery/defenses/sentry/Destroy()
 	if(clash_owner_ckey)
 		clash_forget_build(GLOB.clash_engineer_sentries, clash_owner_ckey, src)
+		if(clash_wrecked)
+			clash_start_rebuild(src, clash_owner_ckey, clash_faction, clash_tier, handheld_type, clash_kills)
 		if(clash_kills && !clash_wrecked)
 			LAZYINITLIST(GLOB.clash_sentry_banked_kills[clash_owner_ckey])
 			var/list/banked = GLOB.clash_sentry_banked_kills[clash_owner_ckey]

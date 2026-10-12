@@ -200,6 +200,7 @@ interface Data extends StaticData {
   sentry_image: string | null;
   sentry_kills: string | null;
   sentry_modules: BooleanLike;
+  sentry_rebuild: { name: string; seconds: number } | null;
   job_class: string;
   class_primaries: BooleanLike;
   hidden_options: string[];
@@ -367,9 +368,9 @@ const WeaponPreview = (props: {
   readonly empty: string;
   readonly pending: boolean;
   readonly progress?: GunProgress;
-  readonly note?: string | null;
+  readonly notes?: (string | null | undefined)[];
 }) => {
-  const { image, scale, empty, pending, progress, note } = props;
+  const { image, scale, empty, pending, progress, notes } = props;
   return (
     <>
       <Box
@@ -392,7 +393,14 @@ const WeaponPreview = (props: {
         )}
       </Box>
       {progress && <GunPanel gun={progress} />}
-      {note && <Box className="ClashKit__gunNote">{note}</Box>}
+      {notes?.map(
+        (note) =>
+          note && (
+            <Box key={note} className="ClashKit__gunNote">
+              {note}
+            </Box>
+          ),
+      )}
     </>
   );
 };
@@ -1737,6 +1745,17 @@ export const ClashKit = () => {
     );
     return () => clearInterval(timer);
   }, [respawn_in]);
+  const rebuildIn = data.sentry_rebuild?.seconds ?? 0;
+  const [rebuildLeft, setRebuildLeft] = useState(rebuildIn);
+  useEffect(() => {
+    setRebuildLeft(rebuildIn);
+    if (!rebuildIn) return;
+    const timer = setInterval(
+      () => setRebuildLeft((left) => Math.max(0, left - 1)),
+      1000,
+    );
+    return () => clearInterval(timer);
+  }, [rebuildIn, data.sentry_rebuild?.name]);
   const [renaming, setRenaming] = useState(false);
 
   useEffect(() => {
@@ -2040,7 +2059,12 @@ export const ClashKit = () => {
                   empty={viewInfo.empty}
                   pending={!!doll_pending}
                   progress={viewData.progress}
-                  note={viewData.note}
+                  notes={[
+                    viewData.note,
+                    view === 'sentry' && rebuildLeft > 0
+                      ? `New ${data.sentry_rebuild?.name} in ${rebuildLeft} seconds.`
+                      : null,
+                  ]}
                 />
                 <ShellPicker shells={viewData.shells} />
               </Stack.Item>
