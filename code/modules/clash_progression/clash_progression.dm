@@ -37,7 +37,6 @@ GLOBAL_LIST_INIT(clash_progression_settings, list("enabled" = TRUE, "xp_multipli
 	var/list/factions = list()
 	var/list/classes = list()
 	var/list/weapons = list()
-	var/list/carriers = list()
 	var/list/seen = list()
 	var/toasts = TRUE
 	var/radar = TRUE
@@ -79,7 +78,7 @@ GLOBAL_LIST_INIT(clash_progression_settings, list("enabled" = TRUE, "xp_multipli
 		log_world("Clash progress: [path] was unreadable, kept it as .bad and [decoded ? "restored the backup" : "found no usable backup"]")
 	if(!decoded)
 		return
-	for(var/name in list("factions", "classes", "weapons", "carriers"))
+	for(var/name in list("factions", "classes", "weapons"))
 		var/list/saved = decoded[name]
 		if(!islist(saved))
 			continue
@@ -90,8 +89,6 @@ GLOBAL_LIST_INIT(clash_progression_settings, list("enabled" = TRUE, "xp_multipli
 				continue
 			if(name == "factions" || name == "classes")
 				entry["best"] = min(entry["best"], CLASH_LEVEL_CAP)
-			else if(name == "carriers")
-				entry["best"] = min(entry["best"], length(GLOB.clash_carrier_tracks[key]))
 			target[key] = entry
 	if(islist(decoded["seen"]))
 		seen = decoded["seen"]
@@ -113,7 +110,6 @@ GLOBAL_LIST_INIT(clash_progression_settings, list("enabled" = TRUE, "xp_multipli
 		"factions" = factions,
 		"classes" = classes,
 		"weapons" = weapons,
-		"carriers" = carriers,
 		"seen" = seen,
 		"toasts" = toasts,
 		"radar" = radar,
@@ -143,9 +139,6 @@ GLOBAL_LIST_INIT(clash_progression_settings, list("enabled" = TRUE, "xp_multipli
 
 /datum/clash_progress/proc/weapon_entry(gun_type)
 	return get_entry(weapons, "[gun_type]", list("xp" = 0, "best" = 1, "mastered" = 0))
-
-/datum/clash_progress/proc/carrier_entry(family)
-	return get_entry(carriers, family, list("xp" = 0, "best" = 0))
 
 /datum/clash_progress/proc/level_from_xp(xp, base)
 	var/level = 1

@@ -180,7 +180,7 @@ SUBSYSTEM_DEF(clash_spawn)
 	page += "</ul>"
 	page += "<h2>Leveling</h2><ul>"
 	page += "<li>XP and levels: Kills reward 100 xp, assists 50, revives 100, objectives, match wins 500, round wins 1000.</li>"
-	page += "<li>Faction level unlocks roles and general perks. Class level unlocks gear slots, guns and class perks.</li>"
+	page += "<li>Faction level unlocks roles and general perks. Class level unlocks armor, grenades, guns and class perks.</li>"
 	page += "<li>Perks: Pick one class perk and one general perk in your loadout. Your killer's perks show on your death card.</li>"
 	page += "<li>Firing without a suppressor, or firing a flamer or underbarrel weapon, shows you as a red mark on the radar of enemies with the Keen Ears perk.</li>"
 	page += "</ul>"
@@ -301,7 +301,7 @@ GLOBAL_LIST_EMPTY(clash_class_briefed)
 		if(CLASH_CLASS_RIFLEMAN)
 			return list(
 				"Your job is to kill.",
-				"Gear: Rifle, sidearm, grenades, armor and pouches are bought with loadout points in the Loadout window. More slots unlock with Rifleman level. Use the Loadout Shop to buy more gear.",
+				"Gear: Pick your gear in the Loadout window. Pouches, belts, webbing, masks and packs are all free. Guns, grenades and armor unlock as you level up. Use the Loadout Shop to spend points on extra gear.",
 				"Armor: Light armor is fast, heavy armor is slow but shrugs off blasts.",
 				"Grenades: Blasts easily tear off limbs. Cook them with care, friendly fire is on.",
 				"Ammo: Out? Get more from your base vendor or a friendly Combat Technician's ammo crate.",

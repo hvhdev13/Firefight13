@@ -54,15 +54,12 @@
 #define CLASH_GATE_FREE "free"
 #define CLASH_GATE_FACTION "faction"
 #define CLASH_GATE_CLASS "class"
-#define CLASH_GATE_TWIN "twin"
-#define CLASH_GATE_CARRIER "carrier"
 #define CLASH_GATE_CLASS_LEVEL "class_level"
 
 #define CLASH_UNLOCK_GUN "gun"
 #define CLASH_UNLOCK_MASTERY "mastery"
 #define CLASH_UNLOCK_ROLE "role"
 #define CLASH_UNLOCK_ATTACHMENT "attachment"
-#define CLASH_UNLOCK_CARRIER "carrier"
 #define CLASH_UNLOCK_GEAR "gear"
 #define CLASH_UNLOCK_SHOP "shop"
 #define CLASH_UNLOCK_COSMETIC "cosmetic"
@@ -97,13 +94,6 @@
 #define CLASH_CLASS_LEADER "leader"
 #define CLASH_CLASS_SUPPORT "support"
 
-#define CLASH_FAMILY_SHOTGUN "shotgun"
-#define CLASH_FAMILY_MAGAZINE "magazine"
-#define CLASH_FAMILY_SIDEARM "sidearm"
-#define CLASH_FAMILY_GRENADE "grenade"
-#define CLASH_FAMILY_FUEL "fuel"
-#define CLASH_FAMILY_LEVER "lever"
-
 GLOBAL_LIST_INIT(clash_job_classes, list(
 	JOB_SQUAD_MARINE = CLASH_CLASS_RIFLEMAN,
 	JOB_UPP = CLASH_CLASS_RIFLEMAN,
@@ -130,7 +120,6 @@ GLOBAL_LIST_INIT(clash_unlock_styles, list(
 	CLASH_UNLOCK_MASTERY = list("order" = 2, "color" = "#E8B931", "header" = "WEAPON MASTERED", "sound" = 'sound/effects/dingding.ogg', "banner" = TRUE, "border" = TRUE),
 	CLASH_UNLOCK_ROLE = list("order" = 3, "color" = "#D9534F", "header" = "ROLE UNLOCKED", "sound" = 'sound/effects/dingding.ogg'),
 	CLASH_UNLOCK_ATTACHMENT = list("order" = 4, "color" = "#4A90E2", "header" = "NEW ATTACHMENT", "sound" = 'sound/machines/ping.ogg'),
-	CLASH_UNLOCK_CARRIER = list("order" = 5, "color" = "#2BB5A8", "header" = "NEW CARRIER", "sound" = 'sound/machines/ding_short.ogg'),
 	CLASH_UNLOCK_GEAR = list("order" = 6, "color" = "#5CB85C", "header" = "NEW GEAR", "sound" = 'sound/machines/ding_short.ogg'),
 	CLASH_UNLOCK_PERK = list("order" = 6, "color" = "#E05A5A", "header" = "NEW PERK", "sound" = 'sound/machines/ding_short.ogg'),
 	CLASH_UNLOCK_SENTRY = list("order" = 6, "color" = "#E0A23A", "header" = "NEW SENTRY", "sound" = 'sound/machines/ding_short.ogg'),

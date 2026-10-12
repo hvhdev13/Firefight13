@@ -347,50 +347,31 @@ const Levels = (props: {
 const Weapons = (props: { readonly progress: CareerProgress }) => {
   const { progress } = props;
   return (
-    <>
-      <Section title="Ammo carriers">
-        <LabeledList>
-          {progress.carriers.map((carrier) => (
-            <LabeledList.Item key={carrier.id} label={`${carrier.family} ammo`}>
+    <Section title="Weapons">
+      <Table>
+        {progress.weapons.map((weapon) => (
+          <Table.Row key={weapon.type}>
+            <Table.Cell>{weapon.name}</Table.Cell>
+            <Table.Cell collapsing>
               <LevelInput
-                track="carrier"
-                id={carrier.id}
-                value={carrier.step}
-                min={0}
-                max={carrier.steps}
-              />{' '}
-              of {carrier.steps} carriers, {carrier.xp.toLocaleString('en-US')}{' '}
-              XP
-            </LabeledList.Item>
-          ))}
-        </LabeledList>
-      </Section>
-      <Section title="Weapons">
-        <Table>
-          {progress.weapons.map((weapon) => (
-            <Table.Row key={weapon.type}>
-              <Table.Cell>{weapon.name}</Table.Cell>
-              <Table.Cell collapsing>
-                <LevelInput
-                  track="weapon"
-                  id={weapon.type}
-                  value={weapon.level}
-                  min={1}
-                  max={weapon.max}
-                />
-              </Table.Cell>
-              <Table.Cell collapsing>of {weapon.max}</Table.Cell>
-              <Table.Cell collapsing>
-                <XpInput track="weapon" id={weapon.type} value={weapon.xp} /> XP
-              </Table.Cell>
-              <Table.Cell collapsing>
-                {!!weapon.mastered && 'Mastered'}
-              </Table.Cell>
-            </Table.Row>
-          ))}
-        </Table>
-      </Section>
-    </>
+                track="weapon"
+                id={weapon.type}
+                value={weapon.level}
+                min={1}
+                max={weapon.max}
+              />
+            </Table.Cell>
+            <Table.Cell collapsing>of {weapon.max}</Table.Cell>
+            <Table.Cell collapsing>
+              <XpInput track="weapon" id={weapon.type} value={weapon.xp} /> XP
+            </Table.Cell>
+            <Table.Cell collapsing>
+              {!!weapon.mastered && 'Mastered'}
+            </Table.Cell>
+          </Table.Row>
+        ))}
+      </Table>
+    </Section>
   );
 };
 
