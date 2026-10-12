@@ -3,6 +3,8 @@ GLOBAL_LIST_EMPTY(clash_kit_budgets)
 GLOBAL_LIST_EMPTY(clash_item_contents)
 GLOBAL_LIST_INIT(clash_role_shop_ammo, list(
 	JOB_SQUAD_SMARTGUN = list(/obj/item/ammo_magazine/smartgun = 10),
+	JOB_SQUAD_ENGI = list(/obj/item/ammo_magazine/m56d = 10),
+	JOB_UPP_ENGI = list(/obj/item/ammo_magazine/m2c/t37/clash = 10),
 ))
 
 GLOBAL_LIST_INIT(clash_shop_shells, list(

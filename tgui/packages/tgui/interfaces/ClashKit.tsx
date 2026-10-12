@@ -163,6 +163,7 @@ interface KitProgress {
   gun?: GunProgress;
   sidearm_gun?: GunProgress;
   back_gun?: GunProgress;
+  sentry?: GunProgress;
 }
 
 interface StaticData {
@@ -201,6 +202,10 @@ interface Data extends StaticData {
   deploy_block: string | null;
   revivable: BooleanLike;
   sentry_slot: BooleanLike;
+  sentry_image: string | null;
+  sentry_kills: string | null;
+  sentry_modules: BooleanLike;
+  sentry_rebuild: { name: string; seconds: number } | null;
   job_class: string;
   class_primaries: BooleanLike;
   hidden_options: string[];
@@ -300,18 +305,23 @@ const WEAPON_TAB_LABELS: Record<WeaponView, string> = {
   primary: 'Primary',
   sidearm: 'Sidearm',
   back: 'Scabbard',
+  sentry: 'Sentry',
 };
 
 const AttachmentGroup = (props: {
   readonly view: WeaponView;
   readonly scabbard: boolean;
+  readonly sentry: boolean;
   readonly setView: (view: WeaponView) => void;
   readonly tiles: ReactNode[];
 }) => {
-  const { view, scabbard, setView, tiles } = props;
-  const views: WeaponView[] = scabbard
-    ? ['primary', 'sidearm', 'back']
-    : ['primary', 'sidearm'];
+  const { view, scabbard, sentry, setView, tiles } = props;
+  const views: WeaponView[] = [
+    'primary',
+    'sidearm',
+    ...(scabbard ? ['back' as const] : []),
+    ...(sentry ? ['sentry' as const] : []),
+  ];
   return (
     <Box>
       <Box className="ClashKit__attachHeader ClashKit__weaponTabs">
@@ -363,8 +373,9 @@ const WeaponPreview = (props: {
   readonly empty: string;
   readonly pending: boolean;
   readonly progress?: GunProgress;
+  readonly notes?: (string | null | undefined)[];
 }) => {
-  const { image, scale, empty, pending, progress } = props;
+  const { image, scale, empty, pending, progress, notes } = props;
   return (
     <>
       <Box
@@ -387,6 +398,14 @@ const WeaponPreview = (props: {
         )}
       </Box>
       {progress && <GunPanel gun={progress} />}
+      {notes?.map(
+        (note) =>
+          note && (
+            <Box key={note} className="ClashKit__gunNote">
+              {note}
+            </Box>
+          ),
+      )}
     </>
   );
 };
@@ -1244,8 +1263,9 @@ const BACK_ATTACHMENT_SLOTS = [
 ];
 const PRIMARY_SCALE = 5;
 const SIDEARM_SCALE = 8;
+const SENTRY_SCALE = 3;
 
-type WeaponView = 'primary' | 'sidearm' | 'back';
+type WeaponView = 'primary' | 'sidearm' | 'back' | 'sentry';
 
 const WEAPON_VIEWS: Record<
   WeaponView,
@@ -1269,6 +1289,12 @@ const WEAPON_VIEWS: Record<
     scale: PRIMARY_SCALE,
     empty: 'Nothing in the scabbard',
   },
+  sentry: {
+    slot: 'sentry',
+    slots: ['sentry_module'],
+    scale: SENTRY_SCALE,
+    empty: 'No sentry',
+  },
 };
 
 const weaponViewData = (view: WeaponView, data: Data) =>
@@ -1277,16 +1303,25 @@ const weaponViewData = (view: WeaponView, data: Data) =>
       image: data.gun,
       progress: data.progress?.gun,
       shells: data.primary_shells,
+      note: null,
     },
     sidearm: {
       image: data.sidearm,
       progress: data.progress?.sidearm_gun,
       shells: null,
+      note: null,
     },
     back: {
       image: data.back_gun,
       progress: data.progress?.back_gun,
       shells: data.back_shells,
+      note: null,
+    },
+    sentry: {
+      image: data.sentry_image,
+      progress: data.progress?.sentry,
+      shells: null,
+      note: data.sentry_kills,
     },
   })[view];
 
@@ -1319,10 +1354,12 @@ const weaponViewFor = (id: string, scabbard?: boolean): WeaponView | null => {
   if (id === 'back' && scabbard) return 'back';
   if (id === 'sidearm' || SIDE_ATTACHMENT_SLOTS.includes(id)) return 'sidearm';
   if (id === 'back_gun' || BACK_ATTACHMENT_SLOTS.includes(id)) return 'back';
+  if (id === 'sentry' || id === 'sentry_module') return 'sentry';
   if (id === 'primary' || ATTACHMENT_SLOTS.includes(id)) return 'primary';
   return null;
 };
 const PERK_SLOTS = ['class_perk', 'general_perk'];
+const NO_ISSUE_SLOTS = [...PERK_SLOTS, 'sentry_module'];
 
 const ScabbardOptions = () => {
   const { act, data } = useBackend<Data>();
@@ -1389,6 +1426,7 @@ const weaponNames = (
     primary: nameOf('primary'),
     sidearm: nameOf('sidearm'),
     back: nameOf('back_gun'),
+    sentry: nameOf('sentry'),
   };
 };
 
@@ -1440,7 +1478,7 @@ const SlotTile = (props: {
     onClick,
   } = props;
   const shown = forced ?? picked ?? issued;
-  const perk = PERK_SLOTS.includes(slot.id);
+  const perk = NO_ISSUE_SLOTS.includes(slot.id);
   const label = forced
     ? `${forced.name}: locked. ${forced.reason}.`
     : blocked
@@ -1638,9 +1676,11 @@ const DefaultRow = (props: {
   const { slotId, issued, attachment, picked } = props;
   const emptyBlurb = PERK_SLOTS.includes(slotId)
     ? 'Spawn without a perk'
-    : attachment
-      ? 'Leave this slot empty'
-      : 'Nothing in this slot';
+    : slotId === 'sentry_module'
+      ? 'Spawn without a module'
+      : attachment
+        ? 'Leave this slot empty'
+        : 'Nothing in this slot';
   return (
     <OptionRow
       issued={issued}
@@ -1716,6 +1756,17 @@ export const ClashKit = () => {
     );
     return () => clearInterval(timer);
   }, [respawn_in]);
+  const rebuildIn = data.sentry_rebuild?.seconds ?? 0;
+  const [rebuildLeft, setRebuildLeft] = useState(rebuildIn);
+  useEffect(() => {
+    setRebuildLeft(rebuildIn);
+    if (!rebuildIn) return;
+    const timer = setInterval(
+      () => setRebuildLeft((left) => Math.max(0, left - 1)),
+      1000,
+    );
+    return () => clearInterval(timer);
+  }, [rebuildIn, data.sentry_rebuild?.name]);
   const [renaming, setRenaming] = useState(false);
 
   useEffect(() => {
@@ -1731,7 +1782,10 @@ export const ClashKit = () => {
   const gunNames = weaponNames(data, issueFor);
   const slotGunName = (id: string) => gunNames[weaponViewFor(id) ?? 'primary'];
   const view: WeaponView =
-    weaponView === 'back' && !data.back_gun_slot ? 'primary' : weaponView;
+    (weaponView === 'back' && !data.back_gun_slot) ||
+    (weaponView === 'sentry' && !sentry_slot)
+      ? 'primary'
+      : weaponView;
   const viewInfo = WEAPON_VIEWS[view];
   const viewData = weaponViewData(view, data);
   const viewName = gunNames[view];
@@ -1995,10 +2049,13 @@ export const ClashKit = () => {
                   <AttachmentGroup
                     view={view}
                     scabbard={!!data.back_gun_slot}
+                    sentry={!!sentry_slot}
                     setView={setWeaponView}
-                    tiles={viewInfo.slots.map((id) =>
-                      tile(id, true, !viewName),
-                    )}
+                    tiles={
+                      view === 'sentry' && !data.sentry_modules
+                        ? []
+                        : viewInfo.slots.map((id) => tile(id, true, !viewName))
+                    }
                   />
                   <Box>
                     <Box className="ClashKit__attachHeader">Perks</Box>
@@ -2014,6 +2071,12 @@ export const ClashKit = () => {
                   empty={viewInfo.empty}
                   pending={!!doll_pending}
                   progress={viewData.progress}
+                  notes={[
+                    viewData.note,
+                    view === 'sentry' && rebuildLeft > 0
+                      ? `New ${data.sentry_rebuild?.name} in ${rebuildLeft} seconds.`
+                      : null,
+                  ]}
                 />
                 <ShellPicker shells={viewData.shells} />
               </Stack.Item>

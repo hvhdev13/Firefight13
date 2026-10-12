@@ -67,6 +67,7 @@
 #define CLASH_UNLOCK_MORE "more"
 #define CLASH_UNLOCK_PERK "perk"
 #define CLASH_UNLOCK_SENTRY "sentry"
+#define CLASH_UNLOCK_SENTRY_MODULE "sentry_module"
 
 #define CLASH_XP_SOURCE_KILL "Kill"
 #define CLASH_XP_SOURCE_ASSIST "Assist"
@@ -123,6 +124,7 @@ GLOBAL_LIST_INIT(clash_unlock_styles, list(
 	CLASH_UNLOCK_GEAR = list("order" = 6, "color" = "#5CB85C", "header" = "NEW GEAR", "sound" = 'sound/machines/ding_short.ogg'),
 	CLASH_UNLOCK_PERK = list("order" = 6, "color" = "#E05A5A", "header" = "NEW PERK", "sound" = 'sound/machines/ding_short.ogg'),
 	CLASH_UNLOCK_SENTRY = list("order" = 6, "color" = "#E0A23A", "header" = "NEW SENTRY", "sound" = 'sound/machines/ding_short.ogg'),
+	CLASH_UNLOCK_SENTRY_MODULE = list("order" = 6, "color" = "#E0A23A", "header" = "NEW SENTRY MODULE", "sound" = 'sound/machines/ding_short.ogg'),
 	CLASH_UNLOCK_SHOP = list("order" = 7, "color" = "#8A939C", "header" = "SHOP UPGRADE", "sound" = 'sound/machines/terminal_button01.ogg'),
 	CLASH_UNLOCK_COSMETIC = list("order" = 8, "color" = "#9B6BD6", "header" = "NEW COSMETIC", "sound" = 'sound/machines/pda_ping.ogg'),
 	CLASH_UNLOCK_LEVEL = list("order" = 9, "color" = "#E6E6E6", "header" = "LEVEL UP", "sound" = 'sound/machines/ding.ogg', "strip" = TRUE),

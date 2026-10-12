@@ -1,5 +1,5 @@
 /proc/clash_weapon_type(obj/item/weapon)
-	if(istype(weapon, /obj/item/weapon/gun) || istype(weapon, /obj/item/explosive/grenade))
+	if(istype(weapon, /obj/item/weapon/gun) || istype(weapon, /obj/item/explosive/grenade) || istype(weapon, /obj/structure/machinery/defenses/sentry))
 		return weapon.type
 	return null
 
@@ -57,6 +57,13 @@
 		entry = class_entry(class)
 		entry["xp"] += amount
 		check_unlocks("class", class, old_level, faction)
+	var/sentry_track = clash_sentry_track_key(gun_type)
+	if(sentry_track)
+		old_level = weapon_level(sentry_track)
+		entry = weapon_entry(sentry_track)
+		entry["xp"] += gear_amount
+		check_unlocks("weapon", sentry_track, old_level, faction)
+		return
 	if(!ispath(gun_type, /obj/item/weapon/gun))
 		return
 	gun_type = clash_track_type(gun_type)
@@ -82,9 +89,10 @@
 			entry["best"] = weapon_level(key)
 			for(var/level in old_level + 1 to entry["best"])
 				notify_weapon_level(key, level)
-			if(!entry["mastered"] && entry["xp"] >= CLASH_WEAPON_MASTERY_XP)
+			if(!entry["mastered"] && entry["xp"] >= clash_track_mastery_xp(key))
 				entry["mastered"] = TRUE
-				clash_notify_unlock(ckey, CLASH_UNLOCK_MASTERY, clash_item_name(faction, key), "about 100 kills", key)
+				if(ispath(key, /obj/item/weapon/gun))
+					clash_notify_unlock(ckey, CLASH_UNLOCK_MASTERY, clash_item_name(faction, key), "about 100 kills", key)
 
 /datum/clash_progress/proc/notify_faction_level(faction, level)
 	var/source = "[clash_side_name(faction)] level [level]"
@@ -164,11 +172,16 @@
 	var/list/unlock = unlocks[level - 1]
 	var/obj/item/weapon/gun/gun = gun_type
 	var/source = "[initial(gun.name)] level [level]"
+	var/obj/structure/machinery/defenses/sentry/sentry = ispath(gun_type, /obj/structure/machinery/defenses/sentry) ? gun_type : null
 	var/list/names = list()
 	for(var/obj/item/attachable/attachment_type as anything in unlock["types"])
 		names |= initial(attachment_type.name)
 	if(!length(names))
-		clash_notify_unlock(ckey, CLASH_UNLOCK_COSMETIC, "Your name engraved on every [strip_improper(initial(gun.name))] you spawn with", source, gun_type)
+		clash_notify_unlock(ckey, CLASH_UNLOCK_COSMETIC, "Your name engraved on every [strip_improper(initial(gun.name))] you [sentry ? "set up" : "spawn with"]", source, sentry ? clash_sentry_kit_for(FACTION_MARINE, initial(sentry.clash_tier)) : gun_type)
+		return
+	if(sentry)
+		var/datum/clash_sentry_module/module = GLOB.clash_sentry_modules[unlock["types"][1]]
+		clash_notify_unlock(ckey, CLASH_UNLOCK_SENTRY_MODULE, "[module.name]: [module.desc]", source, module.icon_type)
 		return
 	clash_notify_unlock(ckey, CLASH_UNLOCK_ATTACHMENT, capitalize(english_list(names)), source, unlock["types"][1])
 
@@ -320,6 +333,7 @@
 /obj/structure/barricade/var/clash_builder_faction
 /obj/structure/barricade/var/clash_enemy_damage = 0
 /obj/structure/barricade/var/clash_cover_carry = 0
+/obj/structure/barricade/var/clash_hardened = FALSE
 
 /proc/clash_progress_match_start()
 	for(var/ckey in GLOB.clash_progress.players)
@@ -434,6 +448,7 @@
 	barricade.clash_builder_ckey = builder.mind?.ckey || builder.ckey
 	barricade.clash_builder_faction = builder.faction
 	if(clash_fast_medicine() && clash_has_perk(builder, /datum/clash_perk/hardened))
+		barricade.clash_hardened = TRUE
 		barricade.maxhealth = round(barricade.maxhealth * CLASH_HARDENED_MULT)
 		barricade.health = barricade.maxhealth
 

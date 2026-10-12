@@ -64,6 +64,7 @@ SUBSYSTEM_DEF(clash_spawn)
 	SIGNAL_HANDLER
 	if(ishuman(new_mob) && SSticker.mode && MODE_HAS_FLAG(MODE_FACTION_CLASH))
 		RegisterSignal(new_mob, COMSIG_POST_SPAWN_UPDATE, PROC_REF(on_spawned), override = TRUE)
+	clash_refresh_all_ammo_bars()
 
 /datum/controller/subsystem/clash_spawn/proc/on_spawned(mob/living/carbon/human/spawned)
 	SIGNAL_HANDLER
@@ -82,6 +83,7 @@ SUBSYSTEM_DEF(clash_spawn)
 		spawned.vendor_buyable_categories[CLASH_CAN_BUY_FLARES] = 1
 	spawned.clash_spawn_points = list(spawned.vendor_points, spawned.vendor_snowflake_points)
 	clash_progress_join(spawned)
+	clash_refresh_all_ammo_bars()
 	if(istype(SSticker.mode, /datum/game_mode/extended/faction_clash/hvh) && spawned.faction == FACTION_MARINE && spawned.assigned_squad && !(spawned.assigned_squad.name in list(SQUAD_MARINE_1, SQUAD_MARINE_2)))
 		INVOKE_ASYNC(GLOBAL_PROC, GLOBAL_PROC_REF(clash_move_to_arena_squad), spawned)
 	spawned.AddElement(/datum/element/clash_iff)
@@ -275,13 +277,13 @@ GLOBAL_LIST_EMPTY(clash_class_briefed)
 			return list(
 				"Your job is to construct defenses, replenish ammo, and take down enemy defenses.",
 				"Sentry: Use it in hand to place it in front of you.",
-				"Light Sentry: covers 4 tiles in every direction, 150 rounds.",
+				"Machine Gun: Use it in hand to set it up where you stand. Any teammate can man it. The M56D is accurate and its bullets pass through teammates. The T37 hits harder but overheats and hits teammates.",
 				"Sentry Gun (CT level 4): covers 6 tiles the way it faces, 250 health, 200 rounds.",
-				"Flamer Sentry (CT level 12): burns 4 tiles the way it faces, 20 shots.",
-				"Repair: Click the sentry with a welder.",
-				"Reload: Click the sentry with metal, 10 sheets for a full load. Flamer Sentry takes a flamer fuel tank instead.",
-				"Pack up: Click the sentry with a wrench.",
-				"New sentry: One out at a time unless you have the Twin Sentries perk (CT level 18). When it is destroyed, take a new one from the Tool Storage Machine in your base.",
+				"Flamer Sentry (CT level 8): burns 4 tiles the way it faces, 20 shots.",
+				"Repair: Click the sentry or machine gun with a welder.",
+				"Reload: Click the sentry or machine gun with metal, 10 sheets for a full load. Flamer Sentry takes a flamer fuel tank instead.",
+				"Turn or pack up: Click the sentry with a wrench. Drag a machine gun onto yourself to pack it up.",
+				"New sentry: One sentry or machine gun out at a time unless you have the Twin Sentries perk (CT level 18). When it is destroyed, weld its wreck back up with 10 metal, or a new one arrives in your backpack after 45 seconds. The Tool Storage Machine in your base also has them.",
 				"Ammo Crate: You spawn with one. Use it in hand to place it. Teammates click it with their gun or an empty hand for a magazine. Holds 10, refills 1 every 15 seconds. One out at a time, new one from the Tool Storage Machine when destroyed.",
 				"Barricades: Only engineers build them. Metal and plasteel from your pouch.",
 				"Sentries cannot see through smoke. Grenades wreck them.",

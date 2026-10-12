@@ -106,7 +106,8 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 			var/list/options = list()
 			for(var/datum/clash_kit_option/option as anything in GLOB.clash_kit_menu[faction][slot])
 				var/datum/clash_perk/perk = GLOB.clash_perks[option.item_type]
-				var/atom/item = perk ? perk.icon_type : option.item_type
+				var/datum/clash_sentry_module/module = GLOB.clash_sentry_modules[option.item_type]
+				var/atom/item = perk ? perk.icon_type : (module ? module.icon_type : option.item_type)
 				options += list(list(
 					"id" = option.id,
 					"name" = option.name,
@@ -155,6 +156,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 	var/gun_type = clash_effective_primary(kit, job)
 	var/sidearm_type = clash_effective_sidearm(kit, job)
 	var/back_type = clash_effective_back_gun(kit, job)
+	var/sentry_type = clash_kit_sentry_type(kit, ckey, job)
 	var/list/fits = list()
 	for(var/slot in GLOB.clash_kit_slots)
 		if(!clash_is_attachment_slot(slot))
@@ -186,6 +188,10 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 		"choices" = kit?.choices || list(),
 		"issue" = clash_sentry_issue(clash_filter_issue(issue, ckey, job) || list(), job),
 		"sentry_slot" = clash_job_is_engineer(job),
+		"sentry_image" = sentry_type ? clash_sentry_preview(sentry_type) : null,
+		"sentry_modules" = !!clash_sentry_track_key(sentry_type),
+		"sentry_rebuild" = clash_job_is_engineer(job) ? clash_next_rebuild_data(ckey) : null,
+		"sentry_kills" = clash_sentry_track_key(sentry_type) ? "This round: [clash_sentry_rank_text(clash_sentry_kills_now(ckey, clash_sentry_tier_of(sentry_type)))]" : null,
 		"job_class" = GLOB.clash_job_classes[job],
 		"class_primaries" = (GLOB.clash_job_classes[job] in GLOB.clash_class_only_primaries),
 		"hidden_options" = clash_class_hidden_options(job),
@@ -217,7 +223,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 		"deploy_block" = deploy_state ? get_deploy_block(user) : null,
 		"revivable" = deploy_state == "dead" && !!clash_revivable_body(user),
 		"hint" = hint,
-		"progress" = clash_progress_ui_data(ckey, job, gun_type, gun_type, sidearm_type, back_type),
+		"progress" = clash_progress_ui_data(ckey, job, gun_type, gun_type, sidearm_type, back_type, sentry_type),
 	)
 
 /datum/clash_kit_screen/proc/clear_locked_attachments(datum/clash_kit/kit)
@@ -357,7 +363,8 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 			var/datum/clash_kit_option/option = get_clash_kit_option(params["id"])
 			if(!kit || !option || option.faction != clash_kit_faction_for_job(job) || option.slot != params["slot"])
 				return TRUE
-			var/lock_text = clash_option_lock_text(ckey, option.id, job, (option.slot in list(KIT_SLOT_PRIMARY, KIT_SLOT_BACK_GUN)) ? option.item_type : clash_kit_slot_gun(kit, job, option.slot))
+			var/slot_gun = option.slot == KIT_SLOT_SENTRY_MODULE ? clash_kit_sentry_type(kit, ckey, job) : clash_kit_slot_gun(kit, job, option.slot)
+			var/lock_text = clash_option_lock_text(ckey, option.id, job, (option.slot in list(KIT_SLOT_PRIMARY, KIT_SLOT_BACK_GUN)) ? option.item_type : slot_gun)
 			if(lock_text)
 				to_chat(user, SPAN_WARNING("[option.name] is locked. [lock_text]."))
 				return TRUE

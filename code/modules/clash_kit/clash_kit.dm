@@ -246,7 +246,7 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 	clash_issue_machinegunner_kit(fighter)
 	clash_issue_class_primary(fighter, job, bot)
 	clash_swap_c4_pouches(fighter)
-	clash_kit_default_webbing(fighter)
+	clash_kit_default_webbing(fighter, job)
 
 /proc/clash_issue_class_primary(mob/living/carbon/human/fighter, job, bot)
 	var/start_type = clash_class_start_primary(clash_kit_faction_for_job(job), GLOB.clash_job_classes[job])
@@ -338,11 +338,12 @@ GLOBAL_LIST_EMPTY(clash_kit_forced_items)
 	if(!kit.get_option(KIT_SLOT_BELT))
 		clash_kit_replace_worn(wearer, WEAR_WAIST, /obj/item/storage/belt/gun/smartgunner)
 
-/proc/clash_kit_default_webbing(mob/living/carbon/human/fighter)
+/proc/clash_kit_default_webbing(mob/living/carbon/human/fighter, job)
 	var/obj/item/clothing/under/uniform = fighter.w_uniform
 	if(!uniform || (locate(/obj/item/clothing/accessory/storage) in uniform.accessories))
 		return
-	var/obj/item/clothing/accessory/storage/webbing = new /obj/item/clothing/accessory/storage/webbing/black(fighter)
+	var/webbing_type = job == JOB_SQUAD_ENGI ? /obj/item/clothing/accessory/storage/tool_webbing/equipped : /obj/item/clothing/accessory/storage/webbing/black
+	var/obj/item/clothing/accessory/storage/webbing = new webbing_type(fighter)
 	if(uniform.can_attach_accessory(webbing))
 		uniform.attach_accessory(fighter, webbing, TRUE)
 	else
@@ -778,7 +779,7 @@ GLOBAL_LIST_EMPTY(clash_kit_forced_items)
 		if(!wearer.equip_to_slot_if_possible(base_item, wear_slot, TRUE, FALSE, TRUE))
 			qdel(base_item)
 	if(!kit.wants_nothing(KIT_SLOT_WEBBING))
-		clash_kit_default_webbing(wearer)
+		clash_kit_default_webbing(wearer, job)
 	if(faction == FACTION_UPP && istype(wearer.w_uniform, /obj/item/clothing/under/marine/veteran/UPP) && !(locate(/obj/item/clothing/accessory/patch/upp) in wearer.w_uniform.accessories))
 		wearer.equip_to_slot_if_possible(new /obj/item/clothing/accessory/patch/upp(wearer), WEAR_ACCESSORY, TRUE, TRUE, TRUE)
 
