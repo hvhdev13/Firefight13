@@ -5,9 +5,9 @@ GLOBAL_LIST_INIT(clash_role_shop_ammo, list(
 	JOB_SQUAD_SMARTGUN = list(/obj/item/ammo_magazine/smartgun = 10),
 ))
 
-GLOBAL_LIST_INIT(clash_shop_shell_boxes, list(
-	/obj/item/ammo_magazine/shotgun/buckshot = list(/obj/item/ammo_magazine/shotgun/slugs, /obj/item/ammo_magazine/shotgun/flechette),
-	/obj/item/ammo_magazine/shotgun/heavy/buckshot = list(/obj/item/ammo_magazine/shotgun/heavy/slug, /obj/item/ammo_magazine/shotgun/heavy/flechette),
+GLOBAL_LIST_INIT(clash_shop_shells, list(
+	/obj/item/ammo_magazine/shotgun/buckshot = list(/obj/item/ammo_magazine/handful/shotgun/buckshot, /obj/item/ammo_magazine/handful/shotgun/slug, /obj/item/ammo_magazine/handful/shotgun/flechette),
+	/obj/item/ammo_magazine/shotgun/heavy/buckshot = list(/obj/item/ammo_magazine/handful/shotgun/heavy/buckshot, /obj/item/ammo_magazine/handful/shotgun/heavy/slug, /obj/item/ammo_magazine/handful/shotgun/heavy/flechette),
 ))
 
 GLOBAL_LIST_INIT(clash_shop_counterparts, list(
@@ -90,7 +90,7 @@ GLOBAL_LIST_INIT(clash_shop_counterparts, list(
 		for(var/datum/clash_kit_option/option as anything in GLOB.clash_kit_menu[clash_kit_faction_for_job(job)]?[slot])
 			if(!option.ammo_type || (option.only_class && option.only_class != GLOB.clash_job_classes[job]))
 				continue
-			for(var/obj/item/ammo_type as anything in list(option.ammo_type) + (GLOB.clash_shop_shell_boxes[option.ammo_type] || list()))
+			for(var/obj/item/ammo_type as anything in GLOB.clash_shop_shells[option.ammo_type] || list(option.ammo_type))
 				if(by_id["[ammo_type]"] || role_ammo?[ammo_type])
 					continue
 				var/list/item = clash_shop_entry(ammo_type, CLASH_SHOP_AMMO_COST)
