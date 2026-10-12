@@ -61,6 +61,13 @@ GLOBAL_LIST_EMPTY(clash_score_panel_icons)
 	label.appearance_flags = RESET_COLOR|RESET_ALPHA|KEEP_APART
 	return label
 
+/proc/clash_score_digits(score)
+	var/text = "[score]"
+	var/dot = findtext(text, ".")
+	if(!dot)
+		return text
+	return "[copytext(text, 1, dot)]<span style='font-family: \"Small Fonts\"'>.</span>[copytext(text, dot + 1)]"
+
 /datum/game_mode/extended/faction_clash/hvh/proc/get_panel_score(faction)
 	if(!round_finished)
 		return get_match_score(faction)
@@ -77,17 +84,17 @@ GLOBAL_LIST_EMPTY(clash_score_panel_icons)
 	var/left = SCORE_PANEL_LEFT
 	var/right_start = SCORE_PANEL_LEFT + SCORE_PANEL_WIDTH - SCORE_SIDE_WIDTH
 	var/text_width = SCORE_SIDE_WIDTH - 10
-	var/big = "font-family: \"VCR OSD Mono\"; font-size: [max(length("[uscm]"), length("[upp]")) >= 4 ? 11 : 14]px; -dm-text-outline: 1px black; vertical-align: middle; color: #ffffff"
+	var/big = "font-family: \"VCR OSD Mono\"; font-size: [max(length(replacetext("[uscm]", ".", "")), length(replacetext("[upp]", ".", ""))) >= 4 ? 11 : 14]px; -dm-text-outline: 1px black; vertical-align: middle; color: #ffffff"
 	var/small = "font-family: \"Small Fonts\"; font-size: 6px; -dm-text-outline: 1px black; vertical-align: bottom"
 	var/list/texts = list()
 	texts += clash_score_text("<span style='[small]; color: #e8ecef; text-align: left'>USCM</span>", left + 5, 13, text_width, 10)
 	if(shows_alive_count())
 		texts += clash_score_text("<span style='[small]; color: #8a939c; text-align: left'>[uscm_alive] alive</span>", left + 5, 3, text_width, 10)
-	texts += clash_score_text("<span style='[big]; text-align: right'>[uscm]</span>", left + 5, 3, text_width, 22)
+	texts += clash_score_text("<span style='[big]; text-align: right'>[clash_score_digits(uscm)]</span>", left + 5, 3, text_width, 22)
 	texts += clash_score_text("<span style='[small]; color: #e8ecef; text-align: right'>UPP</span>", right_start + 5, 13, text_width, 10)
 	if(shows_alive_count())
 		texts += clash_score_text("<span style='[small]; color: #8a939c; text-align: right'>[upp_alive] alive</span>", right_start + 5, 3, text_width, 10)
-	texts += clash_score_text("<span style='[big]; text-align: left'>[upp]</span>", right_start + 5, 3, text_width, 22)
+	texts += clash_score_text("<span style='[big]; text-align: left'>[clash_score_digits(upp)]</span>", right_start + 5, 3, text_width, 22)
 	var/center_x = left + SCORE_SIDE_WIDTH
 	var/center_width = right_start - center_x
 	texts += clash_score_text("<span style='font-family: \"VCR OSD Mono\"; font-size: 11px; -dm-text-outline: 1px black; vertical-align: bottom; text-align: center; color: [clock[3] ? "#ff6a6a" : "#e8ecef"]'>[clock[1]]</span>", center_x, 10, center_width, 16)

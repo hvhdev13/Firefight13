@@ -100,11 +100,3 @@ GLOBAL_LIST_EMPTY(clash_weapon_unlock_levels)
 			level++
 	return max(entry["best"], level)
 
-/datum/clash_progress/proc/carrier_step(family)
-	var/list/entry = carriers[family]
-	var/xp = entry ? entry["xp"] : 0
-	var/step = 0
-	for(var/list/carrier_step as anything in GLOB.clash_carrier_tracks[family])
-		if(xp >= carrier_step[1])
-			step++
-	return max(entry ? entry["best"] : 0, step)
