@@ -366,10 +366,15 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 /proc/clash_job_carries_back_gun(job)
 	return !(GLOB.clash_job_classes[job] in GLOB.clash_class_only_primaries)
 
+/proc/clash_kit_machete_scabbard(datum/clash_kit/kit, primary_type)
+	if(!ispath(kit?.get_option(KIT_SLOT_BACK)?.item_type, /obj/item/storage/large_holster/m37) || !ispath(kit.get_option(KIT_SLOT_BACK_GUN)?.item_type, /obj/item/weapon/sword/machete))
+		return null
+	return ispath(primary_type, /obj/item/weapon/gun/smartgun) ? /obj/item/storage/large_holster/machete/smartgunner/full : /obj/item/storage/large_holster/machete/full
+
 /proc/clash_effective_back_gun(datum/clash_kit/kit, job)
 	var/datum/clash_kit_option/scabbard = kit?.get_option(KIT_SLOT_BACK)
 	var/datum/clash_kit_option/back_gun = kit?.get_option(KIT_SLOT_BACK_GUN)
-	if(!back_gun || !ispath(scabbard?.item_type, /obj/item/storage/large_holster) || !clash_job_carries_back_gun(job))
+	if(!ispath(back_gun?.item_type, /obj/item/weapon/gun) || !ispath(scabbard?.item_type, /obj/item/storage/large_holster/m37) || !clash_job_carries_back_gun(job))
 		return null
 	return back_gun.item_type
 
@@ -390,6 +395,13 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 	desc = "A large leather holster fitted for the Type 23 shotgun. It has harnesses that allow it to be secured to the back for easy storage."
 	can_hold = list(/obj/item/weapon/gun/shotgun/type23)
 	bypass_w_limit = list(/obj/item/weapon/gun/shotgun/type23)
+
+/obj/item/storage/belt/gun/utility/clash/fill_preset_inventory()
+	new /obj/item/tool/screwdriver(src)
+	new /obj/item/tool/wrench(src)
+	new /obj/item/tool/weldingtool(src)
+	new /obj/item/tool/wirecutters(src)
+	new /obj/item/device/multitool(src)
 
 /proc/build_clash_kit_catalog()
 	if(length(GLOB.clash_kit_options))
@@ -437,6 +449,8 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 		add_clash_kit_option(faction, GLOB.clash_kit_sidearm_attachment_slots[initial(attachment.slot)], primary_option?.name || capitalize(strip_improper(initial(attachment.name))), attachment_type)
 	var/list/back_fits = list()
 	for(var/datum/clash_kit_option/gun as anything in GLOB.clash_kit_menu[faction][KIT_SLOT_BACK_GUN])
+		if(!ispath(gun.item_type, /obj/item/weapon/gun))
+			continue
 		for(var/attachment_type in get_clash_gun_attachables(gun.item_type))
 			var/obj/item/attachable/attachment = attachment_type
 			if(ispath(attachment_type, /obj/item/attachable/bayonet) || !GLOB.clash_kit_back_attachment_slots[initial(attachment.slot)])
@@ -450,16 +464,17 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 /proc/add_clash_kit_back_guns(faction)
 	var/datum/clash_kit_option/scabbard_option
 	for(var/datum/clash_kit_option/back as anything in GLOB.clash_kit_menu[faction][KIT_SLOT_BACK])
-		if(ispath(back.item_type, /obj/item/storage/large_holster))
+		if(ispath(back.item_type, /obj/item/storage/large_holster/m37))
 			scabbard_option = back
 	if(!scabbard_option)
 		return
-	var/obj/item/storage/large_holster/scabbard = new scabbard_option.item_type
+	var/obj/item/storage/large_holster/m37/scabbard = new scabbard_option.item_type
 	for(var/datum/clash_kit_option/gun as anything in GLOB.clash_kit_menu[faction][KIT_SLOT_PRIMARY].Copy())
 		if(gun.only_class || !is_path_in_list(gun.item_type, scabbard.can_hold))
 			continue
 		add_clash_kit_option(faction, KIT_SLOT_BACK_GUN, gun.name, gun.item_type, gun.blurb, gun.ammo_type, gun.ammo_count)
 	qdel(scabbard)
+	add_clash_kit_option(faction, KIT_SLOT_BACK_GUN, "M2132 machete", /obj/item/weapon/sword/machete, "A heavy blade for close work")
 
 /proc/build_clash_kit_shared(faction)
 	for(var/slot in list(KIT_SLOT_POUCH_L, KIT_SLOT_POUCH_R))
@@ -479,6 +494,10 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 		add_clash_kit_option(faction, slot, "Flare pouch", /obj/item/storage/pouch/flare/full, "Light up a lane")
 		add_clash_kit_option(faction, slot, "Explosive pouch", /obj/item/storage/pouch/explosive, "Carries your grenades")
 		add_clash_kit_option(faction, slot, "Medium general pouch", /obj/item/storage/pouch/general/medium, "Tools, flares, whatever fits")
+		add_clash_kit_option(faction, slot, "Large general pouch", /obj/item/storage/pouch/general/large, "More room than the medium general pouch")
+		add_clash_kit_option(faction, slot, "Tools pouch", /obj/item/storage/pouch/tools/full, "Screwdriver, wirecutters, wrench and multitool")
+		add_clash_kit_option(faction, slot, "Sling pouch", /obj/item/storage/pouch/sling, "One item on a strap that pulls it back when you drop it")
+		add_clash_kit_option(faction, slot, "Machete pouch", /obj/item/storage/pouch/machete/full, "An M2132 machete at your side")
 		add_clash_kit_option(faction, slot, "Throwing knives", /obj/item/storage/pouch/bayonet, "Five throwing knives")
 	var/datum/clash_kit_option/goggles = add_clash_kit_option(faction, KIT_SLOT_EYES, "Welding goggles", /obj/item/clothing/glasses/welding, "Flip them down to weld without hurting your eyes")
 	goggles.only_class = GLOB.clash_job_classes[JOB_SQUAD_ENGI]
@@ -525,7 +544,7 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 	add_clash_kit_option(faction, KIT_SLOT_MASK, "Heat absorbent coif", /obj/item/clothing/mask/rebreather/scarf, "Scarf and rebreather")
 	add_clash_kit_option(faction, KIT_SLOT_BACK, "Backpack", /obj/item/storage/backpack/marine, "Most room")
 	add_clash_kit_option(faction, KIT_SLOT_BACK, "Satchel", /obj/item/storage/backpack/marine/satchel, "Less room, open it without taking it off")
-	add_clash_kit_option(faction, KIT_SLOT_BACK, "Shotgun scabbard", /obj/item/storage/large_holster/m37/clash, "Carries a shotgun on the back")
+	add_clash_kit_option(faction, KIT_SLOT_BACK, "Scabbard", /obj/item/storage/large_holster/m37/clash, "Carries a shotgun or a machete on the back")
 	add_clash_kit_option(faction, KIT_SLOT_BELT, "M276 ammo load rig", /obj/item/storage/belt/marine, "Rifle magazines")
 	add_clash_kit_option(faction, KIT_SLOT_BELT, "M276 M4A3 holster rig", /obj/item/storage/belt/gun/m4a3, "Holsters the M4A3 or 88 Mod 4 with spare magazines")
 	add_clash_kit_option(faction, KIT_SLOT_BELT, "M276 M44 holster rig", /obj/item/storage/belt/gun/m44, "Holsters the revolver with speedloaders")
@@ -535,6 +554,7 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 	add_clash_kit_option(faction, KIT_SLOT_BELT, "M276 M40 grenade rig, large", /obj/item/storage/belt/grenade/large, "More grenades on the hip")
 	add_clash_kit_option(faction, KIT_SLOT_BELT, "XM88 bandolier", /obj/item/storage/belt/shotgun/xm88, "Loose XM88 rounds")
 	add_clash_kit_option(faction, KIT_SLOT_BELT, "G8-A general utility pouch", /obj/item/storage/backpack/general_belt, "Anything that fits")
+	add_clash_kit_option(faction, KIT_SLOT_BELT, "M276 combat toolbelt rig", /obj/item/storage/belt/gun/utility/clash, "Tools and a holster for your sidearm")
 	add_clash_kit_option(faction, KIT_SLOT_GRENADE, "M40 HEDP", /obj/item/explosive/grenade/high_explosive, "High explosive, dual purpose", null, 2)
 	add_clash_kit_option(faction, KIT_SLOT_GRENADE, "M15 fragmentation", /obj/item/explosive/grenade/high_explosive/m15, "Old pattern, bigger bang, longer fuse", null, 2)
 	add_clash_kit_option(faction, KIT_SLOT_GRENADE, "M40 HIDP incendiary", /obj/item/explosive/grenade/incendiary, "Sets the ground alight", null, 2)
@@ -573,12 +593,13 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 	add_clash_kit_option(faction, KIT_SLOT_MASK, "Rebreather", /obj/item/clothing/mask/rebreather, "Low profile")
 	add_clash_kit_option(faction, KIT_SLOT_BACK, "Combat pack", /obj/item/storage/backpack/lightpack/upp, "Standard issue")
 	add_clash_kit_option(faction, KIT_SLOT_BACK, "Satchel", /obj/item/storage/backpack/marine/satchel, "Less room, open it without taking it off")
-	add_clash_kit_option(faction, KIT_SLOT_BACK, "Shotgun scabbard", /obj/item/storage/large_holster/m37/clash_upp, "Carries a shotgun on the back")
+	add_clash_kit_option(faction, KIT_SLOT_BACK, "Scabbard", /obj/item/storage/large_holster/m37/clash_upp, "Carries a shotgun or a machete on the back")
 	add_clash_kit_option(faction, KIT_SLOT_BELT, "Type 41 ammo load rig", /obj/item/storage/belt/marine/upp, "Rifle magazines")
 	add_clash_kit_option(faction, KIT_SLOT_BELT, "NPZ92 holster rig", /obj/item/storage/belt/gun/type47, "Holsters a pistol with spare magazines")
 	add_clash_kit_option(faction, KIT_SLOT_BELT, "Type 42 shotgun shell rig", /obj/item/storage/belt/shotgun/upp, "Shells and slugs")
 	add_clash_kit_option(faction, KIT_SLOT_BELT, "Type 46 grenade rig", /obj/item/storage/belt/grenade/upp, "Grenades on the hip")
 	add_clash_kit_option(faction, KIT_SLOT_BELT, "G8-A general utility pouch", /obj/item/storage/backpack/general_belt, "Anything that fits")
+	add_clash_kit_option(faction, KIT_SLOT_BELT, "M276 combat toolbelt rig", /obj/item/storage/belt/gun/utility/clash, "Tools and a holster for your sidearm")
 	add_clash_kit_option(faction, KIT_SLOT_GRENADE, "Type 6 shrapnel", /obj/item/explosive/grenade/high_explosive/upp, "Union pattern, fragments wide", null, 2)
 	add_clash_kit_option(faction, KIT_SLOT_GRENADE, "Type 8 WP", /obj/item/explosive/grenade/phosphorus/upp, "White phosphorus. Burns and blinds", null, 2)
 	add_clash_kit_option(faction, KIT_SLOT_GRENADE, "Smoke grenade", /obj/item/explosive/grenade/smokebomb, "Cover to cross", null, 2)

@@ -656,8 +656,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 /datum/game_mode/extended/faction_clash/hvh/proc/report_kill(mob/victim, mob/killer, cause, list/assisters, cause_object)
 	var/health_left = 0
 	if(isliving(killer))
-		var/mob/living/living_killer = killer
-		health_left = max(0, round(living_killer.health / living_killer.maxHealth * 100))
+		health_left = round(clash_health_percent(killer))
 	var/distance = get_dist(victim, killer)
 	to_chat(victim, SPAN_WARNING("Killed by [killer.real_name][cause ? " ([cause])" : ""] at [distance] tiles. They had [health_left]% health left."))
 	show_death_card(victim, killer, cause, distance, health_left, assisters, cause_object)

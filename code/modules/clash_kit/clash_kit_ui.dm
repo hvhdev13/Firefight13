@@ -195,13 +195,14 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 		"class_primaries" = (GLOB.clash_job_classes[job] in GLOB.clash_class_only_primaries),
 		"hidden_options" = clash_class_hidden_options(job),
 		"fits" = fits,
-		"blocked_slots" = clash_kit_blocked_slots(gun_type),
+		"blocked_slots" = clash_kit_blocked_slots(gun_type, kit?.get_option(KIT_SLOT_BACK)?.item_type),
 		"option_problems" = clash_kit_option_problems(kit, job, user),
 		"problems" = clash_kit_current_marks(render?["problems"], render?["choices"], kit),
 		"notes" = clash_kit_current_marks(render?["notes"], render?["choices"], kit),
 		"primary_shells" = clash_kit_shell_names_for(gun_type),
 		"back_shells" = clash_kit_shell_names_for(back_type),
-		"back_gun_slot" = clash_job_carries_back_gun(job) && ispath(kit?.get_option(KIT_SLOT_BACK)?.item_type, /obj/item/storage/large_holster) && !length(clash_kit_blocked_slots(gun_type)),
+		"back_gun_slot" = ispath(kit?.get_option(KIT_SLOT_BACK)?.item_type, /obj/item/storage/large_holster/m37),
+		"scabbard_state" = clash_kit_scabbard_state(clash_kit_machete_scabbard(kit, gun_type)),
 		"primary_shell" = kit?.fills[CLASH_KIT_GUN_FILL] || GLOB.clash_kit_shell_names[1],
 		"doll" = render?["doll"],
 		"gun" = render?["gun"],
@@ -650,3 +651,6 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 	for(var/slot in marks)
 		if(kit && drawn_choices?[slot] == kit.choices[slot])
 			.[slot] = marks[slot]
+
+/proc/clash_kit_scabbard_state(obj/item/storage/large_holster/scabbard_type)
+	return scabbard_type && "[initial(scabbard_type.icon_state)]_full"

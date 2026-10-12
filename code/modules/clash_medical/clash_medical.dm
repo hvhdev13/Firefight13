@@ -19,6 +19,8 @@
 #define CLASH_SHRAPNEL_CHANCE_CUT 0.1
 #define CLASH_STABILIZED_TIME (15 SECONDS)
 #define CLASH_INTERNAL_TOXIN 60
+#define CLASH_DROP_DELAY (0.2 SECONDS)
+#define CLASH_STAGGER_PIXELS 2
 
 GLOBAL_LIST_INIT(clash_med_bursts, list(
 	"bicaridine" = list(5, 5, 0, 0, 0),
@@ -86,6 +88,58 @@ GLOBAL_LIST_INIT(clash_adv_firstaid_stock, list(
 /proc/clash_fast_medicine()
 	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
 	return istype(clash_mode) && clash_mode.arena_rules
+
+/proc/clash_health_percent(mob/living/fighter)
+	if(!ishuman(fighter) || !clash_fast_medicine())
+		return clamp(fighter.health / fighter.maxHealth * 100, 0, 100)
+	return clamp((fighter.health - fighter.health_threshold_crit) / (fighter.maxHealth - fighter.health_threshold_crit) * 100, 0, 100)
+
+/mob/living/carbon/human/med_hud_set_health()
+	. = ..()
+	if(stat == DEAD || (status_flags & FAKEDEATH) || !clash_fast_medicine())
+		return
+	var/image/holder = hud_list[HEALTH_HUD]
+	if(health >= health_threshold_crit)
+		holder.icon_state = "hudhealth[CEILING(clash_health_percent(src), 10)]"
+	else
+		holder.icon_state = health > (health_threshold_crit + health_threshold_dead) * 0.5 ? "hudhealth-0" : "hudhealth-50"
+	var/datum/effects/crit/crit = locate() in effects_list
+	if(crit && health > health_threshold_crit)
+		clash_wake_from_crit(crit)
+	else if(!crit && health < health_threshold_crit && !clash_staggering && (species.flags & HAS_HARDCRIT))
+		clash_stagger()
+
+/mob/living/carbon/human/var/clash_staggering = FALSE
+
+/mob/living/carbon/human/proc/clash_stagger()
+	clash_staggering = TRUE
+	addtimer(CALLBACK(src, PROC_REF(clash_drop)), CLASH_DROP_DELAY)
+	if(body_position == LYING_DOWN)
+		return
+	animate(src, pixel_w = CLASH_STAGGER_PIXELS, pixel_z = -CLASH_STAGGER_PIXELS, time = 1, easing = CUBIC_EASING|EASE_OUT, flags = ANIMATION_PARALLEL|ANIMATION_RELATIVE)
+	animate(pixel_w = -CLASH_STAGGER_PIXELS, pixel_z = CLASH_STAGGER_PIXELS, time = 1, easing = CUBIC_EASING|EASE_IN, flags = ANIMATION_RELATIVE)
+
+/mob/living/carbon/human/proc/clash_drop()
+	clash_staggering = FALSE
+	if(stat == DEAD || health >= health_threshold_crit)
+		return
+	if(!(locate(/datum/effects/crit) in effects_list))
+		new /datum/effects/crit/human(src)
+	apply_effect(3, PARALYZE)
+
+/datum/effects/crit/human/process_mob()
+	var/mob/living/carbon/human/patient = affected_atom
+	if(patient.clash_staggering)
+		return FALSE
+	return ..()
+
+/mob/living/carbon/human/proc/clash_wake_from_crit(datum/effects/crit/crit)
+	qdel(crit)
+	set_effect(0, PARALYZE)
+	blinded = FALSE
+	handle_regular_status_updates(FALSE)
+	if(!blinded)
+		clear_fullscreen("blind")
 
 /obj/item/dig_out_shrapnel(mob/living/carbon/human/embedded_human, mob/living/carbon/human/user = null)
 	if(!clash_fast_medicine())
@@ -898,3 +952,5 @@ GLOBAL_LIST_EMPTY(clash_hud_status_mobs)
 #undef CLASH_SHRAPNEL_CHANCE_CUT
 #undef CLASH_STABILIZED_TIME
 #undef CLASH_INTERNAL_TOXIN
+#undef CLASH_DROP_DELAY
+#undef CLASH_STAGGER_PIXELS

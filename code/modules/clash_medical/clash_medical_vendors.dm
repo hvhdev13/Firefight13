@@ -58,6 +58,7 @@ GLOBAL_LIST_INIT(clash_arena_medic_only, list(
 	/obj/item/stack/medical/advanced,
 	/obj/item/storage/belt/medical,
 	/obj/item/storage/pouch/firstaid/clash/medic,
+	/obj/item/storage/firstaid/adv,
 	/obj/item/device/defibrillator,
 ))
 

@@ -7,9 +7,19 @@ GLOBAL_LIST_INIT(clash_role_shop_ammo, list(
 	JOB_UPP_ENGI = list(/obj/item/ammo_magazine/m2c/t37/clash = 10),
 ))
 
-GLOBAL_LIST_INIT(clash_shop_shell_boxes, list(
-	/obj/item/ammo_magazine/shotgun/buckshot = list(/obj/item/ammo_magazine/shotgun/slugs, /obj/item/ammo_magazine/shotgun/flechette),
-	/obj/item/ammo_magazine/shotgun/heavy/buckshot = list(/obj/item/ammo_magazine/shotgun/heavy/slug, /obj/item/ammo_magazine/shotgun/heavy/flechette),
+GLOBAL_LIST_INIT(clash_shop_shells, list(
+	/obj/item/ammo_magazine/shotgun/buckshot = list(/obj/item/ammo_magazine/handful/shotgun/buckshot, /obj/item/ammo_magazine/handful/shotgun/slug, /obj/item/ammo_magazine/handful/shotgun/flechette),
+	/obj/item/ammo_magazine/shotgun/heavy/buckshot = list(/obj/item/ammo_magazine/handful/shotgun/heavy/buckshot, /obj/item/ammo_magazine/handful/shotgun/heavy/slug, /obj/item/ammo_magazine/handful/shotgun/heavy/flechette),
+))
+
+GLOBAL_LIST_INIT(clash_shop_hidden_types, list(
+	/obj/item/storage/box/guncase,
+	/obj/item/tool/shovel/etool,
+	/obj/item/storage/backpack/marine/satchel/rto,
+	/obj/item/storage/belt/gun/utility,
+	/obj/item/storage/large_holster/machete,
+	/obj/item/clothing/suit/storage/marine/medium/leader,
+	/obj/item/clothing/suit/storage/marine/medium/rto,
 ))
 
 GLOBAL_LIST_INIT(clash_shop_counterparts, list(
@@ -75,7 +85,11 @@ GLOBAL_LIST_INIT(clash_shop_counterparts, list(
 	return list("id" = "[item_type]", "name" = name || capitalize(strip_improper(initial(item_type.name))), "cost" = cost, "pool" = CLASH_SHOP_POINTS, "icon" = "[initial(item_type.icon)]", "icon_state" = initial(item_type.icon_state))
 
 /proc/clash_shop_hidden(item_type)
-	return ispath(item_type, /obj/item/device/encryptionkey) || ispath(item_type, /obj/item/pamphlet) || ispath(item_type, /obj/item/attachable) || clash_is_extended_magazine(item_type) || (ispath(item_type, /obj/item/ammo_magazine) && findtext("[item_type]/", "/ap/"))
+	return is_path_in_list(item_type, GLOB.clash_shop_hidden_types) || ispath(item_type, /obj/item/device/encryptionkey) || ispath(item_type, /obj/item/pamphlet) || ispath(item_type, /obj/item/attachable) || clash_is_extended_magazine(item_type) || (ispath(item_type, /obj/item/ammo_magazine) && findtext("[item_type]/", "/ap/"))
+
+/proc/clash_shop_worn_option(faction, item_type)
+	var/datum/clash_kit_option/option = clash_item_option(faction, item_type)
+	return option && (option.slot in list(KIT_SLOT_BACK, KIT_SLOT_BELT, KIT_SLOT_POUCH_L, KIT_SLOT_POUCH_R, KIT_SLOT_WEBBING))
 
 /proc/get_clash_shop(job)
 	if(GLOB.clash_kit_shops[job])
@@ -92,7 +106,7 @@ GLOBAL_LIST_INIT(clash_shop_counterparts, list(
 		for(var/datum/clash_kit_option/option as anything in GLOB.clash_kit_menu[clash_kit_faction_for_job(job)]?[slot])
 			if(!option.ammo_type || (option.only_class && option.only_class != GLOB.clash_job_classes[job]))
 				continue
-			for(var/obj/item/ammo_type as anything in list(option.ammo_type) + (GLOB.clash_shop_shell_boxes[option.ammo_type] || list()))
+			for(var/obj/item/ammo_type as anything in GLOB.clash_shop_shells[option.ammo_type] || list(option.ammo_type))
 				if(by_id["[ammo_type]"] || role_ammo?[ammo_type])
 					continue
 				var/list/item = clash_shop_entry(ammo_type, CLASH_SHOP_AMMO_COST)
@@ -121,7 +135,7 @@ GLOBAL_LIST_INIT(clash_shop_counterparts, list(
 					sections += list(section)
 				continue
 			var/id = "[entry_type]"
-			if(!section || entry[4] || entry[2] <= 0 || !ispath(entry_type, /obj/item) || by_id[id] || clash_shop_hidden(entry_type))
+			if(!section || entry[4] || entry[2] <= 0 || !ispath(entry_type, /obj/item) || by_id[id] || clash_shop_hidden(entry_type) || clash_shop_worn_option(clash_kit_faction_for_job(job), entry_type))
 				continue
 			var/list/item = clash_shop_entry(entry_type, entry[2], entry[1])
 			item["pool"] = source[2]

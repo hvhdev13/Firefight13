@@ -186,6 +186,7 @@ interface Data extends StaticData {
   back_shells: string[] | null;
   primary_shell: string;
   back_gun_slot: BooleanLike;
+  scabbard_state: string | null;
   doll: string | null;
   gun: string | null;
   sidearm: string | null;
@@ -1273,7 +1274,7 @@ const WEAPON_VIEWS: Record<
     slot: 'back_gun',
     slots: BACK_ATTACHMENT_SLOTS,
     scale: PRIMARY_SCALE,
-    empty: 'No shotgun in the scabbard',
+    empty: 'Nothing in the scabbard',
   },
   sentry: {
     slot: 'sentry',
@@ -1359,7 +1360,7 @@ const ScabbardOptions = () => {
     <>
       <Box className="ClashKit__optionsGroup">In the scabbard</Box>
       <OptionRow
-        label="No shotgun"
+        label="Empty"
         blurb="The scabbard stays empty"
         picked={!data.choices.back_gun}
         onClick={() => act('clear', { slot: 'back_gun' })}
@@ -1381,7 +1382,10 @@ const ScabbardOptions = () => {
 const pickedFor = (data: Data, id: string) => {
   const picked = findOption(data.menus, data.faction, id, data.choices[id]);
   return id === 'back' && picked && data.back_gun_slot && data.choices.back_gun
-    ? { ...picked, icon_state: `${picked.icon_state}_full` }
+    ? {
+        ...picked,
+        icon_state: data.scabbard_state ?? `${picked.icon_state}_full`,
+      }
     : picked;
 };
 

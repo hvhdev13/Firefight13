@@ -152,12 +152,12 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 		return "Only for [GLOB.clash_class_names[option.only_class]]s"
 	if(option.slot == KIT_SLOT_ARMOR && ispath(primary_type, /obj/item/weapon/gun/smartgun))
 		return "The M56A2 only fires with the M56 harness"
-	var/list/blocked = clash_kit_blocked_slots(primary_type)
+	var/list/blocked = clash_kit_blocked_slots(primary_type, option.item_type)
 	if(blocked[option.slot])
 		return blocked[option.slot]
 	if(option.slot == KIT_SLOT_PRIMARY && option.only_class != GLOB.clash_job_classes[job] && (GLOB.clash_job_classes[job] in GLOB.clash_class_only_primaries))
 		return "Machine Gunners carry a machine gun"
-	if(option.slot == KIT_SLOT_BACK_GUN && !clash_job_carries_back_gun(job))
+	if(option.slot == KIT_SLOT_BACK_GUN && !clash_job_carries_back_gun(job) && !ispath(option.item_type, /obj/item/weapon/sword/machete))
 		return "Machine Gunners carry a machine gun"
 	var/datum/clash_perk/perk = GLOB.clash_perks[option.item_type]
 	if(perk)
@@ -211,20 +211,9 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 				return "Unlocks at [clash_side_name(faction)] level [gate["level"]]"
 		if(CLASH_GATE_CLASS)
 			return clash_gear_lock_text(progress, GLOB.clash_job_classes[job], gate["gear"])
-		if(CLASH_GATE_TWIN)
-			if(progress.faction_level(faction) < gate["level"])
-				return "Unlocks at [clash_side_name(faction)] level [gate["level"]]"
-			return clash_gear_lock_text(progress, GLOB.clash_job_classes[job], gate["gear"])
 		if(CLASH_GATE_CLASS_LEVEL)
 			if(progress.class_level(gate["class"]) < gate["level"])
 				return "Unlocks at [GLOB.clash_class_names[gate["class"]]] level [gate["level"]]"
-		if(CLASH_GATE_CARRIER)
-			if(progress.carrier_step(gate["family"]) >= gate["step"] || (gate["level"] && progress.faction_level(faction) >= gate["level"]))
-				return null
-			var/list/entry = progress.carriers[gate["family"]]
-			var/to_go = max(0, gate["xp"] - (entry ? entry["xp"] : 0))
-			var/xp_text = "[clash_number_text(gate["xp"])] [GLOB.clash_family_names[gate["family"]]] XP ([clash_number_text(to_go)] to go)"
-			return gate["level"] ? "Unlocks at [clash_side_name(faction)] level [gate["level"]] or [xp_text]" : "Unlocks at [xp_text]"
 	return null
 
 /proc/clash_gear_lock_text(datum/clash_progress/progress, class, gear)
@@ -362,12 +351,6 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 				return FALSE
 			level = clamp(level, 1, length(unlocks) + 1)
 			xp = level > 1 ? unlocks[level - 1]["xp"] : 0
-		if("carrier")
-			var/list/steps = GLOB.clash_carrier_tracks[key]
-			if(!steps)
-				return FALSE
-			level = clamp(level, 0, length(steps))
-			xp = level ? steps[level][1] : 0
 		else
 			return FALSE
 	return clash_set_progress_xp(ckey, track, key, xp, admin, "level [level]")
@@ -408,13 +391,6 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 			entry["mastered"] = FALSE
 			var/obj/item/weapon/gun/gun = key
 			track_name = initial(gun.name)
-		if("carrier")
-			if(!GLOB.clash_carrier_tracks[key])
-				return FALSE
-			old_level = progress.carrier_step(key)
-			entry = progress.carrier_entry(key)
-			entry["best"] = 0
-			track_name = "[capitalize(GLOB.clash_family_names[key])] ammo carrier"
 		else
 			return FALSE
 	entry["xp"] = xp
@@ -571,7 +547,7 @@ GLOBAL_VAR_INIT(clash_trial_packs_built, FALSE)
 		return FALSE
 	for(var/faction in list(FACTION_MARINE, FACTION_UPP))
 		var/list/gate = clash_gate_for(faction, item_type)
-		if(!gate || gate["kind"] == CLASH_GATE_FREE || (gate["kind"] == CLASH_GATE_CARRIER && !gate["xp"] && !gate["level"]))
+		if(!gate || gate["kind"] == CLASH_GATE_FREE)
 			continue
 		return TRUE
 	return FALSE

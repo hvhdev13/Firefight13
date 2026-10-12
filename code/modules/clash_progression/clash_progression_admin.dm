@@ -203,12 +203,12 @@ GLOBAL_DATUM_INIT(clash_progression_admin, /datum/clash_progression_admin, new)
 				return TRUE
 			var/full = action == "fill_all"
 			var/confirm = full ? "Max everything" : "Reset everything"
-			var/what = full ? "Max every level, weapon and carrier for [player_ckey]? They will be told: \"An admin unlocked every level, weapon and carrier for you.\"" : "Reset every level, XP, weapon and carrier of [player_ckey] back to the start? They will be told: \"An admin reset all your levels and XP. Locked gear in your loadout falls back next spawn.\" Only the previous save survives, as a .bak file."
+			var/what = full ? "Max every level and weapon for [player_ckey]? They will be told: \"An admin unlocked every level and weapon for you.\"" : "Reset every level, XP and weapon of [player_ckey] back to the start? They will be told: \"An admin reset all your levels and XP. Locked gear in your loadout falls back next spawn.\" Only the previous save survives, as a .bak file."
 			if(tgui_alert(user, what, confirm, list("Cancel", confirm)) != confirm || lookups[user.ckey] != player_ckey)
 				return TRUE
 			clash_admin_fill_progress(player_ckey, full)
 			refresh_player(player_ckey)
-			note = full ? "maxed every level, weapon and carrier for [player_ckey]" : "reset every level, weapon and carrier for [player_ckey]"
+			note = full ? "maxed every level and weapon for [player_ckey]" : "reset every level and weapon for [player_ckey]"
 		if("loadout_job")
 			if(params["job"] in GLOB.clash_arena_roles)
 				loadout_jobs[user.ckey] = params["job"]
@@ -274,7 +274,6 @@ GLOBAL_DATUM_INIT(clash_progression_admin, /datum/clash_progression_admin, new)
 		progress.factions = list()
 		progress.classes = list()
 		progress.weapons = list()
-		progress.carriers = list()
 		progress.seen = list()
 		progress.save()
 		var/client/target = GLOB.directory[ckey]
@@ -295,14 +294,9 @@ GLOBAL_DATUM_INIT(clash_progression_admin, /datum/clash_progression_admin, new)
 		entry["xp"] = max(entry["xp"], clash_track_mastery_xp(gun_type), length(unlocks) ? unlocks[length(unlocks)]["xp"] : 0)
 		entry["best"] = length(unlocks) + 1
 		entry["mastered"] = TRUE
-	for(var/family in GLOB.clash_carrier_tracks)
-		var/list/steps = GLOB.clash_carrier_tracks[family]
-		var/list/entry = progress.carrier_entry(family)
-		entry["xp"] = max(entry["xp"], length(steps) ? steps[length(steps)][1] : 0)
-		entry["best"] = length(steps)
 	progress.save()
 	var/client/target = GLOB.directory[ckey]
 	if(target)
-		to_chat(target, SPAN_NOTICE("An admin unlocked every level, weapon and carrier for you."))
+		to_chat(target, SPAN_NOTICE("An admin unlocked every level and weapon for you."))
 
 #undef CLASH_PROGRESSION_MAX_MULTIPLIER
