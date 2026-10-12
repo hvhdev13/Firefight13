@@ -305,9 +305,9 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 		if(istype(pouch) && !length(pouch.contents))
 			clash_kit_top_up(pouch, ammo_type, wearer)
 
-/proc/clash_kit_blocked_slots(primary_type)
+/proc/clash_kit_blocked_slots(primary_type, back_type)
 	. = list()
-	if(ispath(primary_type, /obj/item/weapon/gun/smartgun))
+	if(ispath(primary_type, /obj/item/weapon/gun/smartgun) && !ispath(back_type, /obj/item/storage/large_holster/m37))
 		.[KIT_SLOT_BACK] = "You cannot use a backpack with the M56 harness"
 
 /proc/clash_kit_smartgun_rig(mob/living/carbon/human/wearer, datum/clash_kit/kit)
@@ -511,8 +511,12 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 	return null
 
 /proc/clash_kit_back_gun_of(mob/living/carbon/human/wearer)
-	var/obj/item/storage/large_holster/scabbard = wearer.back
+	var/obj/item/storage/large_holster/m37/scabbard = wearer.back
 	return istype(scabbard) ? (locate(/obj/item/weapon/gun) in scabbard) : null
+
+/proc/clash_kit_back_machete_of(mob/living/carbon/human/wearer)
+	var/obj/item/storage/large_holster/machete/scabbard = wearer.back
+	return istype(scabbard) ? (locate(/obj/item/weapon/sword/machete) in scabbard) : null
 
 /proc/clash_kit_shotgun_of(mob/living/carbon/human/wearer)
 	var/obj/item/weapon/gun/primary = clash_kit_primary_of(wearer)
@@ -664,8 +668,14 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 
 /proc/clash_kit_fit_back_gun(mob/living/carbon/human/wearer, datum/clash_kit/kit, faction, job, ckey)
 	var/datum/clash_kit_option/back_gun = kit.get_option(KIT_SLOT_BACK_GUN)
-	var/obj/item/storage/large_holster/scabbard = wearer.back
-	if(back_gun?.faction != faction || !istype(scabbard) || !clash_job_carries_back_gun(job))
+	var/obj/item/storage/large_holster/m37/scabbard = wearer.back
+	if(back_gun?.faction != faction || !istype(scabbard))
+		return
+	var/machete_scabbard = clash_kit_machete_scabbard(kit)
+	if(machete_scabbard)
+		clash_kit_replace_worn(wearer, WEAR_BACK, machete_scabbard)
+		return
+	if(!clash_job_carries_back_gun(job))
 		return
 	var/obj/item/weapon/gun/gun = new back_gun.item_type()
 	clash_kit_fit_sidearm_attachments(wearer, gun, kit, ckey, job, FALSE, GLOB.clash_kit_back_attachment_slots)
@@ -785,6 +795,12 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 	if(primary)
 		if(ispath(primary.item_type, /obj/item/weapon/gun/smartgun))
 			clash_kit_smartgun_rig(wearer, kit)
+			var/harness_scabbard = clash_kit_machete_scabbard(kit, primary.item_type)
+			var/datum/clash_kit_option/back = kit.get_option(KIT_SLOT_BACK)
+			if(harness_scabbard)
+				clash_kit_replace_worn(wearer, WEAR_BACK, harness_scabbard)
+			else if(back?.faction == faction && ispath(back.item_type, /obj/item/storage/large_holster/m37))
+				clash_kit_problem(wearer, KIT_SLOT_BACK, "It's empty. Pick the machete for the scabbard.")
 		main_gun = new primary.item_type(wearer)
 		if(!wearer.equip_to_slot_if_possible(main_gun, WEAR_J_STORE, TRUE, FALSE, TRUE) && !wearer.equip_to_appropriate_slot(main_gun))
 			clash_kit_hand_or_floor(wearer, main_gun)
@@ -1048,7 +1064,7 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 		var/icon/gun_flat = primary && clash_trim_icon(getFlatIcon(primary, no_anim = TRUE))
 		var/obj/item/weapon/gun/sidearm = clash_kit_sidearm_of(model)
 		var/icon/sidearm_flat = sidearm && clash_trim_icon(getFlatIcon(sidearm, no_anim = TRUE))
-		var/obj/item/weapon/gun/back_gun = clash_kit_back_gun_of(model)
+		var/obj/item/back_gun = clash_kit_back_gun_of(model) || clash_kit_back_machete_of(model)
 		var/icon/back_flat = back_gun && clash_trim_icon(getFlatIcon(back_gun, no_anim = TRUE))
 		. = list("doll" = flat ? icon2base64(flat) : null, "gun" = gun_flat ? icon2base64(gun_flat) : null, "sidearm" = sidearm_flat ? icon2base64(sidearm_flat) : null, "back_gun" = back_flat ? icon2base64(back_flat) : null, "pack" = describe_clash_kit_pack(model, kit, clash_kit_shotgun_of(model)), "left_behind" = describe_clash_kit_left_behind(model, kit), "failed_moves" = describe_clash_kit_failed_moves(model, kit), "problems" = model.clash_kit_problems, "notes" = model.clash_kit_notes, "statuses" = statuses)
 	catch(var/exception/error)
@@ -1089,13 +1105,18 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 	var/holsters = FALSE
 	var/ammo_holder = FALSE
 	var/grenade_holder = FALSE
+	var/other_gear = 0
 	for(var/path in holder.can_hold)
-		if(ispath(path, /obj/item/weapon/gun))
+		if(ispath(path, /obj/item/weapon/gun/pistol) || ispath(path, /obj/item/weapon/gun/revolver))
 			holsters = TRUE
 		else if(ispath(path, /obj/item/ammo_magazine))
 			ammo_holder = TRUE
 		else if(ispath(path, /obj/item/explosive/grenade))
 			grenade_holder = TRUE
+		else if(!ispath(path, /obj/item/weapon/gun))
+			other_gear++
+	if(other_gear * 2 > length(holder.can_hold))
+		return null
 	if(holsters)
 		var/obj/item/weapon/gun/sidearm
 		for(var/obj/item/weapon/gun/gun as anything in guns)
@@ -1131,9 +1152,9 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 		var/obj/item/storage/holder = clash_kit_storage_of(carriers[slot]) || carriers[slot]
 		if(!istype(holder))
 			continue
-		if(istype(holder, /obj/item/storage/large_holster))
+		if(istype(holder, /obj/item/storage/large_holster/m37))
 			if(!(locate(/obj/item/weapon/gun) in holder))
-				clash_kit_problem(wearer, slot, clash_job_carries_back_gun(wearer.job) ? "It's empty. Pick a shotgun for the scabbard." : "It's empty. Machine Gunners carry no shotgun in it.")
+				clash_kit_problem(wearer, slot, clash_job_carries_back_gun(wearer.job) ? "It's empty. Pick a shotgun or the machete for the scabbard." : "It's empty. Pick the machete for the scabbard.")
 			continue
 		var/text = clash_kit_carrier_problem(holder, guns, wearer)
 		if(text)

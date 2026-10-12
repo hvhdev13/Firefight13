@@ -4,7 +4,6 @@
 #define CLASH_BOT_LITTER_SWEEP (5 SECONDS)
 #define CLASH_BOT_BLIP_DELAY 5
 #define CLASH_BOT_PLAN_DELAY (5 SECONDS)
-#define CLASH_BOT_CLASS_MIN 3
 #define CLASH_BOT_CLASS_SHARE 5
 #define CLASH_BOT_HEAVY_PREFERENCE 10
 #define CLASH_BOT_FLANK_DISTANCE 6
@@ -288,7 +287,10 @@ GLOBAL_LIST_INIT(clash_bot_class_jobs, list(
 			.++
 
 /proc/clash_player_count(faction)
-	. = 0
+	return length(clash_player_fighters(faction))
+
+/proc/clash_player_fighters(faction)
+	. = list()
 	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
 	for(var/client/player as anything in GLOB.clients)
 		if(istype(clash_mode) && !clash_mode.counts_for_bot_fill(player))
@@ -297,7 +299,7 @@ GLOBAL_LIST_INIT(clash_bot_class_jobs, list(
 		if(!ishuman(fighter))
 			fighter = player.mob?.mind?.original
 		if(ishuman(fighter) && fighter.faction == faction)
-			.++
+			. += fighter
 
 /proc/clash_bot_director(faction)
 	var/datum/clash_bot_director/director = GLOB.clash_bot_directors[faction]
@@ -729,7 +731,12 @@ GLOBAL_LIST_INIT(clash_bot_class_jobs, list(
 			heavies++
 		if(bot.medic)
 			medics++
-	var/wanted = total >= CLASH_BOT_CLASS_MIN ? max(1, floor(total / CLASH_BOT_CLASS_SHARE)) : 0
+	for(var/mob/living/carbon/human/fighter as anything in clash_player_fighters(faction))
+		if(clash_is_heavy(fighter))
+			heavies++
+		else if(clash_is_medic(fighter))
+			medics++
+	var/wanted = max(1, floor(total / CLASH_BOT_CLASS_SHARE))
 	var/list/roles = clash_role_list()
 	if(heavies < wanted && (jobs[2] in roles))
 		return jobs[2]
@@ -831,7 +838,6 @@ GLOBAL_LIST_INIT(clash_bot_class_jobs, list(
 #undef CLASH_BOT_BLIP_DELAY
 #undef CLASH_BOT_BLIP_COLOR
 #undef CLASH_BOT_PLAN_DELAY
-#undef CLASH_BOT_CLASS_MIN
 #undef CLASH_BOT_CLASS_SHARE
 #undef CLASH_BOT_HEAVY_PREFERENCE
 #undef CLASH_BOT_FLANK_DISTANCE

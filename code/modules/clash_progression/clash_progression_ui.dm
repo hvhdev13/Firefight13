@@ -139,13 +139,8 @@
 			return gate["level"]
 		if(CLASH_GATE_CLASS)
 			return clash_class_gear_level(class, gate["gear"]) || CLASH_LEVEL_CAP
-		if(CLASH_GATE_TWIN)
-			return max(gate["level"], clash_class_gear_level(class, gate["gear"]) || CLASH_LEVEL_CAP)
 		if(CLASH_GATE_CLASS_LEVEL)
 			return gate["level"]
-		if(CLASH_GATE_CARRIER)
-			var/by_xp = progress.level_from_xp(gate["xp"], CLASH_FACTION_XP_BASE)
-			return gate["level"] ? min(gate["level"], by_xp) : by_xp
 	return 1
 
 /proc/clash_gun_progress(datum/clash_progress/progress, gun_type)
@@ -191,13 +186,9 @@
 			continue
 		var/list/entry = progress.classes[class]
 		classes += list(list("id" = class, "name" = GLOB.clash_class_names[class], "level" = progress.class_level(class), "xp" = entry ? entry["xp"] : 0))
-	var/list/carriers = list()
-	for(var/family in GLOB.clash_carrier_tracks)
-		var/list/entry = progress.carriers[family]
-		carriers += list(list("id" = family, "family" = capitalize(GLOB.clash_family_names[family]), "step" = progress.carrier_step(family), "steps" = length(GLOB.clash_carrier_tracks[family]), "xp" = entry ? entry["xp"] : 0))
 	var/list/weapons = list()
 	for(var/gun_type in GLOB.clash_weapon_tracks)
 		var/obj/item/weapon/gun/gun = gun_type
 		var/list/entry = progress.weapons["[gun_type]"]
 		weapons += list(list("type" = "[gun_type]", "name" = initial(gun.name), "level" = progress.weapon_level(gun_type), "max" = length(GLOB.clash_weapon_tracks[gun_type]) + 1, "xp" = entry ? entry["xp"] : 0, "mastery" = entry ? clamp(entry["xp"] / CLASH_WEAPON_MASTERY_XP, 0, 1) : 0, "mastered" = !!entry?["mastered"]))
-	return list("factions" = factions, "classes" = classes, "carriers" = carriers, "weapons" = weapons)
+	return list("factions" = factions, "classes" = classes, "weapons" = weapons)

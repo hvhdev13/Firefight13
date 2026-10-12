@@ -36,14 +36,6 @@ export interface ProgressClass {
   xp: number;
 }
 
-export interface ProgressCarrier {
-  id: string;
-  family: string;
-  step: number;
-  steps: number;
-  xp: number;
-}
-
 export interface ProgressWeapon {
   type: string;
   name: string;
@@ -57,7 +49,6 @@ export interface ProgressWeapon {
 export interface CareerProgress {
   factions: ProgressFaction[];
   classes: ProgressClass[];
-  carriers: ProgressCarrier[];
   weapons: ProgressWeapon[];
 }
 
@@ -204,26 +195,6 @@ export const ProgressionView = (props: {
           />
         ))}
       </div>
-      <table className="ClashStats__table">
-        <thead>
-          <tr>
-            <th className="ClashStats__nameCol">Ammo carriers</th>
-            <th>Unlocked</th>
-            <th>XP</th>
-          </tr>
-        </thead>
-        <tbody>
-          {progress.carriers.map((carrier) => (
-            <tr key={carrier.id}>
-              <td className="ClashStats__nameCol">{carrier.family} ammo</td>
-              <td>
-                {carrier.step} of {carrier.steps}
-              </td>
-              <td>{carrier.xp.toLocaleString('en-US')}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
       <table className="ClashStats__table">
         <thead>
           <tr>

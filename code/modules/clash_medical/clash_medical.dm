@@ -217,6 +217,10 @@ GLOBAL_LIST_INIT(clash_medic_stripped_items, list(
 		for(var/count in 1 to stock[item_type])
 			new item_type(holder)
 
+/proc/clash_overdose_limit(datum/reagent/dose)
+	var/list/limits = clash_fast_medicine() ? GLOB.clash_med_overdose[dose.id] : null
+	return limits ? limits[1] : dose.overdose
+
 /mob/living/carbon/human/var/datum/weakref/clash_care_medic
 /mob/living/carbon/human/var/clash_care_until = 0
 
