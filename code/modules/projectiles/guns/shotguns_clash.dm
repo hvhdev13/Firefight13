@@ -1,9 +1,13 @@
 #define CLASH_SPENT_SHELL_LIFETIME (1 MINUTES)
 #define CLASH_SPENT_SHELL_FALL (3 DECISECONDS)
+#define CLASH_PUMP_HEARD_RANGE 7
 
 /obj/item/weapon/gun/shotgun/pump/var/clash_pump_recovery = 1.2 SECONDS
 /obj/item/weapon/gun/shotgun/pump/var/clash_pump_back_sound
 /obj/item/weapon/gun/shotgun/pump/var/clash_pump_volume = 10
+/obj/item/weapon/gun/shotgun/pump/var/clash_pump_heard_volume = 10
+/obj/item/weapon/gun/shotgun/pump/var/clash_pump_recoil = 0
+/obj/item/weapon/gun/shotgun/pump/var/clash_pump_stroke = 0
 /obj/item/weapon/gun/shotgun/pump/var/clash_racking = FALSE
 /obj/item/weapon/gun/shotgun/pump/var/clash_spent_shell = FALSE
 
@@ -37,19 +41,38 @@
 	if(clash_racking)
 		return
 	clash_racking = TRUE
-	playsound(user, clash_pump_back_sound, clash_pump_volume, FALSE)
+	var/wait = last_fired + clash_pump_recoil - world.time
+	if(wait > 0)
+		addtimer(CALLBACK(src, PROC_REF(clash_rack_start), user), wait)
+	else
+		clash_rack_start(user)
+
+/obj/item/weapon/gun/shotgun/pump/proc/clash_rack_start(mob/user)
+	if(QDELETED(user) || loc != user || pumped)
+		clash_racking = FALSE
+		return
+	clash_pump_sound(user, clash_pump_back_sound)
 	if(clash_spent_shell)
 		clash_eject_shell(user)
-	addtimer(CALLBACK(src, PROC_REF(clash_rack_forward), user), clash_pump_recovery)
+	addtimer(CALLBACK(src, PROC_REF(clash_rack_forward), user), clash_pump_stroke)
 
 /obj/item/weapon/gun/shotgun/pump/proc/clash_rack_forward(mob/user)
 	clash_racking = FALSE
 	if(QDELETED(user) || loc != user || pumped)
 		return
-	playsound(user, pump_sound, clash_pump_volume, FALSE)
+	clash_pump_sound(user, pump_sound)
 	ready_shotgun_tube()
 	pumped = !!in_chamber
 	recent_pump = world.time
+
+/obj/item/weapon/gun/shotgun/pump/proc/clash_pump_sound(mob/user, sound_file)
+	var/turf/source = get_turf(user)
+	for(var/client/listener as anything in GLOB.clients)
+		var/mob/hearer = listener.mob
+		if(hearer == user)
+			playsound_client(listener, sound_file, user, clash_pump_volume)
+		else if(hearer?.z == source?.z && get_dist(hearer, source) <= CLASH_PUMP_HEARD_RANGE)
+			playsound_client(listener, sound_file, user, clash_pump_heard_volume)
 
 /obj/item/weapon/gun/shotgun/pump/pump_shotgun(mob/user)
 	. = ..()
@@ -88,14 +111,17 @@
 	fire_sound = 'sound/weapons/gun_type23_heavy.ogg'
 	pump_sound = 'sound/weapons/shotgunpump_forward_heavy.ogg'
 	clash_pump_back_sound = 'sound/weapons/shotgunpump_back_heavy.ogg'
-	clash_pump_volume = 30
+	clash_pump_volume = 22
+	clash_pump_heard_volume = 12
+	clash_pump_recoil = 0.8 SECONDS
+	clash_pump_stroke = 0.45 SECONDS
 	reload_sound = 'sound/weapons/shell_load1_heavy.ogg'
 	current_mag = /obj/item/ammo_magazine/internal/shotgun/type23/pump
 	flags_gun_features = /obj/item/weapon/gun/shotgun/type23::flags_gun_features
 	map_specific_decoration = FALSE
 	gauge = /obj/item/weapon/gun/shotgun/type23::gauge
 	starting_attachment_types = list(/obj/item/attachable/stock/type23)
-	clash_pump_recovery = 1.1 SECONDS
+	clash_pump_recovery = 1.35 SECONDS
 
 /obj/item/weapon/gun/shotgun/pump/type23/Initialize(mapload, spawn_empty)
 	attachable_allowed = get_clash_gun_attachables(/obj/item/weapon/gun/shotgun/type23).Copy()
@@ -117,3 +143,4 @@
 
 #undef CLASH_SPENT_SHELL_LIFETIME
 #undef CLASH_SPENT_SHELL_FALL
+#undef CLASH_PUMP_HEARD_RANGE
