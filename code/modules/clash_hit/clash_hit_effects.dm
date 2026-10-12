@@ -114,6 +114,7 @@ GLOBAL_LIST_INIT(clash_hit_zone_heights, list(
 	backspray.pixel_y = ring.pixel_y
 
 #define CLASH_HIT_MARKER_FRAMES 3
+#define CLASH_HIT_MARKER_STEP (0.5 DECISECONDS)
 #define CLASH_HIT_MARKER_SIZE 64
 #define CLASH_HIT_MARKER_MEDIUM 25
 #define CLASH_HIT_MARKER_HEAVY 50
@@ -124,7 +125,7 @@ GLOBAL_LIST_INIT(clash_hit_zone_heights, list(
 
 GLOBAL_LIST_EMPTY(clash_hit_marker_cursors)
 GLOBAL_LIST_INIT(clash_hit_marker_states, list("ff", "hit", "down", "kill"))
-GLOBAL_LIST_INIT(clash_hit_marker_times, list(5 DECISECONDS, 5 DECISECONDS, 7 DECISECONDS, 9 DECISECONDS))
+GLOBAL_LIST_INIT(clash_hit_marker_times, list(3 DECISECONDS, 3 DECISECONDS, 5 DECISECONDS, 7 DECISECONDS))
 GLOBAL_LIST_INIT(clash_hit_marker_sounds, list(null, null, 'sound/weapons/gun_xm88_directhit_high.ogg', 'sound/weapons/gun_xm88_directhit_low.ogg'))
 
 /client/var/clash_marker_base
@@ -200,7 +201,7 @@ GLOBAL_LIST_INIT(clash_hit_marker_sounds, list(null, null, 'sound/weapons/gun_xm
 	player.clash_marker_seq++
 	clash_hit_marker_frame(player, player.clash_marker_seq, 1)
 	for(var/frame in 2 to CLASH_HIT_MARKER_FRAMES)
-		addtimer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(clash_hit_marker_frame), player, player.clash_marker_seq, frame), frame - 1)
+		addtimer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(clash_hit_marker_frame), player, player.clash_marker_seq, frame), (frame - 1) * CLASH_HIT_MARKER_STEP)
 	addtimer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(clash_clear_hit_marker), player), duration)
 
 /proc/clash_hit_marker_frame(client/player, seq, frame)
@@ -233,6 +234,7 @@ GLOBAL_LIST_INIT(clash_hit_marker_sounds, list(null, null, 'sound/weapons/gun_xm
 	player.clash_marker_kind = 0
 
 #undef CLASH_HIT_MARKER_FRAMES
+#undef CLASH_HIT_MARKER_STEP
 #undef CLASH_HIT_MARKER_SIZE
 #undef CLASH_HIT_MARKER_MEDIUM
 #undef CLASH_HIT_MARKER_HEAVY
