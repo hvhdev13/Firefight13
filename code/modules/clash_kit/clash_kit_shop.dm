@@ -6,8 +6,8 @@ GLOBAL_LIST_INIT(clash_role_shop_ammo, list(
 ))
 
 GLOBAL_LIST_INIT(clash_shop_shells, list(
-	/obj/item/ammo_magazine/shotgun/buckshot = list(/obj/item/ammo_magazine/handful/shotgun/buckshot, /obj/item/ammo_magazine/handful/shotgun/slug, /obj/item/ammo_magazine/handful/shotgun/flechette),
-	/obj/item/ammo_magazine/shotgun/heavy/buckshot = list(/obj/item/ammo_magazine/handful/shotgun/heavy/buckshot, /obj/item/ammo_magazine/handful/shotgun/heavy/slug, /obj/item/ammo_magazine/handful/shotgun/heavy/flechette),
+	/obj/item/ammo_magazine/shotgun/buckshot = list(/obj/item/ammo_magazine/handful/shotgun/buckshot, /obj/item/ammo_magazine/handful/shotgun/slug),
+	/obj/item/ammo_magazine/shotgun/heavy/buckshot = list(/obj/item/ammo_magazine/handful/shotgun/heavy/buckshot, /obj/item/ammo_magazine/handful/shotgun/heavy/slug),
 ))
 
 GLOBAL_LIST_INIT(clash_shop_hidden_types, list(
@@ -499,7 +499,6 @@ GLOBAL_LIST_INIT(clash_clothing_role_extras, list(
 GLOBAL_LIST_INIT(clash_rack_dropped_categories, list(MARINE_CAN_BUY_ESSENTIALS, MARINE_CAN_BUY_KIT))
 
 GLOBAL_LIST_INIT(clash_gun_rack_ammo, list(
-	/obj/item/ammo_magazine/shotgun/flechette,
 	/obj/item/ammo_magazine/shotgun/buckshot,
 	/obj/item/ammo_magazine/shotgun/slugs,
 	/obj/item/ammo_magazine/rifle/m4ra,
@@ -519,7 +518,6 @@ GLOBAL_LIST_INIT(clash_gun_rack_ammo, list(
 //	/obj/item/ammo_magazine/smg/bizon,
 	/obj/item/ammo_magazine/shotgun/heavy/buckshot,
 	/obj/item/ammo_magazine/shotgun/heavy/slug,
-	/obj/item/ammo_magazine/shotgun/heavy/flechette,
 	/obj/item/ammo_magazine/pistol/t73,
 	/obj/item/ammo_magazine/revolver/upp,
 	/obj/item/ammo_magazine/pistol/np92,

@@ -188,6 +188,8 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 				var/id = replacetext(replacetext(stored["choices"][slot], "/obj/item/storage/pouch/firstaid/ert", "/obj/item/storage/pouch/firstaid/clash"), "/obj/item/storage/pouch/bayonet/upp", "/obj/item/storage/pouch/bayonet")
 				if(findtext(id, "/obj/item/storage/large_holster/m37") == length(id) - length("/obj/item/storage/large_holster/m37") + 1)
 					id += "/clash"
+				for(var/old_type in GLOB.clash_weapon_renames)
+					id = replacetext(id, "[old_type]", "[GLOB.clash_weapon_renames[old_type]]")
 				if(id == CLASH_KIT_NOTHING && (slot in GLOB.clash_kit_slots))
 					kit.choices[slot] = id
 					continue
@@ -706,7 +708,7 @@ GLOBAL_LIST_EMPTY(clash_kit_forced_items)
 
 /proc/clash_kit_load_shells(obj/item/weapon/gun/shotgun/shotgun, datum/clash_kit/kit)
 	var/list/shells = clash_kit_shells_for(shotgun)
-	var/obj/item/ammo_magazine/handful/shell_type = shells?[kit.fills[CLASH_KIT_GUN_FILL]]
+	var/obj/item/ammo_magazine/handful/shell_type = shells?[kit.fills[CLASH_KIT_GUN_FILL] || GLOB.clash_kit_shell_names[1]]
 	if(!shell_type || !shotgun.current_mag || shotgun.in_chamber)
 		return
 	shotgun.current_mag.default_ammo = initial(shell_type.default_ammo)

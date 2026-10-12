@@ -82,21 +82,13 @@ GLOBAL_LIST_INIT(clash_kit_shells, list(
 	"12g" = list(
 		"Buckshot" = /obj/item/ammo_magazine/handful/shotgun/buckshot,
 		"Slug" = /obj/item/ammo_magazine/handful/shotgun/slug,
-		"Flechette" = /obj/item/ammo_magazine/handful/shotgun/flechette,
 	),
 	"8g" = list(
 		"Buckshot" = /obj/item/ammo_magazine/handful/shotgun/heavy/buckshot,
 		"Slug" = /obj/item/ammo_magazine/handful/shotgun/heavy/slug,
-		"Flechette" = /obj/item/ammo_magazine/handful/shotgun/heavy/flechette,
 	),
 ))
-GLOBAL_LIST_INIT(clash_kit_shell_names, list("Buckshot", "Slug", "Flechette"))
-
-/proc/clash_arena_ammo_setup()
-	for(var/ammo_type in GLOB.ammo_list)
-		if(ispath(ammo_type, /datum/ammo/bullet/shotgun/heavy))
-			var/datum/ammo/ammo = GLOB.ammo_list[ammo_type]
-			ammo.damage += 1
+GLOBAL_LIST_INIT(clash_kit_shell_names, list("Buckshot", "Slug"))
 
 /obj/item/weapon/gun/var/clash_burst_default = FALSE
 
@@ -265,6 +257,10 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 /proc/get_clash_kit_option(id)
 	return id ? GLOB.clash_kit_options[id] : null
 
+GLOBAL_LIST_INIT(clash_kit_blocked_attachments, list(
+	/obj/item/weapon/gun/shotgun/type23 = list(/obj/item/attachable/burstfire_assembly),
+))
+
 /proc/get_clash_gun_attachables(gun_type)
 	if(!gun_type)
 		return list()
@@ -272,6 +268,7 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 	if(isnull(allowed))
 		var/obj/item/weapon/gun/gun = new gun_type
 		allowed = gun.attachable_allowed?.Copy() || list()
+		allowed -= GLOB.clash_kit_blocked_attachments[gun_type]
 		GLOB.clash_kit_gun_attachables[gun_type] = allowed
 		qdel(gun)
 	return allowed
@@ -401,8 +398,8 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 /obj/item/storage/large_holster/m37/clash_upp
 	name = "\improper Type 23 shotgun scabbard"
 	desc = "A large leather holster fitted for the Type 23 shotgun. It has harnesses that allow it to be secured to the back for easy storage."
-	can_hold = list(/obj/item/weapon/gun/shotgun/type23)
-	bypass_w_limit = list(/obj/item/weapon/gun/shotgun/type23)
+	can_hold = list(/obj/item/weapon/gun/shotgun/type23, /obj/item/weapon/gun/shotgun/pump/type23)
+	bypass_w_limit = list(/obj/item/weapon/gun/shotgun/type23, /obj/item/weapon/gun/shotgun/pump/type23)
 
 /obj/item/storage/belt/gun/utility/clash/fill_preset_inventory()
 	new /obj/item/tool/screwdriver(src)
@@ -619,7 +616,7 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 	add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "Type 71 carbine", /obj/item/weapon/gun/rifle/type71/carbine, "Devastating up close, useless at range", /obj/item/ammo_magazine/rifle/type71/carbine, 4)
 	add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "AK-4047", /obj/item/weapon/gun/rifle/ak4047, "Big magazine, big kick", /obj/item/ammo_magazine/rifle/ak4047, 4)
 //	add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "Type 64 submachine gun", /obj/item/weapon/gun/smg/bizon, "Fast handling, helical magazine", /obj/item/ammo_magazine/smg/bizon, 4)
-	add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "Type 23 shotgun", /obj/item/weapon/gun/shotgun/type23, "Wins the doorway. Heavy buckshot", /obj/item/ammo_magazine/shotgun/heavy/buckshot, 4)
+	add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "Type 23 shotgun", /obj/item/weapon/gun/shotgun/pump/type23, "Wins the doorway. Heavy buckshot", /obj/item/ammo_magazine/shotgun/heavy/buckshot, 4)
 	var/datum/clash_kit_option/qyj = add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "QYJ-72 machine gun", /obj/item/weapon/gun/pkp, "Belt fed. Open the feed cover to reload", /obj/item/ammo_magazine/pkp, 4)
 	qyj.only_class = GLOB.clash_job_classes[JOB_UPP_SPECIALIST]
 	var/datum/clash_kit_option/rotary = add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "GSh-7.62 rotary machine gun", /obj/item/weapon/gun/minigun/upp, "Huge volume of fire. Slow drum change", /obj/item/ammo_magazine/minigun, 2)

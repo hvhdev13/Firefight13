@@ -43,7 +43,7 @@ GLOBAL_LIST_INIT(clash_faction_ladders, list(
 	FACTION_UPP = list(
 		list(2, /obj/item/explosive/grenade/smokebomb),
 		list(2, /obj/item/clothing/head/helmet/marine/veteran/UPP/army),
-		list(3, /obj/item/weapon/gun/shotgun/type23),
+		list(3, /obj/item/weapon/gun/shotgun/pump/type23),
 //		list(5, /obj/item/weapon/gun/smg/bizon),
 		list(7, /obj/item/weapon/gun/pistol/np92),
 		list(13, /obj/item/weapon/gun/revolver/upp),
@@ -91,7 +91,7 @@ GLOBAL_LIST_INIT(clash_class_primaries, list(
 //		CLASH_CLASS_MEDIC = list("start" = /obj/item/weapon/gun/smg/bizon, "unlocks" = list(list(2, /obj/item/weapon/gun/rifle/type71))),
 		CLASH_CLASS_MEDIC = list("start" = /obj/item/weapon/gun/rifle/ak4047),
 //		CLASH_CLASS_ENGINEER = list("start" = /obj/item/weapon/gun/shotgun/type23, "unlocks" = list(list(2, /obj/item/weapon/gun/rifle/type71/carbine), list(3, /obj/item/weapon/gun/rifle/type71), list(4, /obj/item/weapon/gun/smg/bizon)), "blocked" = list(/obj/item/weapon/gun/rifle/ak4047)),
-		CLASH_CLASS_ENGINEER = list("start" = /obj/item/weapon/gun/shotgun/type23, "unlocks" = list(list(2, /obj/item/weapon/gun/rifle/type71/carbine), list(3, /obj/item/weapon/gun/rifle/type71)), "blocked" = list(/obj/item/weapon/gun/rifle/ak4047)),
+		CLASH_CLASS_ENGINEER = list("start" = /obj/item/weapon/gun/shotgun/pump/type23, "unlocks" = list(list(2, /obj/item/weapon/gun/rifle/type71/carbine), list(3, /obj/item/weapon/gun/rifle/type71)), "blocked" = list(/obj/item/weapon/gun/rifle/ak4047)),
 		CLASH_CLASS_LEADER = list("start" = /obj/item/weapon/gun/rifle/ak4047),
 	),
 ))

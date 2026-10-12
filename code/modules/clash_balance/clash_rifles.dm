@@ -6,6 +6,7 @@ GLOBAL_LIST_INIT(clash_issued_gun_swaps, list(
 	/obj/item/weapon/gun/rifle/type71/sapper = /obj/item/weapon/gun/rifle/type71,
 	/obj/item/weapon/gun/rifle/type71/flamer = /obj/item/weapon/gun/rifle/type71,
 	/obj/item/weapon/gun/smg/bizon/upp = /obj/item/weapon/gun/rifle/type71,
+	/obj/item/weapon/gun/shotgun/type23 = /obj/item/weapon/gun/shotgun/pump/type23,
 ))
 
 /proc/clash_standard_issue_guns(mob/living/carbon/human/fighter)

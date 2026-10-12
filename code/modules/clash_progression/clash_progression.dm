@@ -89,6 +89,10 @@ GLOBAL_LIST_INIT(clash_progression_settings, list("enabled" = TRUE, "xp_multipli
 				continue
 			if(name == "factions" || name == "classes")
 				entry["best"] = min(entry["best"], CLASH_LEVEL_CAP)
+			else
+				var/renamed = GLOB.clash_weapon_renames[text2path(key)]
+				if(renamed && !saved["[renamed]"])
+					key = "[renamed]"
 			target[key] = entry
 	if(islist(decoded["seen"]))
 		seen = decoded["seen"]

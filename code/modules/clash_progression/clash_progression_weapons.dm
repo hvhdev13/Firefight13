@@ -17,6 +17,10 @@ GLOBAL_LIST_INIT(clash_attachment_groups, list(
 	list(/obj/item/attachable/bayonet),
 ))
 
+GLOBAL_LIST_INIT(clash_weapon_renames, list(
+	/obj/item/weapon/gun/shotgun/type23 = /obj/item/weapon/gun/shotgun/pump/type23,
+))
+
 GLOBAL_LIST_INIT(clash_built_in_attachments, list(
 	/obj/item/weapon/gun/rifle/lmg = list(/obj/item/attachable/bipod/m41ae2),
 ))
