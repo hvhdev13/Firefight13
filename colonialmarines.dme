@@ -2520,6 +2520,7 @@
 #include "code\modules\projectiles\guns\pistols.dm"
 #include "code\modules\projectiles\guns\revolvers.dm"
 #include "code\modules\projectiles\guns\rifles.dm"
+#include "code\modules\projectiles\guns\rifles_clash.dm"
 #include "code\modules\projectiles\guns\shotguns.dm"
 #include "code\modules\projectiles\guns\smartgun.dm"
 #include "code\modules\projectiles\guns\smgs.dm"
