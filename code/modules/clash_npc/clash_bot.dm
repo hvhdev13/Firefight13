@@ -31,6 +31,8 @@
 #define CLASH_BOT_MEDIC_SKIP (20 SECONDS)
 #define CLASH_BOT_STAGING_RANGE 3
 #define CLASH_BOT_PATIENT_HEALTH 0.6
+#define CLASH_BOT_CALM_PATIENT_HEALTH 0.8
+#define CLASH_BOT_KIT_DAMAGE 30
 #define CLASH_BOT_PATIENT_SCAN (2 SECONDS)
 #define CLASH_BOT_TREAT_DELAY (2 SECONDS)
 #define CLASH_BOT_LANE_CLOSE 50
@@ -905,7 +907,7 @@ SUBSYSTEM_DEF(clash_bots)
 		return
 	if(body.health >= body.maxHealth * CLASH_BOT_WOUNDED)
 		return
-	var/obj/item/medicine = find_medicine(body)
+	var/obj/item/medicine = medic_tool(body)
 	if(!medicine)
 		return
 	next_heal = world.time + CLASH_BOT_HEAL_DELAY
@@ -920,7 +922,10 @@ SUBSYSTEM_DEF(clash_bots)
 		holder.remove_from_storage(medicine, get_turf(body))
 	body.put_in_hands(medicine, FALSE)
 	if(medicine.loc == body)
+		var/old_zone = body.zone_selected
+		body.zone_selected = treat_zone(medicine, patient)
 		medicine.attack(patient, body)
+		body.zone_selected = old_zone
 	busy_until = 0
 	if(QDELETED(body) || body.stat == DEAD)
 		return
@@ -1012,11 +1017,22 @@ SUBSYSTEM_DEF(clash_bots)
 	if(patient.stat == DEAD)
 		if(!patient.check_tod() || !patient.is_revivable())
 			return FALSE
-	else
-		var/list/mark = GLOB.clash_medic_marks[patient]
-		if(!(mark && mark["until"]) && patient.health >= patient.maxHealth * CLASH_BOT_PATIENT_HEALTH && (clash_is_bot(patient) || !clash_has_internal_injuries(patient)))
-			return FALSE
+	else if(!patient_hurt(patient))
+		return FALSE
 	return !!medic_tool(patient)
+
+/datum/clash_bot/proc/patient_hurt(mob/living/carbon/human/patient)
+	var/list/mark = GLOB.clash_medic_marks[patient]
+	if((mark && mark["until"]) || patient.health < patient.maxHealth * CLASH_BOT_PATIENT_HEALTH || (!clash_is_bot(patient) && clash_has_internal_injuries(patient)))
+		return TRUE
+	var/obj/limb/worst = clash_treat_target(patient)
+	if(worst && clash_limb_bleeding(worst) && find_dressing(worst))
+		return TRUE
+	if(contact_recent())
+		return FALSE
+	if(patient.health < patient.maxHealth * CLASH_BOT_CALM_PATIENT_HEALTH || find_injector(patient, FALSE))
+		return TRUE
+	return clash_splint_target(patient) && (locate(/obj/item/stack/medical/splint) in body.get_contents())
 
 /datum/clash_bot/proc/find_patient()
 	var/mob/living/carbon/human/best
@@ -1037,15 +1053,56 @@ SUBSYSTEM_DEF(clash_bots)
 		for(var/obj/item/reagent_container/hypospray/autoinjector/clash_fixall/fixall in body.get_contents())
 			if(fixall.uses_left > 0)
 				return fixall
-	return find_medicine(patient)
+	var/obj/item/injector = find_injector(patient, TRUE)
+	if(injector && patient.health < patient.maxHealth * CLASH_BOT_PATIENT_HEALTH)
+		return injector
+	var/obj/limb/worst = clash_treat_target(patient)
+	var/obj/item/dressing
+	if(worst)
+		dressing = find_dressing(worst)
+		if(dressing && clash_limb_bleeding(worst))
+			return dressing
+	if(clash_splint_target(patient))
+		var/obj/item/stack/medical/splint/splint = locate() in body.get_contents()
+		if(splint)
+			return splint
+	return dressing || injector || find_injector(patient, FALSE)
 
-/datum/clash_bot/proc/find_medicine(mob/living/carbon/human/patient)
+/datum/clash_bot/proc/find_injector(mob/living/carbon/human/patient, healing)
+	var/damaged = patient.getBruteLoss() + patient.getFireLoss() > 0
+	var/in_pain = patient.pain.pain_level >= PAIN_LEVEL_DISTRESSING
 	for(var/obj/item/reagent_container/hypospray/autoinjector/shot in body.get_contents())
-		if(shot.uses_left > 0 && !istype(shot, /obj/item/reagent_container/hypospray/autoinjector/clash_fixall) && !would_overdose(shot, patient))
+		if(shot.uses_left <= 0 || istype(shot, /obj/item/reagent_container/hypospray/autoinjector/clash_fixall) || would_overdose(shot, patient))
+			continue
+		var/heals = FALSE
+		var/already_in = FALSE
+		for(var/datum/reagent/dose as anything in shot.reagents.reagent_list)
+			if(GLOB.clash_med_bursts[dose.id])
+				heals = TRUE
+			if(patient.reagents.get_reagent_amount(dose.id))
+				already_in = TRUE
+		if(healing ? (heals && damaged) : (!heals && in_pain && !already_in))
 			return shot
-	for(var/obj/item/stack/medical/dressing in body.get_contents())
-		return dressing
 	return null
+
+/datum/clash_bot/proc/find_dressing(obj/limb/limb)
+	var/want_kit = limb.brute_dam + limb.burn_dam >= CLASH_BOT_KIT_DAMAGE
+	var/obj/item/stack/medical/fallback
+	for(var/obj/item/stack/medical/pack in body.get_contents())
+		if(istype(pack, /obj/item/stack/medical/splint))
+			continue
+		if(istype(pack, /obj/item/stack/medical/advanced) == want_kit)
+			return pack
+		fallback = pack
+	return fallback
+
+/datum/clash_bot/proc/treat_zone(obj/item/medicine, mob/living/carbon/human/patient)
+	var/obj/limb/limb
+	if(istype(medicine, /obj/item/stack/medical/splint))
+		limb = clash_splint_target(patient)
+	else if(istype(medicine, /obj/item/stack/medical))
+		limb = clash_treat_target(patient)
+	return limb ? limb.name : "chest"
 
 /datum/clash_bot/proc/would_overdose(obj/item/reagent_container/hypospray/autoinjector/shot, mob/living/carbon/human/patient)
 	if(!shot.reagents.total_volume)
@@ -1465,6 +1522,8 @@ SUBSYSTEM_DEF(clash_bots)
 #undef CLASH_BOT_MEDIC_SKIP
 #undef CLASH_BOT_STAGING_RANGE
 #undef CLASH_BOT_PATIENT_HEALTH
+#undef CLASH_BOT_CALM_PATIENT_HEALTH
+#undef CLASH_BOT_KIT_DAMAGE
 #undef CLASH_BOT_PATIENT_SCAN
 #undef CLASH_BOT_TREAT_DELAY
 #undef CLASH_BOT_LANE_CLOSE
