@@ -515,6 +515,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		"is_viewer" = viewer.ckey && (entry ? entry["ckey"] == viewer.ckey : player?.ckey == viewer.ckey),
 		"mvp" = !!leader && name == leader,
 		"level" = clash_scoreboard_level(entry ? entry["ckey"] : player?.ckey, entry ? entry["faction"] : player?.faction),
+		"veteran" = fighter && clash_veteran_rank(entry ? entry["ckey"] : player?.ckey, fighter.job),
 	)
 
 /datum/game_mode/extended/faction_clash/hvh/proc/get_killfeed_line(list/entry, mob/viewer)

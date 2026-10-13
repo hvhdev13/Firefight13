@@ -20,6 +20,7 @@ interface Row {
   is_viewer: BooleanLike;
   mvp: BooleanLike;
   level?: number;
+  veteran?: string;
 }
 
 interface Team {
@@ -322,9 +323,17 @@ const TeamTable = (props: {
                     </span>
                   )}
                 </div>
-                {row.role && (
-                  <div className="ClashScoreboard__role">{row.role}</div>
-                )}
+                {row.role &&
+                  (row.veteran ? (
+                    <div
+                      className="ClashScoreboard__role ClashScoreboard__role--veteran"
+                      title={row.veteran}
+                    >
+                      <Icon name="medal" /> Veteran {row.role}
+                    </div>
+                  ) : (
+                    <div className="ClashScoreboard__role">{row.role}</div>
+                  ))}
               </td>
               <td className="ClashScoreboard__kills">{row.kills}</td>
               {showBotKills && <td>{row.bot_kills}</td>}

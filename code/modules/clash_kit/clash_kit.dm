@@ -866,6 +866,7 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 	clash_swap_extended_magazines(wearer)
 	if(mode != CLASH_KIT_PREVIEW)
 		clash_engrave_guns(wearer, ckey)
+	clash_pin_veteran_medal(wearer, ckey, job)
 	clash_strip_locked_attachments(wearer, ckey)
 	clash_strip_locked_grenades(wearer, ckey, job)
 	if(mode != CLASH_KIT_RESET && clash_has_perk(wearer, /datum/clash_perk/extra_grenade))
