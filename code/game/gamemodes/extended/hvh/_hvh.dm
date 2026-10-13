@@ -1522,6 +1522,7 @@ GLOBAL_VAR(clash_start_mode)
 		idle_timer_id = addtimer(CALLBACK(src, PROC_REF(check_idle)), idle_check_time, TIMER_LOOP|TIMER_STOPPABLE)
 	open_first_match()
 	if(arena_rules)
+		clash_kit_reset_previews()
 		clash_arena_med_supply()
 		clash_arena_engineering_setup()
 		clash_arena_remove_attachment_vendors()
@@ -1827,6 +1828,13 @@ GLOBAL_VAR(clash_start_mode)
 	var/path = "data/hvh_stats/round_[GLOB.round_id || world.time].json"
 	WRITE_FILE(file(path), json_encode(payload))
 	log_debug("HVH: stats exported to [path], [length(players)] players, [length(weapons)] weapons")
+
+/proc/clash_pregame_mode_type()
+	if(SSticker.mode)
+		return null
+	for(var/datum/game_mode/extended/faction_clash/hvh/mode_type as anything in typesof(/datum/game_mode/extended/faction_clash/hvh))
+		if(initial(mode_type.config_tag) == GLOB.master_mode)
+			return mode_type
 
 #undef KILLFEED_FADE
 #undef KILLFEED_PUSH_FADE

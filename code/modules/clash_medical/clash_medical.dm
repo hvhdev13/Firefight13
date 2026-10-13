@@ -87,7 +87,10 @@ GLOBAL_LIST_INIT(clash_adv_firstaid_stock, list(
 
 /proc/clash_fast_medicine()
 	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
-	return istype(clash_mode) && clash_mode.arena_rules
+	if(istype(clash_mode))
+		return clash_mode.arena_rules
+	var/datum/game_mode/extended/faction_clash/hvh/pending = clash_pregame_mode_type()
+	return pending && initial(pending.arena_rules)
 
 /proc/clash_health_percent(mob/living/fighter)
 	if(!ishuman(fighter) || !clash_fast_medicine())
