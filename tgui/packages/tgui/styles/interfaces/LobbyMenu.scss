@@ -1,14 +1,421 @@
-.LobbyScreen.crtTheme {
-  &.filterEnabled {
-    box-shadow: 0 0 15px;
+$ticker-height: 48px;
+
+.LobbyScreen {
+  font-family: chakrapetch-bold;
+  line-height: 100%;
+  font-size: large;
+
+  background-position: 'center';
+  background-size: 'cover';
+
+  --uscm: 0;
+  --upp: 0;
+  --glitch: 0;
+
+  &.Layout__content.Window__content::before {
+    display: none;
+  }
+
+  .feedBackdrop {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    background: hsl(0, 0%, 0%);
+    font-family: chakrapetch-regular;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+
+    span {
+      color: inherit;
+      font-family: inherit;
+      font-weight: inherit;
+    }
+  }
+
+  .feedFilters {
+    position: absolute;
+    width: 0;
+    height: 0;
+  }
+
+  .feedPicture {
+    position: absolute;
+    inset: 0;
+    filter: url(#feedTone) brightness(1.15);
+  }
+
+  .feedScene,
+  .feedBloom {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .feedScene {
+    filter: url(#feedTape);
+  }
+
+  .feedBloom {
+    mix-blend-mode: screen;
+    opacity: 0.65;
+    filter: blur(3px) brightness(1.4) saturate(1.3);
+  }
+
+  .feedTint {
+    position: absolute;
+    inset: 0;
+    background: hsla(132, 38%, 25%, 0.06);
+    mix-blend-mode: color;
+  }
+
+  .feedSide {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 55%;
+    mix-blend-mode: screen;
+  }
+
+  .feedSideUscm {
+    left: 0;
+    opacity: calc(0.05 + 0.05 * var(--uscm));
+    background: radial-gradient(
+      ellipse 55% 50% at 0% 62%,
+      hsla(131, 100%, 68%, 0.55),
+      hsla(133, 54%, 51%, 0.12) 50%,
+      transparent 75%
+    );
+  }
+
+  .feedSideUpp {
+    right: 0;
+    opacity: calc(0.05 + 0.05 * var(--upp));
+    background: radial-gradient(
+      ellipse 55% 50% at 100% 68%,
+      hsla(9, 100%, 60%, 0.6),
+      hsla(3, 76%, 49%, 0.14) 50%,
+      transparent 75%
+    );
+  }
+
+  .feedNoise {
+    position: absolute;
+    inset: -420px -560px;
+    opacity: calc(0.32 + 0.14 * var(--glitch));
+    mix-blend-mode: multiply;
+    image-rendering: pixelated;
+    background-size: 560px 420px;
+  }
+
+  .feedLines {
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      hsla(0, 0%, 0%, 0.6) 0 1px,
+      transparent 1px 3px
+    );
+  }
+
+  .feedVignette {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      ellipse 72% 72% at 50% 50%,
+      transparent 55%,
+      hsla(0, 0%, 0%, 0.55)
+    );
+  }
+
+  .feedHud {
+    position: absolute;
+    inset: 0;
+    color: hsl(105, 41%, 84%);
+    font-size: clamp(12px, 1.1vw, 20px);
+  }
+
+  .feedHud,
+  .feedTicker {
+    text-shadow:
+      calc(var(--glitch) * -4px) 0 hsla(0, 100%, 58%, 0.7),
+      calc(var(--glitch) * 4px) 0 hsla(187, 100%, 58%, 0.7);
+  }
+
+  .feedCorner {
+    position: absolute;
+    width: clamp(24px, 4vw, 64px);
+    height: clamp(24px, 4vw, 64px);
+    border: clamp(2px, 0.22vw, 4px) solid hsla(105, 41%, 84%, 0.75);
+  }
+
+  .feedCornerTopLeft {
+    left: 3vw;
+    top: 3vw;
+    border-right: 0;
+    border-bottom: 0;
+  }
+
+  .feedCornerTopRight {
+    right: 3vw;
+    top: 3vw;
+    border-left: 0;
+    border-bottom: 0;
+  }
+
+  .feedCornerBottomLeft {
+    left: 3vw;
+    bottom: calc(#{$ticker-height} + 3vw);
+    border-right: 0;
+    border-top: 0;
+  }
+
+  .feedCornerBottomRight {
+    right: 3vw;
+    bottom: calc(#{$ticker-height} + 3vw);
+    border-left: 0;
+    border-top: 0;
+  }
+
+  .feedHudTopLeft {
+    position: absolute;
+    left: 4.4vw;
+    top: 4.2vw;
+  }
+
+  .feedHudTopRight {
+    position: absolute;
+    right: 4.4vw;
+    top: 4.2vw;
+    text-align: right;
+  }
+
+  .feedHudBottomRight {
+    position: absolute;
+    right: 4.4vw;
+    bottom: calc(#{$ticker-height} + 4.2vw);
+    text-align: right;
+    font-size: 0.86em;
+    line-height: 1.5;
+  }
+
+  .feedRec {
+    color: hsl(3, 100%, 59%);
+    animation: feed-blink 1.2s steps(1) infinite;
+  }
+
+  .feedCredit {
+    margin-top: 0.6em;
+    font-size: 0.86em;
+    opacity: 0;
+    animation: feed-credit 6s forwards;
+  }
+
+  .feedCompass {
+    position: absolute;
+    left: 50%;
+    top: 3.6vw;
+    width: 30vw;
+    height: 3em;
+    transform: translateX(-50%);
+    overflow: hidden;
+    font-size: 0.76em;
+    -webkit-mask-image: linear-gradient(
+      90deg,
+      transparent,
+      hsl(0, 0%, 0%) 25%,
+      hsl(0, 0%, 0%) 75%,
+      transparent
+    );
+    mask-image: linear-gradient(
+      90deg,
+      transparent,
+      hsl(0, 0%, 0%) 25%,
+      hsl(0, 0%, 0%) 75%,
+      transparent
+    );
+  }
+
+  .feedCompassStrip {
+    position: absolute;
+    left: 0;
+    top: 0;
+    white-space: nowrap;
+
+    span {
+      display: inline-block;
+      width: 3vw;
+      text-align: center;
+    }
+  }
+
+  .feedCompassNeedle {
+    position: absolute;
+    left: 50%;
+    top: 1.5em;
+    transform: translateX(-50%);
+    font-size: 0.8em;
+  }
+
+  .feedReticle {
+    position: absolute;
+    right: 13vw;
+    top: 25vw;
+    width: 7vw;
+    height: 7vw;
+    opacity: 0.45;
+
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      background: hsl(105, 41%, 84%);
+    }
+
+    &::before {
+      left: 50%;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      transform: translateX(-50%);
+      -webkit-mask-image: linear-gradient(
+        hsl(0, 0%, 0%) 38%,
+        transparent 38% 62%,
+        hsl(0, 0%, 0%) 62%
+      );
+      mask-image: linear-gradient(
+        hsl(0, 0%, 0%) 38%,
+        transparent 38% 62%,
+        hsl(0, 0%, 0%) 62%
+      );
+    }
+
+    &::after {
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 1px;
+      transform: translateY(-50%);
+      -webkit-mask-image: linear-gradient(
+        90deg,
+        hsl(0, 0%, 0%) 38%,
+        transparent 38% 62%,
+        hsl(0, 0%, 0%) 62%
+      );
+      mask-image: linear-gradient(
+        90deg,
+        hsl(0, 0%, 0%) 38%,
+        transparent 38% 62%,
+        hsl(0, 0%, 0%) 62%
+      );
+    }
+  }
+
+  .feedTicker {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: $ticker-height;
+    display: flex;
+    font-size: 18px;
+    line-height: $ticker-height;
+  }
+
+  .feedTickerTag {
+    flex: none;
+    padding: 0 14px;
+    letter-spacing: 0.08em;
+    background: linear-gradient(180deg, hsl(102, 37%, 36%), hsl(103, 39%, 22%));
+    color: hsl(0, 0%, 100%);
+  }
+
+  .feedTickerTrack {
+    flex: 1;
+    overflow: hidden;
+    background: hsla(140, 33%, 4%, 0.88);
+    border-top: 1px solid hsl(102, 37%, 36%);
+    color: hsl(100, 52%, 90%);
+  }
+
+  .feedTickerText {
+    white-space: nowrap;
+    will-change: transform;
+  }
+
+  .feedTickerCopy {
+    display: inline-block;
+    min-width: 100vw;
+  }
+
+  .feedTickerMark {
+    margin: 0 14px;
+    font-size: 0.8em;
+    vertical-align: 0.1em;
+    color: hsl(109, 55%, 62%);
+  }
+
+  .feedIntro {
+    position: absolute;
+    inset: 0;
+    z-index: 100;
+    pointer-events: none;
+    background: hsl(140, 33%, 1%);
+    animation: feed-intro 1.3s forwards;
+  }
+
+  .feedIntroNoise {
+    position: absolute;
+    inset: 0;
+    background-size: 320px 240px;
+    image-rendering: pixelated;
+    opacity: 0.35;
+  }
+
+  .feedIntroText {
+    position: absolute;
+    left: 5vw;
+    top: 5vw;
+    color: hsl(113, 57%, 69%);
+    font-size: clamp(14px, 1.6vw, 26px);
+    line-height: 1.4;
+  }
+
+  .feedControls {
+    position: absolute;
+    left: 2%;
+    bottom: calc(#{$ticker-height} + 14px);
+    display: flex;
+    gap: 6px;
+
+    .Button {
+      background-color: hsla(120, 25%, 6%, 0.85);
+      border: 1px solid hsl(110, 20%, 35%);
+      color: hsl(105, 41%, 84%);
+
+      &:not(.Button--selected):hover {
+        background-color: hsl(93, 33%, 37%);
+        color: hsl(0, 0%, 100%);
+      }
+    }
+
+    .Button.Button--selected {
+      border-color: hsl(95, 37%, 53%);
+    }
   }
 
   .typeEffect {
     overflow: hidden;
     white-space: nowrap;
     width: 0;
+    color: hsl(35, 100%, 64%);
     animation: typing 1s steps(20, end) forwards;
     animation-delay: 1.3s;
+  }
+
+  .feedName {
+    color: hsl(105, 59%, 71%);
   }
 
   .buttonEffect {
@@ -24,14 +431,35 @@
     animation-delay: 1.3s;
   }
 
-  .sectionLoad {
+  .Section.sectionLoad {
     animation: section-loading 1s forwards;
-    box-shadow: 0 0 15px;
-    background-color: hsla(120, 100%, 3%, 0.7);
+    background-color: hsla(140, 29%, 3%, 0.86);
+    border: 1px solid hsl(110, 20%, 35%);
+    box-shadow: 0 0 0 3px hsla(0, 0%, 0%, 0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .Button.distinctButton {
+    background-color: hsla(109, 24%, 18%, 0.55);
+    border: 1px solid hsl(111, 21%, 29%);
+    color: hsl(99, 49%, 88%);
+
+    &:not(.Button--selected):hover {
+      background-color: hsl(93, 33%, 37%);
+      color: hsl(0, 0%, 100%);
+    }
+
+    &.Button--selected {
+      background-color: hsl(102, 37%, 36%);
+      border-color: hsl(95, 37%, 53%);
+      color: hsl(0, 0%, 100%);
+    }
   }
 
   .dividerEffect {
     animation: typing 1s steps(20, end) forwards;
+    border-color: hsl(110, 20%, 35%);
     width: 0;
   }
 
@@ -39,6 +467,74 @@
     opacity: 0;
     animation: bg-load 10s forwards;
     animation-delay: 5s;
+  }
+
+  .bgBackground {
+    background-position: center;
+    background-size: cover;
+    position: absolute;
+  }
+
+  .authorAttrib {
+    position: absolute;
+    bottom: $ticker-height;
+    right: 0px;
+    padding: 5px;
+  }
+
+  .pred {
+    background-image: url('../assets/pred-light.svg');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 24px 24px;
+    width: 24px;
+    height: 24px;
+    margin-left: -0.25em;
+    margin-top: 0.25em;
+    margin-right: 0.25em;
+    margin-bottom: -0.25em;
+  }
+
+  .Button__content {
+    .Icon {
+      vertical-align: middle;
+      margin-bottom: 3px;
+    }
+  }
+
+  .messageHolder {
+    pointer-events: none;
+    padding-bottom: 96px;
+    box-sizing: border-box;
+  }
+
+  @keyframes feed-intro {
+    0%,
+    72% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes feed-credit {
+    0% {
+      opacity: 0;
+    }
+    5%,
+    85% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes feed-blink {
+    50% {
+      opacity: 0;
+    }
   }
 
   @keyframes bg-load {
@@ -75,118 +571,6 @@
     to {
       transform: scaleY(1);
     }
-  }
-
-  &.filterEnabled {
-    .crt {
-      &::before {
-        content: ' ';
-        display: block;
-        position: absolute;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        right: 0;
-        background:
-          linear-gradient(hsla(0, 6%, 7%, 0) 50%, hsla(0, 0%, 0%, 0.25) 50%),
-          linear-gradient(
-            90deg,
-            hsla(0, 100%, 50%, 0.06),
-            hsla(120, 100%, 50%, 0.02),
-            hsla(240, 100%, 50%, 0.06)
-          );
-        z-index: 2;
-        background-size:
-          100% 8px,
-          6px 100%;
-        pointer-events: none;
-      }
-
-      &::after {
-        content: ' ';
-        display: block;
-        position: absolute;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        right: 0;
-        background: hsla(0, 6%, 7%, 0.1);
-        opacity: 0;
-        z-index: 2;
-        pointer-events: none;
-      }
-
-      @supports (not (-webkit-hyphens: none)) and (not (-moz-appearance: none)) {
-        box-shadow: 0 0 500px 25px hsla(0, 0%, 0%, 0.9) inset;
-      }
-    }
-  }
-
-  .pred {
-    background-image: url('../assets/pred-dark.svg');
-  }
-}
-
-.theme-weyland_yutani {
-  .LobbyScreen {
-    .loadEffect {
-      height: 67px;
-    }
-
-    .sectionLoad {
-      border: 3px solid hsl(213, 30%, 31%);
-      background-color: hsla(0, 0%, 0%, 0.7);
-    }
-
-    .dividerEffect {
-      border-color: hsl(213, 30%, 31%);
-    }
-  }
-}
-
-.LobbyScreen {
-  font-family: chakrapetch-bold;
-  line-height: 100%;
-  font-size: large;
-
-  background-position: 'center';
-  background-size: 'cover';
-
-  .bgBackground {
-    background-position: center;
-    background-size: cover;
-    position: absolute;
-  }
-
-  .authorAttrib {
-    position: absolute;
-    bottom: 0px;
-    right: 0px;
-    padding: 5px;
-  }
-
-  .pred {
-    background-image: url('../assets/pred-light.svg');
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: 24px 24px;
-    width: 24px;
-    height: 24px;
-    margin-left: -0.25em;
-    margin-top: 0.25em;
-    margin-right: 0.25em;
-    margin-bottom: -0.25em;
-  }
-
-  .Button__content {
-    .Icon {
-      vertical-align: middle;
-      margin-bottom: 3px;
-    }
-  }
-
-  .messageHolder {
-    pointer-events: none;
   }
 }
 

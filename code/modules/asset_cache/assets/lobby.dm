@@ -24,6 +24,17 @@
 		"load.mp3" = 'sound/lobby/lobby_load.mp3',
 	)
 
+/datum/asset/simple/lobby_music
+	_abstract = /datum/asset/simple/lobby_music
+
+/datum/asset/simple/lobby_music/register()
+	assets[lobby_music_asset_name()] = SSticker.login_music
+	return ..()
+
+/proc/lobby_music_asset_name()
+	var/track = "[SSticker.login_music]"
+	return "lobby_music[copytext(track, findlasttext(track, "."))]"
+
 /datum/asset/simple/restart_animation
 	assets = list(
 		"loading" = 'html/lobby/loading.gif'

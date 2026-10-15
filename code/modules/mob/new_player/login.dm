@@ -81,10 +81,22 @@
 
 	.["preference_issues"] = client.prefs.errors
 
+	.["lobby_music_on"] = !!(client.prefs.toggles_sound & SOUND_LOBBY)
+	var/datum/clash_progress/progress = clash_progress_of(client.ckey)
+	.["lobby_effects"] = progress ? progress.lobby_effects : TRUE
+	.["lobby_news"] = clash_lobby_news()
+	.["lobby_music_volume"] = client.prefs.toggles_sound & SOUND_LOBBY && SSticker.current_state != GAME_STATE_FINISHED ? client.prefs.volume_preferences[VOLUME_LOBBY] * 0.7 : 0
+
 /mob/new_player/ui_static_data(mob/user)
 	. = ..()
 
 	.["lobby_author"] = SSlobby_art.author
+	.["lobby_map"] = uppertext(SSmapping.configs?[GROUND_MAP]?.map_name)
+
+	if(SSticker.login_music)
+		.["lobby_music"] = lobby_music_asset_name()
+		.["lobby_music_beats"] = SSticker.login_music_beats
+		.["lobby_music_credit"] = GLOB.lobby_music_credits["[SSticker.login_music]"]
 
 /mob/new_player/ui_assets(mob/user)
 	. = ..()
@@ -94,6 +106,19 @@
 
 	if(SSlobby_art.initialized)
 		. += get_asset_datum(/datum/asset/simple/lobby_art)
+
+	if(SSticker.login_music)
+		. += get_asset_datum(/datum/asset/simple/lobby_music)
+
+/mob/new_player/proc/refresh_lobby()
+	var/datum/tgui/ui = SStgui.get_open_ui(src, src)
+	if(!ui)
+		return
+
+	for(var/datum/asset/asset as anything in ui_assets(src))
+		lobby_window.send_asset(asset)
+	ui.refresh_cooldown = FALSE
+	ui.send_full_update(force = TRUE)
 
 /mob/new_player/ui_act(action, list/params, datum/tgui/ui, datum/ui_state/state)
 	. = ..()
@@ -105,6 +130,14 @@
 
 		if("clash_loadout")
 			open_clash_kit_screen(src)
+			return TRUE
+
+		if("toggle_lobby_music")
+			client.toggletitlemusic()
+			return TRUE
+
+		if("toggle_lobby_effects")
+			clash_toggle_lobby_effects()
 			return TRUE
 
 		if("preferences")

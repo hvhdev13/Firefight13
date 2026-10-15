@@ -51,11 +51,9 @@ CLIENT_VERB(toggletitlemusic)
 	prefs.save_preferences()
 	if(prefs.toggles_sound & SOUND_LOBBY)
 		to_chat(src, SPAN_BOLDNOTICE("You will now hear music in the game lobby."))
-		if(istype(mob, /mob/new_player))
-			playtitlemusic()
 	else
 		to_chat(src, SPAN_BOLDNOTICE("You will no longer hear music in the game lobby."))
-		src << sound(null, repeat = 0, wait = 0, volume = 85, channel = SOUND_CHANNEL_LOBBY) // stop the jamsz
+	playtitlemusic()
 
 CLIENT_VERB(togglerebootsound)
 	set name = "Hear/Silence Reboot Sound"
