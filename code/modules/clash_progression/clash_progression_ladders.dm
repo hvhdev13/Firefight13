@@ -246,6 +246,7 @@ GLOBAL_LIST_EMPTY(clash_option_gates)
 	return class && "[GLOB.clash_class_names[class]] level [CLASH_LEVEL_CAP]"
 
 /obj/item/clothing/accessory/medal/gold/clash_veteran
+	name = "veteran medal"
 	icon_state = "gold_star"
 	overlay_state = "gold_star"
 
