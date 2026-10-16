@@ -281,9 +281,14 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 			addtimer(CALLBACK(src, PROC_REF(match_countdown_beep), match, FALSE), round_time_limit - seconds_left SECONDS)
 	if(!arena_rules && match_number >= matches_per_round)
 		vote_timer_id = addtimer(CALLBACK(src, PROC_REF(start_round_votes)), max(1, round_time_limit - CLASH_VOTE_LEAD), TIMER_STOPPABLE)
+	start_clash_huds()
+	log_debug("HVH: match [match_number] timer armed for [round_time_limit / 600] minutes")
+
+/datum/game_mode/extended/faction_clash/hvh/proc/start_clash_huds()
 	if(!radar_timer_id)
 		start_clash_radar()
-	log_debug("HVH: match [match_number] timer armed for [round_time_limit / 600] minutes")
+	if(arena_rules && !ammo_timer_id)
+		start_clash_ammo_counters()
 
 /datum/game_mode/extended/faction_clash/hvh/proc/get_display_match()
 	if(match_live || intermission_end_time || round_finished)
@@ -303,6 +308,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	begin_countdown()
 
 /datum/game_mode/extended/faction_clash/hvh/proc/begin_countdown()
+	start_clash_huds()
 	if(!countdown_time)
 		start_match()
 		return
@@ -561,6 +567,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		"is_viewer" = viewer.ckey && (entry ? entry["ckey"] == viewer.ckey : player?.ckey == viewer.ckey),
 		"mvp" = !!leader && name == leader,
 		"level" = clash_scoreboard_level(entry ? entry["ckey"] : player?.ckey, entry ? entry["faction"] : player?.faction),
+		"veteran" = fighter && clash_veteran_rank(entry ? entry["ckey"] : player?.ckey, fighter.job),
 	)
 
 /datum/game_mode/extended/faction_clash/hvh/proc/get_killfeed_line(list/entry, mob/viewer)
@@ -1565,8 +1572,12 @@ GLOBAL_VAR(clash_start_mode)
 /datum/game_mode/extended/faction_clash/hvh/get_roles_list()
 	return arena_rules ? GLOB.clash_arena_roles : GLOB.ROLES_CM_VS_UPP
 
+/datum/game_mode/extended/faction_clash/hvh/check_predator_late_join(mob/pred_candidate, show_warning = TRUE)
+	return FALSE
+
 /datum/game_mode/extended/faction_clash/hvh/post_setup()
 	. = ..()
+	flags_round_type &= ~MODE_PREDATOR
 	for(var/hivenumber in GLOB.hive_datum)
 		var/datum/hive_status/hive = GLOB.hive_datum[hivenumber]
 		hive.UnregisterSignal(SSdcs, COMSIG_GLOB_POST_SETUP)
@@ -1576,6 +1587,7 @@ GLOBAL_VAR(clash_start_mode)
 		idle_timer_id = addtimer(CALLBACK(src, PROC_REF(check_idle)), idle_check_time, TIMER_LOOP|TIMER_STOPPABLE)
 	open_first_match()
 	if(arena_rules)
+		clash_kit_reset_previews()
 		clash_arena_med_supply()
 		clash_arena_engineering_setup()
 		clash_arena_remove_attachment_vendors()
@@ -1881,6 +1893,13 @@ GLOBAL_VAR(clash_start_mode)
 	var/path = "data/hvh_stats/round_[GLOB.round_id || world.time].json"
 	WRITE_FILE(file(path), json_encode(payload))
 	log_debug("HVH: stats exported to [path], [length(players)] players, [length(weapons)] weapons")
+
+/proc/clash_pregame_mode_type()
+	if(SSticker.mode)
+		return null
+	for(var/datum/game_mode/extended/faction_clash/hvh/mode_type as anything in typesof(/datum/game_mode/extended/faction_clash/hvh))
+		if(initial(mode_type.config_tag) == GLOB.master_mode)
+			return mode_type
 
 #undef KILLFEED_FADE
 #undef KILLFEED_PUSH_FADE

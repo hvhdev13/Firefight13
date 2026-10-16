@@ -32,6 +32,14 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 	var/datum/clash_kit_screen/screen = user.ckey && GLOB.clash_kit_screens[user.ckey]
 	return screen && SStgui.get_open_ui(user, screen)
 
+/proc/clash_kit_reset_previews()
+	GLOB.clash_kit_issue_items.Cut()
+	for(var/ckey in GLOB.clash_kit_screens)
+		var/datum/clash_kit_screen/screen = GLOB.clash_kit_screens[ckey]
+		screen.doll_cache.Cut()
+		screen.doll_key = null
+		SStgui.update_uis(screen)
+
 /proc/close_clash_kit_screen(mob/user)
 	var/datum/tgui/open_ui = get_open_clash_kit_screen(user)
 	open_ui?.close()
@@ -322,7 +330,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 	if(render_queued)
 		return
 	render_queued = TRUE
-	addtimer(CALLBACK(src, PROC_REF(render_doll), viewer), 1)
+	clash_kit_defer(CALLBACK(src, PROC_REF(render_doll), viewer))
 
 /datum/clash_kit_screen/proc/render_doll(client/viewer)
 	render_queued = FALSE

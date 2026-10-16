@@ -338,6 +338,10 @@ $hot: #ff8a3d;
     font-size: 10px;
     overflow: hidden;
     text-overflow: ellipsis;
+
+    &--veteran {
+      color: $gold;
+    }
   }
 
   &__mvp {

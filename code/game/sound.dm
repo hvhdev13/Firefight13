@@ -172,10 +172,8 @@
 	SSsound.queue(template, hearers)
 
 /client/proc/playtitlemusic()
-	if(!SSticker?.login_music)
-		return FALSE
-	if(prefs && prefs.toggles_sound & SOUND_LOBBY)
-		playsound_client(src, SSticker.login_music, null, 70, 0, VOLUME_LOBBY, SOUND_CHANNEL_LOBBY, SOUND_STREAM)
+	if(istype(mob, /mob/new_player))
+		SStgui.update_uis(mob)
 
 
 /// Play sound for all on-map clients on a given Z-level. Good for ambient sounds.

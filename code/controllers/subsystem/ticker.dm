@@ -19,6 +19,7 @@ SUBSYSTEM_DEF(ticker)
 	var/datum/game_mode/mode = null
 
 	var/list/login_music = null //Music played in pregame lobby
+	var/login_music_beats
 
 	var/delay_end = FALSE //If set true, the round will not restart on it's own
 	var/delay_start = FALSE
@@ -52,13 +53,19 @@ SUBSYSTEM_DEF(ticker)
 	var/totalPlayersReady = 0 //used for pregame stats on statpanel
 	var/tutorial_disabled = FALSE
 
-/datum/controller/subsystem/ticker/Initialize(timeofday)
-	load_mode()
-
+/datum/controller/subsystem/ticker/OnConfigLoad()
+	if(login_music)
+		return
 	var/all_music = CONFIG_GET(keyed_list/lobby_music)
 	var/key = SAFEPICK(all_music)
 	if(key)
 		login_music = file(all_music[key])
+		var/beats_path = "[copytext(all_music[key], 1, findlasttext(all_music[key], "."))].beats"
+		if(fexists(beats_path))
+			login_music_beats = file2text(beats_path)
+
+/datum/controller/subsystem/ticker/Initialize(timeofday)
+	load_mode()
 	return SS_INIT_SUCCESS
 
 /datum/controller/subsystem/ticker/fire(resumed = FALSE)
@@ -324,6 +331,7 @@ SUBSYSTEM_DEF(ticker)
 	mode = SSticker.mode
 
 	login_music = SSticker.login_music
+	login_music_beats = SSticker.login_music_beats
 
 	delay_end = SSticker.delay_end
 	delay_start = SSticker.delay_start

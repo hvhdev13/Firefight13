@@ -1,6 +1,5 @@
 import { randomInteger } from 'common/random';
-import { type BooleanLike, classes } from 'common/react';
-import { storage } from 'common/storage';
+import type { BooleanLike } from 'common/react';
 import {
   type ComponentProps,
   createContext,
@@ -23,10 +22,11 @@ import {
 } from 'tgui/components';
 import { Window } from 'tgui/layouts';
 
-import { LoadingScreen } from './common/LoadingToolbox';
+import { LobbyBackdrop } from './Backdrop';
 
 type LobbyData = {
   lobby_author: string;
+  lobby_map: string;
 
   character_name: string;
   xeno_prefix: string;
@@ -46,40 +46,49 @@ type LobbyData = {
   fax_responder_enabled: BooleanLike;
 
   preference_issues: string[];
+
+  lobby_music?: string;
+  lobby_music_beats?: string;
+  lobby_music_credit?: string;
+  lobby_music_volume: number;
+  lobby_music_on: BooleanLike;
+  lobby_effects: BooleanLike;
+  lobby_news: string[];
 };
 
 type LobbyContextType = {
   animationsDisable: boolean;
-  themeDisable: boolean;
   setModal?: (_: ReactNode | false) => void;
 };
 
 const LobbyContext = createContext<LobbyContextType>({
   animationsDisable: false,
-  themeDisable: false,
 });
 
 export const LobbyMenu = () => {
   const { act, data } = useBackend<LobbyData>();
 
-  const { lobby_author, upp_enabled, confirmation_message, preference_issues } =
-    data;
+  const {
+    lobby_author,
+    lobby_map,
+    confirmation_message,
+    preference_issues,
+    lobby_music,
+    lobby_music_beats,
+    lobby_music_credit,
+    lobby_music_volume,
+    lobby_music_on,
+    lobby_effects,
+    lobby_news,
+  } = data;
 
   const onLoadPlayer = useRef<HTMLAudioElement>(null);
 
   const [modal, setModal] = useState<ReactNode | false>(false);
 
   const [disableAnimations, setDisableAnimations] = useState(false);
-  const [filterDisabled, setFilterDisabled] = useState(false);
-  const [themeDisabled, setThemeDisabled] = useState<boolean | undefined>();
 
   useEffect(() => {
-    storage
-      .get('lobby-filter-disabled')
-      .then((val) => setFilterDisabled(!!val));
-
-    storage.get('lobby-theme-disabled').then((val) => setThemeDisabled(!!val));
-
     setTimeout(() => {
       onLoadPlayer.current!.play();
     }, 250);
@@ -129,42 +138,26 @@ export const LobbyMenu = () => {
 
   const [hidden, setHidden] = useState<boolean>(false);
 
-  if (themeDisabled === undefined) {
-    return (
-      <Window fitted scrollbars={false}>
-        <Window.Content>
-          <LoadingScreen />
-        </Window.Content>
-      </Window>
-    );
-  }
-
-  const themeToUse = themeDisabled
-    ? 'weyland_yutani'
-    : upp_enabled
-      ? 'crtlobbyred'
-      : 'crtlobby';
-
   return (
-    <Window theme={themeToUse} fitted scrollbars={false}>
+    <Window theme="crtlobby" fitted scrollbars={false}>
       <audio src={resolveAsset('load.mp3')} ref={onLoadPlayer} />
-      <Window.Content
-        className={classes([
-          'LobbyScreen',
-          !themeDisabled && 'crtTheme',
-          !filterDisabled && 'filterEnabled',
-          disableAnimations,
-        ])}
-        fitted
-      >
+      <Window.Content className="LobbyScreen" fitted>
         <LobbyContext.Provider
           value={{
             animationsDisable: disableAnimations,
-            themeDisable: themeDisabled,
             setModal: setModal,
           }}
         >
           {!!modal && <Modal>{modal}</Modal>}
+          <LobbyBackdrop
+            music={lobby_music}
+            beats={lobby_music_beats}
+            credit={lobby_music_credit}
+            volume={lobby_music_volume}
+            effects={!!lobby_effects}
+            news={lobby_news}
+            place={lobby_map}
+          />
           <Box
             height="100%"
             width="100%"
@@ -173,66 +166,33 @@ export const LobbyMenu = () => {
             }}
             className="bgLoad bgBackground"
           />
-          <Box height="100%" width="100%" position="absolute" className="crt" />
-          <Box position="absolute" top="10px" right="10px">
+          <Box className="feedControls">
             <Button
-              icon="cog"
-              onClick={() => {
-                setModal(
-                  <Box className="styledText">
-                    <Section
-                      p={5}
-                      title="Lobby Settings"
-                      buttons={
-                        <Button icon="xmark" onClick={() => setModal(false)} />
-                      }
-                      className="styledText"
-                    >
-                      <Stack>
-                        <Stack.Item>
-                          <Button
-                            icon="tv"
-                            onClick={() => {
-                              storage.set(
-                                'lobby-filter-disabled',
-                                !filterDisabled,
-                              );
-                              setFilterDisabled(!filterDisabled);
-                              setModal(false);
-                            }}
-                            tooltip="Removes the CRT filter background"
-                          >
-                            {`${filterDisabled ? 'Enable' : 'Disable'} Cinema Mode`}
-                          </Button>
-                        </Stack.Item>
-                        <Stack.Item>
-                          <Button
-                            icon="bolt"
-                            onClick={() => {
-                              storage.set(
-                                'lobby-theme-disabled',
-                                !themeDisabled,
-                              );
-                              setThemeDisabled(!themeDisabled);
-                              setModal(false);
-                            }}
-                            tooltip="Totally removes the CRT theme, including the filter"
-                          >
-                            {`${themeDisabled ? 'Enable' : 'Disable'} CRT Theme`}
-                          </Button>
-                        </Stack.Item>
-                      </Stack>
-                    </Section>
-                  </Box>,
-                );
-              }}
+              icon={lobby_music_on ? 'volume-high' : 'volume-xmark'}
+              selected={!!lobby_music_on}
+              tooltip={
+                lobby_music_on ? 'Mute the lobby music' : 'Play the lobby music'
+              }
+              onClick={() => act('toggle_lobby_music')}
             />
+            <Button
+              icon="tv"
+              selected={!!lobby_effects}
+              tooltip={
+                lobby_effects
+                  ? 'Turn off the lobby effects'
+                  : 'Turn on the lobby effects'
+              }
+              onClick={() => act('toggle_lobby_effects')}
+            />
+            {hidden && (
+              <Button
+                icon="check"
+                tooltip="Show the menu"
+                onClick={() => setHidden(false)}
+              />
+            )}
           </Box>
-          {hidden && (
-            <Box position="absolute" top="10px" left="10px">
-              <Button icon={'check'} onClick={() => setHidden(false)} />
-            </Box>
-          )}
           <Stack vertical height="100%" justify="space-around" align="center">
             <Stack.Item>
               <LobbyButtons
@@ -325,7 +285,7 @@ const LobbyButtons = (props: {
                   <Box height="68px">
                     <Box
                       style={{
-                        backgroundImage: `url("${resolveAsset(upp_enabled ? 'upp.png' : 'uscm.png')}")`,
+                        backgroundImage: `url("${resolveAsset('uscm.png')}")`,
                       }}
                       width="67px"
                       className="loadEffect"
@@ -350,7 +310,7 @@ const LobbyButtons = (props: {
                   <Stack justify="center">
                     <Stack.Item>
                       <Box
-                        className="typeEffect styledText"
+                        className="typeEffect styledText feedName"
                         style={{
                           animationDelay: '1.4s',
                         }}
@@ -566,17 +526,11 @@ const LobbyButtons = (props: {
 const TimedDivider = () => {
   const ref = useRef<HTMLDivElement>(null);
 
-  const context = useContext(LobbyContext);
-
-  const { themeDisable } = context;
-
   useEffect(() => {
-    if (!themeDisable) {
-      setTimeout(() => {
-        ref.current!.style.display = 'block';
-      }, 1500);
-    }
-  }, [themeDisable]);
+    setTimeout(() => {
+      ref.current!.style.display = 'block';
+    }, 1500);
+  }, []);
 
   return (
     <Stack.Item>
@@ -584,7 +538,7 @@ const TimedDivider = () => {
         style={{
           borderStyle: 'solid',
           borderWidth: '1px',
-          display: themeDisable ? 'block' : 'none',
+          display: 'none',
         }}
         className="dividerEffect"
         ref={ref}

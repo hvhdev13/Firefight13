@@ -234,6 +234,43 @@ GLOBAL_LIST_EMPTY(clash_option_gates)
 /proc/clash_role_name(title)
 	return GLOB.clash_role_names[title] || title
 
+/proc/clash_veteran_class(ckey, job)
+	var/class = GLOB.clash_job_classes[job]
+	if(!class || !ckey || !clash_progression_active())
+		return null
+	var/datum/clash_progress/progress = clash_progress_of(ckey)
+	return progress?.class_level(class) >= CLASH_LEVEL_CAP ? class : null
+
+/proc/clash_veteran_rank(ckey, job)
+	var/class = clash_veteran_class(ckey, job)
+	return class && "[GLOB.clash_class_names[class]] level [CLASH_LEVEL_CAP]"
+
+/obj/item/clothing/accessory/medal/gold/clash_veteran
+	name = "veteran medal"
+	icon_state = "gold_star"
+	overlay_state = "gold_star"
+
+/proc/clash_pin_veteran_medal(mob/living/carbon/human/wearer, ckey, job)
+	usr = null
+	for(var/obj/item/clothing/clothes in list(wearer.wear_suit, wearer.w_uniform))
+		for(var/obj/item/clothing/accessory/medal/gold/clash_veteran/old in clothes.accessories?.Copy())
+			clothes.remove_accessory(null, old)
+			qdel(old)
+	var/class = clash_veteran_class(ckey, job)
+	if(!class)
+		return
+	var/class_name = GLOB.clash_class_names[class]
+	var/obj/item/clothing/accessory/medal/gold/clash_veteran/medal = new(wearer)
+	medal.name = "veteran [lowertext(class_name)] medal"
+	medal.desc = "A gold star medal awarded for reaching [class_name] level [CLASH_LEVEL_CAP]."
+	medal.recipient_name = wearer.real_name
+	medal.recipient_rank = clash_role_name(job)
+	for(var/obj/item/clothing/clothes in list(wearer.wear_suit, wearer.w_uniform))
+		if(clothes.can_attach_accessory(medal))
+			clothes.attach_accessory(wearer, medal, TRUE)
+			return
+	qdel(medal)
+
 /proc/clash_insignia_name(faction, level)
 	var/list/names = GLOB.clash_insignia_names[faction]
 	level = clamp(level, 1, CLASH_LEVEL_CAP)

@@ -41,6 +41,9 @@ GLOBAL_LIST_INIT(clash_progression_settings, list("enabled" = TRUE, "xp_multipli
 	var/toasts = TRUE
 	var/radar = TRUE
 	var/chatbox = TRUE
+	var/chatbox_width
+	var/chatbox_rows
+	var/lobby_effects = TRUE
 	var/prestige = 0
 	var/zone_seconds = 0
 	var/list/support_xp = list()
@@ -98,6 +101,12 @@ GLOBAL_LIST_INIT(clash_progression_settings, list("enabled" = TRUE, "xp_multipli
 		radar = !!decoded["radar"]
 	if(!isnull(decoded["chatbox"]))
 		chatbox = !!decoded["chatbox"]
+	if(isnum(decoded["chatbox_width"]))
+		chatbox_width = decoded["chatbox_width"]
+	if(isnum(decoded["chatbox_rows"]))
+		chatbox_rows = decoded["chatbox_rows"]
+	if(!isnull(decoded["lobby_effects"]))
+		lobby_effects = !!decoded["lobby_effects"]
 	prestige = decoded["prestige"] || 0
 
 /datum/clash_progress/proc/save()
@@ -114,6 +123,9 @@ GLOBAL_LIST_INIT(clash_progression_settings, list("enabled" = TRUE, "xp_multipli
 		"toasts" = toasts,
 		"radar" = radar,
 		"chatbox" = chatbox,
+		"chatbox_width" = chatbox_width,
+		"chatbox_rows" = chatbox_rows,
+		"lobby_effects" = lobby_effects,
 	)), temp_path)
 	if(!read_file(temp_path))
 		log_world("Clash progress: the new save for [ckey] did not read back, keeping the old file")

@@ -145,7 +145,7 @@
 				clash_notify_unlock(ckey, CLASH_UNLOCK_SENTRY, stats["name"], source)
 	if(level == CLASH_LEVEL_CAP)
 		found = TRUE
-		clash_notify_unlock(ckey, CLASH_UNLOCK_COSMETIC, "Veteran [GLOB.clash_class_names[class]]", source)
+		clash_notify_unlock(ckey, CLASH_UNLOCK_COSMETIC, "Veteran [GLOB.clash_class_names[class]] medal, worn while you play [GLOB.clash_class_names[class]]", source, /obj/item/clothing/accessory/medal/gold/clash_veteran)
 	if(!found)
 		clash_notify_unlock(ckey, CLASH_UNLOCK_LEVEL, GLOB.clash_class_names[class], source)
 

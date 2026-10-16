@@ -214,3 +214,108 @@ GLOBAL_LIST_EMPTY(clash_score_panel_icons)
 #undef SCORE_PANEL_LEFT
 #undef SCORE_SIDE_WIDTH
 #undef SCORE_FILL_STEPS
+
+#define CLASH_AMMO_REFRESH (2 DECISECONDS)
+
+/obj/item/weapon/gun/var/clash_ammo_readout = FALSE
+
+/obj/item/weapon/gun/rifle/m41a
+	clash_ammo_readout = TRUE
+
+/obj/item/weapon/gun/rifle/m41aMK1
+	clash_ammo_readout = TRUE
+
+/obj/item/weapon/gun/rifle/lmg
+	clash_ammo_readout = TRUE
+
+/obj/item/weapon/gun/smartgun
+	clash_ammo_readout = TRUE
+
+/obj/item/weapon/gun/rifle/m4ra
+	clash_ammo_readout = TRUE
+
+/obj/item/weapon/gun/lever_action/xm88
+	clash_ammo_readout = TRUE
+
+/obj/item/weapon/gun/smg/m39
+	clash_ammo_readout = TRUE
+
+/obj/item/weapon/gun/pistol/m4a3
+	clash_ammo_readout = TRUE
+
+/obj/item/weapon/gun/pistol/mod88
+	clash_ammo_readout = TRUE
+
+/obj/item/weapon/gun/pistol/vp78
+	clash_ammo_readout = TRUE
+
+/obj/item/weapon/gun/pistol/m10
+	clash_ammo_readout = TRUE
+
+/obj/item/weapon/gun/revolver/m44
+	clash_ammo_readout = TRUE
+
+/obj/item/weapon/gun/smartgun/upp
+	clash_ammo_readout = FALSE
+
+/obj/item/weapon/gun/smartgun/clf
+	clash_ammo_readout = FALSE
+
+/obj/item/weapon/gun/smartgun/rmc
+	clash_ammo_readout = FALSE
+
+/obj/item/weapon/gun/smartgun/l56a2
+	clash_ammo_readout = FALSE
+
+/client/var/atom/movable/screen/clash_ammo_counter/clash_ammo_counter
+
+/atom/movable/screen/clash_ammo_counter
+	name = "ammo"
+	icon = null
+	mouse_opacity = MOUSE_OPACITY_TRANSPARENT
+	screen_loc = "EAST-3:24,2:7"
+	maptext_width = 32
+	maptext_height = 20
+	maptext_y = 4
+	var/frame_key
+
+/atom/movable/screen/clash_ammo_counter/proc/update(mob/user, obj/item/weapon/gun/gun)
+	var/datum/preferences/prefs = user.client.prefs
+	var/style = user.faction == FACTION_UPP ? HUD_RED : prefs.UI_style
+	if(!(style in GLOB.custom_human_huds))
+		style = HUD_MIDNIGHT
+	if(frame_key != "[style][prefs.UI_style_color]")
+		frame_key = "[style][prefs.UI_style_color]"
+		var/mutable_appearance/frame = mutable_appearance('icons/mob/hud/clash_ammo.dmi', style)
+		frame.color = prefs.UI_style_color
+		underlays = list(frame)
+	if(alpha != prefs.UI_style_alpha)
+		alpha = prefs.UI_style_alpha
+	var/rounds = gun.current_mag?.current_rounds || 0
+	var/fill = gun.current_mag?.max_rounds ? rounds / gun.current_mag.max_rounds : 0
+	var/text = "<span style='text-align: center; vertical-align: bottom; font-family: \"VCR OSD Mono\"; font-size: 11px; color: [hsv_gradient(fill, 0, "#ff4030", 0.5, "#ffd23c", 1, "#4aa8ff")]; -dm-text-outline: 1px black'>[rounds]</span>"
+	if(maptext != text)
+		maptext = text
+
+/datum/game_mode/extended/faction_clash/hvh/var/ammo_timer_id
+
+/datum/game_mode/extended/faction_clash/hvh/proc/update_clash_ammo_counters()
+	for(var/mob/player as anything in GLOB.player_list)
+		var/client/player_client = player.client
+		var/obj/item/weapon/gun/gun = player.get_active_hand()
+		var/atom/movable/screen/clash_ammo_counter/counter = player_client?.clash_ammo_counter
+		if(!player_client || !isgun(gun) || !gun.clash_ammo_readout || player.stat == DEAD || !player.hud_used?.hud_shown)
+			if(counter && (counter in player_client.screen))
+				player_client.remove_from_screen(counter)
+			continue
+		if(!counter)
+			counter = new
+			player_client.clash_ammo_counter = counter
+		if(!(counter in player_client.screen))
+			player_client.add_to_screen(counter)
+		counter.update(player, gun)
+
+/datum/game_mode/extended/faction_clash/hvh/proc/start_clash_ammo_counters()
+	ammo_timer_id = addtimer(CALLBACK(src, PROC_REF(update_clash_ammo_counters)), CLASH_AMMO_REFRESH, TIMER_LOOP|TIMER_STOPPABLE)
+
+#undef CLASH_AMMO_REFRESH

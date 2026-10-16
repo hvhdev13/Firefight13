@@ -9,6 +9,9 @@
 /datum/config_entry/string/servername
 	default = "Firefight13"
 
+/datum/config_entry/keyed_list/lobby_music
+	config_entry_value = list("firefight13" = "sound/lobby/firefight13_main_menu.ogg")
+
 /datum/config_entry/number/lobby_countdown
 	config_entry_value = 20
 	max_val = 20

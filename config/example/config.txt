@@ -185,6 +185,7 @@ AUTOOOCMUTE
 
 #RECORD_ROUNDS
 
+## The Firefight13 theme (sound/lobby/firefight13_main_menu.ogg) is always in the pick; tracks listed here are added to it
 # LOBBY_MUSIC 1 path/to/sound.ogg
 # LOBBY_MUSIC 2 path/to/sound.ogg
 # LOBBY_MUSIC 3 path/to/sound.ogg
