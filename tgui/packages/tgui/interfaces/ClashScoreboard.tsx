@@ -87,6 +87,7 @@ interface ScoreboardData {
   seconds_left?: number;
   countdown?: number;
   intermission?: number;
+  overtime?: BooleanLike;
   finished?: BooleanLike;
   match?: number;
   matches?: number;
@@ -123,6 +124,9 @@ const getStatus = (data: ScoreboardData) => {
   }
   if (countdown) {
     return { big: clock(countdown), small: 'Match starts' };
+  }
+  if (data.overtime) {
+    return { big: '0:00', small: 'Overtime', urgent: true };
   }
   if (seconds_left) {
     return {

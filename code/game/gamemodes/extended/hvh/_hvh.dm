@@ -96,6 +96,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	var/kill_limit = 0
 	var/list/limit_callouts_made = list()
 	var/countdown_time = 0
+	var/countdown_beeps = 0
 	var/countdown_end_time
 	var/bases_sealed = FALSE
 	var/spawn_protection = 0
@@ -115,15 +116,52 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	var/kill_xp_multiplier = 1
 	var/team_gap = CLASH_TEAM_GAP
 	var/match_win_xp_multiplier = 1
+	var/capture_award = "Flag runner"
+	var/respawn_wait_label = "DEPLOY IN"
+	var/admins_skip_respawn = TRUE
 
-/proc/clash_respawn_cooldown()
+/proc/clash_respawn_cooldown(mob/user)
 	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
-	return istype(clash_mode) ? clash_mode.respawn_cooldown : RESPAWN_COOLDOWN
+	return istype(clash_mode) ? clash_mode.get_respawn_cooldown(user) : RESPAWN_COOLDOWN
 
 /proc/clash_respawn_wait(mob/user)
-	if(!user?.timeofdeath || check_client_rights(user.client, R_ADMIN, FALSE))
+	if(!user?.timeofdeath)
 		return 0
-	return max(0, user.timeofdeath + clash_respawn_cooldown() - world.time)
+	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
+	if(check_client_rights(user.client, R_ADMIN, FALSE) && (!istype(clash_mode) || clash_mode.admins_skip_respawn))
+		return 0
+	return istype(clash_mode) ? clash_mode.get_respawn_wait(user) : max(0, user.timeofdeath + RESPAWN_COOLDOWN - world.time)
+
+/proc/clash_side_of(mob/viewer)
+	if(ishuman(viewer))
+		return viewer.faction
+	var/mob/living/carbon/human/body = viewer?.mind?.original
+	return ishuman(body) ? body.faction : null
+
+/datum/game_mode/extended/faction_clash/hvh/proc/get_respawn_cooldown(mob/user)
+	return respawn_cooldown
+
+/datum/game_mode/extended/faction_clash/hvh/proc/get_respawn_wait(mob/user)
+	return max(0, user.timeofdeath + get_respawn_cooldown(user) - world.time)
+
+/datum/game_mode/extended/faction_clash/hvh/proc/get_side_respawn_delay(faction)
+	return respawn_cooldown
+
+/datum/game_mode/extended/faction_clash/hvh/proc/get_side_spawn_turf(faction)
+	return null
+
+/datum/game_mode/extended/faction_clash/hvh/proc/on_fighter_spawned(mob/living/carbon/human/fighter)
+	return
+
+/datum/game_mode/extended/faction_clash/hvh/proc/holds_side(faction)
+	return bases_sealed
+
+/datum/game_mode/extended/faction_clash/hvh/proc/keeps_out(mob/living/mover, turf/spot)
+	return FALSE
+
+/proc/clash_keeps_out(mob/living/mover, turf/spot)
+	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
+	return istype(clash_mode) && clash_mode.keeps_out(mover, spot)
 
 /proc/get_clash_status_lines(mob/viewer)
 	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
@@ -140,7 +178,9 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		. += "Win: [limit]"
 	if(matches_per_round > 1)
 		. += "Match [get_display_match()] of [matches_per_round]"
-		. += "Series: USCM [match_wins[FACTION_MARINE] || 0] - [match_wins[FACTION_UPP] || 0] UPP"
+		var/series = get_series_line()
+		if(series)
+			. += series
 	. += "Score: USCM [get_match_score(FACTION_MARINE)] - [get_match_score(FACTION_UPP)] UPP"
 	var/list/clock = get_clock_parts()
 	switch(clock[2])
@@ -155,11 +195,14 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		else
 			. += "Time Left: [clock[1]]"
 	if(viewer.timeofdeath && (isobserver(viewer) || viewer.stat == DEAD))
-		if(get_spawn_block())
+		if(get_spawn_block(clash_side_of(viewer)))
 			. += "Respawn: when the match ends"
 			return
 		var/wait = CEILING(clash_respawn_wait(viewer) / 10, 1)
 		. += wait ? "Respawn In: [floor(wait / 60)]:[wait % 60 < 10 ? "0" : ""][wait % 60]" : "Respawn: ready"
+
+/datum/game_mode/extended/faction_clash/hvh/proc/get_series_line()
+	return "Series: USCM [match_wins[FACTION_MARINE] || 0] - [match_wins[FACTION_UPP] || 0] UPP"
 
 /datum/game_mode/extended/faction_clash/hvh/proc/get_welcome_rules()
 	. = list()
@@ -266,11 +309,16 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	countdown_end_time = world.time + countdown_time
 	bases_sealed = TRUE
 	hold_fire(TRUE)
+	announce_countdown()
+	countdown_timer_id = addtimer(CALLBACK(src, PROC_REF(countdown_done)), countdown_time, TIMER_STOPPABLE)
+	for(var/seconds_left in 1 to countdown_beeps)
+		addtimer(CALLBACK(src, PROC_REF(countdown_beep), match_number, seconds_left), countdown_time - seconds_left SECONDS)
+	log_debug("HVH: countdown armed for [countdown_time / 10]s")
+
+/datum/game_mode/extended/faction_clash/hvh/proc/announce_countdown()
 	var/label = matches_per_round > 1 ? "Match [match_number + 1] of [matches_per_round]" : "Match"
 	for(var/faction in list(FACTION_MARINE, FACTION_UPP))
 		announce_to_faction(faction, "[label] starts in [countdown_time / 10] seconds. Gear up, you are held in your base until then.")
-	countdown_timer_id = addtimer(CALLBACK(src, PROC_REF(countdown_done)), countdown_time, TIMER_STOPPABLE)
-	log_debug("HVH: countdown armed for [countdown_time / 10]s")
 
 /datum/game_mode/extended/faction_clash/hvh/proc/countdown_done()
 	start_match()
@@ -357,7 +405,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 			count++
 	return count
 
-/datum/game_mode/extended/faction_clash/hvh/proc/get_spawn_block()
+/datum/game_mode/extended/faction_clash/hvh/proc/get_spawn_block(faction)
 	return null
 
 /datum/game_mode/extended/faction_clash/hvh/proc/can_set_score()
@@ -386,9 +434,9 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 /datum/game_mode/extended/faction_clash/hvh/proc/counts_for_bot_fill(client/player)
 	return TRUE
 
-/proc/clash_spawn_block()
+/proc/clash_spawn_block(faction)
 	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
-	return istype(clash_mode) ? clash_mode.get_spawn_block() : null
+	return istype(clash_mode) ? clash_mode.get_spawn_block(faction) : null
 
 /datum/game_mode/extended/faction_clash/hvh/proc/count_for_balance(faction, mob/joiner)
 	return count_side(faction)
@@ -469,7 +517,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	return list(
 		"match" = get_display_match(),
 		"matches" = matches_per_round,
-		"wins_needed" = wins_needed(),
+		"wins_needed" = get_panel_pips(),
 		"series" = list(match_wins[FACTION_MARINE] || 0, match_wins[FACTION_UPP] || 0),
 		"results" = results,
 		"intermission" = intermission_end_time ? CEILING(max(0, intermission_end_time - world.time) / 10, 1) : 0,
@@ -483,11 +531,15 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		"objectives" = get_objective_data(),
 		"seconds_left" = CEILING(remaining / 10, 1),
 		"countdown" = countdown_end_time ? CEILING(max(0, countdown_end_time - world.time) / 10, 1) : 0,
+		"overtime" = is_overtime(),
 		"finished" = !!round_finished,
 		"awards" = intermission_end_time || round_finished ? get_awards() : list(),
 		"kits" = clash_uses_kits(),
 		"progress" = clash_progress_report(viewer.ckey),
 	)
+
+/datum/game_mode/extended/faction_clash/hvh/proc/is_overtime()
+	return FALSE
 
 /datum/game_mode/extended/faction_clash/hvh/proc/get_score_limit()
 	return kill_limit
@@ -911,10 +963,18 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 /datum/game_mode/extended/faction_clash/hvh/proc/match_countdown_beep(match, final)
 	if(match != match_number || !match_live || round_finished)
 		return
-	var/seconds = final ? 0 : CEILING(max(0, round_end_time - world.time) / 10, 1)
+	show_final_count(final ? 0 : CEILING(max(0, round_end_time - world.time) / 10, 1))
+
+/datum/game_mode/extended/faction_clash/hvh/proc/show_final_count(seconds)
 	for(var/client/player as anything in GLOB.clients)
-		playsound_client(player, final ? 'sound/machines/beepalert.ogg' : 'sound/effects/sebb_beep.ogg', null, 50)
+		playsound_client(player, seconds ? 'sound/effects/sebb_beep.ogg' : 'sound/machines/beepalert.ogg', null, 50)
 		clash_show_final_count(player, seconds)
+
+/datum/game_mode/extended/faction_clash/hvh/proc/countdown_beep(match, seconds)
+	if(match != match_number || match_live || !countdown_end_time || round_finished)
+		return FALSE
+	show_final_count(seconds)
+	return TRUE
 
 /datum/game_mode/extended/faction_clash/hvh/proc/finish_match(reason)
 	if(round_finished || !match_live)
@@ -928,7 +988,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	on_match_end()
 	var/uscm = get_match_score(FACTION_MARINE)
 	var/upp = get_match_score(FACTION_UPP)
-	var/winner = uscm > upp ? FACTION_MARINE : (upp > uscm ? FACTION_UPP : null)
+	var/winner = get_match_winner(uscm, upp)
 	if(winner)
 		match_wins[winner] = (match_wins[winner] || 0) + 1
 	clash_progress_match_end(winner)
@@ -951,6 +1011,9 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	log_debug("HVH: round result [round_finished]")
 	roundend_ceasefire()
 	start_round_votes()
+
+/datum/game_mode/extended/faction_clash/hvh/proc/get_match_winner(uscm, upp)
+	return uscm > upp ? FACTION_MARINE : (upp > uscm ? FACTION_UPP : null)
 
 /datum/game_mode/extended/faction_clash/hvh/proc/record_career()
 	clash_progress_round_end()
@@ -1307,6 +1370,7 @@ GLOBAL_LIST_INIT(clash_vote_mode_icons, list(
 	GAMEMODE_KOTH = "clash_mode_koth.png",
 	GAMEMODE_ELIMINATION = "clash_mode_elimination.png",
 	GAMEMODE_CTF = "clash_mode_ctf.png",
+	GAMEMODE_PUSH = "clash_mode_push.png",
 ))
 
 GLOBAL_DATUM_INIT(clash_vote_ui, /datum/clash_vote_ui, new)
@@ -1330,6 +1394,7 @@ GLOBAL_DATUM_INIT(clash_vote_ui, /datum/clash_vote_ui, new)
 		"clash_mode_koth.png" = 'icons/images/ui_images/clash_modes/koth.png',
 		"clash_mode_elimination.png" = 'icons/images/ui_images/clash_modes/elimination.png',
 		"clash_mode_ctf.png" = 'icons/images/ui_images/clash_modes/ctf.png',
+		"clash_mode_push.png" = 'icons/images/ui_images/clash_modes/push.png',
 	)
 
 /datum/asset/simple/clash_vote/register()
@@ -1740,7 +1805,7 @@ GLOBAL_VAR(clash_start_mode)
 	if(best_assists_name)
 		. += "Team player: [best_assists_name], [best_assists] assists"
 	if(best_captures_name)
-		. += "Flag runner: [best_captures_name], [best_captures] captures"
+		. += "[capture_award]: [best_captures_name], [best_captures] captures"
 	if(best_revives_name)
 		. += "Guardian Angel: [best_revives_name], [best_revives] revive\s"
 	if(best_sentry_name)

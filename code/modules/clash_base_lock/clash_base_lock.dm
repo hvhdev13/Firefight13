@@ -12,7 +12,7 @@
 
 /proc/clash_is_held(atom/movable/mover, faction, atom/newloc)
 	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
-	if(!faction || !istype(clash_mode) || !clash_mode.bases_sealed || !isliving(mover))
+	if(!faction || !istype(clash_mode) || !clash_mode.holds_side(faction) || !isliving(mover))
 		return FALSE
 	var/mob/living/held = mover
 	if(held.faction != faction)

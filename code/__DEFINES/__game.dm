@@ -40,6 +40,8 @@
 #define MAP_TDM_KUTJEVO_SUPERMINI "TDM Kutjevo Super Mini"
 #define MAP_TDM_DEATHMATCH2000 "TDM Deathmatch 2000"
 #define MAP_TDM_FOREST "TDM Forest"
+#define MAP_PUSH_MARKET "Market"
+#define MAP_PUSH_CROSSING "Crossing"
 #define MAP_ICE_COLONY_V3 "Shivas Snowball" //Ice Rework, low pop enabled.
 #define MAP_RUNTIME "USS Runtime"
 #define MAP_LV522_CHANCES_CLAIM "LV-522 Chance's Claim"
@@ -61,7 +63,8 @@
 #define GAMEMODE_DOMINATION "Domination"
 #define GAMEMODE_CTF "Capture the Flag"
 #define GAMEMODE_ELIMINATION "Elimination"
-#define HVH_MODE_TAGS list(GAMEMODE_FACTION_CLASH_UPP_CM, GAMEMODE_TDM, GAMEMODE_KOTH, GAMEMODE_ELIMINATION, GAMEMODE_CTF)
+#define GAMEMODE_PUSH "Push"
+#define HVH_MODE_TAGS list(GAMEMODE_FACTION_CLASH_UPP_CM, GAMEMODE_TDM, GAMEMODE_KOTH, GAMEMODE_ELIMINATION, GAMEMODE_CTF, GAMEMODE_PUSH)
 #define GAMEMODE_HUNTER_GAMES "Hunter Games"
 #define GAMEMODE_INFECTION "Infection"
 #define GAMEMODE_EXTENDED "Extended"

@@ -21,6 +21,8 @@ GLOBAL_LIST_INIT(clash_radar_glyphs, list(
 	"A" = list(".X.", "X.X", "XXX", "X.X", "X.X"),
 	"B" = list("XX.", "X.X", "XX.", "X.X", "XX."),
 	"C" = list(".XX", "X..", "X..", "X..", ".XX"),
+	"D" = list("XX.", "X.X", "X.X", "X.X", "XX."),
+	"E" = list("XXX", "X..", "XX.", "X..", "XXX"),
 	"F" = list("XXX", "X..", "XX.", "X..", "X.."),
 	"H" = list("X.X", "X.X", "XXX", "X.X", "X.X"),
 ))

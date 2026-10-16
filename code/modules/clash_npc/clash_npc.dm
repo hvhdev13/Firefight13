@@ -115,7 +115,8 @@ GLOBAL_LIST_INIT(clash_bot_class_jobs, list(
 		return GLOB.clash_bot_respawn_delay
 	if(!isnull(respawn_delay))
 		return respawn_delay
-	return clash_respawn_cooldown()
+	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
+	return istype(clash_mode) ? clash_mode.get_side_respawn_delay(faction) : RESPAWN_COOLDOWN
 
 /obj/effect/landmark/clash_npc/proc/get_hold_turf()
 	if(!rally_id && length(GLOB.clash_objective_turfs))
@@ -149,7 +150,7 @@ GLOBAL_LIST_INIT(clash_bot_class_jobs, list(
 	return best
 
 /obj/effect/landmark/clash_npc/proc/spawn_npc()
-	if(bot || spawning || !active || clash_spawn_block())
+	if(bot || spawning || !active || clash_spawn_block(faction))
 		return
 	if(!GLOB.clash_bots_enabled || (faction in GLOB.clash_bot_sides_off) || clash_bot_count(faction) >= GLOB.clash_bot_caps[faction])
 		if(temporary)
@@ -178,6 +179,9 @@ GLOBAL_LIST_INIT(clash_bot_class_jobs, list(
 	bot = new(npc, src)
 	bot.home = home
 	spawning = FALSE
+	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
+	if(istype(clash_mode))
+		clash_mode.on_fighter_spawned(npc)
 	RegisterSignal(npc, list(COMSIG_MOB_DEATH, COMSIG_MOB_STAT_SET_ALIVE, COMSIG_HUMAN_SET_UNDEFIBBABLE, COMSIG_HUMAN_SQUAD_CHANGED), PROC_REF(queue_blip_tint))
 	queue_blip_tint(npc)
 
@@ -570,6 +574,18 @@ GLOBAL_LIST_INIT(clash_bot_class_jobs, list(
 	if(!length(free))
 		return
 	var/datum/clash_zone/goal = next_hill && moving_soon ? next_hill : hill
+	post_overwatch(free, goal)
+	if(next_hill && !moving_soon && length(free) > 2)
+		var/list/early = list()
+		for(var/count in 1 to round(length(free) / 2))
+			early += take_bot(free, CLASH_BOT_TASK_ATTACK, next_hill, next_hill.hold)
+		attack_zone(early, next_hill)
+	if(goal.owner == faction)
+		defend_zone(free, goal)
+		return
+	attack_zone(free, goal)
+
+/datum/clash_bot_director/proc/post_overwatch(list/free, datum/clash_zone/goal)
 	var/watchers = length(free) >= 6 ? 2 : (length(free) >= 3 ? 1 : 0)
 	if(watch_zone != goal || QDELETED(watch_zone))
 		watch_zone = goal
@@ -579,16 +595,20 @@ GLOBAL_LIST_INIT(clash_bot_class_jobs, list(
 		var/turf/spot = spots[index]
 		var/datum/clash_bot/bot = take_bot(free, CLASH_BOT_TASK_DEFEND, spot, spot, TRUE)
 		bot.set_task(CLASH_BOT_TASK_DEFEND, spot, CLASH_BOT_OVERWATCH_LEASH, spot)
-	if(next_hill && !moving_soon && length(free) > 2)
-		var/list/early = list()
-		for(var/count in 1 to round(length(free) / 2))
-			early += take_bot(free, CLASH_BOT_TASK_ATTACK, next_hill, next_hill.hold)
-		attack_zone(early, next_hill)
-	if(goal.owner == faction)
-		for(var/datum/clash_bot/bot as anything in free)
-			bot.set_task(CLASH_BOT_TASK_DEFEND, goal.hold, goal.radius, goal, null, goal)
+
+/datum/clash_bot_director/proc/defend_zone(list/bots, datum/clash_zone/zone)
+	for(var/datum/clash_bot/bot as anything in bots)
+		bot.set_task(CLASH_BOT_TASK_DEFEND, zone.hold, zone.radius, zone, null, zone)
+
+/datum/clash_bot_director/proc/plan_push(datum/clash_zone/point, attacking)
+	var/list/free = get_bots()
+	if(!length(free))
 		return
-	attack_zone(free, goal)
+	if(attacking)
+		attack_zone(free, point)
+		return
+	post_overwatch(free, point)
+	defend_zone(free, point)
 
 // Domination is out of rotation and unused. How to bring it back: docs/hvh_map_objectives.md, "Domination".
 /datum/clash_bot_director/proc/plan_domination(list/zones)
@@ -745,6 +765,10 @@ GLOBAL_LIST_INIT(clash_bot_class_jobs, list(
 	return jobs[1]
 
 /proc/clash_bot_base_turf(faction)
+	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
+	var/turf/side_spawn = istype(clash_mode) && clash_mode.get_side_spawn_turf(faction)
+	if(side_spawn)
+		return side_spawn
 	var/list/spots = list()
 	switch(faction)
 		if(FACTION_MARINE)

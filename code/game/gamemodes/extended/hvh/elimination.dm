@@ -43,6 +43,7 @@ GLOBAL_LIST_EMPTY(clash_ready_sides)
 	matches_per_round = 7
 	kill_limit = 0
 	countdown_time = 15 SECONDS
+	countdown_beeps = CLASH_ELIM_COUNTDOWN_BEEPS
 	respawn_cooldown = 0
 	intermission_time = 10 SECONDS
 	kill_xp_multiplier = 2.5
@@ -154,22 +155,13 @@ GLOBAL_LIST_EMPTY(clash_ready_sides)
 /datum/game_mode/extended/faction_clash/hvh/tdm/elimination/begin_countdown()
 	countdown_time = match_number ? initial(countdown_time) : CLASH_ELIM_FIRST_COUNTDOWN
 	. = ..()
-	for(var/seconds_left in 1 to CLASH_ELIM_COUNTDOWN_BEEPS)
-		addtimer(CALLBACK(src, PROC_REF(countdown_beep), match_number, seconds_left), countdown_time - seconds_left SECONDS)
 	deploy_returning()
 	refresh_kit_screens()
 
-/datum/game_mode/extended/faction_clash/hvh/tdm/elimination/proc/countdown_beep(match, seconds)
-	if(match != match_number || match_live || !countdown_end_time || round_finished)
-		return
-	show_count(seconds)
-	if(seconds == 1)
+/datum/game_mode/extended/faction_clash/hvh/tdm/elimination/countdown_beep(match, seconds)
+	. = ..()
+	if(. && seconds == 1)
 		clash_bot_fill()
-
-/datum/game_mode/extended/faction_clash/hvh/tdm/elimination/proc/show_count(seconds)
-	for(var/client/player as anything in GLOB.clients)
-		playsound_client(player, seconds ? 'sound/effects/sebb_beep.ogg' : 'sound/machines/beepalert.ogg', null, 50)
-		clash_show_final_count(player, seconds)
 
 /datum/game_mode/extended/faction_clash/hvh/tdm/elimination/shows_alive_count()
 	return FALSE
@@ -291,7 +283,7 @@ GLOBAL_LIST_EMPTY(clash_ready_sides)
 	countdown_end_time = world.time + 5 SECONDS
 	countdown_timer_id = addtimer(CALLBACK(src, PROC_REF(countdown_done)), 5 SECONDS, TIMER_STOPPABLE)
 
-/datum/game_mode/extended/faction_clash/hvh/tdm/elimination/get_spawn_block()
+/datum/game_mode/extended/faction_clash/hvh/tdm/elimination/get_spawn_block(faction)
 	return match_live ? "Wait until the match ends" : null
 
 /datum/game_mode/extended/faction_clash/hvh/tdm/elimination/can_set_score()
@@ -353,7 +345,7 @@ GLOBAL_LIST_EMPTY(clash_ready_sides)
 	disconnected = list()
 	crit_since = list()
 	clash_show_gates(FALSE)
-	show_count(0)
+	show_final_count(0)
 	tick_elimination()
 	refresh_kit_screens()
 

@@ -73,14 +73,20 @@ GLOBAL_LIST_EMPTY(clash_score_panel_icons)
 		return get_match_score(faction)
 	return matches_per_round > 1 ? (match_wins[faction] || 0) : get_round_tiebreak(faction)
 
+/datum/game_mode/extended/faction_clash/hvh/proc/get_panel_subline(faction)
+	return shows_alive_count() ? "[count_side(faction)] alive" : null
+
+/datum/game_mode/extended/faction_clash/hvh/proc/get_panel_pips()
+	return matches_per_round > 1 ? wins_needed() : 0
+
 /datum/game_mode/extended/faction_clash/hvh/proc/build_score_panel()
 	var/uscm = get_panel_score(FACTION_MARINE)
 	var/upp = get_panel_score(FACTION_UPP)
-	var/uscm_alive = count_side(FACTION_MARINE)
-	var/upp_alive = count_side(FACTION_UPP)
+	var/uscm_line = get_panel_subline(FACTION_MARINE)
+	var/upp_line = get_panel_subline(FACTION_UPP)
 	var/limit = get_score_limit()
 	var/list/clock = get_clock_parts()
-	var/needed = matches_per_round > 1 ? wins_needed() : 0
+	var/needed = get_panel_pips()
 	var/left = SCORE_PANEL_LEFT
 	var/right_start = SCORE_PANEL_LEFT + SCORE_PANEL_WIDTH - SCORE_SIDE_WIDTH
 	var/text_width = SCORE_SIDE_WIDTH - 10
@@ -88,19 +94,19 @@ GLOBAL_LIST_EMPTY(clash_score_panel_icons)
 	var/small = "font-family: \"Small Fonts\"; font-size: 6px; -dm-text-outline: 1px black; vertical-align: bottom"
 	var/list/texts = list()
 	texts += clash_score_text("<span style='[small]; color: #e8ecef; text-align: left'>USCM</span>", left + 5, 13, text_width, 10)
-	if(shows_alive_count())
-		texts += clash_score_text("<span style='[small]; color: #8a939c; text-align: left'>[uscm_alive] alive</span>", left + 5, 3, text_width, 10)
+	if(uscm_line)
+		texts += clash_score_text("<span style='[small]; color: #8a939c; text-align: left'>[uscm_line]</span>", left + 5, 3, text_width, 10)
 	texts += clash_score_text("<span style='[big]; text-align: right'>[clash_score_digits(uscm)]</span>", left + 5, 3, text_width, 22)
 	texts += clash_score_text("<span style='[small]; color: #e8ecef; text-align: right'>UPP</span>", right_start + 5, 13, text_width, 10)
-	if(shows_alive_count())
-		texts += clash_score_text("<span style='[small]; color: #8a939c; text-align: right'>[upp_alive] alive</span>", right_start + 5, 3, text_width, 10)
+	if(upp_line)
+		texts += clash_score_text("<span style='[small]; color: #8a939c; text-align: right'>[upp_line]</span>", right_start + 5, 3, text_width, 10)
 	texts += clash_score_text("<span style='[big]; text-align: left'>[clash_score_digits(upp)]</span>", right_start + 5, 3, text_width, 22)
 	var/center_x = left + SCORE_SIDE_WIDTH
 	var/center_width = right_start - center_x
 	texts += clash_score_text("<span style='font-family: \"VCR OSD Mono\"; font-size: 11px; -dm-text-outline: 1px black; vertical-align: bottom; text-align: center; color: [clock[3] ? "#ff6a6a" : "#e8ecef"]'>[clock[1]]</span>", center_x, 10, center_width, 16)
 	texts += clash_score_text("<span style='[small]; text-align: center; color: #8a939c'>[clock[2]]</span>", center_x, 1, center_width, 10)
 	return list(
-		"key" = "[uscm]|[upp]|[limit]|[clock[1]]|[clock[2]]|[uscm_alive]|[upp_alive]|[match_wins[FACTION_MARINE]]|[match_wins[FACTION_UPP]]",
+		"key" = "[uscm]|[upp]|[limit]|[clock[1]]|[clock[2]]|[uscm_line]|[upp_line]|[match_wins[FACTION_MARINE]]|[match_wins[FACTION_UPP]]|[needed]",
 		"texts" = texts,
 		"left_color" = faction_color(FACTION_MARINE),
 		"right_color" = faction_color(FACTION_UPP),

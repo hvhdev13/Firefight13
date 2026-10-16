@@ -1,0 +1,19 @@
+{
+    "map_name": "Market",
+    "map_path": "map_files/Push_Market",
+    "map_file": "Push_Market.dmm",
+    "disable_ship_map": true,
+    "disable_hunter_ship": true,
+    "perf_mode": 31,
+    "traits": [
+        {
+            "Ground": true
+        }
+    ],
+    "gamemodes": [
+        "Push"
+    ],
+    "force_mode": "Push",
+    "tdm_countdown_seconds": 30,
+    "tdm_spawn_protection_seconds": 5
+}

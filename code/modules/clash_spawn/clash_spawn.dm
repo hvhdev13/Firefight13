@@ -86,8 +86,13 @@ SUBSYSTEM_DEF(clash_spawn)
 		INVOKE_ASYNC(GLOBAL_PROC, GLOBAL_PROC_REF(clash_move_to_arena_squad), spawned)
 	spawned.AddElement(/datum/element/clash_iff)
 	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
-	if(istype(clash_mode) && clash_mode.spawn_protection)
-		spawned.AddComponent(/datum/component/clash_spawn_guard, clash_mode.spawn_protection)
+	if(istype(clash_mode))
+		var/turf/side_spawn = clash_mode.get_side_spawn_turf(spawned.faction)
+		if(side_spawn)
+			spawned.forceMove(side_spawn)
+		clash_mode.on_fighter_spawned(spawned)
+		if(clash_mode.spawn_protection)
+			spawned.AddComponent(/datum/component/clash_spawn_guard, clash_mode.spawn_protection)
 	if(clash_uses_kits())
 		issue_clash_role_kit(spawned, spawned.job)
 		var/datum/clash_kit/kit = get_clash_active_kit(spawned.ckey, spawned.job)
@@ -111,6 +116,10 @@ SUBSYSTEM_DEF(clash_spawn)
 /datum/mind/var/clash_job
 
 /proc/get_clash_home_turf(mob/living/carbon/human/fighter)
+	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
+	var/turf/side_spawn = istype(clash_mode) && clash_mode.get_side_spawn_turf(fighter.faction)
+	if(side_spawn)
+		return side_spawn
 	var/datum/job/job = GLOB.RoleAuthority.roles_by_name[fighter.job]
 	var/squad = fighter.assigned_squad?.name
 	var/list/candidates

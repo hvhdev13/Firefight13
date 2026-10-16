@@ -232,11 +232,15 @@
 /proc/clash_progress_capture(mob/living/carbon/human/runner)
 	clash_award_xp(runner, CLASH_XP_CAPTURE, CLASH_XP_SOURCE_CAPTURE)
 
-/proc/clash_progress_zone(datum/clash_zone/zone)
+/proc/clash_progress_point_capture(mob/living/carbon/human/fighter)
+	clash_award_xp(fighter, CLASH_XP_POINT_CAPTURE, CLASH_XP_SOURCE_CAPTURE)
+
+/proc/clash_progress_zone(datum/clash_zone/zone, faction)
 	if(!clash_progression_active())
 		return
+	faction = faction || zone.owner
 	for(var/mob/living/carbon/human/fighter as anything in zone.get_occupant_mobs())
-		if(fighter.faction != zone.owner)
+		if(fighter.faction != faction)
 			continue
 		var/datum/clash_progress/progress = clash_progress_of(fighter.ckey)
 		if(!progress)

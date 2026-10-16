@@ -92,11 +92,19 @@ map tdm_kutjevo_mini
 endmap
 
 map tdm_kutjevo_supermini
+	disabled
 endmap
 
 map tdm_deathmatch2000
-	default
 endmap
 
 map tdm_forest
+endmap
+
+map push_market
+	disabled
+endmap
+
+map push_crossing
+	default
 endmap

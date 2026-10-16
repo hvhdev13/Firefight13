@@ -248,7 +248,7 @@ GLOBAL_LIST_EMPTY(clash_kit_screens)
 		return "Joining is locked right now"
 	if(get_deploy_state(user) == "dead" && !CONFIG_GET(flag/respawn) && !check_client_rights(user.client, R_ADMIN, FALSE))
 		return "Respawning is off"
-	var/spawn_block = clash_spawn_block()
+	var/spawn_block = clash_spawn_block(clash_kit_faction_for_job(job))
 	if(spawn_block)
 		return spawn_block
 	var/datum/job/role = GLOB.RoleAuthority.roles_for_mode[job]
