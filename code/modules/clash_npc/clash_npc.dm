@@ -937,6 +937,7 @@ GLOBAL_LIST_INIT(clash_bot_class_jobs, list(
 			limits[spawner.faction] = max(limits[spawner.faction] || 0, spawner.fill_limit)
 	for(var/faction in limits)
 		GLOB.clash_bot_fill_targets[faction] = limits[faction]
+		GLOB.clash_bot_caps[faction] = max(GLOB.clash_bot_caps[faction], limits[faction])
 
 /proc/clash_bot_fill()
 	var/list/humans = list()

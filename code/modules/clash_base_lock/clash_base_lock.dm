@@ -41,7 +41,8 @@ GLOBAL_LIST_EMPTY(clash_gates)
 /obj/structure/blocker/clash_gate
 	name = "base shield"
 	desc = "A faction-keyed barrier. Friendly personnel pass through, hostiles do not. Nothing fired, thrown or burning gets across."
-	icon_state = "purple_line"
+	icon = 'icons/obj/structures/clash_gate.dmi'
+	icon_state = "ns"
 	density = FALSE
 	layer = ABOVE_OBJ_LAYER
 	var/faction
@@ -53,6 +54,28 @@ GLOBAL_LIST_EMPTY(clash_gates)
 /obj/structure/blocker/clash_gate/Destroy()
 	GLOB.clash_gates -= src
 	return ..()
+
+/obj/structure/blocker/clash_gate/proc/gate_turf()
+	return get_turf(src)
+
+/proc/clash_join_gates()
+	var/list/spots = list()
+	for(var/obj/structure/blocker/clash_gate/gate as anything in GLOB.clash_gates)
+		var/turf/spot = gate.gate_turf()
+		if(spot)
+			spots[spot] = TRUE
+	for(var/obj/structure/blocker/clash_gate/gate as anything in GLOB.clash_gates)
+		var/turf/spot = gate.gate_turf()
+		if(!spot)
+			continue
+		var/arms = ""
+		for(var/direction in GLOB.cardinals)
+			if(spots[get_step(spot, direction)])
+				arms += copytext(dir2text(direction), 1, 2)
+		if(length(arms) < 2)
+			var/across = arms ? findtext(arms, "e") || findtext(arms, "w") : get_step(spot, EAST)?.density || get_step(spot, WEST)?.density
+			arms = across ? "ew" : "ns"
+		gate.icon_state = arms
 
 /proc/clash_show_gates(shown)
 	for(var/obj/structure/blocker/clash_gate/gate as anything in GLOB.clash_gates)
@@ -91,10 +114,10 @@ GLOBAL_LIST_EMPTY(clash_gates)
 	color = "#e61919"
 
 /obj/structure/blocker/clash_gate/uscm/horizontal
-	dir = EAST
+	icon_state = "ew"
 
 /obj/structure/blocker/clash_gate/upp/horizontal
-	dir = EAST
+	icon_state = "ew"
 
 /obj/structure/machinery/door/airlock/upp/medical/solid/autoname/clash_base
 	req_one_access = list(ACCESS_UPP_GENERAL)

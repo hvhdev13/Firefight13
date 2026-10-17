@@ -48,10 +48,10 @@
 /area/clash_arena/push/battlefield)
 "aj" = (
 /obj/effect/landmark/clash_npc/uscm/fill{
-	fill_limit = 10
+	fill_limit = 20
 	},
 /obj/effect/landmark/clash_npc/upp/fill{
-	fill_limit = 10
+	fill_limit = 20
 	},
 /turf/open/floor/kutjevo/plate,
 /area/clash_arena/push/attacker_start/indoors)

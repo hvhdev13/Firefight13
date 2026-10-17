@@ -592,12 +592,11 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 	for(var/i = 1 to length(lines))
 		var/atom/movable/screen/faction_killfeed/line = lines[i]
 		clash_place_killfeed_line(line, i, below_objectives)
-		var/entry_index = length(killfeed) - i + 1
-		if(entry_index < 1)
+		if(i > length(killfeed))
 			line.maptext = ""
 			line.alpha = 255
 			continue
-		line.maptext = get_killfeed_line(killfeed[entry_index], player)
+		line.maptext = get_killfeed_line(killfeed[i], player)
 		line.alpha = 255
 
 /datum/game_mode/extended/faction_clash/hvh/proc/render_killfeed()
@@ -605,14 +604,11 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		render_killfeed_for(player)
 
 /datum/game_mode/extended/faction_clash/hvh/proc/fade_killfeed_line(index, duration)
-	var/slot = length(killfeed) - index + 1
-	if(slot < 1)
-		return
 	for(var/mob/player as anything in GLOB.player_list)
 		var/list/lines = player.hud_used?.faction_killfeed
-		if(slot > length(lines))
+		if(index > length(lines))
 			continue
-		var/atom/movable/screen/faction_killfeed/line = lines[slot]
+		var/atom/movable/screen/faction_killfeed/line = lines[index]
 		if(!line.maptext)
 			continue
 		animate(line, alpha = 0, time = duration)
@@ -1582,6 +1578,7 @@ GLOBAL_VAR(clash_start_mode)
 		var/datum/hive_status/hive = GLOB.hive_datum[hivenumber]
 		hive.UnregisterSignal(SSdcs, COMSIG_GLOB_POST_SETUP)
 	SSradio.faction_coms_clarity[FACTION_MARINE] = 100
+	clash_join_gates()
 	respawn_timer_id = addtimer(CALLBACK(src, PROC_REF(update_respawn_huds)), 1 SECONDS, TIMER_LOOP|TIMER_STOPPABLE)
 	if(idle_limit)
 		idle_timer_id = addtimer(CALLBACK(src, PROC_REF(check_idle)), idle_check_time, TIMER_LOOP|TIMER_STOPPABLE)

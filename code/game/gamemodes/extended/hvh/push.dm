@@ -186,6 +186,9 @@ GLOBAL_LIST_EMPTY(clash_push_vendors)
 	home = get_turf(src)
 	moveToNullspace()
 
+/obj/structure/blocker/clash_gate/push/gate_turf()
+	return home
+
 /obj/structure/blocker/clash_gate/push/proc/set_owner(new_faction, new_color)
 	faction = new_faction
 	color = new_color
