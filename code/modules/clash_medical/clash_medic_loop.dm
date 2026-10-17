@@ -66,6 +66,7 @@ GLOBAL_LIST_EMPTY(clash_call_medic_icons)
 /proc/clash_medic_shout(mob/living/carbon/human/patient)
 	if(!clash_fast_medicine())
 		return
+	patient.clash_called_until = max(patient.clash_called_until, world.time + CLASH_MEDIC_SHOUT_MARK)
 	clash_mark_medic_call(patient, CLASH_MEDIC_SHOUT_MARK)
 	for(var/mob/living/carbon/human/medic as anything in clash_medics_near(patient))
 		if(medic == patient || !clash_has_perk(medic, /datum/clash_perk/loud_call))

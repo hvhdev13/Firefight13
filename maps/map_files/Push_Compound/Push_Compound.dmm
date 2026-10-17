@@ -46,6 +46,15 @@
 	},
 /turf/open/floor/kutjevo/plate,
 /area/clash_arena/push/battlefield)
+"aj" = (
+/obj/effect/landmark/clash_npc/uscm/fill{
+	fill_limit = 10
+	},
+/obj/effect/landmark/clash_npc/upp/fill{
+	fill_limit = 10
+	},
+/turf/open/floor/kutjevo/plate,
+/area/clash_arena/push/attacker_start/indoors)
 "al" = (
 /turf/open/gm/grass,
 /area/clash_arena/push/battlefield)
@@ -6736,7 +6745,7 @@ aw
 aw
 aw
 an
-aq
+aj
 az
 cQ
 cP

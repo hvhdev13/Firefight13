@@ -383,60 +383,44 @@ const LobbyButtons = (props: {
         </LobbyButton>
 
         {round_start ? (
-          <>
-            {data.ready_sides ? (
-              <>
-                <Stack.Item>
-                  <LobbyButton
-                    index={5}
-                    selected={data.ready_side === 'uscm'}
-                    onClick={() => act('ready_uscm')}
-                    icon={data.ready_side === 'uscm' ? 'check' : 'xmark'}
-                  >
-                    Ready - USCM
-                  </LobbyButton>
-                </Stack.Item>
-                <Stack.Item>
-                  <LobbyButton
-                    index={5 + SMALL_BUTTON_DELAY}
-                    selected={data.ready_side === 'upp'}
-                    onClick={() => act('ready_upp')}
-                    icon={data.ready_side === 'upp' ? 'check' : 'xmark'}
-                  >
-                    Ready - UPP
-                  </LobbyButton>
-                </Stack.Item>
-              </>
-            ) : (
+          data.ready_sides ? (
+            <>
               <Stack.Item>
                 <LobbyButton
                   index={5}
-                  selected={!!readied}
-                  onClick={() => act(readied ? 'unready' : 'ready')}
-                  icon={readied ? 'check' : 'xmark'}
-                  tooltip={
-                    xenomorph_enabled
-                      ? 'Ready with Xenomorph enabled'
-                      : undefined
-                  }
+                  selected={data.ready_side === 'uscm'}
+                  onClick={() => act('ready_uscm')}
+                  icon={data.ready_side === 'uscm' ? 'check' : 'xmark'}
                 >
-                  {readied ? 'Unready' : 'Ready'}
+                  Ready - USCM
                 </LobbyButton>
               </Stack.Item>
-            )}
-            {!!data.kits_enabled && (
               <Stack.Item>
                 <LobbyButton
-                  index={6}
-                  onClick={() => act('clash_loadout')}
-                  icon="person-rifle"
-                  tooltip="Build your kits before the round starts"
+                  index={5 + SMALL_BUTTON_DELAY}
+                  selected={data.ready_side === 'upp'}
+                  onClick={() => act('ready_upp')}
+                  icon={data.ready_side === 'upp' ? 'check' : 'xmark'}
                 >
-                  Loadout
+                  Ready - UPP
                 </LobbyButton>
               </Stack.Item>
-            )}
-          </>
+            </>
+          ) : (
+            <Stack.Item>
+              <LobbyButton
+                index={5}
+                selected={!!readied}
+                onClick={() => act(readied ? 'unready' : 'ready')}
+                icon={readied ? 'check' : 'xmark'}
+                tooltip={
+                  xenomorph_enabled ? 'Ready with Xenomorph enabled' : undefined
+                }
+              >
+                {readied ? 'Unready' : 'Ready'}
+              </LobbyButton>
+            </Stack.Item>
+          )
         ) : (
           <>
             <Stack.Item>
@@ -517,6 +501,22 @@ const LobbyButtons = (props: {
               </Stack.Item>
             )}
           </>
+        )}
+        {!!data.kits_enabled && (
+          <Stack.Item>
+            <LobbyButton
+              index={round_start ? 6 : 8}
+              onClick={() => act('clash_loadout')}
+              icon="person-rifle"
+              tooltip={
+                round_start
+                  ? 'Build your kits before the round starts'
+                  : 'Build your kits before you deploy'
+              }
+            >
+              Loadout
+            </LobbyButton>
+          </Stack.Item>
         )}
       </Stack>
     </Section>

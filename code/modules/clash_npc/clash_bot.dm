@@ -148,6 +148,7 @@ SUBSYSTEM_DEF(clash_bots)
 	var/mob/living/carbon/human/medic_patient
 	var/next_patient_scan = 0
 	var/medic_wait_since = 0
+	var/answering_call = FALSE
 	var/list/skipped_patients = list()
 	var/next_think = 0
 	var/next_brace = 0
@@ -282,6 +283,7 @@ SUBSYSTEM_DEF(clash_bots)
 		update_patient()
 	else
 		medic_patient = null
+		answering_call = FALSE
 
 /datum/clash_bot/proc/latest_known()
 	var/mob/living/carbon/human/latest
@@ -941,16 +943,22 @@ SUBSYSTEM_DEF(clash_bots)
 	if(medic_patient && !needs_medic(medic_patient))
 		medic_patient = null
 		medic_wait_since = 0
-	if(world.time < next_patient_scan || (medic_patient && patient_urgent(medic_patient)))
+		answering_call = FALSE
+	if(world.time < next_patient_scan || answering_call)
 		return
 	next_patient_scan = world.time + CLASH_BOT_PATIENT_SCAN
 	var/mob/living/carbon/human/best = find_patient()
-	if(!medic_patient || (best && patient_urgent(best)))
+	var/calling = best && player_calling(best)
+	if(!medic_patient || calling || (best && patient_urgent(best) && !patient_urgent(medic_patient)))
 		medic_patient = best
 		medic_wait_since = 0
+		answering_call = calling
 
 /datum/clash_bot/proc/patient_urgent(mob/living/carbon/human/patient)
 	return patient.stat == DEAD || patient.health < patient.health_threshold_crit
+
+/datum/clash_bot/proc/player_calling(mob/living/carbon/human/patient)
+	return !clash_is_bot(patient) && world.time < patient.clash_called_until
 
 /datum/clash_bot/proc/treat_patient()
 	if(!medic_patient || get_dist(body, medic_patient) > 1 || world.time < next_heal)
@@ -958,6 +966,7 @@ SUBSYSTEM_DEF(clash_bots)
 	var/obj/item/tool = medic_tool(medic_patient)
 	if(!tool)
 		medic_patient = null
+		answering_call = FALSE
 		return FALSE
 	next_heal = world.time + CLASH_BOT_TREAT_DELAY
 	INVOKE_ASYNC(src, PROC_REF(heal_with), tool, medic_patient)
@@ -982,7 +991,7 @@ SUBSYSTEM_DEF(clash_bots)
 		medic_wait_since = 0
 		return
 	release_cover()
-	if(!exposed(spot))
+	if(answering_call || !exposed(spot))
 		medic_wait_since = 0
 		set_destination(spot)
 		return
@@ -1011,7 +1020,7 @@ SUBSYSTEM_DEF(clash_bots)
 /datum/clash_bot/proc/needs_medic(mob/living/carbon/human/patient)
 	if(QDELETED(patient) || patient == body || patient.faction != body.faction || patient.z != body.z || skipped_patients[REF(patient)] > world.time)
 		return FALSE
-	var/called = patient == medic_patient || (world.time < patient.clash_called_until && body.health >= body.maxHealth * CLASH_BOT_WOUNDED)
+	var/called = patient == medic_patient || world.time < patient.clash_called_until
 	if(get_dist(body, patient) > (called ? CLASH_BOT_CALL_RANGE : CLASH_BOT_MEDIC_RANGE))
 		return FALSE
 	if(patient.stat == DEAD)
@@ -1028,7 +1037,10 @@ SUBSYSTEM_DEF(clash_bots)
 	var/obj/limb/worst = clash_treat_target(patient)
 	if(worst && clash_limb_bleeding(worst) && find_dressing(worst))
 		return TRUE
-	if(contact_recent())
+	var/answering = answering_call && patient == medic_patient
+	if(answering && worst && find_dressing(worst))
+		return TRUE
+	if(contact_recent() && !answering)
 		return FALSE
 	if(patient.health < patient.maxHealth * CLASH_BOT_CALM_PATIENT_HEALTH || find_injector(patient, FALSE))
 		return TRUE
@@ -1040,7 +1052,7 @@ SUBSYSTEM_DEF(clash_bots)
 	for(var/mob/living/carbon/human/patient as anything in GLOB.human_mob_list)
 		if(!needs_medic(patient) || !can_enter(get_turf(patient)) || patient_taken(patient))
 			continue
-		var/score = get_dist(body, patient) + (patient_urgent(patient) ? 0 : (GLOB.clash_medic_marks[patient] ? 5 : 10))
+		var/score = get_dist(body, patient) + (player_calling(patient) ? -CLASH_BOT_CALL_RANGE : (patient_urgent(patient) ? 0 : (GLOB.clash_medic_marks[patient] ? 5 : 10)))
 		if(isnull(best_score) || score < best_score)
 			best = patient
 			best_score = score
@@ -1380,7 +1392,9 @@ SUBSYSTEM_DEF(clash_bots)
 		arrived_at = 0
 		if(!destination || get_dist(destination, anchor) > hold_radius)
 			release_cover()
-			set_destination(pick_position() || anchor)
+			var/turf/spot = pick_position()
+			if(spot || !goal_failed(anchor))
+				set_destination(spot || anchor)
 		return
 	if(!arrived_at)
 		arrived_at = world.time

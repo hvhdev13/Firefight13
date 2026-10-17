@@ -1,7 +1,7 @@
 {
-    "map_name": "Crossing",
-    "map_path": "map_files/Push_Crossing",
-    "map_file": "Push_Crossing.dmm",
+    "map_name": "Compound",
+    "map_path": "map_files/Push_Compound",
+    "map_file": "Push_Compound.dmm",
     "disable_ship_map": true,
     "disable_hunter_ship": true,
     "perf_mode": 31,

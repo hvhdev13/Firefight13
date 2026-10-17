@@ -1,5 +1,17 @@
 #define CLASH_PUSH_LOW_TIME (60 SECONDS)
 #define CLASH_PUSH_KEEPOUT_POINT_GAP 8
+#define CLASH_PUSH_ALL_IN (90 SECONDS)
+#define CLASH_PUSH_LANE_SEARCH 300
+#define CLASH_PUSH_LANE_SLACK 16
+#define CLASH_PUSH_LANE_ANGLE 45
+#define CLASH_PUSH_LANES 3
+#define CLASH_PUSH_FRONT_MIN 8
+#define CLASH_PUSH_FRONT_MAX 12
+#define CLASH_PUSH_STAGE_MIN 14
+#define CLASH_PUSH_STAGE_MAX 18
+#define CLASH_PUSH_GUARD_MIN 3
+#define CLASH_PUSH_GUARD_MAX 7
+#define CLASH_PUSH_GUARDS 2
 
 GLOBAL_LIST_EMPTY(clash_push_vendors)
 
@@ -285,6 +297,9 @@ GLOBAL_LIST_EMPTY(clash_push_vendors)
 	var/list/obj/effect/clash_zone_tile/keepout_marks = list()
 	var/attackers_on_point = 0
 	var/overtime = FALSE
+	var/list/lanes = list()
+	var/list/guard_spots = list()
+	var/lanes_build = 0
 
 /datum/game_mode/extended/faction_clash/hvh/tdm/push/pre_setup()
 	. = ..()
@@ -482,6 +497,108 @@ GLOBAL_LIST_EMPTY(clash_push_vendors)
 		var/turf/new_home = get_side_spawn_turf(bot.body?.faction)
 		if(new_home)
 			bot.home = new_home
+	lanes = list()
+	guard_spots = list()
+	INVOKE_ASYNC(src, PROC_REF(build_lanes), ++lanes_build)
+
+/datum/game_mode/extended/faction_clash/hvh/tdm/push/proc/build_lanes(build)
+	var/turf/start = room_centre(spawn_stage(attacker))
+	if(!live_zone || !start)
+		return
+	var/datum/clash_zone/point = live_zone
+	var/turf/hold = point.hold
+	var/list/from_point = clash_push_steps(hold)
+	var/list/from_start = clash_push_steps(start)
+	if(build != lanes_build || QDELETED(point))
+		return
+	var/shortest = from_point[start]
+	var/beyond = from_start[hold]
+	if(isnull(shortest) || isnull(beyond))
+		return
+	var/list/fronts = list()
+	var/list/stages = list()
+	var/list/guards = list()
+	for(var/turf/spot as anything in from_point)
+		var/out = from_point[spot]
+		var/back = from_start[spot]
+		if(isnull(back) || point.covered[spot] || clash_in_base(spot))
+			continue
+		if(out >= CLASH_PUSH_GUARD_MIN && out <= CLASH_PUSH_GUARD_MAX && back > beyond + 1)
+			guards[spot] = abs(out - (CLASH_PUSH_GUARD_MIN + CLASH_PUSH_GUARD_MAX) / 2)
+		var/detour = out + back - shortest
+		if(detour > CLASH_PUSH_LANE_SLACK)
+			continue
+		if(out >= CLASH_PUSH_FRONT_MIN && out <= CLASH_PUSH_FRONT_MAX)
+			fronts[spot] = detour * 2 + abs(out - (CLASH_PUSH_FRONT_MIN + CLASH_PUSH_FRONT_MAX) / 2)
+		else if(out >= CLASH_PUSH_STAGE_MIN && out <= CLASH_PUSH_STAGE_MAX)
+			stages[spot] = detour
+	var/list/found = list()
+	for(var/turf/front as anything in clash_push_spread(fronts, hold, CLASH_PUSH_LANES))
+		var/angle = Get_Angle(hold, front)
+		var/turf/stage
+		var/best
+		for(var/turf/spot as anything in stages)
+			var/score = clash_push_angle_gap(Get_Angle(hold, spot), angle) + stages[spot]
+			if(isnull(best) || score < best)
+				stage = spot
+				best = score
+		found += list(list("front" = front, "stage" = stage || front))
+	lanes = found
+	guard_spots = clash_push_spread(guards, hold, CLASH_PUSH_GUARDS)
+	clash_bot_replan()
+
+/proc/clash_push_spread(list/scored, turf/centre, count)
+	. = list()
+	while(length(.) < count)
+		var/turf/best
+		for(var/turf/spot as anything in scored)
+			if(best && scored[spot] >= scored[best])
+				continue
+			var/spaced = TRUE
+			for(var/turf/picked as anything in .)
+				if(clash_push_angle_gap(Get_Angle(centre, spot), Get_Angle(centre, picked)) < CLASH_PUSH_LANE_ANGLE)
+					spaced = FALSE
+					break
+			if(spaced)
+				best = spot
+		if(!best)
+			return
+		. += best
+
+/proc/clash_push_angle_gap(first, second)
+	. = abs(first - second)
+	if(. > 180)
+		. = 360 - .
+
+/proc/clash_push_steps(turf/start)
+	var/list/steps = list()
+	steps[start] = 0
+	var/list/queue = list(start)
+	var/index = 1
+	while(index <= length(queue))
+		CHECK_TICK
+		var/turf/current = queue[index++]
+		var/taken = steps[current] + 1
+		if(taken > CLASH_PUSH_LANE_SEARCH)
+			continue
+		for(var/direction in GLOB.cardinals)
+			var/turf/next = get_step(current, direction)
+			if(!next || !isnull(steps[next]) || !clash_push_lane_open(next))
+				continue
+			steps[next] = taken
+			queue += next
+	return steps
+
+/proc/clash_push_lane_open(turf/spot)
+	if(spot.density || istype(spot, /turf/open/space) || istype(spot, /turf/open/clash_void))
+		return FALSE
+	for(var/obj/thing in spot)
+		if(!thing.density || !thing.anchored || (thing.flags_atom & ON_BORDER) || istype(thing, /obj/structure/machinery/door) || istype(thing, /obj/structure/blocker/clash_gate))
+			continue
+		var/obj/structure/fence/gate = thing
+		if(!istype(gate) || !gate.door)
+			return FALSE
+	return TRUE
 
 /datum/game_mode/extended/faction_clash/hvh/tdm/push/proc/room_owner_at(turf/spot)
 	var/area/clash_arena/room = get_area(spot)
@@ -672,6 +789,7 @@ GLOBAL_LIST_EMPTY(clash_push_vendors)
 	if(attacking && !defending)
 		if(!live_zone.capturing)
 			announce_to_faction(defender(), "[live_zone.label] is being captured!")
+			clash_bot_replan()
 		live_zone.capturing = attacker
 		live_zone.progress += 1 SECONDS * capture_rates[min(attacking, length(capture_rates))]
 		clash_progress_zone(live_zone, attacker)
@@ -792,7 +910,15 @@ GLOBAL_LIST_EMPTY(clash_push_vendors)
 		return
 	director.own_base = room_centre(spawn_stage(director.faction))
 	director.enemy_base = room_centre(spawn_stage(director.enemy_faction()))
-	director.plan_push(live_zone, director.faction == attacker)
+	var/all_in = overtime || (match_live && (tickets <= 0 || round_end_time - world.time <= CLASH_PUSH_ALL_IN))
+	var/attacking = director.faction == attacker
+	var/list/open_lanes = lanes
+	if(!attacking && length(keepout))
+		open_lanes = list()
+		for(var/list/lane as anything in lanes)
+			if(!keepout[lane["front"]])
+				open_lanes += list(lane)
+	director.plan_push(live_zone, attacking, open_lanes, guard_spots, all_in, attacking ? attackers_on_point : (live_zone.contested || live_zone.capturing))
 
 /datum/game_mode/extended/faction_clash/hvh/tdm/push/is_objective_turf(turf/spot)
 	return live_zone && live_zone.covered[spot]
@@ -934,6 +1060,8 @@ GLOBAL_LIST_EMPTY(clash_push_vendors)
 				return null
 			admin_tampered = TRUE
 			tickets = round(amount)
+			if(tickets)
+				clash_bot_refill()
 			update_score_huds()
 			return "Set the [side_name(attacker)] tickets to [tickets]"
 	return null
@@ -956,3 +1084,15 @@ GLOBAL_LIST_EMPTY(clash_push_vendors)
 
 #undef CLASH_PUSH_LOW_TIME
 #undef CLASH_PUSH_KEEPOUT_POINT_GAP
+#undef CLASH_PUSH_ALL_IN
+#undef CLASH_PUSH_LANE_SEARCH
+#undef CLASH_PUSH_LANE_SLACK
+#undef CLASH_PUSH_LANE_ANGLE
+#undef CLASH_PUSH_LANES
+#undef CLASH_PUSH_FRONT_MIN
+#undef CLASH_PUSH_FRONT_MAX
+#undef CLASH_PUSH_STAGE_MIN
+#undef CLASH_PUSH_STAGE_MAX
+#undef CLASH_PUSH_GUARD_MIN
+#undef CLASH_PUSH_GUARD_MAX
+#undef CLASH_PUSH_GUARDS
