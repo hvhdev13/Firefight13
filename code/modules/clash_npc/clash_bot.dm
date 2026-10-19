@@ -35,6 +35,7 @@
 #define CLASH_BOT_KIT_DAMAGE 30
 #define CLASH_BOT_PATIENT_SCAN (2 SECONDS)
 #define CLASH_BOT_TREAT_DELAY (2 SECONDS)
+#define CLASH_BOT_MEDIC_HOLD (2 SECONDS)
 #define CLASH_BOT_LANE_CLOSE 50
 #define CLASH_BOT_LANE_NEAR 30
 #define CLASH_BOT_LANE_FAR 20
@@ -150,6 +151,8 @@ SUBSYSTEM_DEF(clash_bots)
 	var/medic_wait_since = 0
 	var/answering_call = FALSE
 	var/list/skipped_patients = list()
+	var/mob/living/carbon/human/held_by
+	var/held_until = 0
 	var/next_think = 0
 	var/next_brace = 0
 	var/state = CLASH_BOT_STATE_OBJECTIVE
@@ -564,6 +567,9 @@ SUBSYSTEM_DEF(clash_bots)
 	return goal
 
 /datum/clash_bot/proc/face_focus()
+	if(!target && world.time < held_until && !QDELETED(held_by))
+		body.face_atom(held_by)
+		return
 	if(state == CLASH_BOT_STATE_OBJECTIVE && !contact_recent())
 		return
 	var/turf/focus = focus_turf()
@@ -749,8 +755,27 @@ SUBSYSTEM_DEF(clash_bots)
 	path = null
 	return get_turf(body) == side
 
+/datum/clash_bot/proc/held_for_medic()
+	if(state == CLASH_BOT_STATE_DODGE || charging || carrying() || !clash_fast_medicine() || !(body.health < body.maxHealth || clash_treat_target(body) || clash_splint_target(body) || (locate(/obj/item/shard/shrapnel) in body.embedded_items)))
+		held_until = 0
+		return FALSE
+	var/mob/living/carbon/human/helper
+	for(var/mob/living/carbon/human/nearby in range(1, body))
+		if(nearby != body && nearby.faction == body.faction && nearby.stat == CONSCIOUS && clash_is_medic(nearby) && !clash_is_bot(nearby))
+			helper = nearby
+			break
+	if(!helper)
+		for(var/datum/clash_bot/other as anything in GLOB.clash_bots)
+			if(other.medic_patient == body && get_dist(other.body, body) <= 1 && !other.body.is_mob_incapacitated())
+				helper = other.body
+				break
+	if(helper)
+		held_by = helper
+		held_until = world.time + CLASH_BOT_MEDIC_HOLD
+	return world.time < held_until
+
 /datum/clash_bot/proc/handle_movement()
-	if(world.time < next_step)
+	if(world.time < next_step || held_for_medic())
 		return
 	choose_destination()
 	var/turf/here = get_turf(body)
@@ -989,6 +1014,7 @@ SUBSYSTEM_DEF(clash_bots)
 	var/turf/spot = get_turf(medic_patient)
 	if(!spot || get_dist(body, spot) <= 1)
 		medic_wait_since = 0
+		set_destination(null)
 		return
 	release_cover()
 	if(answering_call || !exposed(spot))
@@ -1540,6 +1566,7 @@ SUBSYSTEM_DEF(clash_bots)
 #undef CLASH_BOT_KIT_DAMAGE
 #undef CLASH_BOT_PATIENT_SCAN
 #undef CLASH_BOT_TREAT_DELAY
+#undef CLASH_BOT_MEDIC_HOLD
 #undef CLASH_BOT_LANE_CLOSE
 #undef CLASH_BOT_LANE_NEAR
 #undef CLASH_BOT_LANE_FAR
