@@ -324,11 +324,13 @@ GLOBAL_LIST_INIT(clash_shop_counterparts, list(
 		var/is_visor = istype(bought, /obj/item/device/helmet_visor)
 		var/visor_problem = is_visor && clash_kit_visor_problem(wearer.head, bought, item["name"])
 		var/obj/item/placed
+		var/wanted = kit.extra_slots[index]
 		if(is_visor && !visor_problem)
 			clash_kit_fit_visor(wearer, bought, mode)
 			placed = wearer.head
+		else if(!wanted && istype(bought, /obj/item/clothing/glasses) && !wearer.glasses && wearer.equip_to_slot_if_possible(bought, WEAR_EYES, TRUE, FALSE, TRUE))
+			placed = wearer
 		else
-			var/wanted = kit.extra_slots[index]
 			var/obj/item/storage/target = wanted && holders[wanted]
 			var/list/tries = target ? list(target) : containers
 			for(var/obj/item/storage/holder as anything in tries)
