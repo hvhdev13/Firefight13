@@ -53,6 +53,7 @@
 #define CLASH_BOT_LANE_PATIENCE (1 SECONDS)
 #define CLASH_BOT_FAILED_GOAL_TIME (10 SECONDS)
 #define CLASH_BOT_BLOCKED_STEP_TIME (5 SECONDS)
+#define CLASH_BOT_DETOUR_SLACK 6
 #define CLASH_BOT_STATE_OBJECTIVE "objective"
 #define CLASH_BOT_STATE_COMBAT "combat"
 #define CLASH_BOT_STATE_SEEK "seek"
@@ -755,6 +756,24 @@ SUBSYSTEM_DEF(clash_bots)
 	path = null
 	return get_turf(body) == side
 
+/datum/clash_bot/proc/player_in(turf/spot)
+	for(var/mob/living/carbon/human/person in spot)
+		if(person != body && person.density && !clash_is_bot(person))
+			return person
+	return null
+
+/datum/clash_bot/proc/detour_around(turf/blocked)
+	var/turf/old_end = path[length(path)]
+	var/old_length = length(path)
+	block_step(blocked)
+	GLOB.clash_bot_paths_this_tick++
+	var/list/detour = find_path(destination)
+	if(length(detour) && length(detour) <= old_length + CLASH_BOT_DETOUR_SLACK && detour[length(detour)] == old_end && !player_in(detour[1]))
+		path = detour
+		return TRUE
+	blocked_steps -= blocked
+	return FALSE
+
 /datum/clash_bot/proc/held_for_medic()
 	if(state == CLASH_BOT_STATE_DODGE || charging || carrying() || !clash_fast_medicine() || !(body.health < body.maxHealth || clash_treat_target(body) || clash_splint_target(body) || (locate(/obj/item/shard/shrapnel) in body.embedded_items)))
 		held_until = 0
@@ -801,7 +820,21 @@ SUBSYSTEM_DEF(clash_bots)
 			return
 	var/turf/next = path[1]
 	next_step = world.time + max(2, body.movement_delay())
+	var/through_player = FALSE
+	if(player_in(next))
+		if(next == destination)
+			destination = null
+			path = null
+			return
+		if(detour_around(next))
+			next = path[1]
+		else
+			through_player = TRUE
+	if(through_player)
+		body.add_temp_pass_flags(PASS_MOB_THRU_HUMAN)
 	step(body, get_dir(here, next))
+	if(through_player)
+		body.remove_temp_pass_flags(PASS_MOB_THRU_HUMAN)
 	var/turf/arrived = get_turf(body)
 	if(arrived == next)
 		path.Cut(1, 2)
@@ -1584,6 +1617,7 @@ SUBSYSTEM_DEF(clash_bots)
 #undef CLASH_BOT_LANE_PATIENCE
 #undef CLASH_BOT_FAILED_GOAL_TIME
 #undef CLASH_BOT_BLOCKED_STEP_TIME
+#undef CLASH_BOT_DETOUR_SLACK
 #undef CLASH_BOT_STATE_OBJECTIVE
 #undef CLASH_BOT_STATE_COMBAT
 #undef CLASH_BOT_STATE_SEEK

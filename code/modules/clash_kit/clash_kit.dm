@@ -345,8 +345,14 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 		qdel(fresh)
 		fresh = null
 	var/obj/item/storage/holder = clash_kit_storage_of(fresh)
+	var/list/carried_types = list()
+	for(var/obj/item/kept in wearer.get_contents() - carried)
+		carried_types[kept.type] = TRUE
 	for(var/obj/item/thing as anything in carried)
 		if(istype(thing, /obj/item/device/flashlight/flare) && !istype(holder, /obj/item/storage/pouch/flare))
+			qdel(thing)
+			continue
+		if(carried_types[thing.type] && (istype(thing, /obj/item/tool) || istype(thing, /obj/item/device/multitool) || istype(thing, /obj/item/stack/cable_coil)))
 			qdel(thing)
 			continue
 		if(holder?.can_be_inserted(thing, wearer, TRUE) && holder.handle_item_insertion(thing, TRUE, wearer))

@@ -2502,6 +2502,7 @@
 #include "code\modules\power\turbine.dm"
 #include "code\modules\projectiles\ammunition.dm"
 #include "code\modules\projectiles\gun.dm"
+#include "code\modules\projectiles\gun_clash.dm"
 #include "code\modules\projectiles\gun_attachables.dm"
 #include "code\modules\projectiles\gun_helpers.dm"
 #include "code\modules\projectiles\homing_projectile_component.dm"
