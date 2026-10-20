@@ -334,6 +334,7 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 /proc/clash_kit_replace_worn(mob/living/carbon/human/wearer, wear_slot, item_type)
 	var/obj/item/old = wearer.get_item_by_slot(wear_slot)
 	var/list/carried = list()
+	var/old_supply = clash_kit_is_supply(old)
 	if(old)
 		var/obj/item/storage/old_storage = clash_kit_storage_of(old)
 		if(old_storage)
@@ -346,7 +347,15 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 	if(!wearer.equip_to_slot_if_possible(fresh, wear_slot, TRUE, FALSE, TRUE))
 		qdel(fresh)
 		fresh = null
-	var/obj/item/storage/holder = clash_kit_storage_of(fresh)
+	if(old_supply && !clash_kit_is_supply(fresh))
+		QDEL_LIST(carried)
+	clash_kit_rehouse(wearer, carried, clash_kit_storage_of(fresh))
+	return fresh
+
+/proc/clash_kit_is_supply(obj/item/container)
+	return istype(container, /obj/item/storage/belt/medical) || istype(container, /obj/item/storage/pouch/firstaid) || istype(container, /obj/item/storage/pouch/medkit) || istype(container, /obj/item/storage/pouch/medical) || istype(container, /obj/item/storage/pouch/autoinjector) || istype(container, /obj/item/storage/pouch/construction)
+
+/proc/clash_kit_rehouse(mob/living/carbon/human/wearer, list/carried, obj/item/storage/holder)
 	var/list/carried_types = list()
 	for(var/obj/item/kept in wearer.get_contents() - carried)
 		carried_types[kept.type] = TRUE
@@ -361,7 +370,6 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 			continue
 		if(!wearer.equip_to_appropriate_slot(thing))
 			qdel(thing)
-	return fresh
 
 /proc/clash_kit_remove_worn(mob/living/carbon/human/wearer, obj/item/worn, list/cosmetics)
 	if(!worn || (worn.type in cosmetics))
@@ -454,11 +462,7 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 	else
 		qdel(fresh)
 		fresh = null
-	for(var/obj/item/thing as anything in carried)
-		if(fresh?.hold.can_be_inserted(thing, wearer, TRUE) && fresh.hold.handle_item_insertion(thing, TRUE, wearer))
-			continue
-		if(!wearer.equip_to_appropriate_slot(thing))
-			qdel(thing)
+	clash_kit_rehouse(wearer, carried, fresh?.hold)
 
 /proc/clash_trim_icon(icon/source)
 	var/width = source.Width()
