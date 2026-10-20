@@ -44,6 +44,8 @@
 	var/area/clash_arena/here = get_area(body)
 	if(istype(here) && clash_is_held(body, here.clash_faction, spot))
 		return FALSE
+	if(clash_keeps_out(body, spot))
+		return FALSE
 	var/area/clash_arena/zone = get_area(spot)
 	if(!istype(zone) || !zone.clash_faction)
 		return TRUE

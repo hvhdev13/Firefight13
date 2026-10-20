@@ -79,6 +79,7 @@ GLOBAL_VAR(clash_respawn_button_sheet)
 	var/shown_step
 	var/counted_down = FALSE
 	var/shown_revivable
+	var/out_reason
 
 /atom/movable/screen/clash_respawn/Initialize(mapload, ...)
 	. = ..()
@@ -137,17 +138,19 @@ GLOBAL_VAR(clash_respawn_button_sheet)
 			status.appearance_flags &= ~RESET_ALPHA
 			overlays += status
 	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
-	if(istype(clash_mode) && clash_mode.get_spawn_block())
+	var/block = istype(clash_mode) && clash_mode.get_spawn_block(clash_side_of(viewer))
+	if(block)
 		counted_down = TRUE
 		var/match_left = max(0, clash_mode.round_end_time - world.time)
 		var/seconds_left = CEILING(match_left / 10, 1)
 		var/match_step = clamp(floor((1 - match_left / clash_mode.round_time_limit) * RESPAWN_FILL_STEPS), 0, RESPAWN_FILL_STEPS - 1)
-		if(state != RESPAWN_STATE_OUT || seconds_left != shown_seconds || match_step != shown_step)
+		if(state != RESPAWN_STATE_OUT || seconds_left != shown_seconds || match_step != shown_step || block != out_reason)
 			shown_seconds = seconds_left
 			shown_step = match_step
+			out_reason = block
 			show_state(RESPAWN_STATE_OUT)
 		return
-	var/cooldown = clash_respawn_cooldown()
+	var/cooldown = clash_respawn_cooldown(viewer)
 	var/remaining = clash_respawn_wait(viewer)
 	if(remaining > 0)
 		counted_down = TRUE
@@ -182,12 +185,13 @@ GLOBAL_VAR(clash_respawn_button_sheet)
 			name = kits ? "Loadout" : "Respawn"
 			desc = kits ? "Pick your loadout while you wait to deploy." : "You can respawn when the wait runs out."
 			var/time = "[floor(shown_seconds / 60)]:[shown_seconds % 60 < 10 ? "0" : ""][shown_seconds % 60]"
-			maptext = "<span style='text-align: center; vertical-align: middle; -dm-text-outline: 1px black'><span style='font-family: \"Small Fonts\"; font-size: 6px; color: #8a939c'>[kits ? "LOADOUT  ·  DEPLOY IN" : "RESPAWN IN"]</span><br><span style='font-family: \"VCR OSD Mono\"; font-size: 11px; color: #d0d6dc'>[time]</span></span>"
+			var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
+			maptext = "<span style='text-align: center; vertical-align: middle; -dm-text-outline: 1px black'><span style='font-family: \"Small Fonts\"; font-size: 6px; color: #8a939c'>[kits ? "LOADOUT  ·  [clash_mode.respawn_wait_label]" : "RESPAWN IN"]</span><br><span style='font-family: \"VCR OSD Mono\"; font-size: 11px; color: #d0d6dc'>[time]</span></span>"
 		if(RESPAWN_STATE_OUT)
 			name = kits ? "Loadout" : "Respawn"
-			desc = "You are out until the match ends."
+			desc = "[out_reason]."
 			var/time = "[floor(shown_seconds / 60)]:[shown_seconds % 60 < 10 ? "0" : ""][shown_seconds % 60]"
-			maptext = "<span style='text-align: center; vertical-align: middle; -dm-text-outline: 1px black'><span style='font-family: \"Small Fonts\"; font-size: 6px; color: #8a939c'>WAIT UNTIL MATCH ENDS</span><br><span style='font-family: \"VCR OSD Mono\"; font-size: 11px; color: #d0d6dc'>[time]</span></span>"
+			maptext = "<span style='text-align: center; vertical-align: middle; -dm-text-outline: 1px black'><span style='font-family: \"Small Fonts\"; font-size: 6px; color: #8a939c'>[uppertext(out_reason)]</span><br><span style='font-family: \"VCR OSD Mono\"; font-size: 11px; color: #d0d6dc'>[time]</span></span>"
 		if(RESPAWN_STATE_LIVE)
 			name = "Loadout"
 			desc = "Change your loadout until the match starts."

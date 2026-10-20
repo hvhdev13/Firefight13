@@ -95,8 +95,19 @@ map tdm_kutjevo_supermini
 endmap
 
 map tdm_deathmatch2000
-	default
 endmap
 
 map tdm_forest
+endmap
+
+map push_market
+	disabled
+	minplayers 4
+	maxplayers 16
+endmap
+
+map push_compound
+	default
+	minplayers 4
+	maxplayers 16
 endmap

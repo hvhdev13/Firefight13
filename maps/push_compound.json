@@ -1,0 +1,19 @@
+{
+    "map_name": "Compound",
+    "map_path": "map_files/Push_Compound",
+    "map_file": "Push_Compound.dmm",
+    "disable_ship_map": true,
+    "disable_hunter_ship": true,
+    "perf_mode": 31,
+    "traits": [
+        {
+            "Ground": true
+        }
+    ],
+    "gamemodes": [
+        "Push"
+    ],
+    "force_mode": "Push",
+    "tdm_countdown_seconds": 30,
+    "tdm_spawn_protection_seconds": 5
+}

@@ -22,6 +22,14 @@
 #define CLASH_BOT_DEFEND_LEASH 6
 #define CLASH_BOT_PATROL_LEASH 4
 #define CLASH_BOT_OBJECTIVE_LEASH 5
+#define CLASH_BOT_POINT_POSTS 8
+#define CLASH_BOT_POST_LEASH 4
+#define CLASH_BOT_FRONT_LEASH 4
+#define CLASH_BOT_STAGE_LEASH 3
+#define CLASH_BOT_GUARD_LEASH 3
+#define CLASH_BOT_STAGE_GATHER 4
+#define CLASH_BOT_STAGE_WAIT (20 SECONDS)
+#define CLASH_BOT_ASSAULT_TIME (45 SECONDS)
 #define CLASH_BOT_BLIP_COLOR list(0.19, 0.29, 0.42, 0.37, 0.58, 0.83, 0.07, 0.11, 0.15, 0.05, 0.1, 0.25)
 
 GLOBAL_LIST_EMPTY(clash_npc_spawners)
@@ -115,7 +123,8 @@ GLOBAL_LIST_INIT(clash_bot_class_jobs, list(
 		return GLOB.clash_bot_respawn_delay
 	if(!isnull(respawn_delay))
 		return respawn_delay
-	return clash_respawn_cooldown()
+	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
+	return istype(clash_mode) ? clash_mode.get_side_respawn_delay(faction) : RESPAWN_COOLDOWN
 
 /obj/effect/landmark/clash_npc/proc/get_hold_turf()
 	if(!rally_id && length(GLOB.clash_objective_turfs))
@@ -149,7 +158,7 @@ GLOBAL_LIST_INIT(clash_bot_class_jobs, list(
 	return best
 
 /obj/effect/landmark/clash_npc/proc/spawn_npc()
-	if(bot || spawning || !active || clash_spawn_block())
+	if(bot || spawning || !active || clash_spawn_block(faction))
 		return
 	if(!GLOB.clash_bots_enabled || (faction in GLOB.clash_bot_sides_off) || clash_bot_count(faction) >= GLOB.clash_bot_caps[faction])
 		if(temporary)
@@ -178,6 +187,9 @@ GLOBAL_LIST_INIT(clash_bot_class_jobs, list(
 	bot = new(npc, src)
 	bot.home = home
 	spawning = FALSE
+	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
+	if(istype(clash_mode))
+		clash_mode.on_fighter_spawned(npc)
 	RegisterSignal(npc, list(COMSIG_MOB_DEATH, COMSIG_MOB_STAT_SET_ALIVE, COMSIG_HUMAN_SET_UNDEFIBBABLE, COMSIG_HUMAN_SQUAD_CHANGED), PROC_REF(queue_blip_tint))
 	queue_blip_tint(npc)
 
@@ -331,6 +343,11 @@ GLOBAL_LIST_INIT(clash_bot_class_jobs, list(
 	var/list/watch_spots = list()
 	var/list/fronts = list()
 	var/list/pushes = list()
+	var/datum/clash_zone/push_point
+	var/list/push_posts = list()
+	var/list/lane_staged = list()
+	var/list/lane_assault = list()
+	var/list/lane_of = list()
 
 /datum/clash_bot_director/New(new_faction)
 	faction = new_faction
@@ -570,6 +587,18 @@ GLOBAL_LIST_INIT(clash_bot_class_jobs, list(
 	if(!length(free))
 		return
 	var/datum/clash_zone/goal = next_hill && moving_soon ? next_hill : hill
+	post_overwatch(free, goal)
+	if(next_hill && !moving_soon && length(free) > 2)
+		var/list/early = list()
+		for(var/count in 1 to round(length(free) / 2))
+			early += take_bot(free, CLASH_BOT_TASK_ATTACK, next_hill, next_hill.hold)
+		attack_zone(early, next_hill)
+	if(goal.owner == faction)
+		defend_zone(free, goal)
+		return
+	attack_zone(free, goal)
+
+/datum/clash_bot_director/proc/post_overwatch(list/free, datum/clash_zone/goal)
 	var/watchers = length(free) >= 6 ? 2 : (length(free) >= 3 ? 1 : 0)
 	if(watch_zone != goal || QDELETED(watch_zone))
 		watch_zone = goal
@@ -579,16 +608,159 @@ GLOBAL_LIST_INIT(clash_bot_class_jobs, list(
 		var/turf/spot = spots[index]
 		var/datum/clash_bot/bot = take_bot(free, CLASH_BOT_TASK_DEFEND, spot, spot, TRUE)
 		bot.set_task(CLASH_BOT_TASK_DEFEND, spot, CLASH_BOT_OVERWATCH_LEASH, spot)
-	if(next_hill && !moving_soon && length(free) > 2)
-		var/list/early = list()
-		for(var/count in 1 to round(length(free) / 2))
-			early += take_bot(free, CLASH_BOT_TASK_ATTACK, next_hill, next_hill.hold)
-		attack_zone(early, next_hill)
-	if(goal.owner == faction)
-		for(var/datum/clash_bot/bot as anything in free)
-			bot.set_task(CLASH_BOT_TASK_DEFEND, goal.hold, goal.radius, goal, null, goal)
+
+/datum/clash_bot_director/proc/defend_zone(list/bots, datum/clash_zone/zone)
+	for(var/datum/clash_bot/bot as anything in bots)
+		bot.set_task(CLASH_BOT_TASK_DEFEND, zone.hold, zone.radius, zone, null, zone)
+
+/datum/clash_bot_director/proc/plan_push(datum/clash_zone/point, attacking, list/lanes, list/guards, all_in, pressed)
+	var/list/free = get_bots()
+	if(!length(free))
 		return
-	attack_zone(free, goal)
+	if(push_point != point)
+		push_point = point
+		push_posts = zone_posts(point, CLASH_BOT_POINT_POSTS)
+		lane_staged = list()
+		lane_assault = list()
+		lane_of = list()
+	if(attacking)
+		plan_push_attack(free, point, lanes, guards, all_in, pressed)
+		return
+	post_overwatch(free, point)
+	if(pressed || !length(lanes))
+		hold_zone(free, point, CLASH_BOT_TASK_DEFEND)
+		return
+	var/holders = max(1, round(length(free) / 3))
+	var/list/holding = list()
+	for(var/datum/clash_bot/bot as anything in free)
+		if(length(holding) < holders && bot.task == CLASH_BOT_TASK_DEFEND && (bot.task_key in push_posts))
+			holding += bot
+	while(length(holding) < holders && length(free) > length(holding))
+		holding += take_bot(free - holding, CLASH_BOT_TASK_DEFEND, point, point.hold)
+	hold_zone(holding, point, CLASH_BOT_TASK_DEFEND)
+	var/list/lane_fronts = list()
+	for(var/list/lane as anything in lanes)
+		lane_fronts += lane["front"]
+	spread_defenders(free - holding, lane_fronts, CLASH_BOT_FRONT_LEASH)
+
+/datum/clash_bot_director/proc/plan_push_attack(list/free, datum/clash_zone/point, list/lanes, list/guards, all_in, capturing)
+	if(all_in || !length(lanes))
+		hold_zone(free, point, CLASH_BOT_TASK_ATTACK)
+		return
+	post_overwatch(free, point)
+	if(capturing)
+		for(var/index in 1 to min(length(guards), round(length(free) / 2)))
+			var/turf/spot = guards[index]
+			var/datum/clash_bot/bot = take_bot(free, CLASH_BOT_TASK_DEFEND, spot, spot)
+			bot.set_task(CLASH_BOT_TASK_DEFEND, spot, CLASH_BOT_GUARD_LEASH, spot)
+		hold_zone(free, point, CLASH_BOT_TASK_ATTACK)
+		return
+	var/count = length(lanes)
+	var/list/groups = list()
+	for(var/index in 1 to count)
+		groups += list(list())
+	var/list/loose = list()
+	var/list/kept = list()
+	for(var/datum/clash_bot/bot as anything in free)
+		var/index = lane_of[bot]
+		if(index && index <= count)
+			var/list/group = groups[index]
+			group += bot
+			kept[bot] = index
+		else
+			loose += bot
+	for(var/datum/clash_bot/bot as anything in loose)
+		var/smallest = 1
+		for(var/index in 2 to count)
+			var/list/candidate = groups[index]
+			var/list/current = groups[smallest]
+			if(length(candidate) < length(current))
+				smallest = index
+		var/list/group = groups[smallest]
+		group += bot
+		kept[bot] = smallest
+	lane_of = kept
+	for(var/index in 1 to count)
+		plan_lane(groups[index], index, lanes[index], point)
+
+/datum/clash_bot_director/proc/plan_lane(list/group, index, list/lane, datum/clash_zone/point)
+	if(!length(group))
+		return
+	var/turf/stage = lane["stage"]
+	var/turf/front = lane["front"]
+	if(length(lane_assault) < index)
+		lane_assault.len = index
+		lane_staged.len = index
+	if(world.time >= lane_assault[index])
+		var/gathered = 0
+		for(var/datum/clash_bot/bot as anything in group)
+			if(get_dist(bot.body, stage) <= CLASH_BOT_STAGE_GATHER)
+				gathered++
+		if(gathered && !lane_staged[index])
+			lane_staged[index] = world.time
+		if(gathered >= min(3, length(group)) || (lane_staged[index] && world.time - lane_staged[index] >= CLASH_BOT_STAGE_WAIT))
+			lane_assault[index] = world.time + CLASH_BOT_ASSAULT_TIME
+			lane_staged[index] = 0
+	var/assault = world.time < lane_assault[index]
+	var/stage_gap = get_dist(stage, point.hold)
+	var/list/attackers = list()
+	for(var/datum/clash_bot/bot as anything in group)
+		if(assault || point.covered[get_turf(bot.body)] || get_dist(bot.body, point.hold) < stage_gap)
+			attackers += bot
+		else
+			bot.set_task(CLASH_BOT_TASK_ATTACK, stage, CLASH_BOT_STAGE_LEASH, "stage[index]")
+	hold_zone(attackers, point, CLASH_BOT_TASK_ATTACK, front)
+
+/datum/clash_bot_director/proc/hold_zone(list/bots, datum/clash_zone/point, task, turf/approach)
+	if(!length(push_posts))
+		for(var/datum/clash_bot/bot as anything in bots)
+			bot.set_task(task, point.hold, point.radius, point, null, point)
+		return
+	var/list/load = list()
+	for(var/turf/post as anything in push_posts)
+		load[post] = 0
+	var/list/loose = list()
+	for(var/datum/clash_bot/bot as anything in bots)
+		if(bot.task == task && !isnull(load[bot.task_key]))
+			load[bot.task_key]++
+		else
+			loose += bot
+	for(var/datum/clash_bot/bot as anything in loose)
+		var/turf/least
+		for(var/turf/post as anything in load)
+			if(!least || load[post] < load[least])
+				least = post
+		load[least]++
+		var/turf/via = approach && get_dist(bot.body, point.hold) > get_dist(approach, point.hold) ? approach : null
+		bot.set_task(task, least, CLASH_BOT_POST_LEASH, least, null, point, via)
+
+/datum/clash_bot_director/proc/zone_posts(datum/clash_zone/point, count)
+	. = list()
+	var/list/open = list()
+	for(var/turf/spot as anything in point.covered)
+		if(clash_turf_passable(spot) && !clash_in_base(spot))
+			open += spot
+	if(!length(open))
+		return
+	var/turf/first = (point.hold in open) ? point.hold : open[1]
+	. += first
+	open -= first
+	while(length(.) < count && length(open))
+		var/turf/best
+		var/best_gap
+		for(var/turf/spot as anything in open)
+			var/gap
+			for(var/turf/post as anything in .)
+				var/distance = get_dist(spot, post)
+				if(isnull(gap) || distance < gap)
+					gap = distance
+			if(isnull(best_gap) || gap > best_gap)
+				best = spot
+				best_gap = gap
+		if(best_gap < 2)
+			break
+		. += best
+		open -= best
 
 // Domination is out of rotation and unused. How to bring it back: docs/hvh_map_objectives.md, "Domination".
 /datum/clash_bot_director/proc/plan_domination(list/zones)
@@ -745,6 +917,10 @@ GLOBAL_LIST_INIT(clash_bot_class_jobs, list(
 	return jobs[1]
 
 /proc/clash_bot_base_turf(faction)
+	var/datum/game_mode/extended/faction_clash/hvh/clash_mode = SSticker.mode
+	var/turf/side_spawn = istype(clash_mode) && clash_mode.get_side_spawn_turf(faction)
+	if(side_spawn)
+		return side_spawn
 	var/list/spots = list()
 	switch(faction)
 		if(FACTION_MARINE)
@@ -761,6 +937,7 @@ GLOBAL_LIST_INIT(clash_bot_class_jobs, list(
 			limits[spawner.faction] = max(limits[spawner.faction] || 0, spawner.fill_limit)
 	for(var/faction in limits)
 		GLOB.clash_bot_fill_targets[faction] = limits[faction]
+		GLOB.clash_bot_caps[faction] = max(GLOB.clash_bot_caps[faction], limits[faction])
 
 /proc/clash_bot_fill()
 	var/list/humans = list()
@@ -856,3 +1033,11 @@ GLOBAL_LIST_INIT(clash_bot_class_jobs, list(
 #undef CLASH_BOT_DEFEND_LEASH
 #undef CLASH_BOT_PATROL_LEASH
 #undef CLASH_BOT_OBJECTIVE_LEASH
+#undef CLASH_BOT_POINT_POSTS
+#undef CLASH_BOT_POST_LEASH
+#undef CLASH_BOT_FRONT_LEASH
+#undef CLASH_BOT_STAGE_LEASH
+#undef CLASH_BOT_GUARD_LEASH
+#undef CLASH_BOT_STAGE_GATHER
+#undef CLASH_BOT_STAGE_WAIT
+#undef CLASH_BOT_ASSAULT_TIME

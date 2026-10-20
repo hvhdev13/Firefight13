@@ -891,6 +891,7 @@ GLOBAL_LIST_EMPTY(clash_kit_forced_items)
 	clash_swap_extended_magazines(wearer)
 	if(mode != CLASH_KIT_PREVIEW)
 		clash_engrave_guns(wearer, ckey)
+	clash_pin_veteran_medal(wearer, ckey, job)
 	clash_strip_locked_attachments(wearer, ckey)
 	clash_strip_locked_grenades(wearer, ckey, job)
 	if(mode != CLASH_KIT_RESET && clash_has_perk(wearer, /datum/clash_perk/extra_grenade))
@@ -1005,7 +1006,17 @@ GLOBAL_LIST_EMPTY(clash_kit_forced_items)
 		waiting |= requester
 		return
 	GLOB.clash_kit_issue_pending[job] = list(requester)
-	addtimer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(build_clash_issue_items), job), 1)
+	clash_kit_defer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(build_clash_issue_items), job))
+
+/proc/clash_kit_defer(datum/callback/callback)
+	if(Master?.current_runlevel & SStimer.runlevels)
+		addtimer(callback, 1)
+	else
+		INVOKE_ASYNC(GLOBAL_PROC, GLOBAL_PROC_REF(clash_kit_run_deferred), callback)
+
+/proc/clash_kit_run_deferred(datum/callback/callback)
+	sleep(1)
+	callback.Invoke()
 
 /proc/build_clash_issue_items(job)
 	var/list/found = list()

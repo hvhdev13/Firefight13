@@ -51,6 +51,8 @@
 	if(!clash_hvh_rules())
 		return
 	set_fire_delay(5.5)
+	if(clash_fast_medicine())
+		damage_mult = BASE_BULLET_DAMAGE_MULT + BULLET_DAMAGE_MULT_TIER_4
 
 /obj/item/weapon/gun/lever_action/xm88/set_gun_config_values()
 	. = ..()

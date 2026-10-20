@@ -121,6 +121,23 @@ Placing the zones:
 - Indoors: paint roofed tiles with the `indoors` subtype of their area, `battlefield/indoors` or
   `zone_N/indoors`. It has a metal ceiling, so rain stops there. A zone takes in its `indoors` tiles too.
 
+## Push
+
+Paint areas; no map-specific code or areas. All live under `/area/clash_arena/push/`, each with an
+`indoors` subtype for roofed tiles.
+- `battlefield`: everything that is not a point or a spawn room.
+- `point_a`, `point_b`, `point_c` (up to `point_e`): the capture zones, taken in that order. About 120 to 200
+  tiles each. A marker is optional; the label goes in the middle of the painted zone.
+- `attacker_start`: where the attackers begin.
+- `behind_a`, `behind_b`, `behind_c` ...: one spawn room behind each point. The room behind the last point is the
+  defenders' final base.
+- Vendors: `/obj/effect/landmark/clash_push_vendor/clothing`, `gear`, `guns`, `tools`, `medical`, inside spawn
+  rooms, against a wall, facing into the room. The game swaps them to the owning side's vendors.
+
+The game does the rest: spawn shields on every room doorway, spawn points and bot spawners.
+At round start admins get "Push: 3 points. Map checks passed.", or a list of what to fix (a missing room, a point
+touching a room, a room with no way out, point A too close to the attacker doors).
+
 ## TDM bot rally
 
 - `/obj/effect/landmark/clash_bot_rally/uscm` (blue X) and `/upp` (red X): bots of that side walk to

@@ -146,12 +146,11 @@
 
 	//Faction clash respawn gate
 	var/mob/dead/observer/abandoning_ghost
-	if(MODE_HAS_FLAG(MODE_FACTION_CLASH) && !is_admin)
-		var/deathtime = world.time - src.timeofdeath
-		var/cooldown = clash_respawn_cooldown()
-		if(deathtime < cooldown)
-			to_chat(usr, SPAN_WARNING("You must wait at least [DisplayTimeText(cooldown)] before respawning."))
-			log_debug("HVH: respawn blocked for [key_name(usr)], dead [deathtime / 10]s")
+	if(MODE_HAS_FLAG(MODE_FACTION_CLASH) && (!is_admin || clash_respawn_wait(src)))
+		var/wait = clash_respawn_wait(src)
+		if(wait)
+			to_chat(usr, SPAN_WARNING("You can respawn in [DisplayTimeText(wait)]."))
+			log_debug("HVH: respawn blocked for [key_name(usr)], [wait / 10]s left")
 			return
 		if(get_revivable_body())
 			if(!confirmed && alert(usr, "Your body can still be revived. Respawn anyway?", "Confirm Respawn", "Yes", "No") != "Yes")

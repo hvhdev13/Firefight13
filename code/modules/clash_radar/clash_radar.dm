@@ -4,11 +4,13 @@
 #define RADAR_REFRESH (5 DECISECONDS)
 #define RADAR_SWEEP_TAIL 45
 #define RADAR_SWEEP_PERIOD 20
+#define RADAR_LOOKAHEAD (360 * RADAR_REFRESH / RADAR_SWEEP_PERIOD)
 #define RADAR_BLIP_FADED_ALPHA 30
 
 #define RADAR_COLOR_BEVEL rgb(77, 86, 94)
 #define RADAR_COLOR_SHADOW rgb(21, 24, 27)
 #define RADAR_COLOR_TICK rgb(106, 116, 124)
+#define RADAR_COLOR_FILL rgb(14, 17, 21)
 #define RADAR_TOGGLE_SIZE 11
 #define RADAR_KEEN_EARS_RANGE 14
 
@@ -21,6 +23,8 @@ GLOBAL_LIST_INIT(clash_radar_glyphs, list(
 	"A" = list(".X.", "X.X", "XXX", "X.X", "X.X"),
 	"B" = list("XX.", "X.X", "XX.", "X.X", "XX."),
 	"C" = list(".XX", "X..", "X..", "X..", ".XX"),
+	"D" = list("XX.", "X.X", "X.X", "X.X", "XX."),
+	"E" = list("XXX", "X..", "XX.", "X..", "XXX"),
 	"F" = list("XXX", "X..", "XX.", "X..", "X.."),
 	"H" = list("X.X", "X.X", "XXX", "X.X", "X.X"),
 ))
@@ -35,8 +39,7 @@ GLOBAL_LIST_INIT(clash_radar_tones, list(
 /atom/movable/screen/clash_radar_toggle
 	name = "Toggle radar"
 	icon = null
-	screen_loc = "LEFT:6,TOP:-134"
-	pixel_y = RADAR_SIZE - RADAR_TOGGLE_SIZE
+	screen_loc = "LEFT:6,TOP:-58"
 	mouse_opacity = MOUSE_OPACITY_OPAQUE
 	var/shown_on
 
@@ -244,10 +247,14 @@ GLOBAL_LIST_INIT(clash_radar_tones, list(
 /atom/movable/clash_radar_sweep/Initialize(mapload, ...)
 	. = ..()
 	icon = get_clash_radar_sweep()
+	spin_from(0)
+
+/atom/movable/clash_radar_sweep/proc/spin_from(angle)
 	var/spin = get_clash_turn_sign()
-	animate(src, transform = turn(matrix(), spin * 120), time = RADAR_SWEEP_PERIOD / 3, loop = -1)
-	animate(transform = turn(matrix(), spin * 240), time = RADAR_SWEEP_PERIOD / 3)
-	animate(transform = null, time = RADAR_SWEEP_PERIOD / 3)
+	transform = turn(matrix(), spin * angle)
+	animate(src, transform = turn(matrix(), spin * (angle + 120)), time = RADAR_SWEEP_PERIOD / 3, loop = -1)
+	animate(transform = turn(matrix(), spin * (angle + 240)), time = RADAR_SWEEP_PERIOD / 3)
+	animate(transform = turn(matrix(), spin * angle), time = RADAR_SWEEP_PERIOD / 3)
 
 /atom/movable/clash_radar_blip
 	icon = null
@@ -256,25 +263,28 @@ GLOBAL_LIST_INIT(clash_radar_tones, list(
 	alpha = 0
 	var/angle = 0
 	var/contact
+	var/held_until = 0
 
 /atom/movable/screen/clash_radar
 	name = ""
 	icon = null
 	icon_state = null
 	mouse_opacity = MOUSE_OPACITY_TRANSPARENT
-	screen_loc = "LEFT:6,TOP:-134"
+	screen_loc = "LEFT:6,TOP:-58"
 	alpha = 0
 	var/atom/movable/clash_radar_sweep/sweep
 	var/sweep_started
+	var/sweep_synced
 	var/list/blips = list()
 	var/list/painted = list()
-	var/last_sweep_angle
+	var/painted_to
 
 /atom/movable/screen/clash_radar/Initialize(mapload, ...)
 	. = ..()
 	icon = get_clash_radar_backdrop()
 	sweep = new
 	sweep_started = world.time
+	sweep_synced = world.time
 	vis_contents += sweep
 
 /atom/movable/screen/clash_radar/Destroy()
@@ -289,11 +299,12 @@ GLOBAL_LIST_INIT(clash_radar_tones, list(
 	alpha = 0
 	overlays.Cut()
 	painted.Cut()
-	last_sweep_angle = null
+	painted_to = null
 	for(var/atom/movable/clash_radar_blip/blip as anything in blips)
 		animate(blip)
 		blip.alpha = 0
 		blip.contact = null
+		blip.held_until = 0
 
 /atom/movable/screen/clash_radar/proc/get_sweep_angle()
 	var/elapsed = world.time - sweep_started
@@ -301,41 +312,49 @@ GLOBAL_LIST_INIT(clash_radar_tones, list(
 
 /atom/movable/screen/clash_radar/proc/get_free_blip()
 	for(var/atom/movable/clash_radar_blip/blip as anything in blips)
-		if(!blip.contact)
+		if(!blip.contact && blip.held_until <= world.time)
 			return blip
 	var/atom/movable/clash_radar_blip/new_blip = new
 	blips += new_blip
 	vis_contents += new_blip
 	return new_blip
 
-/atom/movable/screen/clash_radar/proc/fade_blip(atom/movable/clash_radar_blip/blip, behind)
-	animate(blip)
-	blip.alpha = 255 - (255 - RADAR_BLIP_FADED_ALPHA) * behind / 360
-	animate(blip, alpha = RADAR_BLIP_FADED_ALPHA, time = RADAR_SWEEP_PERIOD * (360 - behind) / 360)
-
 /atom/movable/screen/clash_radar/proc/swept(angle, from, arc)
 	return (angle - from + 720) % 360 <= arc
 
-/atom/movable/screen/clash_radar/proc/place_mark(atom/movable/clash_radar_blip/blip, dx, dy, kind)
+/atom/movable/screen/clash_radar/proc/ahead_of_sweep(angle, sweep_angle)
+	return (angle - sweep_angle + 900) % 360 - 180
+
+/atom/movable/screen/clash_radar/proc/light_blip(atom/movable/clash_radar_blip/blip, dx, dy, kind, ahead, lit)
 	var/icon/mark_icon = get_clash_radar_mark(kind)
 	if(blip.icon != mark_icon)
 		blip.icon = mark_icon
 	var/per_tile = (RADAR_SIZE * 0.5 - RADAR_EDGE_MARGIN) / RADAR_RANGE
-	blip.pixel_x = round(RADAR_SIZE * 0.5 + dx * per_tile - mark_icon.Width() * 0.5)
-	blip.pixel_y = round(RADAR_SIZE * 0.5 + dy * per_tile - mark_icon.Height() * 0.5)
+	var/mark_x = round(RADAR_SIZE * 0.5 + dx * per_tile - mark_icon.Width() * 0.5)
+	var/mark_y = round(RADAR_SIZE * 0.5 + dy * per_tile - mark_icon.Height() * 0.5)
+	if(ahead > 0)
+		animate(blip, alpha = lit ? RADAR_BLIP_FADED_ALPHA : 0, time = RADAR_SWEEP_PERIOD * ahead / 360)
+		animate(pixel_x = mark_x, pixel_y = mark_y, alpha = 255, time = 0)
+		animate(alpha = RADAR_BLIP_FADED_ALPHA, time = RADAR_SWEEP_PERIOD)
+		return
+	animate(blip)
+	blip.pixel_x = mark_x
+	blip.pixel_y = mark_y
+	blip.alpha = 255 + (255 - RADAR_BLIP_FADED_ALPHA) * ahead / 360
+	animate(blip, alpha = RADAR_BLIP_FADED_ALPHA, time = RADAR_SWEEP_PERIOD * (360 + ahead) / 360)
 
 /atom/movable/screen/clash_radar/proc/paint(contact, dx, dy, kind, from, arc, sweep_angle)
 	var/angle = delta_to_angle(dx, dy)
 	if(!swept(angle, from, arc))
 		return
 	var/atom/movable/clash_radar_blip/blip = painted[contact]
+	var/lit = !!blip
 	if(!blip)
 		blip = get_free_blip()
 		blip.contact = contact
 		painted[contact] = blip
 	blip.angle = angle
-	place_mark(blip, dx, dy, kind)
-	fade_blip(blip, (sweep_angle - angle + 720) % 360)
+	light_blip(blip, dx, dy, kind, ahead_of_sweep(angle, sweep_angle), lit)
 
 /atom/movable/screen/clash_radar/proc/clash_paint_build(mob/living/carbon/human/viewer, atom/build, kind, list/seen, from, arc, sweep_angle)
 	if(build.z != viewer.z)
@@ -351,9 +370,12 @@ GLOBAL_LIST_INIT(clash_radar_tones, list(
 /atom/movable/screen/clash_radar/proc/render(mob/living/carbon/human/viewer)
 	alpha = 255
 	var/sweep_angle = get_sweep_angle()
-	var/from = isnull(last_sweep_angle) ? sweep_angle - 360 * RADAR_REFRESH / RADAR_SWEEP_PERIOD : last_sweep_angle
-	var/arc = (sweep_angle - from + 720) % 360
-	last_sweep_angle = sweep_angle
+	if(world.time - sweep_synced >= RADAR_SWEEP_PERIOD)
+		sweep_synced = world.time
+		sweep.spin_from(sweep_angle)
+	var/from = isnull(painted_to) ? sweep_angle - RADAR_LOOKAHEAD : painted_to
+	var/arc = (sweep_angle + RADAR_LOOKAHEAD - from + 720) % 360
+	painted_to = sweep_angle + RADAR_LOOKAHEAD
 	var/list/seen = list()
 	var/medic_sense = clash_has_perk(viewer, /datum/clash_perk/medic_sense)
 	for(var/mob/living/carbon/human/ally as anything in GLOB.alive_human_list)
@@ -437,6 +459,12 @@ GLOBAL_LIST_INIT(clash_radar_tones, list(
 			continue
 		painted -= contact
 		gone.contact = null
+		var/ahead = ahead_of_sweep(gone.angle, sweep_angle)
+		if(ahead > 0)
+			gone.held_until = world.time + RADAR_SWEEP_PERIOD * ahead / 360
+			animate(gone, alpha = RADAR_BLIP_FADED_ALPHA, time = RADAR_SWEEP_PERIOD * ahead / 360)
+			animate(alpha = 0, time = 0)
+			continue
 		animate(gone)
 		gone.alpha = 0
 	var/icon/self_icon = get_clash_radar_mark("self")
@@ -466,21 +494,27 @@ GLOBAL_LIST_INIT(clash_radar_tones, list(
 			continue
 		radar.render(player)
 
+/proc/get_clash_hud_button_icon()
+	if(GLOB.clash_radar_toggle_icons["blank"])
+		return GLOB.clash_radar_toggle_icons["blank"]
+	var/icon/button = icon('icons/effects/effects.dmi', "nothing")
+	button.Scale(RADAR_TOGGLE_SIZE, RADAR_TOGGLE_SIZE)
+	button.DrawBox(RADAR_COLOR_SHADOW, 1, 1, RADAR_TOGGLE_SIZE, RADAR_TOGGLE_SIZE)
+	button.DrawBox(RADAR_COLOR_FILL, 2, 2, RADAR_TOGGLE_SIZE - 1, RADAR_TOGGLE_SIZE - 1)
+	button.DrawBox(RADAR_COLOR_BEVEL, 2, RADAR_TOGGLE_SIZE - 1, RADAR_TOGGLE_SIZE - 1, RADAR_TOGGLE_SIZE - 1)
+	GLOB.clash_radar_toggle_icons["blank"] = button
+	return button
+
 /proc/get_clash_radar_toggle_icon(radar_on)
 	var/key = radar_on ? "on" : "off"
 	if(GLOB.clash_radar_toggle_icons[key])
 		return GLOB.clash_radar_toggle_icons[key]
-	var/fill = rgb(14, 17, 21)
-	var/icon/button = icon('icons/effects/effects.dmi', "nothing")
-	button.Scale(RADAR_TOGGLE_SIZE, RADAR_TOGGLE_SIZE)
-	button.DrawBox(RADAR_COLOR_SHADOW, 1, 1, RADAR_TOGGLE_SIZE, RADAR_TOGGLE_SIZE)
-	button.DrawBox(fill, 2, 2, RADAR_TOGGLE_SIZE - 1, RADAR_TOGGLE_SIZE - 1)
-	button.DrawBox(RADAR_COLOR_BEVEL, 2, RADAR_TOGGLE_SIZE - 1, RADAR_TOGGLE_SIZE - 1, RADAR_TOGGLE_SIZE - 1)
+	var/icon/button = icon(get_clash_hud_button_icon())
 	if(radar_on)
 		button.DrawBox(RADAR_COLOR_TICK, 4, 4, RADAR_TOGGLE_SIZE - 3, 4)
 	else
 		button.DrawBox(RADAR_COLOR_TICK, 4, 4, RADAR_TOGGLE_SIZE - 3, RADAR_TOGGLE_SIZE - 3)
-		button.DrawBox(fill, 5, 5, RADAR_TOGGLE_SIZE - 4, RADAR_TOGGLE_SIZE - 4)
+		button.DrawBox(RADAR_COLOR_FILL, 5, 5, RADAR_TOGGLE_SIZE - 4, RADAR_TOGGLE_SIZE - 4)
 	GLOB.clash_radar_toggle_icons[key] = button
 	return button
 
@@ -518,9 +552,11 @@ GLOBAL_LIST_INIT(clash_radar_tones, list(
 #undef RADAR_REFRESH
 #undef RADAR_SWEEP_TAIL
 #undef RADAR_SWEEP_PERIOD
+#undef RADAR_LOOKAHEAD
 #undef RADAR_BLIP_FADED_ALPHA
 #undef RADAR_COLOR_BEVEL
 #undef RADAR_COLOR_SHADOW
 #undef RADAR_COLOR_TICK
+#undef RADAR_COLOR_FILL
 #undef RADAR_TOGGLE_SIZE
 #undef RADAR_KEEN_EARS_RANGE

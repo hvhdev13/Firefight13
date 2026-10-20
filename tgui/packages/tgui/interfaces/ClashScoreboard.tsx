@@ -20,6 +20,7 @@ interface Row {
   is_viewer: BooleanLike;
   mvp: BooleanLike;
   level?: number;
+  veteran?: string;
 }
 
 interface Team {
@@ -87,6 +88,7 @@ interface ScoreboardData {
   seconds_left?: number;
   countdown?: number;
   intermission?: number;
+  overtime?: BooleanLike;
   finished?: BooleanLike;
   match?: number;
   matches?: number;
@@ -123,6 +125,9 @@ const getStatus = (data: ScoreboardData) => {
   }
   if (countdown) {
     return { big: clock(countdown), small: 'Match starts' };
+  }
+  if (data.overtime) {
+    return { big: '0:00', small: 'Overtime', urgent: true };
   }
   if (seconds_left) {
     return {
@@ -322,9 +327,17 @@ const TeamTable = (props: {
                     </span>
                   )}
                 </div>
-                {row.role && (
-                  <div className="ClashScoreboard__role">{row.role}</div>
-                )}
+                {row.role &&
+                  (row.veteran ? (
+                    <div
+                      className="ClashScoreboard__role ClashScoreboard__role--veteran"
+                      title={row.veteran}
+                    >
+                      <Icon name="medal" /> Veteran {row.role}
+                    </div>
+                  ) : (
+                    <div className="ClashScoreboard__role">{row.role}</div>
+                  ))}
               </td>
               <td className="ClashScoreboard__kills">{row.kills}</td>
               {showBotKills && <td>{row.bot_kills}</td>}
