@@ -8,8 +8,6 @@ $ticker-height: 48px;
   background-position: 'center';
   background-size: 'cover';
 
-  --uscm: 0;
-  --upp: 0;
   --glitch: 0;
 
   &.Layout__content.Window__content::before {
@@ -32,42 +30,15 @@ $ticker-height: 48px;
     }
   }
 
-  .feedFilters {
-    position: absolute;
-    width: 0;
-    height: 0;
-  }
-
-  .feedPicture {
-    position: absolute;
-    inset: 0;
-    filter: url(#feedTone) brightness(1.15);
-  }
-
-  .feedScene,
-  .feedBloom {
+  // The scene renders at 540p and is stretched to fill the screen, which gives
+  // it the soft tape look. Contrast and brightness crush the black level.
+  .feedScene {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     display: block;
-  }
-
-  .feedScene {
-    filter: url(#feedTape);
-  }
-
-  .feedBloom {
-    mix-blend-mode: screen;
-    opacity: 0.65;
-    filter: blur(3px) brightness(1.4) saturate(1.3);
-  }
-
-  .feedTint {
-    position: absolute;
-    inset: 0;
-    background: hsla(132, 38%, 25%, 0.06);
-    mix-blend-mode: color;
+    filter: contrast(1.136) brightness(1.077);
   }
 
   .feedSide {
@@ -75,12 +46,12 @@ $ticker-height: 48px;
     top: 0;
     bottom: 0;
     width: 55%;
-    mix-blend-mode: screen;
+    opacity: 0.05;
+    will-change: opacity;
   }
 
   .feedSideUscm {
     left: 0;
-    opacity: calc(0.05 + 0.05 * var(--uscm));
     background: radial-gradient(
       ellipse 55% 50% at 0% 62%,
       hsla(131, 100%, 68%, 0.55),
@@ -91,7 +62,6 @@ $ticker-height: 48px;
 
   .feedSideUpp {
     right: 0;
-    opacity: calc(0.05 + 0.05 * var(--upp));
     background: radial-gradient(
       ellipse 55% 50% at 100% 68%,
       hsla(9, 100%, 60%, 0.6),
@@ -102,31 +72,28 @@ $ticker-height: 48px;
 
   .feedNoise {
     position: absolute;
-    inset: -420px -560px;
-    opacity: calc(0.32 + 0.14 * var(--glitch));
-    mix-blend-mode: multiply;
+    inset: 0 -560px -420px 0;
+    opacity: 0.32;
+    will-change: transform;
     image-rendering: pixelated;
     background-size: 560px 420px;
   }
 
+  // Scanlines and vignette share a layer so there is one less to composite.
   .feedLines {
     position: absolute;
     inset: 0;
-    background: repeating-linear-gradient(
-      0deg,
-      hsla(0, 0%, 0%, 0.6) 0 1px,
-      transparent 1px 3px
-    );
-  }
-
-  .feedVignette {
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(
-      ellipse 72% 72% at 50% 50%,
-      transparent 55%,
-      hsla(0, 0%, 0%, 0.55)
-    );
+    background:
+      radial-gradient(
+        ellipse 72% 72% at 50% 50%,
+        transparent 55%,
+        hsla(0, 0%, 0%, 0.55)
+      ),
+      repeating-linear-gradient(
+        0deg,
+        hsla(0, 0%, 0%, 0.6) 0 1px,
+        transparent 1px 3px
+      );
   }
 
   .feedHud {
