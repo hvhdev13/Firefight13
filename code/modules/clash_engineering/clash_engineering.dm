@@ -7,7 +7,8 @@
 #define CLASH_MG_BULLET_SHARE 0.5
 #define CLASH_MG_BLAST_MULT 1.5
 #define CLASH_T37_DAMAGE 33
-#define CLASH_M56D_DAMAGE 16
+#define CLASH_M56D_DAMAGE 18
+#define CLASH_M56D_FULL_DAMAGE_RANGE 12
 #define CLASH_MG_ACCURACY -10
 #define CLASH_MG_ACCURATE_RANGE 9
 #define CLASH_MG_RELOAD_TIME (1 SECONDS)
@@ -104,6 +105,8 @@ GLOBAL_LIST_INIT(clash_arena_eng_removed, list(
 	var/sentry_tier = clash_engineer_sentry_choice(engineer)
 	if(sentry_tier)
 		clash_give_engineer_item(engineer, clash_new_build(engineer, sentry_tier))
+		for(var/ammo_type in clash_build_ammo(engineer.faction, sentry_tier))
+			clash_give_engineer_item(engineer, new ammo_type(engineer))
 	clash_give_engineer_item(engineer, clash_new_crate(engineer))
 
 /proc/clash_goggles_up(obj/item/clothing/glasses/welding/goggles, mob/living/carbon/human/wearer)
@@ -132,6 +135,13 @@ GLOBAL_LIST_INIT(clash_arena_eng_removed, list(
 
 /proc/clash_new_build(mob/living/carbon/human/engineer, tier)
 	return tier == CLASH_SENTRY_MG ? clash_new_mg(engineer) : clash_new_sentry(engineer, tier)
+
+/proc/clash_build_ammo(faction, tier)
+	if(tier == CLASH_SENTRY_FLAMER)
+		return list(/obj/item/ammo_magazine/flamer_tank)
+	if(tier == CLASH_SENTRY_MG && faction == FACTION_UPP)
+		return list(/obj/item/ammo_magazine/m2c/t37/clash, /obj/item/ammo_magazine/m2c/t37/clash)
+	return list()
 
 /proc/clash_new_crate(mob/living/carbon/human/engineer)
 	var/crate_type = engineer.faction == FACTION_UPP ? /obj/item/clash_ammo_crate/upp : /obj/item/clash_ammo_crate
@@ -687,6 +697,17 @@ GLOBAL_LIST_EMPTY(clash_engineer_rebuilds)
 	playsound(loc, empty_alarm, 70, 1)
 	update_icon()
 
+/obj/structure/machinery/m56d_hmg/auto/clash/fire_shot()
+	. = ..()
+	if(. == AUTOFIRE_CONTINUE)
+		clash_mark_loud(operator)
+
+// Mounted guns never copy the ammo's full damage range onto the bullet, so it falls off from the muzzle.
+/obj/structure/machinery/m56d_hmg/auto/clash/load_into_chamber()
+	. = ..()
+	if(in_chamber)
+		in_chamber.effective_range_max = in_chamber.ammo.effective_range_max
+
 /obj/structure/machinery/m56d_hmg/auto/clash/update_health(amount)
 	health = min(health - amount, health_max)
 	if(health > 0)
@@ -839,6 +860,7 @@ GLOBAL_LIST_EMPTY(clash_engineer_rebuilds)
 /datum/ammo/bullet/machinegun/clash/setup_faction_clash_values()
 	. = ..()
 	damage = CLASH_M56D_DAMAGE
+	effective_range_max = CLASH_M56D_FULL_DAMAGE_RANGE
 	accuracy = CLASH_MG_ACCURACY
 	shell_speed = AMMO_SPEED_TIER_6
 	scatter = 0
@@ -873,6 +895,7 @@ GLOBAL_LIST_EMPTY(clash_engineer_rebuilds)
 #undef CLASH_MG_BLAST_MULT
 #undef CLASH_T37_DAMAGE
 #undef CLASH_M56D_DAMAGE
+#undef CLASH_M56D_FULL_DAMAGE_RANGE
 #undef CLASH_MG_ACCURACY
 #undef CLASH_MG_ACCURATE_RANGE
 #undef CLASH_MG_RELOAD_TIME

@@ -32,7 +32,9 @@ GLOBAL_LIST_EMPTY(clash_engineer_crates)
 /obj/item/clash_ammo_crate/Destroy()
 	if(owner_ckey)
 		clash_forget_build(GLOB.clash_engineer_crates, owner_ckey, src)
-	QDEL_NULL(deployed)
+	if(deployed)
+		deployed.packed = null
+		QDEL_NULL(deployed)
 	return ..()
 
 /obj/item/clash_ammo_crate/attack_hand(mob/user)

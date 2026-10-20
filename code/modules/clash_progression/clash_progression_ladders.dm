@@ -8,7 +8,7 @@ GLOBAL_LIST_INIT(clash_starting_kits, list(
 		KIT_SLOT_POUCH_R = /obj/item/storage/pouch/magazine,
 		KIT_SLOT_WEBBING = /obj/item/clothing/accessory/storage/webbing/black,
 		KIT_SLOT_PRIMARY = /obj/item/weapon/gun/rifle/m41a,
-		KIT_SLOT_SIDEARM = /obj/item/weapon/gun/pistol/m4a3,
+		KIT_SLOT_SIDEARM = /obj/item/weapon/gun/pistol/m1911,
 	),
 	FACTION_UPP = list(
 		KIT_SLOT_HELMET = /obj/item/clothing/head/helmet/marine/veteran/UPP,
@@ -29,7 +29,6 @@ GLOBAL_LIST_INIT(clash_faction_ladders, list(
 		list(2, /obj/item/clothing/head/helmet/marine/jungle),
 		list(3, /obj/item/weapon/gun/shotgun/pump/m37a),
 //		list(5, /obj/item/weapon/gun/smg/m39),
-		list(7, /obj/item/weapon/gun/pistol/mod88),
 		list(9, /obj/item/clothing/head/helmet/marine/desert),
 		list(12, /obj/item/clothing/head/helmet/marine/urban),
 		list(13, /obj/item/weapon/gun/revolver/m44),
@@ -37,7 +36,6 @@ GLOBAL_LIST_INIT(clash_faction_ladders, list(
 		list(16, /obj/item/weapon/gun/rifle/m4ra),
 		list(17, /obj/item/weapon/gun/pistol/m10),
 		list(18, /obj/item/weapon/gun/lever_action/xm88),
-		list(19, /obj/item/weapon/gun/pistol/m1911),
 		list(20, /obj/item/weapon/gun/pistol/vp78),
 	),
 	FACTION_UPP = list(
@@ -45,7 +43,7 @@ GLOBAL_LIST_INIT(clash_faction_ladders, list(
 		list(2, /obj/item/clothing/head/helmet/marine/veteran/UPP/army),
 		list(3, /obj/item/weapon/gun/shotgun/pump/type23),
 //		list(5, /obj/item/weapon/gun/smg/bizon),
-		list(7, /obj/item/weapon/gun/pistol/np92),
+		list(7, /obj/item/weapon/gun/pistol/mod88),
 		list(13, /obj/item/weapon/gun/revolver/upp),
 		list(15, /obj/item/weapon/gun/flamer/m240),
 		list(16, /obj/item/weapon/gun/rifle/type71/carbine),

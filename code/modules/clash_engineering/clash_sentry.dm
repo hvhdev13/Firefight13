@@ -648,8 +648,9 @@ GLOBAL_LIST_INIT(clash_sentry_kits, list(
 	RegisterSignal(victim, list(COMSIG_MOB_DEATH, COMSIG_PARENT_QDELETING), PROC_REF(clash_laser_target_lost))
 	if(!clash_laser)
 		clash_laser = new(get_turf(src))
-		clash_laser.transform = clash_laser_shape(clash_laser_facing_point())
-	animate(clash_laser, transform = clash_laser_shape(clash_laser_point(victim)), time = CLASH_LASER_SWEEP_TIME, easing = SINE_EASING|EASE_OUT)
+		clash_laser.transform = clash_laser_shape(clash_laser_point(victim))
+		return
+	animate(clash_laser, transform = clash_laser_shape(clash_laser_point(victim)), time = CLASH_LASER_SWEEP_TIME, easing = SINE_EASING|EASE_OUT, flags = ANIMATION_LINEAR_TRANSFORM)
 
 /obj/structure/machinery/defenses/sentry/proc/clash_laser_target_moved(atom/movable/mover, atom/old_loc, dir, forced)
 	SIGNAL_HANDLER
@@ -657,7 +658,7 @@ GLOBAL_LIST_INIT(clash_sentry_kits, list(
 		clash_drop_laser()
 		return
 	var/glide_time = clash_laser_target.glide_size ? clamp(world.icon_size / clash_laser_target.glide_size * world.tick_lag, world.tick_lag, CLASH_LASER_SWEEP_TIME) : world.tick_lag
-	animate(clash_laser, transform = clash_laser_shape(clash_laser_point(clash_laser_target)), time = glide_time)
+	animate(clash_laser, transform = clash_laser_shape(clash_laser_point(clash_laser_target)), time = glide_time, flags = ANIMATION_LINEAR_TRANSFORM)
 
 /obj/structure/machinery/defenses/sentry/proc/clash_laser_target_lost()
 	SIGNAL_HANDLER
@@ -692,10 +693,6 @@ GLOBAL_LIST_INIT(clash_sentry_kits, list(
 			if(smoke.obscuring)
 				return FALSE
 	return TRUE
-
-/obj/structure/machinery/defenses/sentry/proc/clash_laser_facing_point()
-	var/list/facing = list(dir & EAST ? 1 : (dir & WEST ? -1 : 0), dir & NORTH ? 1 : (dir & SOUTH ? -1 : 0))
-	return list(facing[1] * world.icon_size, facing[2] * world.icon_size)
 
 /obj/structure/machinery/defenses/sentry/proc/clash_laser_point(atom/movable/victim)
 	return list((victim.x - x) * world.icon_size + victim.pixel_x, (victim.y - y) * world.icon_size + victim.pixel_y)

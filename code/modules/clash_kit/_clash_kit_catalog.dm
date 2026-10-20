@@ -239,13 +239,16 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 	else if(istype(sample, /obj/item/weapon/gun))
 		var/obj/item/weapon/gun/gun = sample
 		if(option.ammo_type)
-			var/obj/item/ammo_magazine/magazine = option.ammo_type
-			var/datum/ammo/round = GLOB.ammo_list[initial(magazine.default_ammo)]
+			var/obj/item/ammo_magazine/magazine = new option.ammo_type
+			var/datum/ammo/round = GLOB.ammo_list[magazine.default_ammo]
 			if(round)
-				. += list(list("Damage", round.damage))
+				if(!round.faction_clash_applied && SSticker.mode && MODE_HAS_FLAG(MODE_FACTION_CLASH))
+					round.setup_faction_clash_values()
+				. += list(list("Damage", round(round.damage * gun.damage_mult)))
 				if(round.penetration)
 					. += list(list("AP", round.penetration))
-			. += list(list("Rounds", initial(magazine.max_rounds)))
+			. += list(list("Rounds", magazine.max_rounds))
+			qdel(magazine)
 		var/delay = gun.get_fire_delay()
 		if(delay > 0)
 			. += list(list("RPM", round(600 / delay)))
@@ -578,9 +581,7 @@ GLOBAL_LIST_INIT(clash_kit_blocked_attachments, list(
 	smartgun.only_class = GLOB.clash_job_classes[JOB_SQUAD_SMARTGUN]
 	add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "M240A1 incinerator", /obj/item/weapon/gun/flamer/m240, "Burns out a room. Light the pilot first", /obj/item/ammo_magazine/flamer_tank, 4)
 	add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "XM88 heavy rifle", /obj/item/weapon/gun/lever_action/xm88, "Lever action, hits very hard", /obj/item/ammo_magazine/handful/lever_action/xm88, 4)
-	add_clash_kit_option(faction, KIT_SLOT_SIDEARM, "M4A3 service pistol", /obj/item/weapon/gun/pistol/m4a3, "Standard sidearm", /obj/item/ammo_magazine/pistol, 3)
-	add_clash_kit_option(faction, KIT_SLOT_SIDEARM, "88 Mod 4 combat pistol", /obj/item/weapon/gun/pistol/mod88, "Armor piercing, full auto", /obj/item/ammo_magazine/pistol/mod88/normalpoint, 3)
-	add_clash_kit_option(faction, KIT_SLOT_SIDEARM, "M44 combat revolver", /obj/item/weapon/gun/revolver/m44, "Six heavy rounds", /obj/item/ammo_magazine/revolver, 3)
+	add_clash_kit_option(faction, KIT_SLOT_SIDEARM, "M44 combat revolver", /obj/item/weapon/gun/revolver/m44, "Seven heavy rounds", /obj/item/ammo_magazine/revolver, 3)
 	add_clash_kit_option(faction, KIT_SLOT_SIDEARM, "M10 auto pistol", /obj/item/weapon/gun/pistol/m10, "Small and quick", /obj/item/ammo_magazine/pistol/m10, 3)
 	add_clash_kit_option(faction, KIT_SLOT_SIDEARM, "M1911 service pistol", /obj/item/weapon/gun/pistol/m1911, "Old pattern, heavy rounds", /obj/item/ammo_magazine/pistol/m1911, 3)
 	add_clash_kit_option(faction, KIT_SLOT_SIDEARM, "VP78 pistol", /obj/item/weapon/gun/pistol/vp78, "Heavy rounds in bursts", /obj/item/ammo_magazine/pistol/vp78, 3)
@@ -626,5 +627,5 @@ GLOBAL_LIST_INIT(clash_kit_blocked_attachments, list(
 	add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "M240A1 incinerator", /obj/item/weapon/gun/flamer/m240, "Burns out a room. Light the pilot first", /obj/item/ammo_magazine/flamer_tank, 4)
 	add_clash_kit_option(faction, KIT_SLOT_PRIMARY, "Type 88 marksman rifle", /obj/item/weapon/gun/rifle/sniper/svd, "Semi auto, long reach", /obj/item/ammo_magazine/sniper/svd, 4)
 	add_clash_kit_option(faction, KIT_SLOT_SIDEARM, "Type 73 pistol", /obj/item/weapon/gun/pistol/t73, "Standard sidearm", /obj/item/ammo_magazine/pistol/t73, 3)
-	add_clash_kit_option(faction, KIT_SLOT_SIDEARM, "NP92 pistol", /obj/item/weapon/gun/pistol/np92, "Bigger magazine", /obj/item/ammo_magazine/pistol/np92, 3)
-	add_clash_kit_option(faction, KIT_SLOT_SIDEARM, "Type 44 revolver", /obj/item/weapon/gun/revolver/upp, "Six heavy rounds", /obj/item/ammo_magazine/revolver/upp, 3)
+	add_clash_kit_option(faction, KIT_SLOT_SIDEARM, "88 Mod 4 combat pistol", /obj/item/weapon/gun/pistol/mod88, "Burst fire, large magazine", /obj/item/ammo_magazine/pistol/mod88/normalpoint, 3)
+	add_clash_kit_option(faction, KIT_SLOT_SIDEARM, "Type 44 revolver", /obj/item/weapon/gun/revolver/upp, "Seven heavy rounds", /obj/item/ammo_magazine/revolver/upp, 3)
