@@ -241,6 +241,8 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 			stack_trace("Clash kit could not issue [job] their full kit: [error]")
 	if(GLOB.clash_role_issued_armor[job])
 		clash_kit_replace_worn(fighter, WEAR_JACKET, GLOB.clash_role_issued_armor[job])
+	if(job == JOB_UPP_ENGI && istype(fighter.head, /obj/item/clothing/head/uppcap/ushanka))
+		clash_kit_replace_worn(fighter, WEAR_HEAD, /obj/item/clothing/head/helmet/marine/veteran/UPP/engi)
 	clash_standard_issue_guns(fighter)
 	clash_issue_specialist_armor(fighter)
 	clash_issue_machinegunner_kit(fighter)
@@ -355,6 +357,7 @@ GLOBAL_LIST_EMPTY(clash_kit_forced_items)
 	var/obj/item/clipped = wear_slot == WEAR_JACKET ? wearer.s_store : null
 	if(clipped)
 		wearer.drop_inv_item_to_loc(clipped, wearer)
+	var/old_supply = clash_kit_is_supply(old)
 	if(old)
 		var/obj/item/storage/old_storage = clash_kit_storage_of(old)
 		if(old_storage)
@@ -369,16 +372,29 @@ GLOBAL_LIST_EMPTY(clash_kit_forced_items)
 		fresh = null
 	if(clipped && !wearer.equip_to_slot_if_possible(clipped, WEAR_J_STORE, TRUE, FALSE, TRUE))
 		clash_kit_hand_or_floor(wearer, clipped)
-	var/obj/item/storage/holder = clash_kit_storage_of(fresh)
+	if(old_supply && !clash_kit_is_supply(fresh))
+		QDEL_LIST(carried)
+	clash_kit_rehouse(wearer, carried, clash_kit_storage_of(fresh))
+	return fresh
+
+/proc/clash_kit_is_supply(obj/item/container)
+	return istype(container, /obj/item/storage/belt/medical) || istype(container, /obj/item/storage/pouch/firstaid) || istype(container, /obj/item/storage/pouch/medkit) || istype(container, /obj/item/storage/pouch/medical) || istype(container, /obj/item/storage/pouch/autoinjector) || istype(container, /obj/item/storage/pouch/construction)
+
+/proc/clash_kit_rehouse(mob/living/carbon/human/wearer, list/carried, obj/item/storage/holder)
+	var/list/carried_types = list()
+	for(var/obj/item/kept in wearer.get_contents() - carried)
+		carried_types[kept.type] = TRUE
 	for(var/obj/item/thing as anything in carried)
 		if(istype(thing, /obj/item/device/flashlight/flare) && !istype(holder, /obj/item/storage/pouch/flare))
+			qdel(thing)
+			continue
+		if(carried_types[thing.type] && (istype(thing, /obj/item/tool) || istype(thing, /obj/item/device/multitool) || istype(thing, /obj/item/stack/cable_coil)))
 			qdel(thing)
 			continue
 		if(holder?.can_be_inserted(thing, wearer, TRUE) && holder.handle_item_insertion(thing, TRUE, wearer))
 			continue
 		if(!wearer.equip_to_appropriate_slot(thing))
 			qdel(thing)
-	return fresh
 
 /proc/clash_kit_remove_worn(mob/living/carbon/human/wearer, obj/item/worn, list/cosmetics)
 	if(!worn || (worn.type in cosmetics))
@@ -471,11 +487,7 @@ GLOBAL_LIST_EMPTY(clash_kit_forced_items)
 	else
 		qdel(fresh)
 		fresh = null
-	for(var/obj/item/thing as anything in carried)
-		if(fresh?.hold.can_be_inserted(thing, wearer, TRUE) && fresh.hold.handle_item_insertion(thing, TRUE, wearer))
-			continue
-		if(!wearer.equip_to_appropriate_slot(thing))
-			qdel(thing)
+	clash_kit_rehouse(wearer, carried, fresh?.hold)
 
 /proc/clash_trim_icon(icon/source)
 	var/width = source.Width()
