@@ -272,8 +272,8 @@ GLOBAL_LIST_EMPTY(clash_push_vendors)
 	var/drain_rate = 0.5
 	var/tickets_per_attacker = 6
 	var/list/ticket_callouts = list(10, 5)
-	var/attack_wave = 20 SECONDS
-	var/defend_wave = 30 SECONDS
+	var/attack_wave = 30 SECONDS
+	var/defend_wave = 45 SECONDS
 	var/first_attacker
 	var/attacker
 	var/list/point_spots = list()
