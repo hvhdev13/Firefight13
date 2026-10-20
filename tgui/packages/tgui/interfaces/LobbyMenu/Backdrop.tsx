@@ -165,6 +165,7 @@ export const LobbyBackdrop = (props: LobbyBackdropProps) => {
     let scroll = 0;
     let last = performance.now();
     let frame = 0;
+    let running = false;
 
     const aim = (heading: number) => {
       const strip = compass.current!;
@@ -175,7 +176,8 @@ export const LobbyBackdrop = (props: LobbyBackdropProps) => {
       feed.build();
       compassWidth = compass.current!.scrollWidth / 2;
       aim(HEADING);
-      if (!effects) feed.frame(performance.now() / 1000, 0, 0);
+      // Resizing clears the canvas, so redraw a still if the loop won't.
+      if (!effects || !running) feed.frame(performance.now() / 1000, 0, 0);
     };
     const resize = new ResizeObserver(fit);
     resize.observe(scene.current!);
@@ -242,7 +244,6 @@ export const LobbyBackdrop = (props: LobbyBackdropProps) => {
     // Freeze the feed while the game is alt-tabbed or minimized. Clicking
     // into another BYOND pane also blurs the lobby, so moving the mouse back
     // over it wakes the feed up again.
-    let running = false;
     const resume = () => {
       if (running || document.hidden) return;
       running = true;
