@@ -40,7 +40,12 @@ GLOBAL_LIST_EMPTY(clash_call_medic_icons)
 		return clash_gave_up(viewer) ? "STATUS: GAVE UP" : null
 	if(!clash_mode_has_medics())
 		return null
-	var/idle_status = body.stat == DEAD ? "STATUS: REVIVABLE" : "NO MEDIC NEARBY"
+	if(body.stat == DEAD)
+		return "STATUS: REVIVABLE"
+	return clash_medic_distance_status(body)
+
+/proc/clash_medic_distance_status(mob/living/carbon/human/body)
+	var/idle_status = "NO MEDIC NEARBY"
 	if(!clash_fast_medicine())
 		return idle_status
 	var/closest
@@ -208,7 +213,7 @@ GLOBAL_LIST_EMPTY(clash_call_medic_icons)
 			player.add_to_screen(button)
 		button.screen_loc = dead ? CALL_MEDIC_LOC_DEAD : CALL_MEDIC_LOC_CRIT
 		button.update(player)
-		button.show_status(dead ? null : clash_revive_status(viewer))
+		button.show_status(clash_medic_distance_status(clash_patient_body(viewer)))
 	else if(button)
 		player.remove_from_screen(button)
 	if(!give_up)

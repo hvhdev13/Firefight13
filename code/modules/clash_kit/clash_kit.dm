@@ -237,6 +237,8 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 			full_kit.load_gear(fighter, fighter.client)
 		catch(var/exception/error)
 			stack_trace("Clash kit could not issue [job] their full kit: [error]")
+	if(job == JOB_UPP_ENGI && istype(fighter.head, /obj/item/clothing/head/uppcap/ushanka))
+		clash_kit_replace_worn(fighter, WEAR_HEAD, /obj/item/clothing/head/helmet/marine/veteran/UPP/engi)
 	clash_issue_specialist_armor(fighter)
 	clash_issue_machinegunner_kit(fighter)
 	clash_issue_class_primary(fighter, job, bot)
