@@ -1,10 +1,13 @@
 const SPRITE_SIZE = 128;
-const MAX_PIXEL_RATIO = 1.5;
+const RENDER_HEIGHT = 540;
 const TRACER_TAIL = 0.05;
 const MUZZLE_TIME = 0.09;
 const FLARE_LIFE = 11;
 const ARTILLERY_LIFE = 2.5;
 const BLOOM_DIVISOR = 4;
+const BLOOM_ALPHA = 0.65;
+const BLOOM_FILTER = 'brightness(1.4) saturate(1.3)';
+const TINT = 'hsla(132, 38%, 25%, 0.06)';
 const WRECK_X = 0.82;
 const WRECK_Y = 0.84;
 
@@ -116,8 +119,8 @@ const fireFlicker = (fire: Fire, time: number) =>
 export class FeedScene {
   private readonly canvas: HTMLCanvasElement;
   private readonly context: CanvasRenderingContext2D;
-  private readonly bloom: HTMLCanvasElement;
-  private readonly bloomContext: CanvasRenderingContext2D;
+  private readonly bloom = document.createElement('canvas');
+  private readonly bloomContext = this.bloom.getContext('2d')!;
   private readonly smokeSprite = makeSprite(78, 72, 64);
   private readonly orange = makeSprite(255, 120, 40);
   private readonly flareSprite = makeSprite(255, 236, 200);
@@ -139,16 +142,17 @@ export class FeedScene {
   private nextFlare = 0;
   private nextDistant = 0;
 
-  constructor(canvas: HTMLCanvasElement, bloom: HTMLCanvasElement) {
+  constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
     this.context = canvas.getContext('2d')!;
-    this.bloom = bloom;
-    this.bloomContext = bloom.getContext('2d')!;
   }
 
   build() {
     const bounds = this.canvas.getBoundingClientRect();
-    const ratio = Math.min(MAX_PIXEL_RATIO, window.devicePixelRatio || 1);
+    const ratio = Math.min(
+      window.devicePixelRatio || 1,
+      RENDER_HEIGHT / Math.max(1, bounds.height),
+    );
     this.width = Math.max(1, Math.round(bounds.width * ratio));
     this.height = Math.max(1, Math.round(bounds.height * ratio));
     this.canvas.width = this.width;
@@ -668,7 +672,9 @@ export class FeedScene {
         );
       }
     }
+    context.setTransform(1, 0, 0, 1, 0, 0);
     this.bloomContext.globalCompositeOperation = 'copy';
+    this.bloomContext.filter = BLOOM_FILTER;
     this.bloomContext.drawImage(
       this.canvas,
       0,
@@ -676,6 +682,14 @@ export class FeedScene {
       this.bloom.width,
       this.bloom.height,
     );
+    context.globalCompositeOperation = 'screen';
+    context.globalAlpha = BLOOM_ALPHA;
+    context.drawImage(this.bloom, 0, 0, width, height);
+    context.globalCompositeOperation = 'color';
+    context.globalAlpha = 1;
+    context.fillStyle = TINT;
+    context.fillRect(0, 0, width, height);
+    context.globalCompositeOperation = 'source-over';
     this.advance(time, delta);
   }
 

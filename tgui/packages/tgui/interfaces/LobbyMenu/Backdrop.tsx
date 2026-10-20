@@ -10,16 +10,11 @@ const TICKER_SPEED = 70;
 const LOAD_RETRIES = 5;
 const FEED_YEAR = 2182;
 const HEADING = 300;
-const TAPE_BLUR = '2.45 1.7';
-const FRINGE = 0.75;
-const BLACK_LEVEL = -0.06;
+// Every frame recomposites the whole stack of full-screen layers, which on a
+// high refresh laptop screen is what spins the fans, so the feed runs at 30.
+const FRAME_RATE = 30;
 const GRAIN_WIDTH = 560;
 const GRAIN_HEIGHT = 420;
-const TONE = {
-  type: 'linear',
-  slope: 1 / (1 + BLACK_LEVEL),
-  intercept: BLACK_LEVEL / (1 + BLACK_LEVEL),
-} as const;
 
 const COMPASS_POINTS = {
   0: 'N',
@@ -45,7 +40,9 @@ const feedClock = () => {
   return `${FEED_YEAR}.${pad(now.getMonth() + 1)}.${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}Z`;
 };
 
-const noiseTexture = () => {
+// Grain is drawn as black with alpha so it darkens like a multiply blend
+// without making the browser blend the whole screen every frame.
+const noiseTexture = (darken: boolean) => {
   const canvas = document.createElement('canvas');
   canvas.width = 160;
   canvas.height = 120;
@@ -53,10 +50,10 @@ const noiseTexture = () => {
   const image = context.createImageData(160, 120);
   for (let pixel = 0; pixel < image.data.length; pixel += 4) {
     const grey = Math.random() * 255;
-    image.data[pixel] = grey;
-    image.data[pixel + 1] = grey;
-    image.data[pixel + 2] = grey;
-    image.data[pixel + 3] = 255;
+    image.data[pixel] = darken ? 0 : grey;
+    image.data[pixel + 1] = darken ? 0 : grey;
+    image.data[pixel + 2] = darken ? 0 : grey;
+    image.data[pixel + 3] = darken ? 255 - grey : 255;
   }
   context.putImageData(image, 0, 0);
   return `url(${canvas.toDataURL()})`;
@@ -77,8 +74,9 @@ export const LobbyBackdrop = (props: LobbyBackdropProps) => {
 
   const backdrop = useRef<HTMLDivElement>(null);
   const scene = useRef<HTMLCanvasElement>(null);
-  const bloom = useRef<HTMLCanvasElement>(null);
   const noise = useRef<HTMLDivElement>(null);
+  const uscmSide = useRef<HTMLDivElement>(null);
+  const uppSide = useRef<HTMLDivElement>(null);
   const compass = useRef<HTMLDivElement>(null);
   const ticker = useRef<HTMLDivElement>(null);
   const player = useRef<HTMLAudioElement>(null);
@@ -86,7 +84,8 @@ export const LobbyBackdrop = (props: LobbyBackdropProps) => {
   const retries = useRef(0);
   const tickerWidth = useRef(1);
 
-  const [texture] = useState(noiseTexture);
+  const [grain] = useState(() => noiseTexture(true));
+  const [introNoise] = useState(() => noiseTexture(false));
   const [clock, setClock] = useState(feedClock);
   const [intro, setIntro] = useState(true);
   const [creditShown, setCreditShown] = useState(0);
@@ -133,10 +132,31 @@ export const LobbyBackdrop = (props: LobbyBackdropProps) => {
 
   useEffect(() => {
     const screen = backdrop.current!.closest<HTMLElement>('.LobbyScreen')!;
-    const set = (name: string, value: number) =>
-      screen.style.setProperty(name, value.toFixed(3));
+    const shown = new Map<string, string>();
+    // Only touch styles when the value changes: a custom property on the
+    // screen restyles the whole lobby, so it is kept for the rare glitch.
+    const set = (
+      target: HTMLElement | null,
+      name: string,
+      value: number,
+      digits = 2,
+    ) => {
+      const text = value.toFixed(digits);
+      const key = `${target?.className}${name}`;
+      if (!target || shown.get(key) === text) return;
+      shown.set(key, text);
+      target.style.setProperty(name, text);
+    };
+    const sides = (uscmLevel: number, uppLevel: number) => {
+      set(uscmSide.current, 'opacity', 0.05 + 0.05 * uscmLevel, 3);
+      set(uppSide.current, 'opacity', 0.05 + 0.05 * uppLevel, 3);
+    };
+    const glitchTo = (glitch: number) => {
+      set(screen, '--glitch', glitch);
+      set(noise.current, 'opacity', 0.32 + 0.14 * glitch);
+    };
 
-    const feed = new FeedScene(scene.current!, bloom.current!);
+    const feed = new FeedScene(scene.current!);
     const uscm = new LightBar();
     const upp = new LightBar();
     let compassWidth = 1;
@@ -160,13 +180,12 @@ export const LobbyBackdrop = (props: LobbyBackdropProps) => {
     const resize = new ResizeObserver(fit);
     resize.observe(scene.current!);
 
-    if (!effects) {
-      set('--uscm', 0.3);
-      set('--upp', 0.3);
-      set('--glitch', 0);
-    }
+    sides(effects ? 0 : 0.3, effects ? 0 : 0.3);
+    glitchTo(0);
 
     const step = (now: number) => {
+      frame = requestAnimationFrame(step);
+      if (now - last < 1000 / FRAME_RATE - 2) return;
       const delta = Math.min(0.1, (now - last) / 1000);
       last = now;
       const time = now / 1000;
@@ -211,21 +230,42 @@ export const LobbyBackdrop = (props: LobbyBackdropProps) => {
             ? Math.sin((Math.PI * (glitchUntil - time)) / GLITCH_TIME)
             : 0;
 
-        set('--uscm', uscm.level);
-        set('--upp', upp.level);
-        set('--glitch', glitch);
+        sides(uscm.level, upp.level);
+        glitchTo(glitch);
         feed.frame(time, delta, glitch);
 
         aim(HEADING + 25 * Math.sin(time * 0.05) + 3 * Math.sin(time * 0.4));
         noise.current!.style.transform = `translate(${-Math.floor(Math.random() * GRAIN_WIDTH)}px, ${-Math.floor(Math.random() * GRAIN_HEIGHT)}px)`;
       }
-
-      frame = requestAnimationFrame(step);
     };
 
-    frame = requestAnimationFrame(step);
-    return () => {
+    // Freeze the feed while the game is alt-tabbed or minimized. Clicking
+    // into another BYOND pane also blurs the lobby, so moving the mouse back
+    // over it wakes the feed up again.
+    let running = false;
+    const resume = () => {
+      if (running || document.hidden) return;
+      running = true;
+      last = performance.now();
+      frame = requestAnimationFrame(step);
+    };
+    const pause = () => {
+      running = false;
       cancelAnimationFrame(frame);
+    };
+    const visibility = () => (document.hidden ? pause() : resume());
+    window.addEventListener('blur', pause);
+    window.addEventListener('focus', resume);
+    document.addEventListener('pointermove', resume);
+    document.addEventListener('visibilitychange', visibility);
+
+    resume();
+    return () => {
+      pause();
+      window.removeEventListener('blur', pause);
+      window.removeEventListener('focus', resume);
+      document.removeEventListener('pointermove', resume);
+      document.removeEventListener('visibilitychange', visibility);
       resize.disconnect();
     };
   }, [track, drops, effects]);
@@ -244,58 +284,15 @@ export const LobbyBackdrop = (props: LobbyBackdropProps) => {
       {!!music && (
         <audio src={resolveAsset(music)} ref={player} loop onError={retry} />
       )}
-      <svg className="feedFilters">
-        <filter
-          id="feedTape"
-          x="-5%"
-          y="-5%"
-          width="110%"
-          height="110%"
-          colorInterpolationFilters="sRGB"
-        >
-          <feGaussianBlur
-            in="SourceGraphic"
-            stdDeviation={TAPE_BLUR}
-            result="soft"
-          />
-          <feColorMatrix
-            in="soft"
-            type="matrix"
-            values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0"
-            result="red"
-          />
-          <feOffset in="red" dx={-FRINGE} dy="0" result="redShift" />
-          <feColorMatrix
-            in="soft"
-            type="matrix"
-            values="0 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 1 0"
-            result="cyan"
-          />
-          <feOffset in="cyan" dx={FRINGE} dy="0" result="cyanShift" />
-          <feBlend in="redShift" in2="cyanShift" mode="screen" />
-        </filter>
-        <filter id="feedTone" colorInterpolationFilters="sRGB">
-          <feComponentTransfer>
-            <feFuncR {...TONE} />
-            <feFuncG {...TONE} />
-            <feFuncB {...TONE} />
-          </feComponentTransfer>
-        </filter>
-      </svg>
-      <div className="feedPicture">
-        <canvas className="feedScene" ref={scene} />
-        <canvas className="feedBloom" ref={bloom} />
-      </div>
-      <div className="feedTint" />
-      <div className="feedSide feedSideUscm" />
-      <div className="feedSide feedSideUpp" />
+      <canvas className="feedScene" ref={scene} />
+      <div className="feedSide feedSideUscm" ref={uscmSide} />
+      <div className="feedSide feedSideUpp" ref={uppSide} />
       <div
         className="feedNoise"
         ref={noise}
-        style={{ backgroundImage: texture }}
+        style={{ backgroundImage: grain }}
       />
       <div className="feedLines" />
-      <div className="feedVignette" />
       <div className="feedHud">
         <div className="feedCorner feedCornerTopLeft" />
         <div className="feedCorner feedCornerTopRight" />
@@ -346,7 +343,7 @@ export const LobbyBackdrop = (props: LobbyBackdropProps) => {
         <div className="feedIntro">
           <div
             className="feedIntroNoise"
-            style={{ backgroundImage: texture }}
+            style={{ backgroundImage: introNoise }}
           />
           <div className="feedIntroText">
             &gt; ESTABLISHING UPLINK
