@@ -259,7 +259,26 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 	clash_issue_class_primary(fighter, job, bot)
 	clash_swap_c4_pouches(fighter)
 	clash_strip_issued_grenades(fighter)
+	clash_even_role_issue(fighter, job)
 	clash_kit_default_webbing(fighter, job)
+
+/proc/clash_even_role_issue(mob/living/carbon/human/fighter, job)
+	switch(job)
+		if(JOB_UPP)
+			for(var/obj/item/extra in fighter.get_contents())
+				if(!istype(extra, /obj/item/device/binoculars) && !istype(extra, /obj/item/storage/box/m94) && !istype(extra, /obj/item/tool/extinguisher/mini))
+					continue
+				if(extra.loc == fighter)
+					fighter.temp_drop_inv_item(extra, TRUE)
+				qdel(extra)
+		if(JOB_UPP_MEDIC)
+			var/obj/item/storage/pouch/magazine/large/pouch = fighter.r_store
+			if(istype(pouch))
+				QDEL_LIST(pouch.contents)
+				clash_kit_replace_worn(fighter, WEAR_R_STORE, /obj/item/storage/pouch/magazine)
+		if(JOB_SQUAD_ENGI)
+			if(fighter.back?.type == /obj/item/storage/backpack/marine)
+				clash_kit_replace_worn(fighter, WEAR_BACK, /obj/item/storage/backpack/marine/engineerpack)
 
 /proc/clash_pin_preset_rolls(mob/living/carbon/human/fighter)
 	var/obj/item/storage/belt/gun/type47/np92/rig = fighter.belt
