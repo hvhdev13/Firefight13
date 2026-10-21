@@ -237,6 +237,8 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 			full_kit.load_gear(fighter, fighter.client)
 		catch(var/exception/error)
 			stack_trace("Clash kit could not issue [job] their full kit: [error]")
+		if(istype(SSticker.mode, /datum/game_mode/extended/faction_clash/hvh))
+			clash_strip_subdermal_armor(fighter)
 	if(job == JOB_UPP_ENGI && istype(fighter.head, /obj/item/clothing/head/uppcap/ushanka))
 		clash_kit_replace_worn(fighter, WEAR_HEAD, /obj/item/clothing/head/helmet/marine/veteran/UPP/engi)
 	clash_issue_specialist_armor(fighter)
@@ -330,6 +332,15 @@ GLOBAL_LIST_INIT(clash_kit_old_presets, list("Rifleman", "Assault", "Carbineer",
 		uniform.attach_accessory(fighter, webbing, TRUE)
 	else
 		qdel(webbing)
+
+/proc/clash_strip_subdermal_armor(mob/living/carbon/human/fighter)
+	var/listeners = fighter.comp_lookup?[COMSIG_MOB_TAKE_DAMAGE]
+	if(!listeners)
+		return
+	var/list/hooked = list()
+	hooked += listeners
+	for(var/obj/item/device/internal_implant/subdermal_armor/implant in hooked)
+		qdel(implant)
 
 /proc/clash_kit_replace_worn(mob/living/carbon/human/wearer, wear_slot, item_type)
 	var/obj/item/old = wearer.get_item_by_slot(wear_slot)
