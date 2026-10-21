@@ -62,53 +62,6 @@ GLOBAL_LIST_INIT(clash_arena_eng_removed, list(
 	new /obj/item/stack/sheet/plasteel(src, 12)
 	new /obj/item/stack/sandbags(src, 15)
 
-/proc/clash_issue_engineer_gear(mob/living/carbon/human/engineer)
-	if(!clash_fast_medicine() || !engineer.ckey)
-		return
-	var/ckey = engineer.ckey
-	if(!clash_is_engineer(engineer))
-		clash_remove_engineer_builds(ckey, TRUE)
-		return
-	for(var/obj/item/defenses/handheld/stray in engineer.get_contents())
-		var/obj/structure/machinery/defenses/sentry/turret = stray.TR
-		if(!istype(turret) || !turret.clash_tier)
-			qdel(stray)
-	for(var/wear_slot in list(WEAR_L_STORE, WEAR_R_STORE))
-		var/obj/item/worn = engineer.get_item_by_slot(wear_slot)
-		if(istype(worn, /obj/item/storage/pouch/construction) && !istype(worn, /obj/item/storage/pouch/construction/clash))
-			QDEL_LIST(worn.contents)
-			clash_kit_replace_worn(engineer, wear_slot, /obj/item/storage/pouch/construction/clash)
-	var/list/carried = engineer.get_contents()
-	if(!(locate(/obj/item/tool/wrench) in carried))
-		clash_give_engineer_item(engineer, new /obj/item/tool/wrench(engineer))
-	if(!(locate(/obj/item/tool/weldingtool) in carried))
-		clash_give_engineer_item(engineer, new /obj/item/tool/weldingtool(engineer))
-	var/obj/item/clothing/glasses/welding/goggles = locate() in carried
-	if(goggles)
-		clash_goggles_up(goggles, engineer)
-	clash_remove_engineer_builds(ckey, FALSE)
-	var/list/sentries = GLOB.clash_engineer_sentries[ckey]
-	for(var/obj/structure/machinery/defenses/sentry/turret as anything in sentries?.Copy())
-		if(turret.clash_faction == engineer.faction)
-			turret.owner_mob = engineer
-		else
-			qdel(turret)
-	var/list/crates = GLOB.clash_engineer_crates[ckey]
-	for(var/obj/item/clash_ammo_crate/old_crate as anything in crates?.Copy())
-		if(old_crate.deployed?.faction != engineer.faction)
-			qdel(old_crate)
-	var/list/guns = GLOB.clash_engineer_mgs[ckey]
-	for(var/obj/structure/machinery/m56d_hmg/auto/clash/nest in guns?.Copy())
-		if(nest.clash_faction != engineer.faction)
-			qdel(nest)
-	clash_cancel_rebuilds(ckey)
-	var/sentry_tier = clash_engineer_sentry_choice(engineer)
-	if(sentry_tier)
-		clash_give_engineer_item(engineer, clash_new_build(engineer, sentry_tier))
-		for(var/ammo_type in clash_build_ammo(engineer.faction, sentry_tier))
-			clash_give_engineer_item(engineer, new ammo_type(engineer))
-	clash_give_engineer_item(engineer, clash_new_crate(engineer))
-
 /proc/clash_goggles_up(obj/item/clothing/glasses/welding/goggles, mob/living/carbon/human/wearer)
 	if(!goggles.active)
 		return
@@ -225,12 +178,6 @@ GLOBAL_LIST_INIT(clash_arena_eng_removed, list(
 	if(include_deployed)
 		clash_cancel_rebuilds(ckey)
 
-/proc/clash_engineer_sentry_choice(mob/living/carbon/human/engineer)
-	var/datum/clash_kit/kit = get_clash_active_kit(engineer.ckey, engineer.job)
-	if(kit?.wants_nothing(KIT_SLOT_SENTRY))
-		return null
-	return clash_kit_sentry_tier(kit, engineer.ckey)
-
 /proc/clash_kit_sentry_tier(datum/clash_kit/kit, ckey)
 	var/datum/clash_kit_option/option = kit?.get_option(KIT_SLOT_SENTRY)
 	var/tier = option ? clash_sentry_tier_of(option.item_type) : null
@@ -251,8 +198,13 @@ GLOBAL_LIST_INIT(clash_arena_eng_removed, list(
 	return option.item_type
 
 /proc/clash_give_engineer_item(mob/living/carbon/human/engineer, obj/item/item)
-	if(!engineer.equip_to_slot_if_possible(item, WEAR_IN_BACK, TRUE, FALSE, TRUE) && !engineer.put_in_hands(item))
-		item.forceMove(get_turf(engineer))
+	if(engineer.equip_to_slot_if_possible(item, WEAR_IN_BACK, TRUE, FALSE, TRUE) || engineer.put_in_hands(item))
+		return
+	var/turf/floor = get_turf(engineer)
+	if(floor)
+		item.forceMove(floor)
+	else
+		qdel(item)
 
 /proc/clash_clear_engineer_builds()
 	for(var/ckey in GLOB.clash_engineer_sentries | GLOB.clash_engineer_crates | GLOB.clash_engineer_mgs | GLOB.clash_engineer_rebuilds)

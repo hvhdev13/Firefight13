@@ -1168,6 +1168,7 @@ GLOBAL_LIST_INIT(clash_limit_callouts, list(10, 5, 1))
 		if(length(fighter.clash_spawn_points))
 			fighter.vendor_points = fighter.clash_spawn_points[1]
 			fighter.vendor_snowflake_points = fighter.clash_spawn_points[2]
+		fighter.clash_rack_bought = list()
 		if(spawn_protection)
 			fighter.AddComponent(/datum/component/clash_spawn_guard, spawn_protection)
 		if(clash_uses_kits() && fighter.ckey)

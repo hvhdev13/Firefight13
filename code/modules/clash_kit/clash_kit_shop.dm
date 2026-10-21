@@ -2,7 +2,6 @@ GLOBAL_LIST_EMPTY(clash_kit_shops)
 GLOBAL_LIST_EMPTY(clash_kit_budgets)
 GLOBAL_LIST_EMPTY(clash_item_contents)
 GLOBAL_LIST_INIT(clash_role_shop_ammo, list(
-	JOB_SQUAD_SMARTGUN = list(/obj/item/ammo_magazine/smartgun = 10),
 	JOB_SQUAD_ENGI = list(/obj/item/ammo_magazine/m56d = 10),
 	JOB_UPP_ENGI = list(/obj/item/ammo_magazine/m2c/t37/clash = 10),
 ))
@@ -22,13 +21,16 @@ GLOBAL_LIST_INIT(clash_shop_hidden_types, list(
 	/obj/item/clothing/suit/storage/marine/medium/rto,
 ))
 
-GLOBAL_LIST_INIT(clash_shop_counterparts, list(
-	JOB_UPP = JOB_SQUAD_MARINE,
-	JOB_UPP_MEDIC = JOB_SQUAD_MEDIC,
-	JOB_UPP_ENGI = JOB_SQUAD_ENGI,
-	JOB_UPP_SPECIALIST = JOB_SQUAD_SMARTGUN,
-	JOB_UPP_LEADER = JOB_SQUAD_LEADER,
+#define CLASH_SHOP_OPTIC_COST 5
+#define CLASH_SHOP_GRENADE_COST 5
+
+GLOBAL_LIST_INIT(clash_shop_optics, list(
+	/obj/item/device/helmet_visor/medical = "SensorMate Medical Optic",
+	/obj/item/device/helmet_visor/welding_visor = "Welding Visor",
+	/obj/item/clothing/glasses/hud/sensor = "SensorMate Medical HUD",
 ))
+
+GLOBAL_LIST_EMPTY(clash_packet_grenades)
 
 /mob/living/carbon/human/var/list/clash_kit_extras = list()
 /mob/living/carbon/human/var/list/clash_kit_placed = list()
@@ -87,6 +89,52 @@ GLOBAL_LIST_INIT(clash_shop_counterparts, list(
 /proc/clash_shop_hidden(item_type)
 	return is_path_in_list(item_type, GLOB.clash_shop_hidden_types) || ispath(item_type, /obj/item/device/encryptionkey) || ispath(item_type, /obj/item/pamphlet) || ispath(item_type, /obj/item/attachable) || clash_is_extended_magazine(item_type) || (ispath(item_type, /obj/item/ammo_magazine) && findtext("[item_type]/", "/ap/")) || GLOB.faction_clash_restricted_items[item_type]
 
+/proc/clash_packet_grenade(packet_type)
+	if(!ispath(packet_type, /obj/item/storage/box/packet))
+		return null
+	if(isnull(GLOB.clash_packet_grenades[packet_type]))
+		var/obj/item/storage/box/packet/sample = new packet_type
+		var/obj/item/explosive/grenade/inside = locate() in sample
+		GLOB.clash_packet_grenades[packet_type] = inside ? inside.type : FALSE
+		qdel(sample)
+	return GLOB.clash_packet_grenades[packet_type] || null
+
+/proc/clash_shop_single_grenade(list/entry)
+	var/grenade_type = clash_packet_grenade(entry[3])
+	if(!grenade_type)
+		if(!ispath(entry[3], /obj/item/explosive/grenade) || entry[2] <= 0 || entry[2] == CLASH_SHOP_GRENADE_COST)
+			return entry
+		. = entry.Copy()
+		.[2] = CLASH_SHOP_GRENADE_COST
+		return
+	var/obj/item/explosive/grenade/grenade = grenade_type
+	. = entry.Copy()
+	.[1] = capitalize(strip_improper(initial(grenade.name)))
+	.[2] = CLASH_SHOP_GRENADE_COST
+	.[3] = grenade_type
+
+/proc/clash_shop_ammo_usable(ammo_type, faction)
+	var/obj/item/ammo_magazine/magazine = ammo_type
+	var/gun_type = initial(magazine.gun_type)
+	for(var/slot in list(KIT_SLOT_PRIMARY, KIT_SLOT_SIDEARM))
+		for(var/datum/clash_kit_option/option as anything in GLOB.clash_kit_menu[faction]?[slot])
+			if(option.ammo_type == ammo_type || (gun_type && ispath(option.item_type, gun_type)) || (ammo_type in GLOB.clash_shop_shells[option.ammo_type]))
+				return TRUE
+	return FALSE
+
+/proc/clash_shop_ammo_fits(list/by_id, list/gun_types)
+	. = list()
+	for(var/id in by_id)
+		if(!by_id[id]["ammo"])
+			continue
+		var/obj/item/ammo_magazine/magazine = text2path(id)
+		var/gun_type = initial(magazine.gun_type)
+		for(var/gun in gun_types)
+			var/listed = GLOB.clash_kit_gun_ammo[gun]
+			if((gun_type && ispath(gun, gun_type)) || magazine == listed || (magazine in GLOB.clash_shop_shells[listed]))
+				. += id
+				break
+
 /proc/clash_shop_worn_option(faction, item_type)
 	var/datum/clash_kit_option/option = clash_item_option(faction, item_type)
 	return option && (option.slot in list(KIT_SLOT_BACK, KIT_SLOT_BELT, KIT_SLOT_POUCH_L, KIT_SLOT_POUCH_R, KIT_SLOT_WEBBING))
@@ -100,16 +148,18 @@ GLOBAL_LIST_INIT(clash_shop_counterparts, list(
 	var/list/primary_ammo = list("name" = "Primary ammo", "items" = list())
 	var/list/sidearm_ammo = list("name" = "Sidearm ammo", "items" = list())
 	var/list/sections = list(primary_ammo, sidearm_ammo)
-	var/list/by_name = list("SIDEARM AMMUNITION" = sidearm_ammo, "SPECIAL AMMUNITION" = primary_ammo)
+	var/list/by_name = list("PRIMARY AMMUNITION" = primary_ammo, "SIDEARM AMMUNITION" = sidearm_ammo, "SPECIAL AMMUNITION" = primary_ammo)
+	var/faction = clash_kit_faction_for_job(job)
 	for(var/slot in list(KIT_SLOT_PRIMARY, KIT_SLOT_SIDEARM))
 		var/list/section = slot == KIT_SLOT_PRIMARY ? primary_ammo : sidearm_ammo
-		for(var/datum/clash_kit_option/option as anything in GLOB.clash_kit_menu[clash_kit_faction_for_job(job)]?[slot])
+		for(var/datum/clash_kit_option/option as anything in GLOB.clash_kit_menu[faction]?[slot])
 			if(!option.ammo_type || (option.only_class && option.only_class != GLOB.clash_job_classes[job]))
 				continue
 			for(var/obj/item/ammo_type as anything in GLOB.clash_shop_shells[option.ammo_type] || list(option.ammo_type))
 				if(by_id["[ammo_type]"] || role_ammo?[ammo_type])
 					continue
 				var/list/item = clash_shop_entry(ammo_type, CLASH_SHOP_AMMO_COST)
+				item["ammo"] = TRUE
 				section["items"] += list(item)
 				by_id["[ammo_type]"] = item
 	for(var/obj/item/ammo_type as anything in role_ammo)
@@ -125,6 +175,7 @@ GLOBAL_LIST_INIT(clash_shop_counterparts, list(
 			var/list/entry = clash_arena_med_entry(listed, clash_job_is_medic(job), FALSE)
 			if(!entry)
 				continue
+			entry = clash_shop_single_grenade(entry)
 			var/entry_type = entry[3]
 			if(!entry_type)
 				var/header = uppertext(entry[1])
@@ -135,30 +186,33 @@ GLOBAL_LIST_INIT(clash_shop_counterparts, list(
 					sections += list(section)
 				continue
 			var/id = "[entry_type]"
-			if(!section || entry[4] || entry[2] <= 0 || !ispath(entry_type, /obj/item) || by_id[id] || clash_shop_hidden(entry_type) || clash_shop_worn_option(clash_kit_faction_for_job(job), entry_type))
+			if(!section || entry[4] || entry[2] <= 0 || !ispath(entry_type, /obj/item) || by_id[id] || clash_shop_hidden(entry_type) || clash_shop_worn_option(faction, entry_type))
+				continue
+			if(ispath(entry_type, /obj/item/ammo_magazine) && !clash_shop_ammo_usable(entry_type, faction))
 				continue
 			var/list/item = clash_shop_entry(entry_type, entry[2], entry[1])
+			if(ispath(entry_type, /obj/item/ammo_magazine))
+				item["ammo"] = TRUE
 			item["pool"] = source[2]
 			item["contents"] = clash_type_contents(entry_type)
 			section["items"] += list(item)
 			by_id[id] = item
+	var/list/optics = clash_shop_optics(sections)
+	if(!optics)
+		optics = list("name" = "HELMET OPTICS", "items" = list())
+		sections += list(optics)
+	for(var/optic_type in GLOB.clash_shop_optics)
+		var/list/item = by_id["[optic_type]"]
+		if(!item)
+			item = clash_shop_entry(optic_type, CLASH_SHOP_OPTIC_COST, GLOB.clash_shop_optics[optic_type])
+			optics["items"] += list(item)
+			by_id["[optic_type]"] = item
+		item["cost"] = CLASH_SHOP_OPTIC_COST
+	sections -= list(optics)
+	sections.Insert(1, list(optics))
 	for(var/list/section as anything in sections.Copy())
 		if(!length(section["items"]))
 			sections -= list(section)
-	var/list/optics = clash_shop_optics(sections)
-	var/counterpart = GLOB.clash_shop_counterparts[job]
-	if(!optics && counterpart)
-		var/list/borrowed = clash_shop_optics(get_clash_shop(counterpart)["sections"])
-		if(borrowed)
-			optics = list("name" = borrowed["name"], "items" = list())
-			for(var/list/item as anything in borrowed["items"])
-				var/list/copy = item.Copy()
-				optics["items"] += list(copy)
-				by_id[copy["id"]] = copy
-			sections += list(optics)
-	if(optics)
-		sections -= list(optics)
-		sections.Insert(1, list(optics))
 	GLOB.clash_kit_shops[job] = list("sections" = sections, "by_id" = by_id)
 	return GLOB.clash_kit_shops[job]
 
@@ -173,10 +227,10 @@ GLOBAL_LIST_INIT(clash_shop_counterparts, list(
 	var/list/limits = clash_shop_budget(ckey, job)
 	return limits ? list(budget[1] ? limits[1] : 0, min(budget[2], limits[2])) : budget
 
-/proc/clash_raise_vendor_points(mob/living/carbon/human/fighter, ckey, job)
+/proc/clash_set_vendor_points(mob/living/carbon/human/fighter, ckey, job)
 	var/list/limits = fighter.vendor_points ? clash_shop_budget(ckey, job) : null
 	if(limits)
-		fighter.vendor_points = max(fighter.vendor_points, limits[1])
+		fighter.vendor_points = limits[1]
 
 /proc/get_clash_kit_spent(datum/clash_kit/kit, job)
 	. = list(CLASH_SHOP_POINTS = 0, CLASH_SHOP_SNOWFLAKE = 0)
@@ -205,6 +259,10 @@ GLOBAL_LIST_INIT(clash_shop_counterparts, list(
 	for(var/obj/item/clothing/accessory/storage/webbing in wearer.w_uniform?.accessories)
 		count++
 		.[count > 1 ? "webbing_[count]" : "webbing"] = webbing.hold
+
+/proc/clash_kit_holder_key(key)
+	var/static/regex/holder_key = regex(@"^(back|belt|l_store|r_store|suit|webbing(_\d+)?)$")
+	return istext(key) && holder_key.Find(key)
 
 /proc/clash_kit_containers(mob/living/carbon/human/wearer)
 	. = list()
@@ -267,10 +325,13 @@ GLOBAL_LIST_INIT(clash_shop_counterparts, list(
 /proc/stock_clash_kit(mob/living/carbon/human/wearer, datum/clash_kit/kit, job, mode, ckey)
 	for(var/datum/weakref/given_ref as anything in wearer.clash_kit_extras)
 		var/obj/item/given = given_ref.resolve()
-		if(!given || !clash_kit_carried(wearer, given))
+		if(!given)
 			continue
-		if(istype(given.loc, /obj/item/clothing/head/helmet/marine))
-			clash_kit_unfit_visor(wearer, given.loc, given)
+		if(istype(given.loc, /obj/item/clothing/head/helmet/marine) && ismob(given.loc.loc))
+			clash_kit_unfit_visor(given.loc.loc, given.loc, given)
+		else if(ismob(given.loc))
+			var/mob/holder = given.loc
+			holder.temp_drop_inv_item(given, TRUE)
 		qdel(given)
 	wearer.clash_kit_extras = list()
 	wearer.clash_kit_placed = list()
@@ -357,6 +418,27 @@ GLOBAL_LIST_INIT(clash_shop_counterparts, list(
 		statuses[index] = "ok"
 	return statuses
 
+/proc/clash_kit_shop_room(mob/living/carbon/human/wearer, job)
+	. = list()
+	var/list/by_id = get_clash_shop(job)["by_id"]
+	var/list/containers = clash_kit_containers(wearer)
+	for(var/id in by_id)
+		var/item_type = text2path(id)
+		if(!ispath(item_type, /obj/item))
+			continue
+		var/obj/item/sample = clash_kit_sample(item_type)
+		if(istype(sample, /obj/item/device/helmet_visor) && !clash_kit_visor_problem(wearer.head, sample, by_id[id]["name"]))
+			continue
+		if(istype(sample, /obj/item/clothing/glasses) && !wearer.glasses)
+			continue
+		var/fits = FALSE
+		for(var/obj/item/storage/holder as anything in containers)
+			if(holder.can_be_inserted(sample, wearer, TRUE))
+				fits = TRUE
+				break
+		if(!fits)
+			. += id
+
 /proc/apply_clash_kit_moves(mob/living/carbon/human/wearer, datum/clash_kit/kit)
 	. = list()
 	var/list/holders = clash_kit_container_slots(wearer)
@@ -415,7 +497,7 @@ GLOBAL_LIST_INIT(clash_shop_counterparts, list(
 		var/list/entry = list("name" = capitalize(label), "capacity" = capacity, "items" = items, "type" = "[holder.type]", "slot" = key)
 		if(shells && clash_kit_holds_ammo(holder) && holder.can_hold_type(shells[shells[1]], wearer))
 			entry["shells"] = GLOB.clash_kit_shell_names
-			entry["fill"] = kit?.fills["[holder.type]"] || kit?.fills[CLASH_KIT_GUN_FILL] || GLOB.clash_kit_shell_names[1]
+			entry["fill"] = clash_kit_fill_of(kit, key, holder)
 		. += list(entry)
 
 /proc/describe_clash_kit_left_behind(mob/living/carbon/human/wearer, datum/clash_kit/kit)
@@ -487,12 +569,12 @@ GLOBAL_LIST_INIT(clash_gear_rack_extras, list(
 
 GLOBAL_LIST_INIT(clash_rack_role_extras, list(
 	JOB_SQUAD_SMARTGUN = list(
-		list("SPECIAL AMMUNITION", list("M41AE2 Box Magazine (10x24mm)", 5, /obj/item/ammo_magazine/rifle/lmg, null, VENDOR_ITEM_REGULAR)),
-		list("SPECIAL AMMUNITION", list("M56 Smartgun Drum", 10, /obj/item/ammo_magazine/smartgun, null, VENDOR_ITEM_REGULAR)),
+		list("SPECIAL AMMUNITION", list("M41AE2 Box Magazine (10x24mm)", CLASH_SHOP_AMMO_COST, /obj/item/ammo_magazine/rifle/lmg, null, VENDOR_ITEM_REGULAR)),
+		list("SPECIAL AMMUNITION", list("M56 Smartgun Drum", CLASH_SHOP_AMMO_COST, /obj/item/ammo_magazine/smartgun, null, VENDOR_ITEM_REGULAR)),
 	),
 	JOB_UPP_SPECIALIST = list(
-		list("SPECIAL AMMUNITION", list("QYJ-72 Ammo Box (7.62x54mmR)", 5, /obj/item/ammo_magazine/pkp, null, VENDOR_ITEM_REGULAR)),
-		list("SPECIAL AMMUNITION", list("Rotating Ammo Drum (7.62x51mm)", 5, /obj/item/ammo_magazine/minigun, null, VENDOR_ITEM_REGULAR)),
+		list("SPECIAL AMMUNITION", list("QYJ-72 Ammo Box (7.62x54mmR)", CLASH_SHOP_AMMO_COST, /obj/item/ammo_magazine/pkp, null, VENDOR_ITEM_REGULAR)),
+		list("SPECIAL AMMUNITION", list("Rotating Ammo Drum (7.62x51mm)", CLASH_SHOP_AMMO_COST, /obj/item/ammo_magazine/minigun, null, VENDOR_ITEM_REGULAR)),
 	),
 ))
 
@@ -630,6 +712,7 @@ GLOBAL_LIST_INIT(clash_gun_rack_ammo, list(
 	entry = clash_arena_med_entry(entry, medic, FALSE)
 	if(!entry || !clash_rack_paid(entry))
 		return entry
+	entry = clash_shop_single_grenade(entry)
 	var/list/item = !(entry[3] in GLOB.clash_gun_rack_ammo) && shop["[entry[3]]"]
 	if(!item)
 		return null
@@ -641,10 +724,16 @@ GLOBAL_LIST_INIT(clash_gun_rack_ammo, list(
 	var/list/shop = get_clash_shop(job)["by_id"]
 	var/medic = clash_job_is_medic(job)
 	var/list/products = list()
+	var/list/seen = list()
 	for(var/list/listed as anything in source)
 		var/list/entry = clash_rack_entry(listed, shop, medic)
-		if(entry)
-			products += list(entry)
+		if(!entry)
+			continue
+		if(ispath(entry[3]))
+			if(seen[entry[3]])
+				continue
+			seen[entry[3]] = TRUE
+		products += list(entry)
 	for(var/list/extra as anything in extras)
 		var/list/entry = clash_rack_entry(extra[2], shop, medic)
 		if(entry)
@@ -684,6 +773,85 @@ GLOBAL_LIST_INIT(clash_gun_rack_ammo, list(
 	if(!user)
 		return clash_uscm_rack_all(FALSE) + clash_rack_icon_entries()
 	return clash_rack_for(user, "uscm_clothing")
+
+/proc/clash_rack_snapshot(mob/living/carbon/human/user, turf/spot)
+	. = list()
+	if(!ishuman(user))
+		return
+	. += user.get_contents()
+	if(spot)
+		. += spot.contents
+
+/proc/clash_note_rack_vend(mob/living/carbon/human/user, list/before, turf/spot, cost)
+	if(!ishuman(user) || cost <= 0)
+		return
+	var/list/fresh = clash_rack_snapshot(user, spot) - before
+	for(var/obj/item/thing in fresh)
+		if(thing.loc in fresh)
+			continue
+		user.clash_rack_bought[WEAKREF(thing)] = cost
+		cost = 0
+
+/proc/clash_gun_rack_cost(obj/structure/machinery/cm_vending/vendor, mob/living/carbon/human/user, list/itemspec)
+	if(!ishuman(user) || !clash_uses_kits() || !ispath(LAZYACCESS(itemspec, 3), /obj/item/ammo_magazine))
+		return 0
+	if(!istype(vendor, /obj/structure/machinery/cm_vending/sorted/cargo_guns/squad_prep/clash) && !istype(vendor, /obj/structure/machinery/cm_vending/sorted/cargo_guns/upp_squad_guns/clash))
+		return 0
+	var/list/item = get_clash_shop(user.job)["by_id"]["[itemspec[3]]"]
+	return item ? item["cost"] : CLASH_SHOP_AMMO_COST
+
+/proc/clash_gun_rack_vend(obj/structure/machinery/cm_vending/vendor, list/itemspec, mob/living/carbon/human/user)
+	var/cost = clash_gun_rack_cost(vendor, user, itemspec)
+	if(!cost)
+		return 0
+	if(user.vendor_points < cost)
+		to_chat(user, SPAN_WARNING("[itemspec[1]] costs [cost] points. You have [user.vendor_points]."))
+		vendor.vend_fail()
+		return -1
+	user.vendor_points -= cost
+	return cost
+
+/obj/structure/machinery/cm_vending/sorted/cargo_guns/squad_prep/clash/vendor_successful_vend(list/itemspec, mob/living/carbon/human/user, turf/override_turf)
+	var/cost = clash_gun_rack_vend(src, itemspec, user)
+	if(cost < 0)
+		return
+	var/turf/spot = override_turf || get_appropriate_vend_turf(user)
+	var/list/before = clash_rack_snapshot(user, spot)
+	. = ..()
+	clash_note_rack_vend(user, before, spot, cost)
+
+/obj/structure/machinery/cm_vending/sorted/cargo_guns/upp_squad_guns/clash/vendor_successful_vend(list/itemspec, mob/living/carbon/human/user, turf/override_turf)
+	var/cost = clash_gun_rack_vend(src, itemspec, user)
+	if(cost < 0)
+		return
+	var/turf/spot = override_turf || get_appropriate_vend_turf(user)
+	var/list/before = clash_rack_snapshot(user, spot)
+	. = ..()
+	clash_note_rack_vend(user, before, spot, cost)
+
+/obj/structure/machinery/cm_vending/clothing/marine/clash/vendor_successful_vend(list/itemspec, mob/living/carbon/human/user, turf/override_turf)
+	var/turf/spot = override_turf || get_appropriate_vend_turf(user)
+	var/list/before = clash_rack_snapshot(user, spot)
+	. = ..()
+	clash_note_rack_vend(user, before, spot, LAZYACCESS(itemspec, 2))
+
+/obj/structure/machinery/cm_vending/gear/clash/vendor_successful_vend(list/itemspec, mob/living/carbon/human/user, turf/override_turf)
+	var/turf/spot = override_turf || get_appropriate_vend_turf(user)
+	var/list/before = clash_rack_snapshot(user, spot)
+	. = ..()
+	clash_note_rack_vend(user, before, spot, LAZYACCESS(itemspec, 2))
+
+/obj/structure/machinery/cm_vending/clothing/antag/upp/clash/vendor_successful_vend(list/itemspec, mob/living/carbon/human/user, turf/override_turf)
+	var/turf/spot = override_turf || get_appropriate_vend_turf(user)
+	var/list/before = clash_rack_snapshot(user, spot)
+	. = ..()
+	clash_note_rack_vend(user, before, spot, LAZYACCESS(itemspec, 2))
+
+/obj/structure/machinery/cm_vending/gear/antag/clash/vendor_successful_vend(list/itemspec, mob/living/carbon/human/user, turf/override_turf)
+	var/turf/spot = override_turf || get_appropriate_vend_turf(user)
+	var/list/before = clash_rack_snapshot(user, spot)
+	. = ..()
+	clash_note_rack_vend(user, before, spot, LAZYACCESS(itemspec, 2))
 
 /obj/structure/machinery/cm_vending/clothing/marine/clash/vendor_successful_vend_one(prod_type, mob/living/carbon/human/user, turf/target_turf, insignas_override, stack_amount)
 	headset_type = GLOB.clash_squad_headsets[user.assigned_squad?.name] || initial(headset_type)

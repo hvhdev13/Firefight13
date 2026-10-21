@@ -119,6 +119,7 @@ interface ShopItem {
   icon: string;
   icon_state: string;
   contents?: string[];
+  ammo?: BooleanLike;
 }
 
 interface ShopSection {
@@ -170,7 +171,6 @@ interface StaticData {
   slots: Slot[];
   menus: Record<string, Record<string, Option[]>>;
   roles: RoleGroup[];
-  kit_count: number;
   role_names: Record<string, string>;
 }
 
@@ -215,6 +215,8 @@ interface Data extends StaticData {
   removed: LeftBehind[];
   failed_moves: FailedMove[];
   shop: ShopSection[];
+  shop_room: string[];
+  gun_ammo: string[];
   budget: [number, number];
   spent: { points: number; snowflake: number };
   progress?: KitProgress;
@@ -873,7 +875,7 @@ const PackHolder = (props: {
             selected={holder.fill}
             displayText={holder.fill}
             onSelected={(value) =>
-              act('fill', { container: holder.type, shell: value })
+              act('fill', { container: holder.slot, shell: value })
             }
           />
         )}
@@ -1101,7 +1103,7 @@ const pointsLeft = (data: Data) => ({
 
 const ShopView = () => {
   const { act, data } = useBackend<Data>();
-  const { shop, budget, extras, progress } = data;
+  const { shop, budget, extras, progress, shop_room, gun_ammo } = data;
   const [search, setSearch] = useState('');
   const left = pointsLeft(data);
   const owned: Record<string, number> = {};
@@ -1165,12 +1167,15 @@ const ShopView = () => {
             const lock = progress?.shop_locks[item.id];
             const count = owned[item.id] ?? 0;
             const problem = problemOf[item.id];
+            const noRoom = shop_room.includes(item.id);
+            const offGun = !!item.ammo && !gun_ammo.includes(item.id);
             return (
               <Box
                 key={item.id}
                 className={classes([
                   'ClashKit__packItem',
                   problem && 'ClashKit__packProblem',
+                  offGun && 'ClashKit__packItem--dimmed',
                 ])}
               >
                 <Stack align="center">
@@ -1195,6 +1200,16 @@ const ShopView = () => {
                         <Icon name="triangle-exclamation" /> {problem}
                       </Box>
                     )}
+                    {!problem && noRoom && (
+                      <Box className="ClashKit__optionLock">
+                        <Icon name="box-open" /> No room left in your gear
+                      </Box>
+                    )}
+                    {offGun && (
+                      <Box className="ClashKit__optionLock">
+                        No gun in this loadout uses it
+                      </Box>
+                    )}
                   </Stack.Item>
                   <Stack.Item className="ClashKit__shopCost">
                     {item.cost}
@@ -1209,10 +1224,14 @@ const ShopView = () => {
                     />
                     <Button
                       icon="cart-plus"
-                      disabled={short || !!lock}
+                      disabled={short || !!lock || noRoom}
                       tooltip={
                         lock ||
-                        (short ? 'Not enough points' : 'Buy and pack it')
+                        (short
+                          ? 'Not enough points'
+                          : noRoom
+                            ? 'No room left in your gear'
+                            : 'Buy and pack it')
                       }
                       onClick={() => act('buy', { id: item.id })}
                     />
@@ -1803,8 +1822,13 @@ export const ClashKit = () => {
   useEffect(() => {
     if (selectedSlot === 'class_perk' && !hasClassPerks) {
       setSelectedSlot('general_perk');
+    } else if (
+      (weaponViewFor(selectedSlot) === 'sentry' && !sentry_slot) ||
+      (weaponViewFor(selectedSlot) === 'back' && !data.back_gun_slot)
+    ) {
+      setSelectedSlot('primary');
     }
-  }, [job]);
+  }, [job, sentry_slot, data.back_gun_slot]);
   const options = slotOptions(selectedSlot)
     .filter(
       (option) =>

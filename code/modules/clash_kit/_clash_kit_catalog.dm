@@ -29,6 +29,7 @@ GLOBAL_LIST_INIT(clash_kit_worn_slots, list(KIT_SLOT_HELMET, KIT_SLOT_EYES, KIT_
 GLOBAL_LIST_INIT(clash_kit_attachment_slots, list(KIT_SLOT_RAIL, KIT_SLOT_MUZZLE, KIT_SLOT_UNDER, KIT_SLOT_STOCK))
 GLOBAL_LIST_INIT(clash_kit_sidearm_attachment_slots, list(KIT_SLOT_RAIL = KIT_SLOT_SIDE_RAIL, KIT_SLOT_MUZZLE = KIT_SLOT_SIDE_MUZZLE, KIT_SLOT_UNDER = KIT_SLOT_SIDE_UNDER, KIT_SLOT_STOCK = KIT_SLOT_SIDE_STOCK))
 GLOBAL_LIST_INIT(clash_kit_back_attachment_slots, list(KIT_SLOT_RAIL = KIT_SLOT_BACK_RAIL, KIT_SLOT_MUZZLE = KIT_SLOT_BACK_MUZZLE, KIT_SLOT_UNDER = KIT_SLOT_BACK_UNDER, KIT_SLOT_STOCK = KIT_SLOT_BACK_STOCK))
+GLOBAL_LIST_INIT(clash_kit_primary_attachment_slots, list(KIT_SLOT_RAIL = KIT_SLOT_RAIL, KIT_SLOT_MUZZLE = KIT_SLOT_MUZZLE, KIT_SLOT_UNDER = KIT_SLOT_UNDER, KIT_SLOT_STOCK = KIT_SLOT_STOCK))
 #define CLASH_KIT_COUNT 7
 #define CLASH_KIT_NOTHING "nothing"
 #define CLASH_KIT_SPAWN "spawn"
@@ -114,6 +115,8 @@ GLOBAL_LIST_INIT(clash_kit_shell_names, list("Buckshot", "Slug"))
 		SEND_SIGNAL(src, COMSIG_GUN_FIRE_MODE_TOGGLE, gun_firemode)
 
 GLOBAL_LIST_EMPTY(clash_kit_options)
+GLOBAL_LIST_EMPTY(clash_kit_gun_ammo)
+GLOBAL_VAR_INIT(clash_kit_catalog_built, FALSE)
 GLOBAL_LIST_INIT(clash_attachment_purposes, list(
 	/obj/item/attachable/flashlight = "Light you can switch on",
 	/obj/item/attachable/flashlight/laser_light_combo = "Light and laser you can switch on",
@@ -217,8 +220,15 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 		options = list()
 		slots[slot] = options
 	options += option
+	if(ammo_type && !GLOB.clash_kit_gun_ammo[item_type])
+		GLOB.clash_kit_gun_ammo[item_type] = ammo_type
 	option.stats = read_clash_kit_stats(option)
 	return option
+
+/proc/refresh_clash_kit_stats()
+	for(var/id in GLOB.clash_kit_options)
+		var/datum/clash_kit_option/option = GLOB.clash_kit_options[id]
+		option.stats = read_clash_kit_stats(option)
 
 /proc/read_clash_kit_stats(datum/clash_kit_option/option)
 	. = list()
@@ -247,7 +257,8 @@ GLOBAL_LIST_INIT(clash_kit_base_outfits, list(
 				. += list(list("Damage", round(round.damage * gun.damage_mult)))
 				if(round.penetration)
 					. += list(list("AP", round.penetration))
-			. += list(list("Rounds", magazine.max_rounds))
+			var/obj/item/ammo_magazine/tube = istype(gun, /obj/item/weapon/gun/shotgun) ? gun.current_mag : null
+			. += list(list("Rounds", tube ? tube.max_rounds : magazine.max_rounds))
 			qdel(magazine)
 		var/delay = gun.get_fire_delay()
 		if(delay > 0)
@@ -395,6 +406,66 @@ GLOBAL_LIST_INIT(clash_kit_blocked_attachments, list(
 		/obj/item/weapon/gun/shotgun/double/mou53,
 	)
 
+/obj/item/storage/belt/gun/m4a3/clash
+	name = "\improper M276 pattern universal holster rig"
+	desc = "The M276 is the standard load-bearing equipment of the USCM. This version holsters any service pistol or revolver, with side pouches for its magazines or speedloaders."
+	can_hold = list(
+		/obj/item/weapon/gun/pistol,
+		/obj/item/weapon/gun/revolver,
+		/obj/item/ammo_magazine/pistol,
+		/obj/item/ammo_magazine/revolver,
+		/obj/item/ammo_magazine/handful/revolver,
+	)
+	cant_hold = list(
+		/obj/item/weapon/gun/pistol/smart,
+		/obj/item/ammo_magazine/pistol/smart,
+		/obj/item/weapon/gun/pistol/kt42,
+		/obj/item/weapon/gun/pistol/auto9,
+		/obj/item/weapon/gun/pistol/chimp,
+		/obj/item/weapon/gun/pistol/skorpion,
+	)
+
+/obj/item/storage/belt/gun/type47/clash
+	name = "\improper Type 47 universal holster rig"
+	desc = "This UPP-designed sidearm rig fits any Union sidearm: the Type 73, the 88 Mod 4, the NP92 or the Type 44 revolver, with their magazines or speedloaders."
+	can_hold = list(
+		/obj/item/weapon/gun/pistol/t73,
+		/obj/item/ammo_magazine/pistol/t73,
+		/obj/item/ammo_magazine/pistol/t73_impact,
+		/obj/item/weapon/gun/pistol/np92,
+		/obj/item/ammo_magazine/pistol/np92,
+		/obj/item/ammo_magazine/pistol/np92/tranq,
+		/obj/item/weapon/gun/pistol/mod88,
+		/obj/item/ammo_magazine/pistol/mod88,
+		/obj/item/weapon/gun/revolver/upp,
+		/obj/item/ammo_magazine/revolver/upp,
+		/obj/item/ammo_magazine/revolver/upp/shrapnel,
+	)
+
+GLOBAL_LIST_INIT(clash_kit_type_renames, list(
+	/obj/item/storage/pouch/firstaid/ert = /obj/item/storage/pouch/firstaid/clash,
+	/obj/item/storage/pouch/bayonet/upp = /obj/item/storage/pouch/bayonet,
+	/obj/item/storage/belt/gun/m44 = /obj/item/storage/belt/gun/m4a3/clash,
+	/obj/item/storage/belt/gun/m10 = /obj/item/storage/belt/gun/m4a3/clash,
+	/obj/item/storage/belt/gun/m4a3 = /obj/item/storage/belt/gun/m4a3/clash,
+	/obj/item/storage/belt/gun/type47 = /obj/item/storage/belt/gun/type47/clash,
+))
+
+/proc/clash_kit_migrate_type(type_text, faction)
+	var/item_type = text2path(type_text)
+	if(!item_type)
+		return type_text
+	item_type = GLOB.clash_weapon_renames[item_type] || GLOB.clash_kit_type_renames[item_type] || item_type
+	if(item_type == /obj/item/storage/large_holster/m37)
+		item_type = faction == FACTION_UPP ? /obj/item/storage/large_holster/m37/clash_upp : /obj/item/storage/large_holster/m37/clash
+	return "[item_type]"
+
+/proc/clash_kit_migrate_id(id, faction)
+	var/list/parts = splittext(id, "|")
+	if(length(parts) != 3)
+		return clash_kit_migrate_type(id, faction)
+	return clash_kit_option_id(parts[1], parts[2], clash_kit_migrate_type(parts[3], parts[1]))
+
 /obj/item/storage/pouch/explosive/Initialize(mapload, ...)
 	if(clash_fast_medicine())
 		storage_slots = CLASH_EXPLOSIVE_POUCH_SLOTS
@@ -414,8 +485,11 @@ GLOBAL_LIST_INIT(clash_kit_blocked_attachments, list(
 	new /obj/item/device/multitool(src)
 
 /proc/build_clash_kit_catalog()
-	if(length(GLOB.clash_kit_options))
+	if(GLOB.clash_kit_catalog_built)
 		return
+	GLOB.clash_kit_options = list()
+	GLOB.clash_kit_menu = list()
+	GLOB.clash_kit_gun_ammo = list()
 	build_clash_kit_shared(FACTION_MARINE)
 	build_clash_kit_shared(FACTION_UPP)
 	build_clash_kit_uscm()
@@ -430,6 +504,7 @@ GLOBAL_LIST_INIT(clash_kit_blocked_attachments, list(
 	add_clash_kit_gun_attachments(FACTION_UPP)
 	describe_clash_attachment_options()
 	build_clash_weapon_tracks()
+	GLOB.clash_kit_catalog_built = TRUE
 
 /proc/add_clash_kit_gun_attachments(faction)
 	var/list/fits_by_type = list()
@@ -537,7 +612,6 @@ GLOBAL_LIST_INIT(clash_kit_blocked_attachments, list(
 	add_clash_kit_option(faction, KIT_SLOT_UNDER, "Underslung grenade launcher", /obj/item/attachable/attached_gun/grenade)
 	add_clash_kit_option(faction, KIT_SLOT_STOCK, "Rifle stock", /obj/item/attachable/stock/rifle)
 	add_clash_kit_option(faction, KIT_SLOT_STOCK, "Folding rifle stock", /obj/item/attachable/stock/rifle/collapsible)
-	add_clash_kit_option(faction, KIT_SLOT_STOCK, "Folding SMG stock", /obj/item/attachable/stock/smg/collapsible)
 
 /proc/build_clash_kit_uscm()
 	var/faction = FACTION_MARINE
@@ -558,9 +632,7 @@ GLOBAL_LIST_INIT(clash_kit_blocked_attachments, list(
 	add_clash_kit_option(faction, KIT_SLOT_BACK, "Satchel", /obj/item/storage/backpack/marine/satchel, "Less room, open it without taking it off")
 	add_clash_kit_option(faction, KIT_SLOT_BACK, "Scabbard", /obj/item/storage/large_holster/m37/clash, "Carries a shotgun or a machete on the back")
 	add_clash_kit_option(faction, KIT_SLOT_BELT, "M276 ammo load rig", /obj/item/storage/belt/marine, "Rifle magazines")
-	add_clash_kit_option(faction, KIT_SLOT_BELT, "M276 M4A3 holster rig", /obj/item/storage/belt/gun/m4a3, "Holsters the M4A3 or 88 Mod 4 with spare magazines")
-	add_clash_kit_option(faction, KIT_SLOT_BELT, "M276 M44 holster rig", /obj/item/storage/belt/gun/m44, "Holsters the revolver with speedloaders")
-	add_clash_kit_option(faction, KIT_SLOT_BELT, "M276 M10 holster rig", /obj/item/storage/belt/gun/m10, "Holsters the M10 with spare magazines")
+	add_clash_kit_option(faction, KIT_SLOT_BELT, "M276 universal holster rig", /obj/item/storage/belt/gun/m4a3/clash, "Holsters any USCM sidearm with spare magazines or speedloaders")
 	add_clash_kit_option(faction, KIT_SLOT_BELT, "M276 shotgun shell rig", /obj/item/storage/belt/shotgun, "Shells and slugs")
 	add_clash_kit_option(faction, KIT_SLOT_BELT, "M276 M40 grenade rig", /obj/item/storage/belt/grenade, "Grenades on the hip")
 	add_clash_kit_option(faction, KIT_SLOT_BELT, "M276 M40 grenade rig, large", /obj/item/storage/belt/grenade/large, "More grenades on the hip")
@@ -607,7 +679,7 @@ GLOBAL_LIST_INIT(clash_kit_blocked_attachments, list(
 	add_clash_kit_option(faction, KIT_SLOT_BACK, "Satchel", /obj/item/storage/backpack/marine/satchel, "Less room, open it without taking it off")
 	add_clash_kit_option(faction, KIT_SLOT_BACK, "Scabbard", /obj/item/storage/large_holster/m37/clash_upp, "Carries a shotgun or a machete on the back")
 	add_clash_kit_option(faction, KIT_SLOT_BELT, "Type 41 ammo load rig", /obj/item/storage/belt/marine/upp, "Rifle magazines")
-	add_clash_kit_option(faction, KIT_SLOT_BELT, "NPZ92 holster rig", /obj/item/storage/belt/gun/type47, "Holsters a pistol with spare magazines")
+	add_clash_kit_option(faction, KIT_SLOT_BELT, "Type 47 universal holster rig", /obj/item/storage/belt/gun/type47/clash, "Holsters any UPP sidearm with spare magazines or speedloaders")
 	add_clash_kit_option(faction, KIT_SLOT_BELT, "Type 42 shotgun shell rig", /obj/item/storage/belt/shotgun/upp, "Shells and slugs")
 	add_clash_kit_option(faction, KIT_SLOT_BELT, "Type 46 grenade rig", /obj/item/storage/belt/grenade/upp, "Grenades on the hip")
 	add_clash_kit_option(faction, KIT_SLOT_BELT, "G8-A general utility pouch", /obj/item/storage/backpack/general_belt, "Anything that fits")
