@@ -118,3 +118,5 @@ GLOBAL_LIST_INIT(clash_issued_gun_swaps, list(
 	if(!clash_hvh_rules())
 		return
 	damage = 48
+	if(type != /datum/ammo/bullet/lever_action/xm88)
+		penetration = min(initial(penetration), ARMOR_PENETRATION_TIER_6)

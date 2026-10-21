@@ -35,7 +35,7 @@
 	. = ..()
 	if(!clash_hvh_rules())
 		return
-	damage = 19
+	damage = 18
 	penetration = ARMOR_PENETRATION_TIER_6
 	accurate_range = 4
 	max_range = 4
