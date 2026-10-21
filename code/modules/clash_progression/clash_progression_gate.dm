@@ -80,12 +80,7 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 			var/obj/item/attachable/attachment = gun.attachments[slot]
 			if(!attachment || !(attachment.flags_attach_features & ATTACH_REMOVABLE) || !levels[attachment.type] || level >= levels[attachment.type])
 				continue
-			if(get_turf(gun))
-				attachment.Detach(null, gun)
-			else
-				gun.attachments[slot] = null
-			gun.update_attachable(slot)
-			qdel(attachment)
+			clash_remove_attachment(gun, attachment)
 
 /proc/clash_strip_locked_grenades(mob/living/carbon/human/wearer, ckey, job)
 	if(!clash_progression_gating())
@@ -287,12 +282,12 @@ GLOBAL_DATUM_INIT(clash_progress_blank, /datum/clash_progress, new)
 	var/list/starting = GLOB.clash_starting_kits[faction]
 	var/datum/clash_kit/filtered = new
 	filtered.name = kit.name
-	filtered.extras = kit.extras
-	filtered.extra_slots = kit.extra_slots
-	filtered.moves = kit.moves
-	filtered.removed = kit.removed
-	filtered.removed_slots = kit.removed_slots
-	filtered.fills = kit.fills
+	filtered.extras = kit.extras.Copy()
+	filtered.extra_slots = kit.extra_slots.Copy()
+	filtered.moves = kit.moves.Copy()
+	filtered.removed = kit.removed.Copy()
+	filtered.removed_slots = kit.removed_slots.Copy()
+	filtered.fills = kit.fills.Copy()
 	for(var/slot in kit.choices)
 		if(clash_is_attachment_slot(slot))
 			continue
@@ -498,13 +493,17 @@ GLOBAL_VAR_INIT(clash_trial_packs_built, FALSE)
 	return TRUE
 
 /proc/clash_label_vendor_products(obj/structure/machinery/cm_vending/vendor, mob/living/carbon/human/user, list/categories)
-	if(!ishuman(user) || !clash_progression_gating())
+	if(!ishuman(user))
 		return
+	var/gating = clash_progression_gating()
 	var/list/products = vendor.get_available_products(user)
 	for(var/list/category as anything in categories)
 		for(var/list/display_item as anything in category["items"])
 			var/list/itemspec = products[display_item["prod_index"]]
-			var/label = clash_vendor_label(user, itemspec[3]) || clash_rack_lock_text(user, itemspec)
+			var/label = gating ? (clash_vendor_label(user, itemspec[3]) || clash_rack_lock_text(user, itemspec)) : null
+			var/cost = clash_gun_rack_cost(vendor, user, itemspec)
+			if(cost)
+				label = label ? "[cost] points, [label]" : "[cost] points"
 			if(label)
 				display_item["prod_name"] = "[display_item["prod_name"]] ([label])"
 

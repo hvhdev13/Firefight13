@@ -210,7 +210,6 @@ GLOBAL_LIST_INIT(clash_bot_class_jobs, list(
 			build_clash_kit_catalog()
 			issue_clash_role_kit(npc, spawn_job, TRUE)
 			apply_clash_kit(npc, new /datum/clash_kit, CLASH_KIT_SPAWN, spawn_job)
-			clash_issue_medic_gear(npc)
 	if(bot_grenade && !(locate(/obj/item/explosive/grenade) in npc.get_contents()))
 		npc.equip_to_appropriate_slot(new bot_grenade(npc))
 	if(bot_medical && !(locate(/obj/item/reagent_container/hypospray/autoinjector) in npc.get_contents()))

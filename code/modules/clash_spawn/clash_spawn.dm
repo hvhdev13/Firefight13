@@ -77,7 +77,7 @@ SUBSYSTEM_DEF(clash_spawn)
 	if(spawned.faction == FACTION_UPP && !(spawned.job in list(JOB_UPP_MEDIC, JOB_UPP_LT_DOKTOR)))
 		spawned.skills?.set_skill(SKILL_MEDICAL, SKILL_MEDICAL_DEFAULT)
 	if(clash_uses_kits())
-		clash_raise_vendor_points(spawned, spawned.ckey, spawned.job)
+		clash_set_vendor_points(spawned, spawned.ckey, spawned.job)
 		spawned.vendor_buyable_categories[CLASH_CAN_BUY_FLASHLIGHT] = 1
 		spawned.vendor_buyable_categories[CLASH_CAN_BUY_FLARES] = 1
 	spawned.clash_spawn_points = list(spawned.vendor_points, spawned.vendor_snowflake_points)
@@ -101,8 +101,6 @@ SUBSYSTEM_DEF(clash_spawn)
 			to_chat(spawned, SPAN_NOTICE("Kitted out as [kit.name]. [clash_perk_spawn_text(spawned)]Use the Loadout verb to change it for your next spawn."))
 			for(var/slot in spawned.clash_kit_notes)
 				to_chat(spawned, SPAN_NOTICE(spawned.clash_kit_notes[slot]))
-		clash_issue_medic_gear(spawned)
-		clash_issue_engineer_gear(spawned)
 	else
 		addtimer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(clash_equip_spawn_loadout), spawned), 1 SECONDS)
 	var/ckey = spawned.ckey

@@ -535,6 +535,10 @@ $note: #7c858e;
     letter-spacing: 0.05em;
   }
 
+  &__packItem--dimmed {
+    opacity: 0.55;
+  }
+
   &__packItem {
     padding: 2px 8px;
 

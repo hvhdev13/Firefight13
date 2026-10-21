@@ -245,8 +245,13 @@ GLOBAL_LIST_EMPTY(clash_call_medic_icons)
 	clash_give_medic_item(medic, new pouch_type(medic))
 
 /proc/clash_give_medic_item(mob/living/carbon/human/medic, obj/item/item)
-	if(!medic.equip_to_slot_if_possible(item, WEAR_IN_BACK, TRUE, FALSE, TRUE) && !medic.equip_to_appropriate_slot(item) && !medic.put_in_hands(item))
-		item.forceMove(get_turf(medic))
+	if(medic.equip_to_slot_if_possible(item, WEAR_IN_BACK, TRUE, FALSE, TRUE) || medic.equip_to_appropriate_slot(item) || medic.put_in_hands(item))
+		return
+	var/turf/floor = get_turf(medic)
+	if(floor)
+		item.forceMove(floor)
+	else
+		qdel(item)
 
 #undef CLASH_MEDIC_RANGE
 #undef CLASH_CALL_MEDIC_COOLDOWN
