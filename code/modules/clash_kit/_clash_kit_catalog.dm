@@ -554,7 +554,8 @@ GLOBAL_LIST_INIT(clash_kit_type_renames, list(
 	if(!scabbard_option)
 		return
 	var/obj/item/storage/large_holster/m37/scabbard = new scabbard_option.item_type
-	for(var/datum/clash_kit_option/gun as anything in GLOB.clash_kit_menu[faction][KIT_SLOT_PRIMARY].Copy())
+	var/list/primaries = GLOB.clash_kit_menu[faction][KIT_SLOT_PRIMARY]
+	for(var/datum/clash_kit_option/gun as anything in primaries.Copy())
 		if(gun.only_class || !is_path_in_list(gun.item_type, scabbard.can_hold))
 			continue
 		add_clash_kit_option(faction, KIT_SLOT_BACK_GUN, gun.name, gun.item_type, gun.blurb, gun.ammo_type, gun.ammo_count)

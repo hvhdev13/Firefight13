@@ -17,6 +17,7 @@ GLOBAL_LIST_EMPTY(clash_kit_issue_pending)
 	var/list/removed_slots = list()
 
 /datum/clash_kit/proc/get_option(slot)
+	RETURN_TYPE(/datum/clash_kit_option)
 	return get_clash_kit_option(choices[slot])
 
 /datum/clash_kit/proc/wants_nothing(slot)

@@ -183,18 +183,13 @@ GLOBAL_LIST_INIT(clash_adv_firstaid_stock, list(
 		if(ammo.shrapnel_chance > 0)
 			ammo.shrapnel_chance -= (ammo.shrapnel_chance + floor(ammo.damage / 10)) * CLASH_SHRAPNEL_CHANCE_CUT
 
-/mob/living/carbon/human/movement_delay()
-	. = ..()
-	if(!length(embedded_items) || !clash_fast_medicine())
-		return
+/mob/living/carbon/human/proc/clash_shrapnel_slow()
+	if(!clash_fast_medicine())
+		return 0
 	var/pieces = 0
 	for(var/obj/item/shard/shrapnel/shard in embedded_items)
 		pieces += shard.count
-	if(!pieces)
-		return
-	var/slow = min(pieces * CLASH_SHRAPNEL_SLOW, CLASH_SHRAPNEL_SLOW_MAX)
-	. += slow
-	move_delay += slow
+	return min(pieces * CLASH_SHRAPNEL_SLOW, CLASH_SHRAPNEL_SLOW_MAX)
 
 GLOBAL_LIST_INIT(clash_medic_stripped_items, list(
 	/obj/item/device/defibrillator,

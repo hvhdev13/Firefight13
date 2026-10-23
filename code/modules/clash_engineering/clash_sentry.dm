@@ -151,10 +151,7 @@ GLOBAL_LIST_INIT(clash_sentry_kits, list(
 	name = "packed Flamer Sentry"
 	defense_type = /obj/structure/machinery/defenses/sentry/flamer/upp/clash
 
-/obj/structure/machinery/defenses/sentry/Initialize()
-	. = ..()
-	if(!clash_tier)
-		return
+/obj/structure/machinery/defenses/sentry/proc/clash_sentry_init()
 	var/list/stats = GLOB.clash_sentry_tiers[clash_tier]
 	health_max = stats["health"]
 	health = health_max
@@ -172,7 +169,7 @@ GLOBAL_LIST_INIT(clash_sentry_kits, list(
 	RegisterSignal(src, COMSIG_SENTRY_DESTROYED_ALERT, PROC_REF(clash_destroyed))
 	update_icon()
 
-/obj/structure/machinery/defenses/sentry/Destroy()
+/obj/structure/machinery/defenses/sentry/proc/clash_sentry_destroy()
 	if(clash_owner_ckey)
 		clash_forget_build(GLOB.clash_engineer_sentries, clash_owner_ckey, src)
 		if(clash_wrecked)
@@ -186,25 +183,21 @@ GLOBAL_LIST_INIT(clash_sentry_kits, list(
 	clash_drop_laser()
 	clash_hide_ammo_bar()
 	clash_ammo_bar = null
-	return ..()
 
-/obj/structure/machinery/defenses/sentry/get_examine_text(mob/user)
-	. = ..()
-	if(!clash_tier)
-		return
-	for(var/line in .)
+/obj/structure/machinery/defenses/sentry/proc/clash_sentry_examine(list/lines, mob/user)
+	for(var/line in lines)
 		if(findtext(line, "multitool"))
-			. -= line
-	. += SPAN_INFO("It has [SPAN_HELPFUL("[health]/[health_max]")] health.")
+			lines -= line
+	lines += SPAN_INFO("It has [SPAN_HELPFUL("[health]/[health_max]")] health.")
 	if(clash_tier == CLASH_SENTRY_FLAMER)
-		. += SPAN_HELPFUL("Click it with a flamer fuel tank to refuel it. A welder repairs it and a wrench turns it or packs it up.")
+		lines += SPAN_HELPFUL("Click it with a flamer fuel tank to refuel it. A welder repairs it and a wrench turns it or packs it up.")
 	else
-		. += SPAN_HELPFUL("Click it with metal to reload it, [clash_reload_metal(user)] sheets for a full load. A welder repairs it and a wrench turns it or packs it up.")
+		lines += SPAN_HELPFUL("Click it with metal to reload it, [clash_reload_metal(user)] sheets for a full load. A welder repairs it and a wrench turns it or packs it up.")
 	var/datum/clash_sentry_module/module = GLOB.clash_sentry_modules[clash_module]
 	if(module)
-		. += SPAN_INFO("Module: [module.name]. [module.desc].")
+		lines += SPAN_INFO("Module: [module.name]. [module.desc].")
 	if(clash_kills)
-		. += SPAN_INFO(clash_sentry_rank_text(clash_kills))
+		lines += SPAN_INFO(clash_sentry_rank_text(clash_kills))
 
 /obj/structure/machinery/defenses/sentry/proc/clash_activate(mob/living/carbon/human/engineer)
 	var/list/groups = engineer.faction_group
@@ -383,17 +376,16 @@ GLOBAL_LIST_INIT(clash_sentry_kits, list(
 		return
 	to_chat(user, SPAN_NOTICE("[src]: [health]/[health_max] health, [ammo.current_rounds]/[ammo.max_rounds] ammo."))
 
-/obj/structure/machinery/defenses/sentry/attackby(obj/item/tool, mob/living/carbon/human/user)
-	if(!clash_tier || QDELETED(tool))
-		return ..()
+/obj/structure/machinery/defenses/sentry/proc/clash_sentry_attackby(obj/item/tool, mob/living/carbon/human/user)
 	if(HAS_TRAIT(tool, TRAIT_TOOL_MULTITOOL))
 		to_chat(user, SPAN_WARNING("[src] can't be hacked."))
-		return
+		return TRUE
 	var/wrench = HAS_TRAIT(tool, TRAIT_TOOL_WRENCH)
 	var/metal = istype(tool, /obj/item/stack/sheet/metal)
 	var/fuel = istype(tool, /obj/item/ammo_magazine/flamer_tank)
 	if(!wrench && !metal && !fuel && !iswelder(tool))
-		return ..()
+		return FALSE
+	. = TRUE
 	if(user.faction != clash_faction)
 		return
 	if(!clash_is_engineer(user))
@@ -548,9 +540,7 @@ GLOBAL_LIST_INIT(clash_sentry_kits, list(
 		return
 	update_health(severity * CLASH_SENTRY_BLAST_MULT * clash_blast_share())
 
-/obj/structure/machinery/defenses/sentry/damaged_action(damage)
-	if(!clash_tier)
-		return ..()
+/obj/structure/machinery/defenses/sentry/proc/clash_sentry_damaged()
 	clash_last_hit = world.time
 	if(prob(10))
 		spark_system.start()
@@ -581,11 +571,6 @@ GLOBAL_LIST_INIT(clash_sentry_kits, list(
 /obj/structure/machinery/defenses/sentry/upp/clash/get_target(atom/movable/new_target)
 	. = ..()
 	clash_aim_laser()
-
-/obj/structure/machinery/defenses/sentry/update_icon()
-	. = ..()
-	if(clash_tier)
-		clash_update_ammo_bar()
 
 /obj/structure/machinery/defenses/sentry/proc/clash_update_ammo_bar()
 	if(!placed || !ammo?.max_rounds)

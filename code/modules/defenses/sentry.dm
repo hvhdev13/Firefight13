@@ -58,6 +58,8 @@
 
 /obj/structure/machinery/defenses/sentry/Initialize()
 	. = ..()
+	if(clash_tier)
+		clash_sentry_init()
 	spark_system = new /datum/effect_system/spark_spread
 	spark_system.set_up(5, 0, src)
 	spark_system.attach(src)
@@ -81,6 +83,7 @@
 	QDEL_NULL(spark_system)
 	QDEL_NULL(ammo)
 	stop_processing()
+	clash_sentry_destroy()
 	. = ..()
 
 /obj/structure/machinery/defenses/sentry/process()
@@ -131,6 +134,8 @@
 
 /obj/structure/machinery/defenses/sentry/update_icon()
 	..()
+	if(clash_tier)
+		clash_update_ammo_bar()
 
 	overlays.Cut()
 	if(stat == DEFENSE_DAMAGED)
@@ -186,6 +191,8 @@
 
 /obj/structure/machinery/defenses/sentry/get_examine_text(mob/user)
 	. = ..()
+	if(clash_tier)
+		clash_sentry_examine(., user)
 	if(ammo)
 		. += SPAN_NOTICE("\The [src] has [ammo.current_rounds]/[ammo.max_rounds] round\s loaded.")
 		if(additional_rounds_stored)
@@ -216,6 +223,9 @@
 
 /obj/structure/machinery/defenses/sentry/attackby(obj/item/O, mob/user)
 	if(QDELETED(O) || QDELETED(user))
+		return
+
+	if(clash_tier && clash_sentry_attackby(O, user))
 		return
 
 	//Securing/Unsecuring
@@ -285,6 +295,9 @@
 		qdel(src)
 
 /obj/structure/machinery/defenses/sentry/damaged_action(damage)
+	if(clash_tier)
+		clash_sentry_damaged()
+		return
 	if(prob(10))
 		spark_system.start()
 	..()
