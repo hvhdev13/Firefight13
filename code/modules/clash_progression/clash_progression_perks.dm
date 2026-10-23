@@ -4,7 +4,6 @@
 #define CLASH_BANDOLIER_EVERY 5
 #define CLASH_BANDOLIER_FUEL_BACK 0.2
 #define CLASH_BANDOLIER_FUEL_CHECK (3 SECONDS)
-#define CLASH_QUICK_DRAW_CUT 0.5
 #define CLASH_LONG_THROW_RANGE 2
 #define CLASH_ADRENALINE_TIME (5 SECONDS)
 #define CLASH_ADRENALINE_SPEED 1.2
@@ -342,17 +341,6 @@ GLOBAL_LIST_INIT(clash_perks, build_clash_perks())
 	tank.reagents.add_reagent(fuel.id, saved)
 	to_chat(shooter, SPAN_NOTICE("Bandolier: saved [max(1, round(saved * 100 / tank.reagents.maximum_volume))]% of a tank."))
 
-/obj/item/weapon/gun/equipped(mob/living/user, slot)
-	. = ..()
-	if(clash_has_perk(user, /datum/clash_perk/quick_draw))
-		pull_time -= wield_delay * CLASH_QUICK_DRAW_CUT
-
-/obj/item/weapon/gun/wield(mob/living/user)
-	var/was_wielded = flags_item & WIELDED
-	. = ..()
-	if(!was_wielded && (flags_item & WIELDED) && clash_has_perk(user, /datum/clash_perk/quick_draw))
-		wield_time -= wield_delay * CLASH_QUICK_DRAW_CUT
-
 /obj/item/explosive/grenade/throw_atom(atom/target, range, speed = 0, atom/thrower, spin, launch_type = NORMAL_LAUNCH, pass_flags = NO_FLAGS, list/end_throw_callbacks, list/collision_callbacks, tracking = FALSE)
 	if(spin && clash_has_perk(thrower, /datum/clash_perk/long_throw))
 		range += CLASH_LONG_THROW_RANGE
@@ -400,7 +388,6 @@ GLOBAL_LIST_INIT(clash_perks, build_clash_perks())
 #undef CLASH_BANDOLIER_EVERY
 #undef CLASH_BANDOLIER_FUEL_BACK
 #undef CLASH_BANDOLIER_FUEL_CHECK
-#undef CLASH_QUICK_DRAW_CUT
 #undef CLASH_LONG_THROW_RANGE
 #undef CLASH_ADRENALINE_TIME
 #undef CLASH_ADRENALINE_SPEED

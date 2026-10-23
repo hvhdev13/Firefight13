@@ -9,11 +9,6 @@
 /mob/living/carbon/human/var/clash_revive_guard_until = 0
 /mob/living/carbon/human/var/clash_dnr = FALSE
 
-/mob/living/carbon/human/GetKnockOutDuration(amount)
-	if(world.time < clash_revive_guard_until)
-		return 0
-	return ..()
-
 GLOBAL_LIST_INIT(clash_revive_health, list(50, 35, 20))
 
 /mob/living/carbon/human/var/clash_revive_chain = 0

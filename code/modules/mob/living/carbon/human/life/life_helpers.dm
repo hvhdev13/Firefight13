@@ -184,6 +184,8 @@
 	return . * final_reduction
 
 /mob/living/carbon/human/GetKnockOutDuration(amount)
+	if(world.time < clash_revive_guard_until)
+		return 0
 	. = ..()
 	var/skill_resistance = skills ? (skills.get_skill_level(SKILL_ENDURANCE)-1)*0.08 : 0
 	var/final_reduction = (1 - skill_resistance) / species.knock_out_reduction

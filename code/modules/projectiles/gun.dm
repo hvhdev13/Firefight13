@@ -560,6 +560,9 @@ As sniper rifles have both and weapon mods can change them as well. ..() deals w
 			force_light(on = FALSE)
 			ADD_TRAIT(src, TRAIT_GUN_LIGHT_FORCE_DEACTIVATED, WEAKREF(user))
 
+	if(clash_has_perk(user, /datum/clash_perk/quick_draw))
+		pull_time -= wield_delay * CLASH_QUICK_DRAW_CUT
+
 	return ..()
 
 /obj/item/weapon/gun/dropped(mob/user)
@@ -899,6 +902,8 @@ As sniper rifles have both and weapon mods can change them as well. ..() deals w
 			wield_time -= 2*1.5
 		else //Max level skill of firearms.
 			wield_time -= 2*2
+	if(clash_has_perk(user, /datum/clash_perk/quick_draw))
+		wield_time -= wield_delay * CLASH_QUICK_DRAW_CUT
 
 	update_mouse_pointer(user, TRUE)
 	if(user.client)
